@@ -93,6 +93,12 @@ namespace FavelaAmarela.Player
         private InputAction sneakAction;
         private InputAction runAction;
 
+        // --- Leap State ---
+        private AnomalyPowerBridge anomalyBridge;
+        private bool isLeaping;
+        private Vector2 leapVelocity;
+        private InputAction leapAction;
+
         public PlayerStealthState StealthState => stealthState;
         public bool IsMoving => isMoving;
 
@@ -109,6 +115,8 @@ namespace FavelaAmarela.Player
             rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
+            anomalyBridge = GetComponent<AnomalyPowerBridge>();
+
             // --- POCO init ---
             stealthState = new PlayerStealthState();
 
@@ -117,8 +125,9 @@ namespace FavelaAmarela.Player
             if (playerInput != null)
             {
                 moveAction  = playerInput.actions.FindAction("Move");
-                sneakAction = playerInput.actions.FindAction("Crouch");   // Unity default asset name
-                runAction   = playerInput.actions.FindAction("Sprint");   // Unity default asset name
+                sneakAction = playerInput.actions.FindAction("Crouch");
+                runAction   = playerInput.actions.FindAction("Sprint");
+                leapAction  = playerInput.actions.FindAction("Jump"); // Use Jump or Dash
 
                 if (moveAction == null)
                     Debug.LogWarning("[PlayerMovement] 'Move' action not found in Input Actions asset.", this);
@@ -129,11 +138,56 @@ namespace FavelaAmarela.Player
             }
         }
 
+        private void OnEnable()
+        {
+            if (anomalyBridge != null)
+            {
+                anomalyBridge.OnDimensionalLeapActivated += HandleLeapActivated;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (anomalyBridge != null)
+            {
+                anomalyBridge.OnDimensionalLeapActivated -= HandleLeapActivated;
+            }
+        }
+
+        private void HandleLeapActivated(Vector2 direction, float duration, float speedMultiplier)
+        {
+            isLeaping = true;
+            
+            // Convert leap direction to isometric if needed
+            Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
+            leapVelocity = finalDirection * (stealthState.Speed * speedMultiplier);
+
+            // Make player invincible/intangible during leap
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast"); // Example intangible layer
+
+            Invoke(nameof(EndLeap), duration);
+        }
+
+        private void EndLeap()
+        {
+            isLeaping = false;
+            gameObject.layer = LayerMask.NameToLayer("Default"); // Restore layer
+        }
+
         private void Update()
         {
+            if (isLeaping) return; // Lock input while leaping
+
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
             isMoving = inputDirection.sqrMagnitude > 0.01f;
+
+            // Trigger Leap
+            if (leapAction != null && leapAction.WasPressedThisFrame() && anomalyBridge != null)
+            {
+                anomalyBridge.TryActivateLeap(inputDirection);
+                if (anomalyBridge.IsLeaping) return; // Successful leap
+            }
 
             // Determine stealth mode from modifier keys
             if (sneakAction != null && sneakAction.IsPressed())
@@ -146,6 +200,12 @@ namespace FavelaAmarela.Player
 
         private void FixedUpdate()
         {
+            if (isLeaping)
+            {
+                rb.linearVelocity = leapVelocity;
+                return;
+            }
+
             if (!isMoving)
             {
                 rb.linearVelocity = Vector2.zero;
