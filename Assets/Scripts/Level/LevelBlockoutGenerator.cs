@@ -1,38 +1,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace FavelaAmarela.Level
 {
+    /// <summary>
+    /// Editor utility: Generates the "S-Path" blockout for the Ruínas Pálidas level.
+    /// All walls use SpriteRenderer + BoxCollider2D for proper 2D physics collision.
+    /// No 3D primitives (Cube/Quad) are used — everything lives on the XY plane.
+    ///
+    /// Architecture: This MonoBehaviour is a thin bridge that reads layout data from
+    /// <see cref="LevelLayoutData"/> (POCO) and instantiates Unity GameObjects.
+    /// All geometric calculations live in the POCO for testability.
+    ///
+    /// USAGE:
+    ///   1. Add this component to an empty GameObject in the scene.
+    ///   2. Right-click the component header → "Generate S-Path Blockout".
+    ///   3. Walls will be created as children with BoxCollider2D (solid, not triggers).
+    /// </summary>
     public class LevelBlockoutGenerator : MonoBehaviour
     {
         [Header("General Settings")]
         [SerializeField] private float wallThickness = 0.5f;
-        [SerializeField] private float wallHeight = 2.0f; // Useful if using 3D blocks for 2D isometric layout
-        [SerializeField] private Material wallMaterial;
+        [SerializeField] private Color wallColor = new Color(0.4f, 0.35f, 0.25f, 1f);     // Dark brown
+        [SerializeField] private Color floorColor = new Color(0.2f, 0.18f, 0.15f, 0.5f);   // Dark floor
 
-        [Header("Zone 1: Rua de Entrada (goes East)")]
+        [Header("Zone 1: Rua de Entrada (East)")]
         [SerializeField] private float z1Length = 20.0f;
         [SerializeField] private float z1Width = 4.0f;
 
-        [Header("Zone 2: Vila das Casas (goes South)")]
+        [Header("Zone 2: Vila das Casas (South)")]
         [SerializeField] private float z2Length = 18.0f;
         [SerializeField] private float z2Width = 14.0f;
-        [SerializeField] private float houseSize = 4.0f;
 
-        [Header("Zone 3: Beco do Vento (goes West)")]
+        [Header("Zone 3: Beco do Vento (West)")]
         [SerializeField] private float z3Length = 15.0f;
-        [SerializeField] private float z3Width = 2.5f; // Narrower bottleneck
+        [SerializeField] private float z3Width = 2.5f;
 
-        [Header("Zone 4: Praça do Cerco (goes South)")]
+        [Header("Zone 4: Praça do Cerco (South)")]
         [SerializeField] private float z4Length = 12.0f;
-        [SerializeField] private float z4Width = 12.0f; // Large arena cul-de-sac
+        [SerializeField] private float z4Width = 12.0f;
+
+        [Header("House Settings")]
+        [SerializeField] private float houseSize = 4.0f;
+        [SerializeField] private float doorGap = 1.2f;
+        [SerializeField] private Vector2[] houseOffsets = new[]
+        {
+            new Vector2(3f, -4f),
+            new Vector2(9f, -7f),
+            new Vector2(5f, -13f)
+        };
 
         [Header("Generated Objects Root")]
         [SerializeField] private Transform generationRoot;
+
+        // Instance-level sprite cache — avoids static state issues on domain reload (fixes B2)
+        [System.NonSerialized] private Sprite whitePixelSprite;
+
+        // --- Public API (ContextMenu for Editor, callable at Runtime) ---
 
         [ContextMenu("Generate S-Path Blockout")]
         public void GenerateBlockout()
@@ -41,58 +65,72 @@ namespace FavelaAmarela.Level
 
             if (generationRoot == null)
             {
-                GameObject rootGo = new GameObject("Blockout_Root");
-                rootGo.transform.parent = this.transform;
+                var rootGo = new GameObject("Blockout_Root");
+                rootGo.transform.SetParent(this.transform);
                 generationRoot = rootGo.transform;
             }
 
-            Vector3 currentOrigin = Vector3.zero;
+            // --- Build layout data via POCO ---
+            var layout = new LevelLayoutData(
+                wallThickness,
+                z1Length, z1Width,
+                z2Length, z2Width,
+                z3Length, z3Width,
+                z4Length, z4Width,
+                houseSize, doorGap,
+                houseOffsets
+            );
+            layout.Build();
 
-            // ZONA 1: Rua de Entrada (Runs East -> +X)
-            // Left (West) wall is blocked (entrance)
-            // Bottom (South) and Top (North) walls form the street.
-            BuildBoxRoom("Zona1_RuaEntrada", currentOrigin, z1Length, z1Width, 
-                openDirections: new List<Vector2> { Vector2.right }, // Open to the East
-                blockedDirections: new List<Vector2> { Vector2.left });
+            // --- Validate layout and log any errors ---
+            var errors = layout.Validate();
+            foreach (var error in errors)
+            {
+                Debug.LogError($"[LevelBlockout] Layout validation error: {error}", this);
+            }
 
-            // ZONA 2: Vila das Casas (Runs South -> -Y)
-            // Transition offset: We connect the East end of Zone 1 to the North-East corner of Zone 2.
-            currentOrigin = new Vector3(z1Length - z1Width, 0f, 0f);
-            
-            // Generate Vila Room (Open North to receive Zone 1, Open South at the bottom-left to connect Zone 3)
-            BuildBoxRoom("Zona2_VilaDasCasas", currentOrigin + new Vector3(0f, -z2Length/2f + z1Width/2f, 0f), z2Width, z2Length,
-                openDirections: new List<Vector2> { Vector2.up, Vector2.down }); // Open North & South
+            // --- Instantiate zones ---
+            foreach (var zone in layout.Zones)
+            {
+                var roomGo = new GameObject(zone.Name);
+                roomGo.transform.SetParent(generationRoot);
+                roomGo.transform.position = new Vector3(zone.Center.x, zone.Center.y, 0f);
 
-            // Spawn 3 Houses in the Vila (as simple box walls with a small opening)
-            SpawnHouse("Casa_1", currentOrigin + new Vector3(2f, -4f, 0f), houseSize);
-            SpawnHouse("Casa_2", currentOrigin + new Vector3(-2f, -8f, 0f), houseSize);
-            SpawnHouse("Casa_3", currentOrigin + new Vector3(3f, -12f, 0f), houseSize);
+                foreach (var wall in zone.Walls)
+                {
+                    Vector2 localPos = wall.WorldCenter - zone.Center;
+                    SpawnWall2D(wall, roomGo.transform, localPos);
+                }
 
-            // ZONA 3: Beco do Vento (Runs West -> -X)
-            // Starts at the bottom of the Vila and runs left (-X)
-            currentOrigin = currentOrigin + new Vector3(0f, -z2Length + z1Width/2f, 0f);
-            BuildBoxRoom("Zona3_BecoDoVento", currentOrigin + new Vector3(-z3Length/2f, 0f, 0f), z3Length, z3Width,
-                openDirections: new List<Vector2> { Vector2.right, Vector2.left }); // Open East (from Vila) and West (to Praça)
+                // Floor (visual only, no collider)
+                SpawnFloor2D("Floor", roomGo.transform, Vector2.zero, zone.Size);
+            }
 
-            // ZONA 4: Praça do Cerco (Runs South -> -Y)
-            // Connects to the West end of Zone 3, runs downwards
-            currentOrigin = currentOrigin + new Vector3(-z3Length, 0f, 0f);
-            BuildBoxRoom("Zona4_PracaDoCerco", currentOrigin + new Vector3(0f, -z4Length/2f + z3Width/2f, 0f), z4Width, z4Length,
-                openDirections: new List<Vector2> { Vector2.up }, // Open North (from Beco)
-                blockedDirections: new List<Vector2> { Vector2.down, Vector2.left, Vector2.right }); // Dead end!
+            // --- Instantiate houses ---
+            foreach (var house in layout.Houses)
+            {
+                var houseGo = new GameObject(house.Name);
+                houseGo.transform.SetParent(generationRoot);
+                houseGo.transform.position = new Vector3(house.Position.x, house.Position.y, 0f);
+
+                foreach (var wall in house.Walls)
+                {
+                    Vector2 localPos = wall.WorldCenter - house.Position;
+                    SpawnWall2D(wall, houseGo.transform, localPos);
+                }
+            }
+
+            Debug.Log("[LevelBlockout] S-Path generated successfully with 4 zones.", this);
         }
 
         [ContextMenu("Clear Blockout")]
         public void ClearExisting()
         {
             if (generationRoot == null) return;
-            
-            // Destroy all children in editor safely
-            List<GameObject> children = new List<GameObject>();
+
+            var children = new List<GameObject>();
             foreach (Transform child in generationRoot)
-            {
                 children.Add(child.gameObject);
-            }
 
             foreach (var child in children)
             {
@@ -105,100 +143,89 @@ namespace FavelaAmarela.Level
             }
         }
 
-        private void BuildBoxRoom(string name, Vector3 center, float widthX, float heightY, List<Vector2> openDirections, List<Vector2> blockedDirections = null)
+        // --- Internal: Wall and Floor builders (Unity-side only) ---
+
+        /// <summary>
+        /// Creates a pure 2D wall: SpriteRenderer (white pixel, tinted) + BoxCollider2D.
+        /// No 3D primitives. Collider is NOT a trigger — it blocks movement.
+        /// </summary>
+        private void SpawnWall2D(LevelLayoutData.WallData data, Transform parent, Vector2 localPos)
         {
-            GameObject roomParent = new GameObject(name);
-            roomParent.transform.parent = generationRoot;
-            roomParent.transform.position = center;
+            // Derive a readable name from the wall's relative position
+            string wallName = GetWallName(localPos);
 
-            float halfX = widthX * 0.5f;
-            float halfY = heightY * 0.5f;
+            var wallGo = new GameObject(wallName);
+            wallGo.transform.SetParent(parent);
+            wallGo.transform.localPosition = new Vector3(localPos.x, localPos.y, 0f);
 
-            // North Wall (+Y)
-            if (openDirections == null || !openDirections.Contains(Vector2.up) || (blockedDirections != null && blockedDirections.Contains(Vector2.up)))
-            {
-                SpawnWall("Wall_North", roomParent.transform, new Vector3(0f, halfY, 0f), new Vector3(widthX, wallThickness, wallHeight));
-            }
-            
-            // South Wall (-Y)
-            if (openDirections == null || !openDirections.Contains(Vector2.down) || (blockedDirections != null && blockedDirections.Contains(Vector2.down)))
-            {
-                SpawnWall("Wall_South", roomParent.transform, new Vector3(0f, -halfY, 0f), new Vector3(widthX, wallThickness, wallHeight));
-            }
+            // SpriteRenderer for visual
+            var sr = wallGo.AddComponent<SpriteRenderer>();
+            sr.sprite = GetOrCreateWhitePixelSprite();
+            sr.color = wallColor;
+            sr.sortingOrder = 1;
+            wallGo.transform.localScale = new Vector3(data.Size.x, data.Size.y, 1f);
 
-            // East Wall (+X)
-            if (openDirections == null || !openDirections.Contains(Vector2.right) || (blockedDirections != null && blockedDirections.Contains(Vector2.right)))
-            {
-                SpawnWall("Wall_East", roomParent.transform, new Vector3(halfX, 0f, 0f), new Vector3(wallThickness, heightY, wallHeight));
-            }
-
-            // West Wall (-X)
-            if (openDirections == null || !openDirections.Contains(Vector2.left) || (blockedDirections != null && blockedDirections.Contains(Vector2.left)))
-            {
-                SpawnWall("Wall_West", roomParent.transform, new Vector3(-halfX, 0f, 0f), new Vector3(wallThickness, heightY, wallHeight));
-            }
-
-            // Floor
-            GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            floor.name = "Floor";
-            floor.transform.parent = roomParent.transform;
-            floor.transform.localPosition = Vector3.zero;
-            floor.transform.localScale = new Vector3(widthX, heightY, 1f);
-            floor.transform.rotation = Quaternion.Euler(0, 0, 0); // Flat on XY plane for 2D
-            
-            // Remove 3D collider for 2D project compatibility
-            DestroyImmediate(floor.GetComponent<Collider>());
-            floor.AddComponent<BoxCollider2D>(); // 2D Trigger/Floor
-            
-            if (wallMaterial != null)
-            {
-                floor.GetComponent<Renderer>().sharedMaterial = wallMaterial;
-            }
-        }
-
-        private void SpawnHouse(string name, Vector3 position, float size)
-        {
-            GameObject houseParent = new GameObject(name);
-            houseParent.transform.parent = generationRoot;
-            houseParent.transform.position = position;
-
-            float half = size * 0.5f;
-            float doorGap = 1.2f;
-
-            // Spawn 3 closed walls
-            SpawnWall("Wall_N", houseParent.transform, new Vector3(0f, half, 0f), new Vector3(size, wallThickness, wallHeight));
-            SpawnWall("Wall_E", houseParent.transform, new Vector3(half, 0f, 0f), new Vector3(wallThickness, size, wallHeight));
-            SpawnWall("Wall_W", houseParent.transform, new Vector3(-half, 0f, 0f), new Vector3(wallThickness, size, wallHeight));
-
-            // South wall has a door (two wall segments with a gap)
-            float wallSegmentWidth = (size - doorGap) * 0.5f;
-            float segmentCenterOffset = half - (wallSegmentWidth * 0.5f);
-
-            SpawnWall("Wall_S_Left", houseParent.transform, new Vector3(-segmentCenterOffset, -half, 0f), new Vector3(wallSegmentWidth, wallThickness, wallHeight));
-            SpawnWall("Wall_S_Right", houseParent.transform, new Vector3(segmentCenterOffset, -half, 0f), new Vector3(wallSegmentWidth, wallThickness, wallHeight));
-        }
-
-        private void SpawnWall(string name, Transform parent, Vector3 localPosition, Vector3 scale)
-        {
-            GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            wall.name = name;
-            wall.transform.parent = parent;
-            wall.transform.localPosition = localPosition;
-            wall.transform.localScale = scale;
-
-            // Convert standard 3D collider to 2D for our isometric topdown setup
-            DestroyImmediate(wall.GetComponent<Collider>());
-            
-            // We use BoxCollider2D on the walls so the Rigidbody2D on the player collides with it
-            BoxCollider2D col = wall.AddComponent<BoxCollider2D>();
-            // Since it's topdown 2D, the collision happens in the XY plane.
-            // Scale represents thickness and length. We match size of 2D collider.
+            // BoxCollider2D for physics collision (NOT trigger)
+            var col = wallGo.AddComponent<BoxCollider2D>();
+            col.isTrigger = false;
+            // Size is (1,1) because the collider scales with the transform
             col.size = new Vector2(1f, 1f);
+        }
 
-            if (wallMaterial != null)
+        private void SpawnFloor2D(string name, Transform parent, Vector2 localPos, Vector2 size)
+        {
+            var floorGo = new GameObject(name);
+            floorGo.transform.SetParent(parent);
+            floorGo.transform.localPosition = new Vector3(localPos.x, localPos.y, 0f);
+
+            var sr = floorGo.AddComponent<SpriteRenderer>();
+            sr.sprite = GetOrCreateWhitePixelSprite();
+            sr.color = floorColor;
+            sr.sortingOrder = 0; // Behind walls
+            floorGo.transform.localScale = new Vector3(size.x, size.y, 1f);
+            // No collider on floor — player walks on it freely
+        }
+
+        // --- Sprite cache (instance-level, survives domain reload correctly) ---
+
+        /// <summary>
+        /// Gets or creates a 1x1 white pixel sprite for blockout visuals.
+        /// Uses an instance field instead of a static field to avoid domain reload issues.
+        /// The Unity-overloaded == operator correctly detects destroyed objects here
+        /// because Sprite inherits from UnityEngine.Object.
+        /// </summary>
+        private Sprite GetOrCreateWhitePixelSprite()
+        {
+            // Unity's overloaded == handles destroyed native objects correctly for instance fields
+            if (whitePixelSprite != null) return whitePixelSprite;
+
+            var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false)
             {
-                wall.GetComponent<Renderer>().sharedMaterial = wallMaterial;
+                filterMode = FilterMode.Point
+            };
+            tex.SetPixel(0, 0, Color.white);
+            tex.Apply();
+
+            whitePixelSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+
+            if (whitePixelSprite == null)
+            {
+                Debug.LogError("[LevelBlockout] Failed to create white pixel sprite!", this);
             }
+
+            return whitePixelSprite;
+        }
+
+        /// <summary>
+        /// Derives a wall name from its local position relative to the parent room.
+        /// </summary>
+        private static string GetWallName(Vector2 localPos)
+        {
+            if (Mathf.Abs(localPos.x) > Mathf.Abs(localPos.y))
+                return localPos.x > 0 ? "Wall_East" : "Wall_West";
+            if (Mathf.Abs(localPos.y) > Mathf.Abs(localPos.x))
+                return localPos.y > 0 ? "Wall_North" : "Wall_South";
+            return "Wall";
         }
     }
 }

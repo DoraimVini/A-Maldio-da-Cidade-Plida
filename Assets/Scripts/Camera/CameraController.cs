@@ -2,31 +2,79 @@ using UnityEngine;
 
 namespace FavelaAmarela.Camera
 {
-    public class CameraController : MonoBehaviour
+    /// <summary>
+    /// Orthographic 2D camera controller for isometric top-down view.
+    /// Attaches to the Main Camera. Follows a target with smooth damping.
+    /// 
+    /// SETUP (Inspector):
+    ///   1. Drag the player (Damiao) into the "Target" field.
+    ///   2. Ensure Main Camera projection is set to "Orthographic".
+    ///   3. Adjust "Orthographic Size" for zoom level (e.g., 8-12 for blockout).
+    ///   4. Camera Z offset must be negative (default -10) so it renders the 2D scene.
+    /// </summary>
+    public class IsometricCameraController : MonoBehaviour
     {
         [Header("Target")]
         [SerializeField] private Transform target;
 
         [Header("Follow Settings")]
-        [SerializeField] private float smoothTime = 0.25f;
-        [SerializeField] private Vector3 offset = new Vector3(0f, 0f, -10f);
+        [SerializeField] private float smoothTime = 0.15f;
+
+        [Header("Camera Configuration")]
+        [Tooltip("Z offset keeps camera behind the 2D plane. Must be negative.")]
+        [SerializeField] private float zOffset = -10f;
+
+        [Tooltip("Orthographic size controls the zoom level. Smaller = more zoomed in.")]
+        [SerializeField] private float orthographicSize = 10f;
 
         private Vector3 velocity = Vector3.zero;
+        private UnityEngine.Camera cam;
+
+        private void Awake()
+        {
+            cam = GetComponent<UnityEngine.Camera>();
+            if (cam == null)
+            {
+                Debug.LogError("[IsometricCameraController] No Camera component found!", this);
+                return;
+            }
+
+            // Force orthographic projection for 2D isometric
+            cam.orthographic = true;
+            cam.orthographicSize = orthographicSize;
+
+            if (target == null)
+                Debug.LogWarning("[IsometricCameraController] No target assigned. Camera will not follow.", this);
+        }
 
         private void LateUpdate()
         {
             if (target == null) return;
 
-            // Target position on the 2D plane combined with camera offset
-            Vector3 targetPosition = target.position + offset;
+            // Follow target on X/Y plane, keep Z offset fixed
+            Vector3 targetPosition = new Vector3(
+                target.position.x,
+                target.position.y,
+                zOffset
+            );
 
-            // Smoothly move the camera
-            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+            transform.position = Vector3.SmoothDamp(
+                transform.position,
+                targetPosition,
+                ref velocity,
+                smoothTime
+            );
         }
 
         /// <summary>
-        /// Manually sets a target to follow.
+        /// Updates the orthographic size at runtime (e.g., for zoom effects during Salto Dimensional).
         /// </summary>
+        public void SetZoom(float newSize)
+        {
+            orthographicSize = Mathf.Max(1f, newSize);
+            if (cam != null) cam.orthographicSize = orthographicSize;
+        }
+
         public void SetTarget(Transform newTarget)
         {
             target = newTarget;
