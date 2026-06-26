@@ -71,6 +71,7 @@ namespace FavelaAmarela.Player
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(BoxCollider2D))]
+    [AddComponentMenu("Favela Amarela/Damião Movement")]
     public class PlayerMovement : MonoBehaviour
     {
         [Header("Movement Settings")]

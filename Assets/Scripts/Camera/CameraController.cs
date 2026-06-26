@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FavelaAmarela.Camera
+namespace FavelaAmarela.CameraSystem
 {
     /// <summary>
     /// Orthographic 2D camera controller for isometric top-down view.
@@ -75,6 +75,9 @@ namespace FavelaAmarela.Camera
             if (cam != null) cam.orthographicSize = orthographicSize;
         }
 
+        /// <summary>
+        /// Sets a new target for the camera to follow.
+        /// </summary>
         public void SetTarget(Transform newTarget)
         {
             target = newTarget;

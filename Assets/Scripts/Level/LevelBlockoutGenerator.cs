@@ -5,6 +5,9 @@ namespace FavelaAmarela.Level
 {
     /// <summary>
     /// Editor utility: Generates the "S-Path" blockout for the Ruínas Pálidas level.
+    /// The Ruínas Pálidas (Ruins of Hali) are a specific location within the
+    /// Cidade Pálida (Carcosa) — the overarching dimensional setting of the game.
+    ///
     /// All walls use SpriteRenderer + BoxCollider2D for proper 2D physics collision.
     /// No 3D primitives (Cube/Quad) are used — everything lives on the XY plane.
     ///
@@ -17,6 +20,7 @@ namespace FavelaAmarela.Level
     ///   2. Right-click the component header → "Generate S-Path Blockout".
     ///   3. Walls will be created as children with BoxCollider2D (solid, not triggers).
     /// </summary>
+
     public class LevelBlockoutGenerator : MonoBehaviour
     {
         [Header("General Settings")]
@@ -62,6 +66,8 @@ namespace FavelaAmarela.Level
         public void GenerateBlockout()
         {
             ClearExisting();
+
+            // TODO: Adicionar zona de transição dimensional (Salto Dimensional) — ver GDD seção 5
 
             if (generationRoot == null)
             {
@@ -199,14 +205,8 @@ namespace FavelaAmarela.Level
             // Unity's overloaded == handles destroyed native objects correctly for instance fields
             if (whitePixelSprite != null) return whitePixelSprite;
 
-            var tex = new Texture2D(1, 1, TextureFormat.RGBA32, false)
-            {
-                filterMode = FilterMode.Point
-            };
-            tex.SetPixel(0, 0, Color.white);
-            tex.Apply();
-
-            whitePixelSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+            // Fix W1: Use Texture2D.whiteTexture to avoid leaking custom textures on domain reload
+            whitePixelSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 1f);
 
             if (whitePixelSprite == null)
             {
@@ -225,7 +225,7 @@ namespace FavelaAmarela.Level
                 return localPos.x > 0 ? "Wall_East" : "Wall_West";
             if (Mathf.Abs(localPos.y) > Mathf.Abs(localPos.x))
                 return localPos.y > 0 ? "Wall_North" : "Wall_South";
-            return "Wall";
+            return $"Wall_{localPos.x:F0}_{localPos.y:F0}";
         }
     }
 }

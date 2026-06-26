@@ -4,7 +4,8 @@ using UnityEngine;
 namespace FavelaAmarela.Level
 {
     /// <summary>
-    /// POCO: Pure data representation of the S-Path level layout.
+    /// POCO: Pure data representation of the S-Path level layout for the Ruínas Pálidas
+    /// (Ruins of Hali), a location within the Cidade Pálida (Carcosa).
     /// Contains zero Unity API calls for object creation — only math and data.
     /// Fully unit-testable without a Unity scene.
     /// </summary>
@@ -83,22 +84,34 @@ namespace FavelaAmarela.Level
 
         // --- Layout parameters (injected via constructor) ---
 
+        /// <summary>Thickness of the walls.</summary>
         public float WallThickness { get; }
 
+        /// <summary>Length of Zone 1 (Rua de Entrada).</summary>
         public float Z1Length { get; }
+        /// <summary>Width of Zone 1 (Rua de Entrada).</summary>
         public float Z1Width { get; }
 
+        /// <summary>Length of Zone 2 (Vila das Casas).</summary>
         public float Z2Length { get; }
+        /// <summary>Width of Zone 2 (Vila das Casas).</summary>
         public float Z2Width { get; }
 
+        /// <summary>Length of Zone 3 (Beco do Vento).</summary>
         public float Z3Length { get; }
+        /// <summary>Width of Zone 3 (Beco do Vento).</summary>
         public float Z3Width { get; }
 
+        /// <summary>Length of Zone 4 (Praça do Cerco).</summary>
         public float Z4Length { get; }
+        /// <summary>Width of Zone 4 (Praça do Cerco).</summary>
         public float Z4Width { get; }
 
+        /// <summary>Size of each square house.</summary>
         public float HouseSize { get; }
+        /// <summary>Width of the door gap in each house.</summary>
         public float DoorGap { get; }
+        /// <summary>Offsets for house placement within Zone 2.</summary>
         public Vector2[] HouseOffsets { get; }
 
         // --- Output ---
