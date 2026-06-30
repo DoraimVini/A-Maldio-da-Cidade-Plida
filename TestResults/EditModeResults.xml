@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="47" result="Passed" total="47" passed="47" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0,4258373">
+  <test-suite type="TestSuite" id="1000" name="A Maldição da Cidade Pálida" fullname="A Maldição da Cidade Pálida" runstate="Runnable" testcasecount="47" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.425837" total="47" passed="47" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1051" name="FavelaAmarela.Tests.EditMode.dll" fullname="C:/Users/Vini/Desktop/projeto_amarelo/A Maldição da Cidade Pálida/Library/ScriptAssemblies/FavelaAmarela.Tests.EditMode.dll" runstate="Runnable" testcasecount="47" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.388938" total="47" passed="47" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="20300" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1052" name="FavelaAmarela" fullname="FavelaAmarela" runstate="Runnable" testcasecount="47" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.383690" total="47" passed="47" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1053" name="Tests" fullname="FavelaAmarela.Tests" runstate="Runnable" testcasecount="47" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.376349" total="47" passed="47" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1054" name="EditMode" fullname="FavelaAmarela.Tests.EditMode" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.148454" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1046" name="DimensionalLeapTests" fullname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests" classname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.141922" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1049" name="DimensionalLeap_CanActivate_ReturnsFalse_WhenInsufficientResilience" fullname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests.DimensionalLeap_CanActivate_ReturnsFalse_WhenInsufficientResilience" methodname="DimensionalLeap_CanActivate_ReturnsFalse_WhenInsufficientResilience" classname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests" runstate="Runnable" seed="875277541" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.053822" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="DimensionalLeap_CanActivate_ReturnsFalse_WhenOnCooldown" fullname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests.DimensionalLeap_CanActivate_ReturnsFalse_WhenOnCooldown" methodname="DimensionalLeap_CanActivate_ReturnsFalse_WhenOnCooldown" classname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests" runstate="Runnable" seed="681760903" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000698" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="DimensionalLeap_CanActivate_ReturnsTrue_WhenConditionsMet" fullname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests.DimensionalLeap_CanActivate_ReturnsTrue_WhenConditionsMet" methodname="DimensionalLeap_CanActivate_ReturnsTrue_WhenConditionsMet" classname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests" runstate="Runnable" seed="69999828" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001395" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1050" name="DimensionalLeap_Execute_ReturnsCorrectResult" fullname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests.DimensionalLeap_Execute_ReturnsCorrectResult" methodname="DimensionalLeap_Execute_ReturnsCorrectResult" classname="FavelaAmarela.Tests.EditMode.DimensionalLeapTests" runstate="Runnable" seed="1982643591" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.016800" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestFixture" id="1001" name="LevelLayoutTests" fullname="FavelaAmarela.Tests.LevelLayoutTests" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" testcasecount="29" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.139154" total="29" passed="29" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1022" name="AllWalls_HavePositiveSize" fullname="FavelaAmarela.Tests.LevelLayoutTests.AllWalls_HavePositiveSize" methodname="AllWalls_HavePositiveSize" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1106819206" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.045330" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1030" name="AllZoneConnections_ArePhysicallyPassable" fullname="FavelaAmarela.Tests.LevelLayoutTests.AllZoneConnections_ArePhysicallyPassable" methodname="AllZoneConnections_ArePhysicallyPassable" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="197432521" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.011387" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="Build_Creates3Houses" fullname="FavelaAmarela.Tests.LevelLayoutTests.Build_Creates3Houses" methodname="Build_Creates3Houses" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="700843915" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.002221" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1002" name="Build_Creates4Zones" fullname="FavelaAmarela.Tests.LevelLayoutTests.Build_Creates4Zones" methodname="Build_Creates4Zones" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1277436700" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000916" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1029" name="CustomParameters_AffectZoneSizes" fullname="FavelaAmarela.Tests.LevelLayoutTests.CustomParameters_AffectZoneSizes" methodname="CustomParameters_AffectZoneSizes" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="2031903295" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.006728" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1023" name="EachHouse_Has5Walls" fullname="FavelaAmarela.Tests.LevelLayoutTests.EachHouse_Has5Walls" methodname="EachHouse_Has5Walls" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="603630129" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.003463" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1025" name="House_DoorGap_IsPositive" fullname="FavelaAmarela.Tests.LevelLayoutTests.House_DoorGap_IsPositive" methodname="House_DoorGap_IsPositive" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1476616284" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001419" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1024" name="Houses_AreInsideZone2Bounds" fullname="FavelaAmarela.Tests.LevelLayoutTests.Houses_AreInsideZone2Bounds" methodname="Houses_AreInsideZone2Bounds" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="383783162" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.002114" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1027" name="SPath_Zone3_IsLeftOfZone2" fullname="FavelaAmarela.Tests.LevelLayoutTests.SPath_Zone3_IsLeftOfZone2" methodname="SPath_Zone3_IsLeftOfZone2" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1530623201" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001685" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1026" name="SPath_ZonesFormDescendingPath" fullname="FavelaAmarela.Tests.LevelLayoutTests.SPath_ZonesFormDescendingPath" methodname="SPath_ZonesFormDescendingPath" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="2106487319" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001621" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1028" name="Validate_BeforeBuild_ReturnsError" fullname="FavelaAmarela.Tests.LevelLayoutTests.Validate_BeforeBuild_ReturnsError" methodname="Validate_BeforeBuild_ReturnsError" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="7199569" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.011869" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1008" name="Validate_DefaultLayout_ReturnsNoErrors" fullname="FavelaAmarela.Tests.LevelLayoutTests.Validate_DefaultLayout_ReturnsNoErrors" methodname="Validate_DefaultLayout_ReturnsNoErrors" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="371169130" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.003316" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1018" name="Z1SouthEdge_AlignsWithZ2NorthEdge" fullname="FavelaAmarela.Tests.LevelLayoutTests.Z1SouthEdge_AlignsWithZ2NorthEdge" methodname="Z1SouthEdge_AlignsWithZ2NorthEdge" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1537651967" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001490" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="Zone1_HasCorrectWallCount" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone1_HasCorrectWallCount" methodname="Zone1_HasCorrectWallCount" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="767069678" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001284" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="Zone1_HasEastOpening" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone1_HasEastOpening" methodname="Zone1_HasEastOpening" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="622491780" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.003007" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="Zone1_HasSouthOpening_ForZ2Connection" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone1_HasSouthOpening_ForZ2Connection" methodname="Zone1_HasSouthOpening_ForZ2Connection" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="52526215" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001110" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="Zone1_NameIsCorrect" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone1_NameIsCorrect" methodname="Zone1_NameIsCorrect" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="236891374" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000839" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="Zone2_HasNorthOpening_ForZ1Connection" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone2_HasNorthOpening_ForZ1Connection" methodname="Zone2_HasNorthOpening_ForZ1Connection" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1061592512" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001053" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="Zone2_HasSouthOpening_ForZ3Connection" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone2_HasSouthOpening_ForZ3Connection" methodname="Zone2_HasSouthOpening_ForZ3Connection" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1179539458" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000990" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="Zone2_NameIsCorrect" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone2_NameIsCorrect" methodname="Zone2_NameIsCorrect" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1015405666" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000960" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1021" name="Zone3_HasCorrectWallCount" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone3_HasCorrectWallCount" methodname="Zone3_HasCorrectWallCount" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1708079964" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001100" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1013" name="Zone3_HasEastOpening_ForZ2Connection" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone3_HasEastOpening_ForZ2Connection" methodname="Zone3_HasEastOpening_ForZ2Connection" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="221563027" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001062" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1015" name="Zone3_HasSouthOpening_ForZ4Connection" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone3_HasSouthOpening_ForZ4Connection" methodname="Zone3_HasSouthOpening_ForZ4Connection" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1897921205" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001083" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1014" name="Zone3_HasWestOpening_ForZ4Connection" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone3_HasWestOpening_ForZ4Connection" methodname="Zone3_HasWestOpening_ForZ4Connection" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="555933453" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001202" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1006" name="Zone3_NameIsCorrect" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone3_NameIsCorrect" methodname="Zone3_NameIsCorrect" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1998046633" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.003235" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1020" name="Zone4_HasCorrectWallCount" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone4_HasCorrectWallCount" methodname="Zone4_HasCorrectWallCount" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="940781564" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001140" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="Zone4_HasNorthOpening_ForZ3Connection" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone4_HasNorthOpening_ForZ3Connection" methodname="Zone4_HasNorthOpening_ForZ3Connection" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="627378030" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000865" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="Zone4_IsDeadEnd_Only1Opening" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone4_IsDeadEnd_Only1Opening" methodname="Zone4_IsDeadEnd_Only1Opening" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="1232155388" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001229" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="Zone4_NameIsCorrect" fullname="FavelaAmarela.Tests.LevelLayoutTests.Zone4_NameIsCorrect" methodname="Zone4_NameIsCorrect" classname="FavelaAmarela.Tests.LevelLayoutTests" runstate="Runnable" seed="665154022" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000923" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1031" name="PlayerStealthStateTests" fullname="FavelaAmarela.Tests.PlayerStealthStateTests" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.081575" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1045" name="CustomConstructor_UsesProvidedValues" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.CustomConstructor_UsesProvidedValues" methodname="CustomConstructor_UsesProvidedValues" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="1183565383" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.021351" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1032" name="DefaultMode_IsWalking" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.DefaultMode_IsWalking" methodname="DefaultMode_IsWalking" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="1362828869" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001796" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1044" name="ModeSwitching_UpdatesSpeedAndNoise" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.ModeSwitching_UpdatesSpeedAndNoise" methodname="ModeSwitching_UpdatesSpeedAndNoise" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="34970871" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001041" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1043" name="NoiseEmission_StormIntensityAboveOne_ClampedToMax" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.NoiseEmission_StormIntensityAboveOne_ClampedToMax" methodname="NoiseEmission_StormIntensityAboveOne_ClampedToMax" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="942992254" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.002655" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1041" name="NoiseEmission_WhenMoving_FullStorm_IsReduced" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.NoiseEmission_WhenMoving_FullStorm_IsReduced" methodname="NoiseEmission_WhenMoving_FullStorm_IsReduced" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="1649678444" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001141" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1042" name="NoiseEmission_WhenMoving_HalfStorm_IsPartiallyReduced" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.NoiseEmission_WhenMoving_HalfStorm_IsPartiallyReduced" methodname="NoiseEmission_WhenMoving_HalfStorm_IsPartiallyReduced" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="1701607905" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001243" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1040" name="NoiseEmission_WhenMoving_NoStorm_EqualsNoiseRadius" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.NoiseEmission_WhenMoving_NoStorm_EqualsNoiseRadius" methodname="NoiseEmission_WhenMoving_NoStorm_EqualsNoiseRadius" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="749612591" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000766" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1039" name="NoiseEmission_WhenNotMoving_IsZero" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.NoiseEmission_WhenNotMoving_IsZero" methodname="NoiseEmission_WhenNotMoving_IsZero" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="896703652" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.004610" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1038" name="RunningMode_HasCorrectNoise" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.RunningMode_HasCorrectNoise" methodname="RunningMode_HasCorrectNoise" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="478292448" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001672" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1037" name="RunningMode_HasCorrectSpeed" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.RunningMode_HasCorrectSpeed" methodname="RunningMode_HasCorrectSpeed" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="1675762126" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.000908" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1036" name="SneakingMode_HasCorrectNoise" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.SneakingMode_HasCorrectNoise" methodname="SneakingMode_HasCorrectNoise" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="957275629" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001098" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1035" name="SneakingMode_HasCorrectSpeed" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.SneakingMode_HasCorrectSpeed" methodname="SneakingMode_HasCorrectSpeed" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="1170018155" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001423" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1034" name="WalkingMode_HasCorrectNoise" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.WalkingMode_HasCorrectNoise" methodname="WalkingMode_HasCorrectNoise" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="705990667" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.002049" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1033" name="WalkingMode_HasCorrectSpeed" fullname="FavelaAmarela.Tests.PlayerStealthStateTests.WalkingMode_HasCorrectSpeed" methodname="WalkingMode_HasCorrectSpeed" classname="FavelaAmarela.Tests.PlayerStealthStateTests" runstate="Runnable" seed="1615453329" result="Passed" start-time="2026-06-30 14:18:27Z" end-time="2026-06-30 14:18:27Z" duration="0.001938" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/Vini/AppData/LocalLow/DefaultCompany/A Maldição da Cidade Pálida\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

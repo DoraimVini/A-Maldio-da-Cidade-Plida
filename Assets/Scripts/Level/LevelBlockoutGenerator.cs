@@ -30,7 +30,7 @@ namespace FavelaAmarela.Level
 
         [Header("Zone 1: Rua de Entrada (East)")]
         [SerializeField] private float z1Length = 20.0f;
-        [SerializeField] private float z1Width = 4.0f;
+        [SerializeField] private float z1Width = 8.0f;
 
         [Header("Zone 2: Vila das Casas (South)")]
         [SerializeField] private float z2Length = 18.0f;
@@ -38,15 +38,15 @@ namespace FavelaAmarela.Level
 
         [Header("Zone 3: Beco do Vento (West)")]
         [SerializeField] private float z3Length = 15.0f;
-        [SerializeField] private float z3Width = 2.5f;
+        [SerializeField] private float z3Width = 6.0f;
 
         [Header("Zone 4: Praça do Cerco (South)")]
-        [SerializeField] private float z4Length = 12.0f;
-        [SerializeField] private float z4Width = 12.0f;
+        [SerializeField] private float z4Length = 16.0f;
+        [SerializeField] private float z4Width = 16.0f;
 
         [Header("House Settings")]
         [SerializeField] private float houseSize = 4.0f;
-        [SerializeField] private float doorGap = 1.2f;
+        [SerializeField] private float doorGap = 2.0f;
         [SerializeField] private Vector2[] houseOffsets = new[]
         {
             new Vector2(3f, -4f),

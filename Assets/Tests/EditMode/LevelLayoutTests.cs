@@ -111,6 +111,13 @@ namespace FavelaAmarela.Tests
         }
 
         [Test]
+        public void Zone3_HasSouthOpening_ForZ4Connection()
+        {
+            Assert.IsTrue(layout.Zones[2].OpenSides.Contains(LevelLayoutData.Side.South),
+                "Zone 3 must have a South opening — without it, Z4 is physically inaccessible.");
+        }
+
+        [Test]
         public void Zone4_HasNorthOpening_ForZ3Connection()
         {
             Assert.IsTrue(layout.Zones[3].OpenSides.Contains(LevelLayoutData.Side.North),
@@ -156,6 +163,14 @@ namespace FavelaAmarela.Tests
             // Z4 opens North only → 3 walls closed (South, East, West) = 3 walls
             Assert.AreEqual(3, layout.Zones[3].Walls.Count,
                 "Zone 4 should have 3 walls (South, East, West closed).");
+        }
+
+        [Test]
+        public void Zone3_HasCorrectWallCount()
+        {
+            // Z3 opens East, West, and South → only 1 wall closed (North) = 1 wall
+            Assert.AreEqual(1, layout.Zones[2].Walls.Count,
+                "Zone 3 should have 1 wall (only North closed).");
         }
 
         [Test]
@@ -263,6 +278,85 @@ namespace FavelaAmarela.Tests
             Assert.AreEqual(4, custom.Zones.Count);
             Assert.AreEqual(new Vector2(10f, 3f), custom.Zones[0].Size);
             Assert.AreEqual(new Vector2(6f, 8f), custom.Zones[1].Size);
+        }
+
+        // --- Passability: no wall physically blocks the corridor between connected zones ---
+
+        /// <summary>
+        /// Regression test for the Z4-inaccessible bug:
+        /// For each zone connection (Z1→Z2, Z2→Z3, Z3→Z4), asserts that no wall
+        /// from either zone has a collider rect that fully covers the shared opening.
+        /// If a wall covers ≥100% of the opening span, the corridor is blocked.
+        /// </summary>
+        [Test]
+        public void AllZoneConnections_ArePhysicallyPassable()
+        {
+            // Shared opening between Z1(South) and Z2(North) at their Y boundary
+            AssertConnectionPassable(layout.Zones[0], layout.Zones[1], "Z1→Z2");
+
+            // Z2(South/East corner) → Z3(East)
+            AssertConnectionPassable(layout.Zones[1], layout.Zones[2], "Z2→Z3");
+
+            // Z3(South/West) → Z4(North) — this was the original blocked connection
+            AssertConnectionPassable(layout.Zones[2], layout.Zones[3], "Z3→Z4");
+        }
+
+        /// <summary>
+        /// Checks that the shared boundary between two zones has at least
+        /// <see cref="LevelLayoutData.WallThickness"/> of unblocked passage.
+        /// Collects all walls from both zones and checks if any wall's bounding
+        /// rect fully covers the opening rectangle.
+        /// </summary>
+        private void AssertConnectionPassable(
+            LevelLayoutData.ZoneData zoneA,
+            LevelLayoutData.ZoneData zoneB,
+            string label)
+        {
+            // Compute the overlapping rect of the two floor bounds — this is the shared edge.
+            Rect intersection = IntersectRects(zoneA.FloorBounds, zoneB.FloorBounds);
+
+            // If zones don't overlap at all, they might connect via a perpendicular turn.
+            // Expand each floor by wallThickness to catch adjacent-but-not-overlapping edges.
+            if (intersection.width <= 0 || intersection.height <= 0)
+            {
+                Rect expandedA = new Rect(
+                    zoneA.FloorBounds.x - layout.WallThickness,
+                    zoneA.FloorBounds.y - layout.WallThickness,
+                    zoneA.FloorBounds.width + layout.WallThickness * 2f,
+                    zoneA.FloorBounds.height + layout.WallThickness * 2f);
+                intersection = IntersectRects(expandedA, zoneB.FloorBounds);
+            }
+
+            Assert.IsTrue(intersection.width > 0 || intersection.height > 0,
+                $"{label}: Zones do not share any edge — they are completely disconnected.");
+
+            // Check that no single wall from either zone fully covers this intersection
+            var allWalls = new List<LevelLayoutData.WallData>();
+            allWalls.AddRange(zoneA.Walls);
+            allWalls.AddRange(zoneB.Walls);
+
+            foreach (var wall in allWalls)
+            {
+                Rect wb = wall.Bounds;
+                // A wall blocks the connection if it fully contains the intersection rect
+                bool fullyBlocks = wb.xMin <= intersection.xMin
+                                && wb.xMax >= intersection.xMax
+                                && wb.yMin <= intersection.yMin
+                                && wb.yMax >= intersection.yMax;
+
+                Assert.IsFalse(fullyBlocks,
+                    $"{label}: Wall at {wall.WorldCenter} (size {wall.Size}) " +
+                    $"fully blocks the connection opening {intersection}.");
+            }
+        }
+
+        private static Rect IntersectRects(Rect a, Rect b)
+        {
+            float xMin = Mathf.Max(a.xMin, b.xMin);
+            float yMin = Mathf.Max(a.yMin, b.yMin);
+            float xMax = Mathf.Min(a.xMax, b.xMax);
+            float yMax = Mathf.Min(a.yMax, b.yMax);
+            return new Rect(xMin, yMin, Mathf.Max(0, xMax - xMin), Mathf.Max(0, yMax - yMin));
         }
     }
 }
