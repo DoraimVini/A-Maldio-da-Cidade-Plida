@@ -1,0 +1,14 @@
+{
+    "name": "FavelaAmarela.Level",
+    "rootNamespace": "FavelaAmarela.Level",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
-
+using FavelaAmarela.Core.Combat;
 namespace FavelaAmarela.Player
 {
     /// <summary>
@@ -21,8 +21,12 @@ namespace FavelaAmarela.Player
         private DimensionalLeap dimensionalLeap;
         private float lastUseTime = -999f;
         
-        // Mock current resilience until we implement the Resilience system
-        private float currentResilience = 100f; 
+        private ResilienciaMental _resiliencia;
+
+        public void Bind(ResilienciaMental resiliencia)
+        {
+            _resiliencia = resiliencia;
+        }
 
         // Events that other components (like VFX, Audio, Physics) can subscribe to
         public event Action<Vector2, float, float> OnDimensionalLeapActivated; // direction, duration, speedMultiplier
@@ -40,13 +44,15 @@ namespace FavelaAmarela.Player
             if (IsLeaping) return;
             if (direction == Vector2.zero) return;
 
-            if (dimensionalLeap.CanActivate(currentResilience, Time.time - lastUseTime))
+            if (_resiliencia == null) return;
+
+            if (dimensionalLeap.CanActivate(_resiliencia.Atual, Time.time - lastUseTime))
             {
-                var result = dimensionalLeap.Execute(currentResilience);
+                var result = dimensionalLeap.Execute(_resiliencia.Atual);
                 if (result.Success)
                 {
                     lastUseTime = Time.time;
-                    currentResilience -= result.ResilienceCost;
+                    _resiliencia.SofrerTrauma(result.ResilienceCost);
                     
                     IsLeaping = true;
                     
