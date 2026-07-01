@@ -78,6 +78,11 @@ namespace FavelaAmarela.Runtime.GameLoop
             if (telaPause != null) telaPause.SetActive(atual == GameState.Pausado);
             if (telaVitoria != null) telaVitoria.SetActive(atual == GameState.Vitoria);
             if (gameplayRoot != null) gameplayRoot.SetActive(atual == GameState.Gameplay || atual == GameState.Colapso);
+
+            if (atual == GameState.Menu)
+            {
+                Resiliencia?.EstabilizarCompletamente();
+            }
         }
 
         private void HandleResilienciaChanged(ResilienciaChangedArgs args)
