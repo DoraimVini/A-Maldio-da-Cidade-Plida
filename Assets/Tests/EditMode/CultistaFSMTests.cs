@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using FavelaAmarela.Core.AI;
+using FavelaAmarela.Core.Enemies;
 
 namespace FavelaAmarela.Tests.EditMode
 {

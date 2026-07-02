@@ -1,6 +1,6 @@
 using System;
 
-namespace FavelaAmarela.Core.AI
+namespace FavelaAmarela.Core.Enemies
 {
     /// <summary>
     /// Máquina de estados pura para o Cultista.

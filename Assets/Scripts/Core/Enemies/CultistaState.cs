@@ -1,4 +1,4 @@
-namespace FavelaAmarela.Core.AI
+namespace FavelaAmarela.Core.Enemies
 {
     public enum CultistaState
     {

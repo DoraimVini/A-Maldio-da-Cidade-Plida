@@ -1,7 +1,7 @@
 using UnityEngine;
-using FavelaAmarela.Core.AI;
+using FavelaAmarela.Core.Enemies;
 
-namespace FavelaAmarela.Runtime.AI
+namespace FavelaAmarela.Runtime.Enemies
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class CultistaAI : MonoBehaviour
