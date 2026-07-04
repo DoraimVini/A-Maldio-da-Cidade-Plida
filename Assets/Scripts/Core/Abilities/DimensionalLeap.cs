@@ -27,7 +27,17 @@ namespace FavelaAmarela.Core.Abilities
 
         public PowerResult Execute(float currentResilience)
         {
-            // For now, assume CanActivate was checked.
+            if (currentResilience < resilienceCost)
+            {
+                return new PowerResult
+                {
+                    Success = false,
+                    DurationSeconds = 0f,
+                    CooldownSeconds = cooldown,
+                    ResilienceCost = 0f
+                };
+            }
+
             return new PowerResult
             {
                 Success = true,

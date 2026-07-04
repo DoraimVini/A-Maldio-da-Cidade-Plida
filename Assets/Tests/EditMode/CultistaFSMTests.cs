@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using UnityEngine;
 using FavelaAmarela.Core.Enemies;
 
 namespace FavelaAmarela.Tests.EditMode
@@ -20,37 +21,47 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         [Test]
-        public void ReceberEstimuloSonoro_DistanteNãoAlerta()
+        public void ReceberEstimuloSonoro_RaioZero_NenhumaTransicao()
         {
-            // Jogador andando a 10m (o limite é 8m)
-            fsm.ReceberEstimuloSonoro(10f, jogadorCorrendo: false);
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 1f, raioEfetivo: 0f);
             Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
         }
 
         [Test]
-        public void ReceberEstimuloSonoro_AndandoPerto_Alerta()
+        public void ReceberEstimuloSonoro_ForaDoRaio_NenhumaTransicao()
         {
-            // Jogador andando a 7m (limite 8m)
-            fsm.ReceberEstimuloSonoro(7f, jogadorCorrendo: false);
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 4f);
+            Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
+        }
+
+        [Test]
+        public void ReceberEstimuloSonoro_DentroDoRaio_ErranteParaAlerta()
+        {
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 7f, raioEfetivo: 8.5f);
             Assert.AreEqual(CultistaState.Alerta, fsm.CurrentState);
             Assert.AreEqual(0f, fsm.TimeSinceLastStimulus);
         }
 
         [Test]
-        public void ReceberEstimuloSonoro_CorrendoLonge_Alerta()
+        public void ReceberEstimuloSonoro_RepetidoDentroDoRaio_ResetaTempo()
         {
-            // Jogador correndo a 13m (limite 14m)
-            fsm.ReceberEstimuloSonoro(13f, jogadorCorrendo: true);
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
+            Assert.AreEqual(CultistaState.Alerta, fsm.CurrentState);
+            
+            fsm.Tick(1.0f);
+            Assert.AreEqual(1.0f, fsm.TimeSinceLastStimulus);
+            
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
+            Assert.AreEqual(0f, fsm.TimeSinceLastStimulus);
             Assert.AreEqual(CultistaState.Alerta, fsm.CurrentState);
         }
 
         [Test]
         public void Alerta_VoltaParaErrante_SeNaoHouverEstimuloPor4s()
         {
-            fsm.ReceberEstimuloSonoro(7f, false);
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 7f, raioEfetivo: 8.5f);
             Assert.AreEqual(CultistaState.Alerta, fsm.CurrentState);
 
-            // Simula passagem de tempo sem ouvir nada
             fsm.Tick(4.1f);
             Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
         }
@@ -58,18 +69,14 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void Alerta_TransicionaParaCaca_AposPausaTelegrafada()
         {
-            // O jogador faz barulho
-            fsm.ReceberEstimuloSonoro(5f, false);
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
             Assert.AreEqual(CultistaState.Alerta, fsm.CurrentState);
 
-            // Passa 1.0s (ainda em alerta, não terminou os 1.5s)
             fsm.Tick(1.0f);
             Assert.AreEqual(CultistaState.Alerta, fsm.CurrentState);
 
-            // O jogador faz barulho DE NOVO (o que valida a caça pois o TimeSinceLastStimulus zera)
-            fsm.ReceberEstimuloSonoro(5f, false);
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
             
-            // Passa mais 0.6s (total = 1.6s em Alerta)
             fsm.Tick(0.6f);
             
             Assert.AreEqual(CultistaState.Caca, fsm.CurrentState);
@@ -78,15 +85,13 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void Caca_VoltaParaErrante_SePerderRastroPor5s()
         {
-            // Força ida para caça
-            fsm.ReceberEstimuloSonoro(5f, false); // Alerta
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
             fsm.Tick(1.0f);
-            fsm.ReceberEstimuloSonoro(5f, false);
-            fsm.Tick(0.6f); // Caça
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
+            fsm.Tick(0.6f);
             
             Assert.AreEqual(CultistaState.Caca, fsm.CurrentState);
 
-            // Tempo passa sem ouvir o jogador
             fsm.Tick(5.1f);
 
             Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
@@ -96,8 +101,37 @@ namespace FavelaAmarela.Tests.EditMode
         public void Tick_NaoAcumulaLixo_SemFazerTransicoesInvalidas()
         {
             fsm.Tick(100f);
-            // Continua em Errante sem bugar
             Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
+        }
+
+        [Test]
+        public void ReceberEstimulo_Valido_GravaOrigemConhecida()
+        {
+            var origem = new Vector2(10f, 5f);
+            fsm.ReceberEstimuloSonoro(origem, 5f, 10f);
+            Assert.AreEqual(origem, fsm.UltimaOrigemConhecida);
+        }
+
+        [Test]
+        public void NenhumEstimulo_OrigemConhecida_E_Null()
+        {
+            Assert.IsNull(fsm.UltimaOrigemConhecida);
+        }
+
+        [Test]
+        public void EstimuloInvalido_NaoSobreescreve_OrigemConhecida()
+        {
+            var origemValida = new Vector2(10f, 5f);
+            fsm.ReceberEstimuloSonoro(origemValida, 5f, 10f);
+            Assert.AreEqual(origemValida, fsm.UltimaOrigemConhecida);
+
+            // Fora do raio
+            fsm.ReceberEstimuloSonoro(new Vector2(20f, 20f), 15f, 10f);
+            Assert.AreEqual(origemValida, fsm.UltimaOrigemConhecida);
+
+            // Raio zero
+            fsm.ReceberEstimuloSonoro(new Vector2(30f, 30f), 1f, 0f);
+            Assert.AreEqual(origemValida, fsm.UltimaOrigemConhecida);
         }
     }
 }

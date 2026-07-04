@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace FavelaAmarela.Core.Enemies
 {
@@ -12,6 +13,12 @@ namespace FavelaAmarela.Core.Enemies
         public CultistaState CurrentState { get; private set; }
         public float TimeInState { get; private set; }
         public float TimeSinceLastStimulus { get; private set; }
+        
+        /// <summary>
+        /// Última posição conhecida de um estímulo válido. Null se nenhum
+        /// estímulo ainda foi recebido nesta "vida" do Cultista.
+        /// </summary>
+        public Vector2? UltimaOrigemConhecida { get; private set; }
 
         public event Action<CultistaState, CultistaState> OnStateChanged;
 
@@ -21,21 +28,17 @@ namespace FavelaAmarela.Core.Enemies
             TimeSinceLastStimulus = 999f;
         }
 
-        public void ReceberEstimuloSonoro(float distancia, bool jogadorCorrendo)
+        public void ReceberEstimuloSonoro(Vector2 origemSom, float distanciaAoJogador, float raioEfetivo)
         {
-            // Regras de detecção (baseado no design doc das Ruínas Pálidas)
-            bool detectou = (distancia <= 3f) || 
-                            (jogadorCorrendo && distancia <= 14f) || 
-                            (!jogadorCorrendo && distancia <= 8f);
+            if (raioEfetivo <= 0f) return;
+            if (distanciaAoJogador > raioEfetivo) return;
 
-            if (detectou)
+            TimeSinceLastStimulus = 0f;
+            UltimaOrigemConhecida = origemSom;
+
+            if (CurrentState == CultistaState.Errante)
             {
-                TimeSinceLastStimulus = 0f;
-
-                if (CurrentState == CultistaState.Errante)
-                {
-                    ChangeState(CultistaState.Alerta);
-                }
+                ChangeState(CultistaState.Alerta);
             }
         }
 

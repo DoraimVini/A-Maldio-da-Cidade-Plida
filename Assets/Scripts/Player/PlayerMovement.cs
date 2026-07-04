@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using FavelaAmarela.Core.Stealth;
+using FavelaAmarela.Core.Environment;
 
 namespace FavelaAmarela.Player
 {
@@ -101,6 +103,17 @@ namespace FavelaAmarela.Player
 
         public PlayerStealthState StealthState => stealthState;
         public bool IsMoving => isMoving;
+
+        // --- Injected Services ---
+        private SoundBroadcastService _soundBroadcaster;
+        private EnvironmentState _environment;
+        private float _soundTimer;
+
+        public void Bind(SoundBroadcastService broadcaster, EnvironmentState env)
+        {
+            _soundBroadcaster = broadcaster;
+            _environment = env;
+        }
 
         private void Awake()
         {
@@ -218,6 +231,21 @@ namespace FavelaAmarela.Player
                 movement = ConvertToIsometric(movement);
 
             rb.linearVelocity = movement * stealthState.Speed;
+
+            // Broadcast de som a cada 0.15s se estiver movendo
+            if (_soundBroadcaster != null && _environment != null)
+            {
+                _soundTimer += Time.fixedDeltaTime;
+                if (_soundTimer >= 0.15f)
+                {
+                    _soundTimer = 0f;
+                    float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, _environment.StormIntensity);
+                    if (currentNoise > 0f)
+                    {
+                        _soundBroadcaster.Emitir(new SomEmitido(transform.position, currentNoise));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -234,7 +262,8 @@ namespace FavelaAmarela.Player
         {
             if (!showNoiseGizmo || stealthState == null) return;
 
-            float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, debugStormIntensity);
+            float stormIntensity = _environment != null ? _environment.StormIntensity : debugStormIntensity;
+            float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, stormIntensity);
             if (currentNoise <= 0f) return;
 
             // Filled circle (projected sphere in 2D ortho looks like a disk)

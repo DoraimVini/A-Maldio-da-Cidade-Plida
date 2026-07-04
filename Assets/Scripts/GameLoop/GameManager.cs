@@ -1,18 +1,26 @@
 using UnityEngine;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.GameLoop;
+using FavelaAmarela.Core.Stealth;
+using FavelaAmarela.Core.Environment;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.UI;
+using UnityEngine.InputSystem;
 
 namespace FavelaAmarela.Runtime.GameLoop
 {
     [AddComponentMenu("Favela Amarela/Game Manager")]
+    // Garante que Instance esteja pronto antes do Awake/OnEnable de qualquer outro script da cena
+    // (ex.: CultistaAI se inscreve em GameManager.Instance.SoundBroadcaster no próprio OnEnable).
+    [DefaultExecutionOrder(-100)]
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
 
         public GameLoopStateMachine StateMachine { get; private set; }
         public ResilienciaMental Resiliencia { get; private set; }
+        public SoundBroadcastService SoundBroadcaster { get; private set; }
+        public EnvironmentState Environment { get; private set; }
 
         [Header("Configurações Iniciais")]
         [SerializeField] private float maxResiliencia = 100f;
@@ -35,6 +43,8 @@ namespace FavelaAmarela.Runtime.GameLoop
             // 1. Cria a Lógica Pura (Core)
             StateMachine = new GameLoopStateMachine(GameState.Gameplay);
             Resiliencia = ResilienciaMental.ComThresholdFracional(maxResiliencia, fracaoPanico);
+            SoundBroadcaster = new SoundBroadcastService();
+            Environment = new EnvironmentState();
 
             // 2. Observa o Core
             StateMachine.OnStateChanged += HandleStateChanged;
@@ -47,20 +57,25 @@ namespace FavelaAmarela.Runtime.GameLoop
         private void InjetarDependencias()
         {
             // Busca o HUDController e injeta
-            var hud = FindObjectOfType<HUDController>();
+            var hud = FindAnyObjectByType<HUDController>();
             if (hud != null)
                 hud.InjetarResiliencia(Resiliencia);
 
             // Busca o AnomalyPowerBridge e injeta
-            var bridge = FindObjectOfType<AnomalyPowerBridge>();
+            var bridge = FindAnyObjectByType<AnomalyPowerBridge>();
             if (bridge != null)
                 bridge.Bind(Resiliencia);
+
+            // Busca o PlayerMovement e injeta
+            var player = FindAnyObjectByType<PlayerMovement>();
+            if (player != null)
+                player.Bind(SoundBroadcaster, Environment);
         }
 
         private void Update()
         {
             // Toggle de pause (Esc)
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 if (StateMachine.CurrentState == GameState.Gameplay)
                     StateMachine.TryTransition(GameState.Pausado);

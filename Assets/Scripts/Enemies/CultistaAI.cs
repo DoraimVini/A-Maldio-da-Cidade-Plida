@@ -1,13 +1,20 @@
 using UnityEngine;
 using FavelaAmarela.Core.Enemies;
+using FavelaAmarela.Core.Stealth;
+using FavelaAmarela.Runtime.GameLoop;
 
 namespace FavelaAmarela.Runtime.Enemies
 {
-    [RequireComponent(typeof(SpriteRenderer))]
+    [RequireComponent(typeof(SpriteRenderer), typeof(Rigidbody2D))]
     public class CultistaAI : MonoBehaviour
     {
         private CultistaFSM _fsm;
         private SpriteRenderer _spriteRenderer;
+        private Rigidbody2D _rb;
+        private PatrolRoute _patrolRoute;
+
+        [Header("Patrulha")]
+        [SerializeField] private Transform[] waypoints;
 
         [Header("Configurações")]
         [SerializeField] private float velocidadeErrante = 1.0f;
@@ -19,35 +26,98 @@ namespace FavelaAmarela.Runtime.Enemies
         private void Awake()
         {
             _spriteRenderer = GetComponent<SpriteRenderer>();
+            _rb = GetComponent<Rigidbody2D>();
+            _rb.gravityScale = 0f;
+            _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
             _fsm = new CultistaFSM(CultistaState.Errante);
             _fsm.OnStateChanged += HandleStateChanged;
-            
+
+            if (waypoints != null && waypoints.Length > 0)
+            {
+                var poses = new Vector2[waypoints.Length];
+                for (int i = 0; i < waypoints.Length; i++)
+                {
+                    if (waypoints[i] == null)
+                    {
+                        Debug.LogError($"[CultistaAI] Waypoint {i} não está atribuído no Inspector. Usando posição atual como fallback.", this);
+                        poses[i] = transform.position;
+                        continue;
+                    }
+                    poses[i] = waypoints[i].position;
+                }
+
+                _patrolRoute = new PatrolRoute(poses, loop: true);
+            }
+            else
+            {
+                _patrolRoute = new PatrolRoute(new[] { (Vector2)transform.position });
+            }
+
             AtualizarVisual(_fsm.CurrentState);
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-            _fsm.Tick(Time.deltaTime);
+            _fsm.Tick(Time.fixedDeltaTime);
 
-            // Simulação de comportamento baseado no estado (Pode ser integrado ao NavMesh depois)
             switch (_fsm.CurrentState)
             {
                 case CultistaState.Errante:
-                    // Logica de patrulha lenta (velocidadeErrante)
+                    if (_patrolRoute != null)
+                    {
+                        MoverEmDirecaoA(_patrolRoute.AlvoAtual, velocidadeErrante);
+                        _patrolRoute.AtualizarChegada(transform.position, 0.3f);
+                    }
+                    else
+                    {
+                        _rb.linearVelocity = Vector2.zero;
+                    }
                     break;
                 case CultistaState.Alerta:
                     // Parado (Pausa telegrafada antes de caçar)
+                    // Poderia apenas rotacionar em direção a _fsm.UltimaOrigemConhecida se desejado
+                    _rb.linearVelocity = Vector2.zero;
                     break;
                 case CultistaState.Caca:
-                    // Perseguir jogador (velocidadeCaca)
+                    if (_fsm.UltimaOrigemConhecida.HasValue)
+                    {
+                        MoverEmDirecaoA(_fsm.UltimaOrigemConhecida.Value, velocidadeCaca);
+                    }
+                    else
+                    {
+                        _rb.linearVelocity = Vector2.zero;
+                    }
                     break;
             }
         }
 
-        public void Ouvir(Vector2 origemSom, bool jogadorCorrendo)
+        private void MoverEmDirecaoA(Vector2 alvo, float velocidade)
         {
-            float distancia = Vector2.Distance(transform.position, origemSom);
-            _fsm.ReceberEstimuloSonoro(distancia, jogadorCorrendo);
+            Vector2 direcao = (alvo - (Vector2)transform.position).normalized;
+            _rb.linearVelocity = direcao * velocidade;
+        }
+
+        private void OnEnable()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
+            {
+                GameManager.Instance.SoundBroadcaster.OnSomEmitido += HandleSomEmitido;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
+            {
+                GameManager.Instance.SoundBroadcaster.OnSomEmitido -= HandleSomEmitido;
+            }
+        }
+
+        private void HandleSomEmitido(SomEmitido som)
+        {
+            float distancia = Vector2.Distance(transform.position, som.Origem);
+            _fsm.ReceberEstimuloSonoro(som.Origem, distancia, som.RaioEfetivo);
         }
 
         private void HandleStateChanged(CultistaState anterior, CultistaState atual)
