@@ -12,10 +12,10 @@ description: Enforces the strict 2D isometric grid rules for Favela Amarela rend
 
 2. **Camera Projection**:
    - Camera must be Orthographic.
-   - The rotation on the X-axis must be precisely `26.57°` to achieve a true isometric projection (arctangent of 0.5).
+   - Rotation MUST stay `Quaternion.identity` (no tilt on any axis). This project does NOT use a physically-tilted 3D dimetric camera — `LevelBlockoutGenerator` places walls/floors as flat `SpriteRenderer`/`BoxCollider2D` on the XY plane and fakes depth purely via Y-sorting (`sortingOrder = -worldCenter.y * 10`). The "isometric feel" comes from `PlayerMovement.ConvertToIsometric` remapping input direction, not from camera rotation. Tilting the camera (e.g. 26.57° on X, the classic 3D-dimetric-diorama trick) breaks the Y-sort depth illusion and visually desyncs colliders from sprites — do not reintroduce it. (`PrefabMigrationTool.cs`'s "cenário A" / `Quaternion.identity` is the correct reference implementation; `PlaytestSceneSetup.cs` previously diverged from it and was fixed to match.)
 
 3. **Tilemap & Cell Size**:
-   - The global grid `cellSize` must be exactly `(1.0, 0.5, 1.0)`.
+   - No `UnityEngine.Grid`/`Tilemap` component is currently used in code — level geometry is generated procedurally as plain XY `Vector2` positions (`LevelBlockoutPlanner` + `LevelBlockoutGenerator`). If a Grid/Tilemap is introduced later, keep `cellSize` at `(1.0, 0.5, 1.0)`, but don't assume one exists today.
 
 4. **Sprite Settings (Pixels Per Unit)**:
    - All Sprites must have a consistent Pixels Per Unit (PPU). The standard for this project is `16`.
