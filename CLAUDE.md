@@ -3,7 +3,9 @@
 ## 1. Contexto Geral
 - Engine: Unity 6000.4.4f1, 2D isométrico.
 - Linguagem: C#, com separação estrita entre lógica pura (POCO) e adaptadores Unity.
-- Gênero: jogo de stealth / horror cósmico. Não é um ARPG com inventário ou árvore de habilidades — evite propor essas mecânicas por padrão.
+- Gênero: jogo de stealth / horror cósmico. O núcleo continua sendo furtividade e horror cósmico, não farming/loot genérico de ARPG — mas o jogo vai incorporar sistemas de progressão (inventário, barra de ações, árvore de talentos/habilidades) por decisão explícita do Vini. **Não proponha mecânicas de ARPG novas por conta própria** — essas três abaixo já foram decididas; qualquer outra (ex.: níveis de personagem, moeda, crafting) precisa ser confirmada com ele antes.
+- Inventário e barra de ações: **previstos** (decisão de 2026-07-07), para armas e armaduras coletadas via gameplay — sem data definida, não implementar por conta própria sem confirmar com o Vini antes. Quando entrar em desenvolvimento, deve ser enxuto (sem grind de itens) e seguir a terminologia diegética da skill `favela-lore-enforcer`.
+- Árvore de talentos/habilidades: **também prevista** (decisão de 2026-07-07), sem data definida — não implementar por conta própria sem confirmar com o Vini antes. Ao desenhar, seguir a terminologia diegética (nada de "Skill Tree"/"Talent Point" genérico visível ao jogador) e a filosofia de composição sobre herança da seção 4 (habilidades plugáveis via interface, ver `IAnomalyPower`) em vez de um grafo de nós genérico copiado de ARPG.
 - Ambientação: Ruínas Pálidas (Ruins of Hali) dentro da Cidade Pálida (Carcosa). Protagonista: Damião.
 - Controle de versão: Git.
 
@@ -28,6 +30,41 @@ Antes de usar uma API da Unity que você não tenha certeza absoluta (assinatura
 Isso importa porque a Unity 6 renomeou/alterou APIs comuns (ex.: `Rigidbody2D.velocity` → `Rigidbody2D.linearVelocity`, já refletido em `PlayerMovement.cs`). Nunca assuma o nome de uma API de "Unity clássico" sem checar a Script Reference da 6000.4 primeiro.
 
 Para as classes `Core/` (POCO), não existe documentação "Unity" a seguir — são C# puro. Siga as convenções padrão de C#/.NET (nullable reference types, `IDisposable`, `readonly struct`, etc.) e não introduza nenhum tipo/atributo da `UnityEngine` além do já permitido em `Assets/Scripts/Core/CLAUDE.md`. Na dúvida sobre um recurso de linguagem C#, prefira a documentação oficial da Microsoft (learn.microsoft.com/dotnet/csharp) a suposições.
+
+### 3.1 Knowledge Bundle OKF (Game Design como código)
+O projeto mantém uma base de conhecimento interna em formato [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf) no diretório `Docs/KnowledgeBundle/`.
+
+Essa base contém documentação de **sistemas de gameplay**, **regras de negócio**, **scripts** e **testes** em arquivos Markdown com frontmatter YAML — projetada para ser lida tanto por humanos quanto por agentes de IA.
+
+**Regras de uso obrigatório:**
+1. Antes de **implementar ou alterar** qualquer mecânica de jogo (dano, movimentação, UI, IA de inimigos, stealth), **leia o arquivo relevante** em `Docs/KnowledgeBundle/`. Comece pelo `index.md` e navegue pelos links.
+2. Use o campo `type` do frontmatter YAML para filtrar documentos relevantes (ex: `type: Game System` para regras de mecânica, `type: C# Script` para detalhes de implementação).
+3. Se uma **nova mecânica** for criada ou uma existente for **refatorada significativamente**, **atualize o OKF correspondente** (ou crie um novo arquivo `.md` seguindo o padrão) e atualize o `index.md` do diretório pai. Não deixe a base de conhecimento ficar desatualizada.
+4. Em caso de **conflito** entre o OKF e o código existente, o **código-fonte** é a verdade para *como* funciona, mas o **OKF** é a verdade para *como deveria* funcionar. Sinalize a divergência.
+
+**Estrutura do bundle:**
+```
+Docs/KnowledgeBundle/
+├── index.md            ← Ponto de entrada (leia primeiro)
+├── architecture/       ← Decisões arquiteturais e padrões estruturais
+│   ├── index.md
+│   └── *.md
+├── scripts/            ← Documentação de scripts C# (core/ e runtime/)
+│   ├── index.md
+│   └── *.md
+├── systems/            ← Regras de game design e mecânicas
+│   ├── index.md
+│   └── *.md
+├── unity64_gotchas/    ← APIs renomeadas e armadilhas de performance da Unity 6.4
+│   ├── index.md
+│   └── *.md
+├── tests/              ← Estrutura de testes e QA
+│   ├── index.md
+│   └── *.md
+└── lore/               ← Terminologia diegética e regras de universo narrativo
+    ├── index.md
+    └── *.md
+```
 
 ## 4. Regras de Ouro
 1. **Nunca aloque lixo em `Update`/`FixedUpdate`/`LateUpdate`.** Sem `new`, `GetComponent` em hot path, `FindObjectOfType`, LINQ dentro de loops. Cache em `Awake`/`Start`. Prefira `readonly struct` para event args (ver `SomEmitido`, `ResilienciaChangedArgs`).
