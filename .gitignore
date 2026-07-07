@@ -108,3 +108,8 @@ InitTestScene*.unity*
 
 # aseprite-bridge MCP server (Node deps only; build/ output is committed)
 Tools/aseprite-bridge/node_modules/
+
+# Backups e recuperação automática da Unity — não são fonte de verdade,
+# só duplicam o que o histórico do Git já cobre.
+*.unity.bak*
+/Assets/_Recovery/
