@@ -1,0 +1,403 @@
+fileFormatVersion: 2
+guid: 4f82f80e547740549a5a8860e809bb4f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4941490199006815140
+    second: damiao_hd2d_spritesheet_0
+  - first:
+      213: 5934142272777388445
+    second: damiao_hd2d_spritesheet_1
+  - first:
+      213: 3369901772494749049
+    second: damiao_hd2d_spritesheet_2
+  - first:
+      213: 8011984009870465973
+    second: damiao_hd2d_spritesheet_3
+  - first:
+      213: -4077125331881957044
+    second: damiao_hd2d_spritesheet_4
+  - first:
+      213: -2369921049027898482
+    second: damiao_hd2d_spritesheet_5
+  - first:
+      213: 69308754361297164
+    second: damiao_hd2d_spritesheet_6
+  - first:
+      213: 1652434790498636464
+    second: damiao_hd2d_spritesheet_7
+  - first:
+      213: 654095851050679687
+    second: damiao_hd2d_spritesheet_8
+  - first:
+      213: 1281679903307772854
+    second: damiao_hd2d_spritesheet_9
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_0
+      rect:
+        serializedVersion: 2
+        x: 409
+        y: 995
+        width: 1232
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a320e4a723b39440800000000000000
+      internalID: 4941490199006815140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_1
+      rect:
+        serializedVersion: 2
+        x: 2069
+        y: 25
+        width: 372
+        height: 976
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d918687e4fe4a5250800000000000000
+      internalID: 5934142272777388445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_2
+      rect:
+        serializedVersion: 2
+        x: 2869
+        y: 0
+        width: 3691
+        height: 1004
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97d328dbecb44ce20800000000000000
+      internalID: 3369901772494749049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_3
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 9
+        width: 372
+        height: 976
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bb5076f109403f60800000000000000
+      internalID: 8011984009870465973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_4
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 5
+        width: 372
+        height: 976
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c49ed68bc142b67c0800000000000000
+      internalID: -4077125331881957044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_5
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 1
+        width: 372
+        height: 976
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8398febc595c1fd0800000000000000
+      internalID: -2369921049027898482
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_6
+      rect:
+        serializedVersion: 2
+        x: 1249
+        y: 5
+        width: 372
+        height: 976
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c09a783e1fb36f000800000000000000
+      internalID: 69308754361297164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_7
+      rect:
+        serializedVersion: 2
+        x: 1659
+        y: 9
+        width: 372
+        height: 976
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b21b2edfa0aee610800000000000000
+      internalID: 1652434790498636464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_8
+      rect:
+        serializedVersion: 2
+        x: 2049
+        y: 0
+        width: 412
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78dbee206b0d31900800000000000000
+      internalID: 654095851050679687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_hd2d_spritesheet_9
+      rect:
+        serializedVersion: 2
+        x: 2479
+        y: 9
+        width: 372
+        height: 976
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b3ba68d41179c110800000000000000
+      internalID: 1281679903307772854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      damiao_hd2d_spritesheet_0: 4941490199006815140
+      damiao_hd2d_spritesheet_1: 5934142272777388445
+      damiao_hd2d_spritesheet_2: 3369901772494749049
+      damiao_hd2d_spritesheet_3: 8011984009870465973
+      damiao_hd2d_spritesheet_4: -4077125331881957044
+      damiao_hd2d_spritesheet_5: -2369921049027898482
+      damiao_hd2d_spritesheet_6: 69308754361297164
+      damiao_hd2d_spritesheet_7: 1652434790498636464
+      damiao_hd2d_spritesheet_8: 654095851050679687
+      damiao_hd2d_spritesheet_9: 1281679903307772854
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

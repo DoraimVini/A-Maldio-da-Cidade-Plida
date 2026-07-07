@@ -1,0 +1,5551 @@
+fileFormatVersion: 2
+guid: b3aada8a29d8e9e4c9a4b9ec16836363
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3244299405995872689
+    second: damiao_spritesheet_cultist_0
+  - first:
+      213: 545767782847548349
+    second: damiao_spritesheet_cultist_1
+  - first:
+      213: 732468193594907097
+    second: damiao_spritesheet_cultist_2
+  - first:
+      213: 7624588955666911938
+    second: damiao_spritesheet_cultist_3
+  - first:
+      213: -4745732152027342696
+    second: damiao_spritesheet_cultist_4
+  - first:
+      213: -7018184228566697412
+    second: damiao_spritesheet_cultist_5
+  - first:
+      213: -7351045306264909175
+    second: damiao_spritesheet_cultist_6
+  - first:
+      213: 6642444773354364257
+    second: damiao_spritesheet_cultist_7
+  - first:
+      213: 8240968635930300374
+    second: damiao_spritesheet_cultist_8
+  - first:
+      213: 2313298660362699800
+    second: damiao_spritesheet_cultist_9
+  - first:
+      213: -6435458800317574195
+    second: damiao_spritesheet_cultist_10
+  - first:
+      213: 1595584153355636537
+    second: damiao_spritesheet_cultist_11
+  - first:
+      213: 1251266192954827004
+    second: damiao_spritesheet_cultist_12
+  - first:
+      213: -3313202053167021380
+    second: damiao_spritesheet_cultist_13
+  - first:
+      213: 6827146166688611486
+    second: damiao_spritesheet_cultist_14
+  - first:
+      213: 3518023757134944238
+    second: damiao_spritesheet_cultist_15
+  - first:
+      213: -2954727131388501699
+    second: damiao_spritesheet_cultist_16
+  - first:
+      213: -147053669621006234
+    second: damiao_spritesheet_cultist_17
+  - first:
+      213: -6652615146768876591
+    second: damiao_spritesheet_cultist_18
+  - first:
+      213: 7540089983737045380
+    second: damiao_spritesheet_cultist_19
+  - first:
+      213: 7012329240505248726
+    second: damiao_spritesheet_cultist_20
+  - first:
+      213: -6398042074028831140
+    second: damiao_spritesheet_cultist_21
+  - first:
+      213: -7276453010883662532
+    second: damiao_spritesheet_cultist_22
+  - first:
+      213: 7898056936351399504
+    second: damiao_spritesheet_cultist_23
+  - first:
+      213: 115445126459639561
+    second: damiao_spritesheet_cultist_24
+  - first:
+      213: -8252096458078020343
+    second: damiao_spritesheet_cultist_25
+  - first:
+      213: -1437629422646245947
+    second: damiao_spritesheet_cultist_26
+  - first:
+      213: -3948302751397779690
+    second: damiao_spritesheet_cultist_27
+  - first:
+      213: 9014531444034136350
+    second: damiao_spritesheet_cultist_28
+  - first:
+      213: -4731443647627952252
+    second: damiao_spritesheet_cultist_29
+  - first:
+      213: 7731172535271395978
+    second: damiao_spritesheet_cultist_30
+  - first:
+      213: 1690847172231139850
+    second: damiao_spritesheet_cultist_31
+  - first:
+      213: -6928605160815747863
+    second: damiao_spritesheet_cultist_32
+  - first:
+      213: 5448777935952974243
+    second: damiao_spritesheet_cultist_33
+  - first:
+      213: 2462768370530385322
+    second: damiao_spritesheet_cultist_34
+  - first:
+      213: 3997286744276332775
+    second: damiao_spritesheet_cultist_35
+  - first:
+      213: 5705770793678039774
+    second: damiao_spritesheet_cultist_36
+  - first:
+      213: -155397814964707893
+    second: damiao_spritesheet_cultist_37
+  - first:
+      213: 7443412941856877280
+    second: damiao_spritesheet_cultist_38
+  - first:
+      213: 1368302146318429018
+    second: damiao_spritesheet_cultist_39
+  - first:
+      213: -2189883685630080171
+    second: damiao_spritesheet_cultist_40
+  - first:
+      213: 4304020918610419378
+    second: damiao_spritesheet_cultist_41
+  - first:
+      213: -736997205024142749
+    second: damiao_spritesheet_cultist_42
+  - first:
+      213: -5543551327581126869
+    second: damiao_spritesheet_cultist_43
+  - first:
+      213: 3008210684586222149
+    second: damiao_spritesheet_cultist_44
+  - first:
+      213: 1574296084634689234
+    second: damiao_spritesheet_cultist_45
+  - first:
+      213: 56222288724737158
+    second: damiao_spritesheet_cultist_46
+  - first:
+      213: 7086652564830131153
+    second: damiao_spritesheet_cultist_47
+  - first:
+      213: 5107834746747593860
+    second: damiao_spritesheet_cultist_48
+  - first:
+      213: 9158583857338431301
+    second: damiao_spritesheet_cultist_49
+  - first:
+      213: 2376949377771377583
+    second: damiao_spritesheet_cultist_50
+  - first:
+      213: -8476408741577023898
+    second: damiao_spritesheet_cultist_51
+  - first:
+      213: 9097874743327349849
+    second: damiao_spritesheet_cultist_52
+  - first:
+      213: -2156807153238094350
+    second: damiao_spritesheet_cultist_53
+  - first:
+      213: -318158558368962535
+    second: damiao_spritesheet_cultist_54
+  - first:
+      213: -7809349931526999339
+    second: damiao_spritesheet_cultist_55
+  - first:
+      213: 6440364652606445509
+    second: damiao_spritesheet_cultist_56
+  - first:
+      213: 2880363143099956597
+    second: damiao_spritesheet_cultist_57
+  - first:
+      213: -9004949651555658156
+    second: damiao_spritesheet_cultist_58
+  - first:
+      213: -7272545547901900252
+    second: damiao_spritesheet_cultist_59
+  - first:
+      213: 4065621326788100620
+    second: damiao_spritesheet_cultist_60
+  - first:
+      213: 1016756137584194785
+    second: damiao_spritesheet_cultist_61
+  - first:
+      213: 8051953003035264409
+    second: damiao_spritesheet_cultist_62
+  - first:
+      213: 5122371367854138847
+    second: damiao_spritesheet_cultist_63
+  - first:
+      213: -6168564796972324411
+    second: damiao_spritesheet_cultist_64
+  - first:
+      213: 4619078840104087681
+    second: damiao_spritesheet_cultist_65
+  - first:
+      213: 7887233478405941145
+    second: damiao_spritesheet_cultist_66
+  - first:
+      213: 451489162775264787
+    second: damiao_spritesheet_cultist_67
+  - first:
+      213: 723410546676703377
+    second: damiao_spritesheet_cultist_68
+  - first:
+      213: 506094011270132344
+    second: damiao_spritesheet_cultist_69
+  - first:
+      213: 6695713011285066010
+    second: damiao_spritesheet_cultist_70
+  - first:
+      213: -8493749626868297399
+    second: damiao_spritesheet_cultist_71
+  - first:
+      213: 8250054253838564432
+    second: damiao_spritesheet_cultist_72
+  - first:
+      213: 6274794855025478726
+    second: damiao_spritesheet_cultist_73
+  - first:
+      213: 7335653703816066865
+    second: damiao_spritesheet_cultist_74
+  - first:
+      213: -3787230297505465101
+    second: damiao_spritesheet_cultist_75
+  - first:
+      213: 2402057900210478016
+    second: damiao_spritesheet_cultist_76
+  - first:
+      213: -4285917266307399844
+    second: damiao_spritesheet_cultist_77
+  - first:
+      213: -4045834266255074319
+    second: damiao_spritesheet_cultist_78
+  - first:
+      213: -7439500218126168194
+    second: damiao_spritesheet_cultist_79
+  - first:
+      213: 7970459995000153214
+    second: damiao_spritesheet_cultist_80
+  - first:
+      213: -4884423150834676319
+    second: damiao_spritesheet_cultist_81
+  - first:
+      213: -6193082947884461229
+    second: damiao_spritesheet_cultist_82
+  - first:
+      213: 6716847147465954491
+    second: damiao_spritesheet_cultist_83
+  - first:
+      213: -1528970341814039206
+    second: damiao_spritesheet_cultist_84
+  - first:
+      213: -2997142780736141126
+    second: damiao_spritesheet_cultist_85
+  - first:
+      213: 1050045953450632959
+    second: damiao_spritesheet_cultist_86
+  - first:
+      213: -6399021584842052116
+    second: damiao_spritesheet_cultist_87
+  - first:
+      213: -9160508663600883896
+    second: damiao_spritesheet_cultist_88
+  - first:
+      213: 2588124710666412614
+    second: damiao_spritesheet_cultist_89
+  - first:
+      213: -7345339319924392554
+    second: damiao_spritesheet_cultist_90
+  - first:
+      213: 1171573944922548711
+    second: damiao_spritesheet_cultist_91
+  - first:
+      213: -7414427473735872090
+    second: damiao_spritesheet_cultist_92
+  - first:
+      213: -4034928001225309335
+    second: damiao_spritesheet_cultist_93
+  - first:
+      213: -3821845809830687657
+    second: damiao_spritesheet_cultist_94
+  - first:
+      213: 2169578039001326472
+    second: damiao_spritesheet_cultist_95
+  - first:
+      213: 7787019776373020061
+    second: damiao_spritesheet_cultist_96
+  - first:
+      213: 5355046663571100476
+    second: damiao_spritesheet_cultist_97
+  - first:
+      213: -58859131506956157
+    second: damiao_spritesheet_cultist_98
+  - first:
+      213: 3945482579748300441
+    second: damiao_spritesheet_cultist_99
+  - first:
+      213: -3964441541341221411
+    second: damiao_spritesheet_cultist_100
+  - first:
+      213: -7433815858356849481
+    second: damiao_spritesheet_cultist_101
+  - first:
+      213: -4694717447274308218
+    second: damiao_spritesheet_cultist_102
+  - first:
+      213: -4735639814352704788
+    second: damiao_spritesheet_cultist_103
+  - first:
+      213: -4662678784154401072
+    second: damiao_spritesheet_cultist_104
+  - first:
+      213: 9130905335556012591
+    second: damiao_spritesheet_cultist_105
+  - first:
+      213: 7167476224914037963
+    second: damiao_spritesheet_cultist_106
+  - first:
+      213: -6975917711318437568
+    second: damiao_spritesheet_cultist_107
+  - first:
+      213: 3025218696983791802
+    second: damiao_spritesheet_cultist_108
+  - first:
+      213: 2021789178836681216
+    second: damiao_spritesheet_cultist_109
+  - first:
+      213: 5704748614986568244
+    second: damiao_spritesheet_cultist_110
+  - first:
+      213: 4207002608504724634
+    second: damiao_spritesheet_cultist_111
+  - first:
+      213: 3138461281828536098
+    second: damiao_spritesheet_cultist_112
+  - first:
+      213: -1210502706583960528
+    second: damiao_spritesheet_cultist_113
+  - first:
+      213: 8870648156535336488
+    second: damiao_spritesheet_cultist_114
+  - first:
+      213: 4410926101112101629
+    second: damiao_spritesheet_cultist_115
+  - first:
+      213: 5765936346382342776
+    second: damiao_spritesheet_cultist_116
+  - first:
+      213: -815264091668733763
+    second: damiao_spritesheet_cultist_117
+  - first:
+      213: -6559971461681597762
+    second: damiao_spritesheet_cultist_118
+  - first:
+      213: -2744542868486942543
+    second: damiao_spritesheet_cultist_119
+  - first:
+      213: -516001660646751404
+    second: damiao_spritesheet_cultist_120
+  - first:
+      213: 840953076827578235
+    second: damiao_spritesheet_cultist_121
+  - first:
+      213: 4416248105285545978
+    second: damiao_spritesheet_cultist_122
+  - first:
+      213: -25707706148724190
+    second: damiao_spritesheet_cultist_123
+  - first:
+      213: 8289244881197768845
+    second: damiao_spritesheet_cultist_124
+  - first:
+      213: -1147117508956854566
+    second: damiao_spritesheet_cultist_125
+  - first:
+      213: -8495975103561317268
+    second: damiao_spritesheet_cultist_126
+  - first:
+      213: 2572072502401547385
+    second: damiao_spritesheet_cultist_127
+  - first:
+      213: 1416987938711409366
+    second: damiao_spritesheet_cultist_128
+  - first:
+      213: -1763979703792634269
+    second: damiao_spritesheet_cultist_129
+  - first:
+      213: -6013646074787791425
+    second: damiao_spritesheet_cultist_130
+  - first:
+      213: -3036740748046603780
+    second: damiao_spritesheet_cultist_131
+  - first:
+      213: 1998684006921435082
+    second: damiao_spritesheet_cultist_132
+  - first:
+      213: 6019851987185799383
+    second: damiao_spritesheet_cultist_133
+  - first:
+      213: 6003310242849392312
+    second: damiao_spritesheet_cultist_134
+  - first:
+      213: 1795972254579066182
+    second: damiao_spritesheet_cultist_135
+  - first:
+      213: 8275215607875136743
+    second: damiao_spritesheet_cultist_136
+  - first:
+      213: -4249784431769225974
+    second: damiao_spritesheet_cultist_137
+  - first:
+      213: -4969427802322352572
+    second: damiao_spritesheet_cultist_138
+  - first:
+      213: -7840133720171359021
+    second: damiao_spritesheet_cultist_139
+  - first:
+      213: -2026041996459259585
+    second: damiao_spritesheet_cultist_140
+  - first:
+      213: -4296789127102057029
+    second: damiao_spritesheet_cultist_141
+  - first:
+      213: 2562564992768429702
+    second: damiao_spritesheet_cultist_142
+  - first:
+      213: -8945193301540974241
+    second: damiao_spritesheet_cultist_143
+  - first:
+      213: 5913582011731340359
+    second: damiao_spritesheet_cultist_144
+  - first:
+      213: 5522704176789992127
+    second: damiao_spritesheet_cultist_145
+  - first:
+      213: 8029332449601997330
+    second: damiao_spritesheet_cultist_146
+  - first:
+      213: -3415391231902429141
+    second: damiao_spritesheet_cultist_147
+  - first:
+      213: -2446624020310245636
+    second: damiao_spritesheet_cultist_148
+  - first:
+      213: -7455557155454284811
+    second: damiao_spritesheet_cultist_149
+  - first:
+      213: -4931809870280561801
+    second: damiao_spritesheet_cultist_150
+  - first:
+      213: -7785212419288010188
+    second: damiao_spritesheet_cultist_151
+  - first:
+      213: 3693271873644927414
+    second: damiao_spritesheet_cultist_152
+  - first:
+      213: -1624487611983726160
+    second: damiao_spritesheet_cultist_153
+  - first:
+      213: -1980490311374177019
+    second: damiao_spritesheet_cultist_154
+  - first:
+      213: 2403631307435707068
+    second: damiao_spritesheet_cultist_155
+  - first:
+      213: 8981289758190756891
+    second: damiao_spritesheet_cultist_156
+  - first:
+      213: 4937159949525196983
+    second: damiao_spritesheet_cultist_157
+  - first:
+      213: 6212120164210029908
+    second: damiao_spritesheet_cultist_158
+  - first:
+      213: 5841900700128668881
+    second: damiao_spritesheet_cultist_159
+  - first:
+      213: -8059187155570942427
+    second: damiao_spritesheet_cultist_160
+  - first:
+      213: -6192896640327661521
+    second: damiao_spritesheet_cultist_161
+  - first:
+      213: 2557294296790753936
+    second: damiao_spritesheet_cultist_162
+  - first:
+      213: -8514323746051114038
+    second: damiao_spritesheet_cultist_163
+  - first:
+      213: 9139175440318837095
+    second: damiao_spritesheet_cultist_164
+  - first:
+      213: 2644753443611988102
+    second: damiao_spritesheet_cultist_165
+  - first:
+      213: -7694808023913061060
+    second: damiao_spritesheet_cultist_166
+  - first:
+      213: -7081891029562489959
+    second: damiao_spritesheet_cultist_167
+  - first:
+      213: 4932729773728804386
+    second: damiao_spritesheet_cultist_168
+  - first:
+      213: -4942757006194062199
+    second: damiao_spritesheet_cultist_169
+  - first:
+      213: -263453053516951559
+    second: damiao_spritesheet_cultist_170
+  - first:
+      213: -2061334494021041008
+    second: damiao_spritesheet_cultist_171
+  - first:
+      213: 6626348026166874558
+    second: damiao_spritesheet_cultist_172
+  - first:
+      213: -4708997520362940449
+    second: damiao_spritesheet_cultist_173
+  - first:
+      213: -1510178444232890588
+    second: damiao_spritesheet_cultist_174
+  - first:
+      213: 895995004090759311
+    second: damiao_spritesheet_cultist_175
+  - first:
+      213: 7520036666075023534
+    second: damiao_spritesheet_cultist_176
+  - first:
+      213: -6917065589978854448
+    second: damiao_spritesheet_cultist_177
+  - first:
+      213: -6032607012419661307
+    second: damiao_spritesheet_cultist_178
+  - first:
+      213: 5388006758280171636
+    second: damiao_spritesheet_cultist_179
+  - first:
+      213: -4673694342175400375
+    second: damiao_spritesheet_cultist_180
+  - first:
+      213: 1124828978527234938
+    second: damiao_spritesheet_cultist_181
+  - first:
+      213: -5625732819097449907
+    second: damiao_spritesheet_cultist_182
+  - first:
+      213: -3557543333727663306
+    second: damiao_spritesheet_cultist_183
+  - first:
+      213: -3960770172727262259
+    second: damiao_spritesheet_cultist_184
+  - first:
+      213: -462058957273966776
+    second: damiao_spritesheet_cultist_185
+  - first:
+      213: 2058145715577598812
+    second: damiao_spritesheet_cultist_186
+  - first:
+      213: -3887507630744815506
+    second: damiao_spritesheet_cultist_187
+  - first:
+      213: 7342321598815485159
+    second: damiao_spritesheet_cultist_188
+  - first:
+      213: -7984565891333682001
+    second: damiao_spritesheet_cultist_189
+  - first:
+      213: -6496885793465430781
+    second: damiao_spritesheet_cultist_190
+  - first:
+      213: 485553557202762292
+    second: damiao_spritesheet_cultist_191
+  - first:
+      213: 4580772996139332777
+    second: damiao_spritesheet_cultist_192
+  - first:
+      213: -7784195491425083593
+    second: damiao_spritesheet_cultist_193
+  - first:
+      213: -771612209075265526
+    second: damiao_spritesheet_cultist_194
+  - first:
+      213: -1290145187072178238
+    second: damiao_spritesheet_cultist_195
+  - first:
+      213: -7216067812069139739
+    second: damiao_spritesheet_cultist_196
+  - first:
+      213: -325083635140505606
+    second: damiao_spritesheet_cultist_197
+  - first:
+      213: -5202075730640950070
+    second: damiao_spritesheet_cultist_198
+  - first:
+      213: -7186648416105317545
+    second: damiao_spritesheet_cultist_199
+  - first:
+      213: 6088416458620734218
+    second: damiao_spritesheet_cultist_200
+  - first:
+      213: 7854524954116869408
+    second: damiao_spritesheet_cultist_201
+  - first:
+      213: -2172157436580875779
+    second: damiao_spritesheet_cultist_202
+  - first:
+      213: 7024913319175984099
+    second: damiao_spritesheet_cultist_203
+  - first:
+      213: -8657407556517804639
+    second: damiao_spritesheet_cultist_204
+  - first:
+      213: -3478429389899816712
+    second: damiao_spritesheet_cultist_205
+  - first:
+      213: 5127790162881267725
+    second: damiao_spritesheet_cultist_206
+  - first:
+      213: -8460218882376328356
+    second: damiao_spritesheet_cultist_207
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_0
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 63
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4eea9811eee9f2d0800000000000000
+      internalID: -3244299405995872689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_1
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 95
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbb0b7a28e4f29700800000000000000
+      internalID: 545767782847548349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_2
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 86
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d91f78f0ff3a2a00800000000000000
+      internalID: 732468193594907097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_3
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c294e4224bffc960800000000000000
+      internalID: 7624588955666911938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_4
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 63
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 898924f60c5c32eb0800000000000000
+      internalID: -4745732152027342696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_5
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3a7808c0a66a9e90800000000000000
+      internalID: -7018184228566697412
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_6
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 95
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a0740dd37dbf990800000000000000
+      internalID: -7351045306264909175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_7
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 64
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16ddfe30454be2c50800000000000000
+      internalID: 6642444773354364257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_8
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 96
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6dfc2c5df4dcd5270800000000000000
+      internalID: 8240968635930300374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_9
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 87
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8144e4e00ec7a1020800000000000000
+      internalID: 2313298660362699800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_10
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 96
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc3d8605158a0b6a0800000000000000
+      internalID: -6435458800317574195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_11
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 64
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93f410e6557a42610800000000000000
+      internalID: 1595584153355636537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_12
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 96
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf0278619f36d5110800000000000000
+      internalID: 1251266192954827004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_13
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 96
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb282e769442502d0800000000000000
+      internalID: -3313202053167021380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_14
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 64
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9cf42f4445eebe50800000000000000
+      internalID: 6827146166688611486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_15
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 96
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee7d963c7f782d030800000000000000
+      internalID: 3518023757134944238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_16
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 87
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d31216d2453bef6d0800000000000000
+      internalID: -2954727131388501699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_17
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 96
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6608253777f85fdf0800000000000000
+      internalID: -147053669621006234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_18
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 64
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1db357565c92da3a0800000000000000
+      internalID: -6652615146768876591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_19
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 96
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 481a02f14e7c3a860800000000000000
+      internalID: 7540089983737045380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_20
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 96
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6db66649a4cc05160800000000000000
+      internalID: 7012329240505248726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_21
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 63
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5e0287c1a69537a0800000000000000
+      internalID: -6398042074028831140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_22
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 95
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3d2575f988d40b90800000000000000
+      internalID: -7276453010883662532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_23
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 86
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05ef80b10f88b9d60800000000000000
+      internalID: 7898056936351399504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_24
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9074da91bb42a9100800000000000000
+      internalID: 115445126459639561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_25
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 63
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90d100c2ef9aa7d80800000000000000
+      internalID: -8252096458078020343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_26
+      rect:
+        serializedVersion: 2
+        x: 449
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c5458038a38c0ce0800000000000000
+      internalID: -1437629422646245947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_27
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 95
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 617ec3d019fc439c0800000000000000
+      internalID: -3948302751397779690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_28
+      rect:
+        serializedVersion: 2
+        x: 548
+        y: 63
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e196e3a569c0a1d70800000000000000
+      internalID: 9014531444034136350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_29
+      rect:
+        serializedVersion: 2
+        x: 551
+        y: 95
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48f7b5c1219865eb0800000000000000
+      internalID: -4731443647627952252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_30
+      rect:
+        serializedVersion: 2
+        x: 551
+        y: 86
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a829b169574aa4b60800000000000000
+      internalID: 7731172535271395978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_31
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a029f4e6b88177710800000000000000
+      internalID: 1690847172231139850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_32
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 63
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ec93a8c056a8df90800000000000000
+      internalID: -6928605160815747863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_33
+      rect:
+        serializedVersion: 2
+        x: 577
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a19674f9a2fd9b40800000000000000
+      internalID: 5448777935952974243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_34
+      rect:
+        serializedVersion: 2
+        x: 592
+        y: 95
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aadf781e8c28d2220800000000000000
+      internalID: 2462768370530385322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_35
+      rect:
+        serializedVersion: 2
+        x: 679
+        y: 93
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e0f7f98d17397730800000000000000
+      internalID: 3997286744276332775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_36
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 93
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eda6afe6e48fe2f40800000000000000
+      internalID: 5705770793678039774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_37
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 93
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcd1828b28ae7ddf0800000000000000
+      internalID: -155397814964707893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_38
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 93
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0eaaceb32a05c4760800000000000000
+      internalID: 7443412941856877280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_39
+      rect:
+        serializedVersion: 2
+        x: 804
+        y: 63
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5be6b07d8f2df210800000000000000
+      internalID: 1368302146318429018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_40
+      rect:
+        serializedVersion: 2
+        x: 807
+        y: 95
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55b8892f368fb91e0800000000000000
+      internalID: -2189883685630080171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_41
+      rect:
+        serializedVersion: 2
+        x: 807
+        y: 86
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bedf97c834fabb30800000000000000
+      internalID: 4304020918610419378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_42
+      rect:
+        serializedVersion: 2
+        x: 817
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36a841262f8a5c5f0800000000000000
+      internalID: -736997205024142749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_43
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 63
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2fb16540795113b0800000000000000
+      internalID: -5543551327581126869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_44
+      rect:
+        serializedVersion: 2
+        x: 833
+        y: 95
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 542eb40fdaf4fb920800000000000000
+      internalID: 3008210684586222149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_45
+      rect:
+        serializedVersion: 2
+        x: 848
+        y: 95
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2de50ffa2f509d510800000000000000
+      internalID: 1574296084634689234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_46
+      rect:
+        serializedVersion: 2
+        x: 935
+        y: 93
+        width: 10
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68cb5ebafddb7c000800000000000000
+      internalID: 56222288724737158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_47
+      rect:
+        serializedVersion: 2
+        x: 945
+        y: 93
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d39f4506f8d85260800000000000000
+      internalID: 7086652564830131153
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_48
+      rect:
+        serializedVersion: 2
+        x: 961
+        y: 93
+        width: 13
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 484a943c3aca2e640800000000000000
+      internalID: 5107834746747593860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_49
+      rect:
+        serializedVersion: 2
+        x: 976
+        y: 93
+        width: 9
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 547b8467e73d91f70800000000000000
+      internalID: 9158583857338431301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_50
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 63
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa3162f8dde9cf020800000000000000
+      internalID: 2376949377771377583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_51
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 44
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66e1943d82fbd5a80800000000000000
+      internalID: -8476408741577023898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_52
+      rect:
+        serializedVersion: 2
+        x: 145
+        y: 64
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95c560f50e4224e70800000000000000
+      internalID: 9097874743327349849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_53
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 64
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fdc836425b7112e0800000000000000
+      internalID: -2156807153238094350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_54
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 72
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 918ea221a7ca59bf0800000000000000
+      internalID: -318158558368962535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_55
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 44
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d2bc9cec9d9f9390800000000000000
+      internalID: -7809349931526999339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_56
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 64
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c7d69e6785c06950800000000000000
+      internalID: 6440364652606445509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_57
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 64
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57db990940b19f720800000000000000
+      internalID: 2880363143099956597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_58
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 72
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4565fbe800ef70380800000000000000
+      internalID: -9004949651555658156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_59
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 63
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42a65741b5ab21b90800000000000000
+      internalID: -7272545547901900252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_60
+      rect:
+        serializedVersion: 2
+        x: 593
+        y: 63
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c02057e5e0dfb6830800000000000000
+      internalID: 4065621326788100620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_61
+      rect:
+        serializedVersion: 2
+        x: 676
+        y: 61
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e477e3f15e3c1e00800000000000000
+      internalID: 1016756137584194785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_62
+      rect:
+        serializedVersion: 2
+        x: 679
+        y: 84
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9958e0e58984ebf60800000000000000
+      internalID: 8051953003035264409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_63
+      rect:
+        serializedVersion: 2
+        x: 704
+        y: 61
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd5e39c9e91561740800000000000000
+      internalID: 5122371367854138847
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_64
+      rect:
+        serializedVersion: 2
+        x: 721
+        y: 61
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c92c76effad46aa0800000000000000
+      internalID: -6168564796972324411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_65
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 63
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1807ded6bb34a1040800000000000000
+      internalID: 4619078840104087681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_66
+      rect:
+        serializedVersion: 2
+        x: 932
+        y: 61
+        width: 26
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99764fc6f05157d60800000000000000
+      internalID: 7887233478405941145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_67
+      rect:
+        serializedVersion: 2
+        x: 935
+        y: 84
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31e782f5003044600800000000000000
+      internalID: 451489162775264787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_68
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 61
+        width: 14
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 190af653f021a0a00800000000000000
+      internalID: 723410546676703377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_69
+      rect:
+        serializedVersion: 2
+        x: 977
+        y: 61
+        width: 14
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87275b462d1060700800000000000000
+      internalID: 506094011270132344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_70
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 43
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a118b932283fbec50800000000000000
+      internalID: 6695713011285066010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_71
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 63
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 941986757b3202a80800000000000000
+      internalID: -8493749626868297399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_72
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 71
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05c7fb912a41e7270800000000000000
+      internalID: 8250054253838564432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_73
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 43
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64c0e34ecac841750800000000000000
+      internalID: 6274794855025478726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_74
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 63
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1373c3b7d2a7dc560800000000000000
+      internalID: 7335653703816066865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_75
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 71
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fcf69a2c1e017bc0800000000000000
+      internalID: -3787230297505465101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_76
+      rect:
+        serializedVersion: 2
+        x: 521
+        y: 43
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cb57fffee2d55120800000000000000
+      internalID: 2402057900210478016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_77
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 63
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5fb80d34fc5584c0800000000000000
+      internalID: -4285917266307399844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_78
+      rect:
+        serializedVersion: 2
+        x: 610
+        y: 71
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fb53cbab2f4ad7c0800000000000000
+      internalID: -4045834266255074319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_79
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 41
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7f0620c7f591c890800000000000000
+      internalID: -7439500218126168194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_80
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 61
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e74227ad223cc9e60800000000000000
+      internalID: 7970459995000153214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_81
+      rect:
+        serializedVersion: 2
+        x: 738
+        y: 69
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ad0ec9e50b073cb0800000000000000
+      internalID: -4884423150834676319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_82
+      rect:
+        serializedVersion: 2
+        x: 777
+        y: 43
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35351da0fdfbd0aa0800000000000000
+      internalID: -6193082947884461229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_83
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 63
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb4dd4ba4e8073d50800000000000000
+      internalID: 6716847147465954491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_84
+      rect:
+        serializedVersion: 2
+        x: 866
+        y: 71
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5d0110339108cae0800000000000000
+      internalID: -1528970341814039206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_85
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 41
+        width: 8
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab8881d35820866d0800000000000000
+      internalID: -2997142780736141126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_86
+      rect:
+        serializedVersion: 2
+        x: 913
+        y: 61
+        width: 13
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff6e2453b33829e00800000000000000
+      internalID: 1050045953450632959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_87
+      rect:
+        serializedVersion: 2
+        x: 994
+        y: 69
+        width: 21
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cedae65a5cb1237a0800000000000000
+      internalID: -6399021584842052116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_88
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 42
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8475e28a7e55fd080800000000000000
+      internalID: -9160508663600883896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_89
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 42
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 642aead36bddae320800000000000000
+      internalID: 2588124710666412614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_90
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69d72394ecc101a90800000000000000
+      internalID: -7345339319924392554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_91
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e9263fab44424010800000000000000
+      internalID: 1171573944922548711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_92
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a19317fe79aa1990800000000000000
+      internalID: -7414427473735872090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_93
+      rect:
+        serializedVersion: 2
+        x: 97
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96340b06c5e0108c0800000000000000
+      internalID: -4034928001225309335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_94
+      rect:
+        serializedVersion: 2
+        x: 113
+        y: 42
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75c0ab62c7316fac0800000000000000
+      internalID: -3821845809830687657
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_95
+      rect:
+        serializedVersion: 2
+        x: 145
+        y: 43
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 883a9274bb3eb1e10800000000000000
+      internalID: 2169578039001326472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_96
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 43
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d95d7adaa3d011c60800000000000000
+      internalID: 7787019776373020061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_97
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 43
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c33dbc97192f05a40800000000000000
+      internalID: 5355046663571100476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_98
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 43
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3886db68ee3ee2ff0800000000000000
+      internalID: -58859131506956157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_99
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 43
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 996a361908b21c630800000000000000
+      internalID: 3945482579748300441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_100
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 43
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ddded833c697bf8c0800000000000000
+      internalID: -3964441541341221411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_101
+      rect:
+        serializedVersion: 2
+        x: 241
+        y: 43
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b479f4ecd7c5d890800000000000000
+      internalID: -7433815858356849481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_102
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 43
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68dd26afa5309deb0800000000000000
+      internalID: -4694717447274308218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_103
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 43
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cea6f49eda0a74eb0800000000000000
+      internalID: -4735639814352704788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_104
+      rect:
+        serializedVersion: 2
+        x: 304
+        y: 43
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d60ab88956da4fb0800000000000000
+      internalID: -4662678784154401072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_105
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 43
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2af88b660e77be70800000000000000
+      internalID: 9130905335556012591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_106
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 43
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcc1f02d6adf77360800000000000000
+      internalID: 7167476224914037963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_107
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 43
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04132823dcf803f90800000000000000
+      internalID: -6975917711318437568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_108
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 43
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab8c699606cbbf920800000000000000
+      internalID: 3025218696983791802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_109
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 42
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0020a47db86de0c10800000000000000
+      internalID: 2021789178836681216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_110
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 42
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4321d29e3a65b2f40800000000000000
+      internalID: 5704748614986568244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_111
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9cd0113596426a30800000000000000
+      internalID: 4207002608504724634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_112
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22ff4b458ed0e8b20800000000000000
+      internalID: 3138461281828536098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_113
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0340a6ea33e633fe0800000000000000
+      internalID: -1210502706583960528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_114
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82e23c9ef7fda1b70800000000000000
+      internalID: 8870648156535336488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_115
+      rect:
+        serializedVersion: 2
+        x: 497
+        y: 42
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfa194b3be1c63d30800000000000000
+      internalID: 4410926101112101629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_116
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 42
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87a12abce88b40050800000000000000
+      internalID: 5765936346382342776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_117
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 42
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db024f9c0a99fa4f0800000000000000
+      internalID: -815264091668733763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_118
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb2b4c936bc46f4a0800000000000000
+      internalID: -6559971461681597762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_119
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b011056dcc69e9d0800000000000000
+      internalID: -2744542868486942543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_120
+      rect:
+        serializedVersion: 2
+        x: 593
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45383a9393bc6d8f0800000000000000
+      internalID: -516001660646751404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_121
+      rect:
+        serializedVersion: 2
+        x: 609
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7f54192e5aabab00800000000000000
+      internalID: 840953076827578235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_122
+      rect:
+        serializedVersion: 2
+        x: 625
+        y: 42
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aff6983e04aa94d30800000000000000
+      internalID: 4416248105285545978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_123
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 40
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 222e30b3afaa4aff0800000000000000
+      internalID: -25707706148724190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_124
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 40
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d80a4081d40590370800000000000000
+      internalID: 8289244881197768845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_125
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 40
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad6eefa04be9410f0800000000000000
+      internalID: -1147117508956854566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_126
+      rect:
+        serializedVersion: 2
+        x: 704
+        y: 40
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c644aab28ab381a80800000000000000
+      internalID: -8495975103561317268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_127
+      rect:
+        serializedVersion: 2
+        x: 721
+        y: 40
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97cb1324056d1b320800000000000000
+      internalID: 2572072502401547385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_128
+      rect:
+        serializedVersion: 2
+        x: 737
+        y: 40
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d218e1d5072aa310800000000000000
+      internalID: 1416987938711409366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_129
+      rect:
+        serializedVersion: 2
+        x: 753
+        y: 40
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 366f07c2ec51587e0800000000000000
+      internalID: -1763979703792634269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_130
+      rect:
+        serializedVersion: 2
+        x: 785
+        y: 42
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbdf953b1cc3b8ca0800000000000000
+      internalID: -6013646074787791425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_131
+      rect:
+        serializedVersion: 2
+        x: 800
+        y: 42
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf96ab501645bd5d0800000000000000
+      internalID: -3036740748046603780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_132
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac77ecac380ccbb10800000000000000
+      internalID: 1998684006921435082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_133
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 42
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d093a0ec7fca8350800000000000000
+      internalID: 6019851987185799383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_134
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b68085ebda005350800000000000000
+      internalID: 6003310242849392312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_135
+      rect:
+        serializedVersion: 2
+        x: 865
+        y: 42
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64584a400439ce810800000000000000
+      internalID: 1795972254579066182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_136
+      rect:
+        serializedVersion: 2
+        x: 881
+        y: 42
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ec6a2b50c877d270800000000000000
+      internalID: 8275215607875136743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_137
+      rect:
+        serializedVersion: 2
+        x: 913
+        y: 40
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a05f86c539bb505c0800000000000000
+      internalID: -4249784431769225974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_138
+      rect:
+        serializedVersion: 2
+        x: 928
+        y: 40
+        width: 17
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44640a13ebb090bb0800000000000000
+      internalID: -4969427802322352572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_139
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 40
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d4df999bef323390800000000000000
+      internalID: -7840133720171359021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_140
+      rect:
+        serializedVersion: 2
+        x: 960
+        y: 40
+        width: 17
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f39c505e98d02e3e0800000000000000
+      internalID: -2026041996459259585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_141
+      rect:
+        serializedVersion: 2
+        x: 977
+        y: 40
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb53254ed0dbe54c0800000000000000
+      internalID: -4296789127102057029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_142
+      rect:
+        serializedVersion: 2
+        x: 993
+        y: 40
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68e40dba84f009320800000000000000
+      internalID: 2562564992768429702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_143
+      rect:
+        serializedVersion: 2
+        x: 1009
+        y: 40
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f51527ef51a4cd380800000000000000
+      internalID: -8945193301540974241
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_144
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 23
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74ce2671283411250800000000000000
+      internalID: 5913582011731340359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_145
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 21
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb23221303694ac40800000000000000
+      internalID: 5522704176789992127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_146
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 21
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21a4b0a525bed6f60800000000000000
+      internalID: 8029332449601997330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_147
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 21
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b20d87525c71a90d0800000000000000
+      internalID: -3415391231902429141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_148
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 23
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfe38729a68db0ed0800000000000000
+      internalID: -2446624020310245636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_149
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 21
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5fb8682b44a888890800000000000000
+      internalID: -7455557155454284811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_150
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 21
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77b69268d01be8bb0800000000000000
+      internalID: -4931809870280561801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_151
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 21
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 432f06f6d8e55f390800000000000000
+      internalID: -7785212419288010188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_152
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 23
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b91c878333214330800000000000000
+      internalID: 3693271873644927414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_153
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 21
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b9ffa1bf19a479e0800000000000000
+      internalID: -1624487611983726160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_154
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 21
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50d707d0e82e384e0800000000000000
+      internalID: -1980490311374177019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_155
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 21
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cba86ba60f96b5120800000000000000
+      internalID: 2403631307435707068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_156
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 23
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1460dd3373f3ac70800000000000000
+      internalID: 8981289758190756891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_157
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 21
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b02cbed0d0548440800000000000000
+      internalID: 4937159949525196983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_158
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 21
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 455b7c94062e53650800000000000000
+      internalID: 6212120164210029908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_159
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 21
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dc664c2cb9921150800000000000000
+      internalID: 5841900700128668881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_160
+      rect:
+        serializedVersion: 2
+        x: 547
+        y: 25
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52e9dcd3bf3082090800000000000000
+      internalID: -8059187155570942427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_161
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 23
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f284f8621596e0aa0800000000000000
+      internalID: -6192896640327661521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_162
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 19
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09268522d955d7320800000000000000
+      internalID: 2557294296790753936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_163
+      rect:
+        serializedVersion: 2
+        x: 598
+        y: 19
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acb33fde9ab07d980800000000000000
+      internalID: -8514323746051114038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_164
+      rect:
+        serializedVersion: 2
+        x: 675
+        y: 25
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 761bd2c34afd4de70800000000000000
+      internalID: 9139175440318837095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_165
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 23
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 680dbf49e3d04b420800000000000000
+      internalID: 2644753443611988102
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_166
+      rect:
+        serializedVersion: 2
+        x: 706
+        y: 19
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3526dffedc863590800000000000000
+      internalID: -7694808023913061060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_167
+      rect:
+        serializedVersion: 2
+        x: 726
+        y: 19
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99307ec41a118bd90800000000000000
+      internalID: -7081891029562489959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_168
+      rect:
+        serializedVersion: 2
+        x: 803
+        y: 21
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22e29103893947440800000000000000
+      internalID: 4932729773728804386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_169
+      rect:
+        serializedVersion: 2
+        x: 817
+        y: 19
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98ccab2d0bcc76bb0800000000000000
+      internalID: -4942757006194062199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_170
+      rect:
+        serializedVersion: 2
+        x: 834
+        y: 23
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ff412af7d6085cf0800000000000000
+      internalID: -263453053516951559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_171
+      rect:
+        serializedVersion: 2
+        x: 854
+        y: 23
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 094cd98f23ba463e0800000000000000
+      internalID: -2061334494021041008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_172
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 21
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb199c10c6485fb50800000000000000
+      internalID: 6626348026166874558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_173
+      rect:
+        serializedVersion: 2
+        x: 945
+        y: 19
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd7529e54b746aeb0800000000000000
+      internalID: -4708997520362940449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_174
+      rect:
+        serializedVersion: 2
+        x: 962
+        y: 23
+        width: 16
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 427eb0cc4b4ca0be0800000000000000
+      internalID: -1510178444232890588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_175
+      rect:
+        serializedVersion: 2
+        x: 982
+        y: 23
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f88ba5385b63f6c00800000000000000
+      internalID: 895995004090759311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_176
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 3
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea8805341898c5860800000000000000
+      internalID: 7520036666075023534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_177
+      rect:
+        serializedVersion: 2
+        x: 46
+        y: 3
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0db8b3d7e75a100a0800000000000000
+      internalID: -6917065589978854448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_178
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 3
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 502123362efd74ca0800000000000000
+      internalID: -6032607012419661307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_179
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 3
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47091ba899b06ca40800000000000000
+      internalID: 5388006758280171636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_180
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 3
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94ed1e112c3b32fb0800000000000000
+      internalID: -4673694342175400375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_181
+      rect:
+        serializedVersion: 2
+        x: 174
+        y: 3
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7b6e221ff13c9f00800000000000000
+      internalID: 1124828978527234938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_182
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 3
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4a8074bec16de1b0800000000000000
+      internalID: -5625732819097449907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_183
+      rect:
+        serializedVersion: 2
+        x: 213
+        y: 3
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63b8a18cf2111aec0800000000000000
+      internalID: -3557543333727663306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_184
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 3
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc301a153848809c0800000000000000
+      internalID: -3960770172727262259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_185
+      rect:
+        serializedVersion: 2
+        x: 302
+        y: 3
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 847d56293df6699f0800000000000000
+      internalID: -462058957273966776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_186
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 3
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c53bef0bf90009c10800000000000000
+      internalID: 2058145715577598812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_187
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 3
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e68b5df186ccc0ac0800000000000000
+      internalID: -3887507630744815506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_188
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 3
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ec3314c79a25e560800000000000000
+      internalID: 7342321598815485159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_189
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 3
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fac0b5930af113190800000000000000
+      internalID: -7984565891333682001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_190
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 3
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30d0636facc66d5a0800000000000000
+      internalID: -6496885793465430781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_191
+      rect:
+        serializedVersion: 2
+        x: 469
+        y: 3
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43a7f7043680db600800000000000000
+      internalID: 485553557202762292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_192
+      rect:
+        serializedVersion: 2
+        x: 547
+        y: 5
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a4369f15cc229f30800000000000000
+      internalID: 4580772996139332777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_193
+      rect:
+        serializedVersion: 2
+        x: 558
+        y: 5
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73f1967617bf8f390800000000000000
+      internalID: -7784195491425083593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_194
+      rect:
+        serializedVersion: 2
+        x: 575
+        y: 1
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a00e6b5b8ceaa45f0800000000000000
+      internalID: -771612209075265526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_195
+      rect:
+        serializedVersion: 2
+        x: 597
+        y: 1
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c702efa9cb781ee0800000000000000
+      internalID: -1290145187072178238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_196
+      rect:
+        serializedVersion: 2
+        x: 675
+        y: 5
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ea1d7aae806bdb90800000000000000
+      internalID: -7216067812069139739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_197
+      rect:
+        serializedVersion: 2
+        x: 686
+        y: 5
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aff482df7221d7bf0800000000000000
+      internalID: -325083635140505606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_198
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 1
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acc277c4fa38ec7b0800000000000000
+      internalID: -5202075730640950070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_199
+      rect:
+        serializedVersion: 2
+        x: 725
+        y: 1
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75b3b609755e34c90800000000000000
+      internalID: -7186648416105317545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_200
+      rect:
+        serializedVersion: 2
+        x: 803
+        y: 1
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a0b0bb4e2866e7450800000000000000
+      internalID: 6088416458620734218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_201
+      rect:
+        serializedVersion: 2
+        x: 814
+        y: 1
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02dc399a4d0e00d60800000000000000
+      internalID: 7854524954116869408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_202
+      rect:
+        serializedVersion: 2
+        x: 831
+        y: 5
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df1bf5ce152fad1e0800000000000000
+      internalID: -2172157436580875779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_203
+      rect:
+        serializedVersion: 2
+        x: 853
+        y: 5
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e31567b1718d7160800000000000000
+      internalID: 7024913319175984099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_204
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 1
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a549fd32b5bad780800000000000000
+      internalID: -8657407556517804639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_205
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 1
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f02ebe36e22abfc0800000000000000
+      internalID: -3478429389899816712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_206
+      rect:
+        serializedVersion: 2
+        x: 959
+        y: 5
+        width: 30
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d08c7452cf1992740800000000000000
+      internalID: 5127790162881267725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: damiao_spritesheet_cultist_207
+      rect:
+        serializedVersion: 2
+        x: 981
+        y: 5
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5b18e920c3479a80800000000000000
+      internalID: -8460218882376328356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      damiao_spritesheet_cultist_0: -3244299405995872689
+      damiao_spritesheet_cultist_1: 545767782847548349
+      damiao_spritesheet_cultist_10: -6435458800317574195
+      damiao_spritesheet_cultist_100: -3964441541341221411
+      damiao_spritesheet_cultist_101: -7433815858356849481
+      damiao_spritesheet_cultist_102: -4694717447274308218
+      damiao_spritesheet_cultist_103: -4735639814352704788
+      damiao_spritesheet_cultist_104: -4662678784154401072
+      damiao_spritesheet_cultist_105: 9130905335556012591
+      damiao_spritesheet_cultist_106: 7167476224914037963
+      damiao_spritesheet_cultist_107: -6975917711318437568
+      damiao_spritesheet_cultist_108: 3025218696983791802
+      damiao_spritesheet_cultist_109: 2021789178836681216
+      damiao_spritesheet_cultist_11: 1595584153355636537
+      damiao_spritesheet_cultist_110: 5704748614986568244
+      damiao_spritesheet_cultist_111: 4207002608504724634
+      damiao_spritesheet_cultist_112: 3138461281828536098
+      damiao_spritesheet_cultist_113: -1210502706583960528
+      damiao_spritesheet_cultist_114: 8870648156535336488
+      damiao_spritesheet_cultist_115: 4410926101112101629
+      damiao_spritesheet_cultist_116: 5765936346382342776
+      damiao_spritesheet_cultist_117: -815264091668733763
+      damiao_spritesheet_cultist_118: -6559971461681597762
+      damiao_spritesheet_cultist_119: -2744542868486942543
+      damiao_spritesheet_cultist_12: 1251266192954827004
+      damiao_spritesheet_cultist_120: -516001660646751404
+      damiao_spritesheet_cultist_121: 840953076827578235
+      damiao_spritesheet_cultist_122: 4416248105285545978
+      damiao_spritesheet_cultist_123: -25707706148724190
+      damiao_spritesheet_cultist_124: 8289244881197768845
+      damiao_spritesheet_cultist_125: -1147117508956854566
+      damiao_spritesheet_cultist_126: -8495975103561317268
+      damiao_spritesheet_cultist_127: 2572072502401547385
+      damiao_spritesheet_cultist_128: 1416987938711409366
+      damiao_spritesheet_cultist_129: -1763979703792634269
+      damiao_spritesheet_cultist_13: -3313202053167021380
+      damiao_spritesheet_cultist_130: -6013646074787791425
+      damiao_spritesheet_cultist_131: -3036740748046603780
+      damiao_spritesheet_cultist_132: 1998684006921435082
+      damiao_spritesheet_cultist_133: 6019851987185799383
+      damiao_spritesheet_cultist_134: 6003310242849392312
+      damiao_spritesheet_cultist_135: 1795972254579066182
+      damiao_spritesheet_cultist_136: 8275215607875136743
+      damiao_spritesheet_cultist_137: -4249784431769225974
+      damiao_spritesheet_cultist_138: -4969427802322352572
+      damiao_spritesheet_cultist_139: -7840133720171359021
+      damiao_spritesheet_cultist_14: 6827146166688611486
+      damiao_spritesheet_cultist_140: -2026041996459259585
+      damiao_spritesheet_cultist_141: -4296789127102057029
+      damiao_spritesheet_cultist_142: 2562564992768429702
+      damiao_spritesheet_cultist_143: -8945193301540974241
+      damiao_spritesheet_cultist_144: 5913582011731340359
+      damiao_spritesheet_cultist_145: 5522704176789992127
+      damiao_spritesheet_cultist_146: 8029332449601997330
+      damiao_spritesheet_cultist_147: -3415391231902429141
+      damiao_spritesheet_cultist_148: -2446624020310245636
+      damiao_spritesheet_cultist_149: -7455557155454284811
+      damiao_spritesheet_cultist_15: 3518023757134944238
+      damiao_spritesheet_cultist_150: -4931809870280561801
+      damiao_spritesheet_cultist_151: -7785212419288010188
+      damiao_spritesheet_cultist_152: 3693271873644927414
+      damiao_spritesheet_cultist_153: -1624487611983726160
+      damiao_spritesheet_cultist_154: -1980490311374177019
+      damiao_spritesheet_cultist_155: 2403631307435707068
+      damiao_spritesheet_cultist_156: 8981289758190756891
+      damiao_spritesheet_cultist_157: 4937159949525196983
+      damiao_spritesheet_cultist_158: 6212120164210029908
+      damiao_spritesheet_cultist_159: 5841900700128668881
+      damiao_spritesheet_cultist_16: -2954727131388501699
+      damiao_spritesheet_cultist_160: -8059187155570942427
+      damiao_spritesheet_cultist_161: -6192896640327661521
+      damiao_spritesheet_cultist_162: 2557294296790753936
+      damiao_spritesheet_cultist_163: -8514323746051114038
+      damiao_spritesheet_cultist_164: 9139175440318837095
+      damiao_spritesheet_cultist_165: 2644753443611988102
+      damiao_spritesheet_cultist_166: -7694808023913061060
+      damiao_spritesheet_cultist_167: -7081891029562489959
+      damiao_spritesheet_cultist_168: 4932729773728804386
+      damiao_spritesheet_cultist_169: -4942757006194062199
+      damiao_spritesheet_cultist_17: -147053669621006234
+      damiao_spritesheet_cultist_170: -263453053516951559
+      damiao_spritesheet_cultist_171: -2061334494021041008
+      damiao_spritesheet_cultist_172: 6626348026166874558
+      damiao_spritesheet_cultist_173: -4708997520362940449
+      damiao_spritesheet_cultist_174: -1510178444232890588
+      damiao_spritesheet_cultist_175: 895995004090759311
+      damiao_spritesheet_cultist_176: 7520036666075023534
+      damiao_spritesheet_cultist_177: -6917065589978854448
+      damiao_spritesheet_cultist_178: -6032607012419661307
+      damiao_spritesheet_cultist_179: 5388006758280171636
+      damiao_spritesheet_cultist_18: -6652615146768876591
+      damiao_spritesheet_cultist_180: -4673694342175400375
+      damiao_spritesheet_cultist_181: 1124828978527234938
+      damiao_spritesheet_cultist_182: -5625732819097449907
+      damiao_spritesheet_cultist_183: -3557543333727663306
+      damiao_spritesheet_cultist_184: -3960770172727262259
+      damiao_spritesheet_cultist_185: -462058957273966776
+      damiao_spritesheet_cultist_186: 2058145715577598812
+      damiao_spritesheet_cultist_187: -3887507630744815506
+      damiao_spritesheet_cultist_188: 7342321598815485159
+      damiao_spritesheet_cultist_189: -7984565891333682001
+      damiao_spritesheet_cultist_19: 7540089983737045380
+      damiao_spritesheet_cultist_190: -6496885793465430781
+      damiao_spritesheet_cultist_191: 485553557202762292
+      damiao_spritesheet_cultist_192: 4580772996139332777
+      damiao_spritesheet_cultist_193: -7784195491425083593
+      damiao_spritesheet_cultist_194: -771612209075265526
+      damiao_spritesheet_cultist_195: -1290145187072178238
+      damiao_spritesheet_cultist_196: -7216067812069139739
+      damiao_spritesheet_cultist_197: -325083635140505606
+      damiao_spritesheet_cultist_198: -5202075730640950070
+      damiao_spritesheet_cultist_199: -7186648416105317545
+      damiao_spritesheet_cultist_2: 732468193594907097
+      damiao_spritesheet_cultist_20: 7012329240505248726
+      damiao_spritesheet_cultist_200: 6088416458620734218
+      damiao_spritesheet_cultist_201: 7854524954116869408
+      damiao_spritesheet_cultist_202: -2172157436580875779
+      damiao_spritesheet_cultist_203: 7024913319175984099
+      damiao_spritesheet_cultist_204: -8657407556517804639
+      damiao_spritesheet_cultist_205: -3478429389899816712
+      damiao_spritesheet_cultist_206: 5127790162881267725
+      damiao_spritesheet_cultist_207: -8460218882376328356
+      damiao_spritesheet_cultist_21: -6398042074028831140
+      damiao_spritesheet_cultist_22: -7276453010883662532
+      damiao_spritesheet_cultist_23: 7898056936351399504
+      damiao_spritesheet_cultist_24: 115445126459639561
+      damiao_spritesheet_cultist_25: -8252096458078020343
+      damiao_spritesheet_cultist_26: -1437629422646245947
+      damiao_spritesheet_cultist_27: -3948302751397779690
+      damiao_spritesheet_cultist_28: 9014531444034136350
+      damiao_spritesheet_cultist_29: -4731443647627952252
+      damiao_spritesheet_cultist_3: 7624588955666911938
+      damiao_spritesheet_cultist_30: 7731172535271395978
+      damiao_spritesheet_cultist_31: 1690847172231139850
+      damiao_spritesheet_cultist_32: -6928605160815747863
+      damiao_spritesheet_cultist_33: 5448777935952974243
+      damiao_spritesheet_cultist_34: 2462768370530385322
+      damiao_spritesheet_cultist_35: 3997286744276332775
+      damiao_spritesheet_cultist_36: 5705770793678039774
+      damiao_spritesheet_cultist_37: -155397814964707893
+      damiao_spritesheet_cultist_38: 7443412941856877280
+      damiao_spritesheet_cultist_39: 1368302146318429018
+      damiao_spritesheet_cultist_4: -4745732152027342696
+      damiao_spritesheet_cultist_40: -2189883685630080171
+      damiao_spritesheet_cultist_41: 4304020918610419378
+      damiao_spritesheet_cultist_42: -736997205024142749
+      damiao_spritesheet_cultist_43: -5543551327581126869
+      damiao_spritesheet_cultist_44: 3008210684586222149
+      damiao_spritesheet_cultist_45: 1574296084634689234
+      damiao_spritesheet_cultist_46: 56222288724737158
+      damiao_spritesheet_cultist_47: 7086652564830131153
+      damiao_spritesheet_cultist_48: 5107834746747593860
+      damiao_spritesheet_cultist_49: 9158583857338431301
+      damiao_spritesheet_cultist_5: -7018184228566697412
+      damiao_spritesheet_cultist_50: 2376949377771377583
+      damiao_spritesheet_cultist_51: -8476408741577023898
+      damiao_spritesheet_cultist_52: 9097874743327349849
+      damiao_spritesheet_cultist_53: -2156807153238094350
+      damiao_spritesheet_cultist_54: -318158558368962535
+      damiao_spritesheet_cultist_55: -7809349931526999339
+      damiao_spritesheet_cultist_56: 6440364652606445509
+      damiao_spritesheet_cultist_57: 2880363143099956597
+      damiao_spritesheet_cultist_58: -9004949651555658156
+      damiao_spritesheet_cultist_59: -7272545547901900252
+      damiao_spritesheet_cultist_6: -7351045306264909175
+      damiao_spritesheet_cultist_60: 4065621326788100620
+      damiao_spritesheet_cultist_61: 1016756137584194785
+      damiao_spritesheet_cultist_62: 8051953003035264409
+      damiao_spritesheet_cultist_63: 5122371367854138847
+      damiao_spritesheet_cultist_64: -6168564796972324411
+      damiao_spritesheet_cultist_65: 4619078840104087681
+      damiao_spritesheet_cultist_66: 7887233478405941145
+      damiao_spritesheet_cultist_67: 451489162775264787
+      damiao_spritesheet_cultist_68: 723410546676703377
+      damiao_spritesheet_cultist_69: 506094011270132344
+      damiao_spritesheet_cultist_7: 6642444773354364257
+      damiao_spritesheet_cultist_70: 6695713011285066010
+      damiao_spritesheet_cultist_71: -8493749626868297399
+      damiao_spritesheet_cultist_72: 8250054253838564432
+      damiao_spritesheet_cultist_73: 6274794855025478726
+      damiao_spritesheet_cultist_74: 7335653703816066865
+      damiao_spritesheet_cultist_75: -3787230297505465101
+      damiao_spritesheet_cultist_76: 2402057900210478016
+      damiao_spritesheet_cultist_77: -4285917266307399844
+      damiao_spritesheet_cultist_78: -4045834266255074319
+      damiao_spritesheet_cultist_79: -7439500218126168194
+      damiao_spritesheet_cultist_8: 8240968635930300374
+      damiao_spritesheet_cultist_80: 7970459995000153214
+      damiao_spritesheet_cultist_81: -4884423150834676319
+      damiao_spritesheet_cultist_82: -6193082947884461229
+      damiao_spritesheet_cultist_83: 6716847147465954491
+      damiao_spritesheet_cultist_84: -1528970341814039206
+      damiao_spritesheet_cultist_85: -2997142780736141126
+      damiao_spritesheet_cultist_86: 1050045953450632959
+      damiao_spritesheet_cultist_87: -6399021584842052116
+      damiao_spritesheet_cultist_88: -9160508663600883896
+      damiao_spritesheet_cultist_89: 2588124710666412614
+      damiao_spritesheet_cultist_9: 2313298660362699800
+      damiao_spritesheet_cultist_90: -7345339319924392554
+      damiao_spritesheet_cultist_91: 1171573944922548711
+      damiao_spritesheet_cultist_92: -7414427473735872090
+      damiao_spritesheet_cultist_93: -4034928001225309335
+      damiao_spritesheet_cultist_94: -3821845809830687657
+      damiao_spritesheet_cultist_95: 2169578039001326472
+      damiao_spritesheet_cultist_96: 7787019776373020061
+      damiao_spritesheet_cultist_97: 5355046663571100476
+      damiao_spritesheet_cultist_98: -58859131506956157
+      damiao_spritesheet_cultist_99: 3945482579748300441
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
