@@ -1,0 +1,22 @@
+{
+  "name": "aseprite-bridge-server",
+  "version": "1.0.0",
+  "description": "MCP server bridging Claude Code to a local Aseprite CLI build for content-aware spritesheet slicing",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "watch": "tsc --watch"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "zod": "^3.24.4"
+  }
+}

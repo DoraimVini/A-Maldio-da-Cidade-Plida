@@ -1,10 +1,19 @@
 {
-   "mcpServers": {
-       "mcp-unity": {
-          "command": "node",
-          "args": [
-             "Library/PackageCache/com.gamelovers.mcp-unity@c523d75b086d/Server~/build/index.js"
-          ]
-       }
-   }
+  "mcpServers": {
+    "mcp-unity": {
+      "command": "node",
+      "args": [
+        "Library/PackageCache/com.gamelovers.mcp-unity@c523d75b086d/Server~/build/index.js"
+      ]
+    },
+    "aseprite-bridge": {
+      "command": "node",
+      "args": [
+        "Tools/aseprite-bridge/build/index.js"
+      ],
+      "env": {
+        "ASEPRITE_EXE_PATH": "C:\\aseprite\\build\\bin\\aseprite.exe"
+      }
+    }
+  }
 }
