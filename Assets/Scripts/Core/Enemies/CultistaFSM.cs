@@ -49,8 +49,8 @@ namespace FavelaAmarela.Core.Enemies
 
             if (CurrentState == CultistaState.Alerta)
             {
-                // Volta para Errante se não houver novo estímulo por 4s
-                if (TimeSinceLastStimulus >= 4f)
+                // Volta para Errante se não houver novo estímulo por 8s
+                if (TimeSinceLastStimulus >= 8f)
                 {
                     ChangeState(CultistaState.Errante);
                 }
@@ -63,8 +63,8 @@ namespace FavelaAmarela.Core.Enemies
             }
             else if (CurrentState == CultistaState.Caca)
             {
-                // Perde o rastro após 5s sem ouvir nada
-                if (TimeSinceLastStimulus >= 5f)
+                // Perde o rastro após 10s sem ouvir nada
+                if (TimeSinceLastStimulus >= 10f)
                 {
                     ChangeState(CultistaState.Errante);
                 }

@@ -29,9 +29,31 @@ namespace FavelaAmarela.Level.Runtime
         [Header("Cores")]
         [SerializeField] private Color wallColor = new(0.4f, 0.35f, 0.25f, 1f);
         [SerializeField] private Color floorColor = new(0.2f, 0.18f, 0.15f, 0.5f);
+        [SerializeField] private Color anomalyWallColor = new(0.55f, 0.15f, 0.65f, 1f);
 
         [Header("Runtime")]
         [SerializeField] private Transform generationRoot;
+
+        private void Awake()
+        {
+            ConfigureAnomalyBarrierPhysics();
+        }
+
+        /// <summary>
+        /// Garante que a layer "AnomalyBarrier" (paredes que parecem sólidas mas
+        /// só bloqueiam o jogador andando normalmente) não colida com a layer
+        /// usada pelo jogador durante o Salto Dimensional ("Ignore Raycast", ver
+        /// PlayerMovement.HandleLeapActivated). Chamada de runtime pura — a
+        /// matriz de colisão do Physics2DSettings não é persistida para esse
+        /// par específico, então isso precisa rodar a cada Play/build.
+        /// </summary>
+        private static void ConfigureAnomalyBarrierPhysics()
+        {
+            int anomalyLayer = LayerMask.NameToLayer("AnomalyBarrier");
+            int leapLayer = LayerMask.NameToLayer("Ignore Raycast");
+            if (anomalyLayer < 0 || leapLayer < 0) return; // erro já logado em SpawnWall2D se a layer faltar
+            Physics2D.IgnoreLayerCollision(anomalyLayer, leapLayer, true);
+        }
 
         // ── Editor API ───────────────────────────────────────────────────────
 
@@ -66,7 +88,7 @@ namespace FavelaAmarela.Level.Runtime
             foreach (var w in layout.Walls)
             {
                 var parent = GetOrCreateRoomRoot(w.ParentName);
-                SpawnWall2D(w.Name, parent, w.Center, w.Size);
+                SpawnWall2D(w.Name, parent, w.Center, w.Size, w.IsAnomalyBarrier);
             }
 
             foreach (var f in layout.Floors)
@@ -108,10 +130,22 @@ namespace FavelaAmarela.Level.Runtime
         /// Parede: SpriteRenderer colorido + BoxCollider2D sólido (não trigger).
         /// SortingOrder calculado por Y (maior Y = mais atrás = menor order),
         /// alinhado com favela-isometric-standards (profundidade automática no Y).
+        /// Paredes anômalas (<paramref name="isAnomalyBarrier"/>) usam cor
+        /// distinta e ficam na layer "AnomalyBarrier" (ver ConfigureAnomalyBarrierPhysics).
         /// </summary>
-        private void SpawnWall2D(string name, Transform parent, Vector2 worldCenter, Vector2 size)
+        private void SpawnWall2D(string name, Transform parent, Vector2 worldCenter, Vector2 size, bool isAnomalyBarrier)
         {
-            var go = CreateSpriteObject(name, parent, worldCenter, size, wallColor, isTrigger: false);
+            var color = isAnomalyBarrier ? anomalyWallColor : wallColor;
+            var go = CreateSpriteObject(name, parent, worldCenter, size, color, isTrigger: false);
+
+            if (isAnomalyBarrier)
+            {
+                int anomalyLayer = LayerMask.NameToLayer("AnomalyBarrier");
+                if (anomalyLayer < 0)
+                    Debug.LogError("[LevelBlockoutGenerator] Layer 'AnomalyBarrier' não existe em Project Settings > Tags and Layers. Parede anômala ficará na layer Default.", this);
+                else
+                    go.layer = anomalyLayer;
+            }
 
             // SortingOrder por Y: paredes ao norte (Y maior) ficam atrás de paredes ao sul
             // Fator 10 para dar resolução suficiente sem overflow no int do SortingOrder
@@ -184,8 +218,14 @@ namespace FavelaAmarela.Level.Runtime
 
         /// <summary>
         /// Sprite de 1×1 pixel branco, gerado uma única vez em runtime.
-        /// FilterMode.Point (sem blur) alinhado com favela-pixelart-standards.
-        /// PPU = 16 — escala visual correta com o grid isométrico (célula 1.0u).
+        /// FilterMode.Point (sem blur), mas com PPU = 1 — este retângulo é
+        /// esticado via <c>transform.localScale = size</c> em <see cref="CreateSpriteObject"/>
+        /// e <see cref="SpawnFloor2D"/>, que assume 1 unidade de escala = 1 unidade
+        /// de mundo. PPU = 16 (regra de import de pixel art real, ver
+        /// favela-pixelart-standards) não se aplica aqui: isso NÃO é um sprite
+        /// importado, é um placeholder sólido de blockout, e usar PPU = 16 faria
+        /// o sprite nativo medir 0.0625u, deixando toda parede/chão 16x menor
+        /// que o `size` pedido.
         /// </summary>
         private static Sprite WhitePixelSprite()
         {
@@ -199,8 +239,7 @@ namespace FavelaAmarela.Level.Runtime
             tex.SetPixel(0, 0, Color.white);
             tex.Apply();
 
-            // PPU = 16 para alinhar com favela-pixelart-standards
-            _cachedWhiteSprite = Sprite.Create(tex, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f), pixelsPerUnit: 16f);
+            _cachedWhiteSprite = Sprite.Create(tex, new Rect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f), pixelsPerUnit: 1f);
             return _cachedWhiteSprite;
         }
     }

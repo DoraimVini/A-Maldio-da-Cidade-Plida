@@ -33,11 +33,19 @@ namespace FavelaAmarela.Level.Core
         public readonly float Width;
         public readonly float Offset; // a partir do centro do próprio lado, ao longo do seu eixo
 
-        public Doorway(Side side, float width, float offset = 0f)
+        /// <summary>
+        /// Se true, esta abertura não vira um buraco vazio na parede — vira um
+        /// segmento de parede próprio, marcado como barreira anômala (só
+        /// atravessável durante o Salto Dimensional). Ver <see cref="WallSpec.IsAnomalyBarrier"/>.
+        /// </summary>
+        public readonly bool IsAnomalyBarrier;
+
+        public Doorway(Side side, float width, float offset = 0f, bool isAnomalyBarrier = false)
         {
             Side = side;
             Width = width;
             Offset = offset;
+            IsAnomalyBarrier = isAnomalyBarrier;
         }
     }
 
@@ -86,12 +94,20 @@ namespace FavelaAmarela.Level.Core
         public readonly Vector2 Center;
         public readonly Vector2 Size;
 
-        public WallSpec(string name, string parentName, Vector2 center, Vector2 size)
+        /// <summary>
+        /// Se true, esta parede deve ser instanciada na layer "AnomalyBarrier"
+        /// (bloqueia o jogador andando normalmente, mas é atravessável durante
+        /// o Salto Dimensional — ver LevelBlockoutGenerator.ConfigureAnomalyBarrierPhysics).
+        /// </summary>
+        public readonly bool IsAnomalyBarrier;
+
+        public WallSpec(string name, string parentName, Vector2 center, Vector2 size, bool isAnomalyBarrier = false)
         {
             Name = name;
             ParentName = parentName;
             Center = center;
             Size = size;
+            IsAnomalyBarrier = isAnomalyBarrier;
         }
     }
 
@@ -149,5 +165,9 @@ namespace FavelaAmarela.Level.Core
         [Header("Zona 4: Praça do Cerco (beco sem saída)")]
         public float Zone4Length = 12f;
         public float Zone4Width = 12f;
+
+        [Header("Zona 5: Transição Dimensional (Sul da Praça)")]
+        public float Zone5Length = 10f;
+        public float Zone5Width = 8f;
     }
 }

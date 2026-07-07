@@ -36,18 +36,19 @@ namespace FavelaAmarela.Level.Tests
         // ── 1. Estrutura básica ──────────────────────────────────────────────
 
         [Test]
-        public void Layout_DeveTerQuatroZonas()
+        public void Layout_DeveTerCincoZonas()
         {
-            Assert.AreEqual(4, _layout.Rooms.Count, "S-Path deve ter exatamente 4 salas.");
+            Assert.AreEqual(5, _layout.Rooms.Count, "S-Path deve ter exatamente 5 salas.");
         }
 
         [Test]
         public void Layout_NomesDeZonasNaOrdemCorreta()
         {
-            Assert.AreEqual("Zona1_RuaEntrada",      _layout.Rooms[0].Name);
-            Assert.AreEqual("Zona2_VilaDasCasas",   _layout.Rooms[1].Name);
-            Assert.AreEqual("Zona3_BecoDoVento",    _layout.Rooms[2].Name);
-            Assert.AreEqual("Zona4_PracaDoCerco",   _layout.Rooms[3].Name);
+            Assert.AreEqual("Zona1_RuaEntrada",           _layout.Rooms[0].Name);
+            Assert.AreEqual("Zona2_VilaDasCasas",         _layout.Rooms[1].Name);
+            Assert.AreEqual("Zona3_BecoDoVento",          _layout.Rooms[2].Name);
+            Assert.AreEqual("Zona4_PracaDoCerco",         _layout.Rooms[3].Name);
+            Assert.AreEqual("Zona5_TransicaoDimensional", _layout.Rooms[4].Name);
         }
 
         [Test]
@@ -65,6 +66,7 @@ namespace FavelaAmarela.Level.Tests
             Assert.Less(z3Gargalo, Mathf.Min(_layout.Rooms[0].Width, _layout.Rooms[0].Height), "Beco deve ser mais estreito que Rua de Entrada.");
             Assert.Less(z3Gargalo, Mathf.Min(_layout.Rooms[1].Width, _layout.Rooms[1].Height), "Beco deve ser mais estreito que Vila das Casas.");
             Assert.Less(z3Gargalo, Mathf.Min(_layout.Rooms[3].Width, _layout.Rooms[3].Height), "Beco deve ser mais estreito que Praça do Cerco.");
+            Assert.Less(z3Gargalo, Mathf.Min(_layout.Rooms[4].Width, _layout.Rooms[4].Height), "Beco deve ser mais estreito que Zona de Transição Dimensional.");
         }
 
         // ── 3. BUG 1: Zona 2 → Zona 3 (parede Norte da Z3 dentro do chão Z2) ─
@@ -83,6 +85,75 @@ namespace FavelaAmarela.Level.Tests
             float gap = z2SouthY - z3NorthY;
             Assert.LessOrEqual(Mathf.Abs(gap), _cfg.WallThickness + 0.01f,
                 $"Fronteiras Z2 Sul e Z3 Norte devem ser adjacentes. Gap atual: {gap:F3}u");
+        }
+
+        [Test]
+        public void Bug0_ParedeOesteDeZ2_NaoDeveSelarConexaoComZ1()
+        {
+            var z1 = _layout.Rooms[0];
+            var z2 = _layout.Rooms[1];
+
+            // Faixa Y onde o corredor da Zona 1 encosta na Zona 2 — a "porta" natural.
+            float z1MinY = z1.Center.y - z1.Height * 0.5f;
+            float z1MaxY = z1.Center.y + z1.Height * 0.5f;
+            float z2WestCenterX = z2.Center.x - z2.Width * 0.5f + _cfg.WallThickness * 0.5f;
+
+            // Segmentos de parede da Zona 2 na face Oeste (perto de z2WestCenterX).
+            var z2WestWalls = _layout.Walls.Where(w =>
+                w.ParentName == "Zona2_VilaDasCasas" &&
+                !w.IsAnomalyBarrier &&
+                Mathf.Abs(w.Center.x - z2WestCenterX) < _cfg.WallThickness).ToList();
+
+            // Nenhum deles pode cobrir a faixa inteira de conexão: se cobrir,
+            // o jogador nasce preso na Zona 1 sem passagem para a Zona 2.
+            foreach (var wall in z2WestWalls)
+            {
+                float wallMinY = wall.Center.y - wall.Size.y * 0.5f;
+                float wallMaxY = wall.Center.y + wall.Size.y * 0.5f;
+                bool cobreConexao = wallMinY <= z1MinY + 0.01f && wallMaxY >= z1MaxY - 0.01f;
+                Assert.IsFalse(cobreConexao,
+                    $"Parede '{wall.Name}' sela a conexão Zona1→Zona2 (faixa y {z1MinY}..{z1MaxY}).");
+            }
+        }
+
+        [Test]
+        public void Bug4_ParedesDeZ1_NaoDevemInvadirCasasDaZona2()
+        {
+            // Zona 1 e Zona 2 se sobrepõem de propósito só no chão (ver comentário
+            // em BuildSPathLayout, seção Zona 2). Acontecia de a parede Sul da
+            // Zona 1 atravessar o telhado da Casa_1 nessa faixa de sobreposição
+            // (achado em playtest — a parede corria pelo comprimento inteiro,
+            // sem descontar a faixa). Um resíduo de até ~CornerInset*WallThickness
+            // nas pontas truncadas é esperado (mesma tolerância de canto usada em
+            // toda porta do jogo); o que não pode é uma parede de verdade cortando
+            // o miolo de uma casa.
+            float toleranciaArea = _cfg.CornerInset * _cfg.WallThickness + 0.05f;
+
+            var z1Walls = _layout.Walls.Where(w => w.ParentName == "Zona1_RuaEntrada").ToList();
+
+            foreach (var house in _layout.Houses)
+            {
+                float houseMinX = house.Position.x - house.Size * 0.5f;
+                float houseMaxX = house.Position.x + house.Size * 0.5f;
+                float houseMinY = house.Position.y - house.Size * 0.5f;
+                float houseMaxY = house.Position.y + house.Size * 0.5f;
+
+                foreach (var wall in z1Walls)
+                {
+                    float wallMinX = wall.Center.x - wall.Size.x * 0.5f;
+                    float wallMaxX = wall.Center.x + wall.Size.x * 0.5f;
+                    float wallMinY = wall.Center.y - wall.Size.y * 0.5f;
+                    float wallMaxY = wall.Center.y + wall.Size.y * 0.5f;
+
+                    float overlapX = Mathf.Min(wallMaxX, houseMaxX) - Mathf.Max(wallMinX, houseMinX);
+                    float overlapY = Mathf.Min(wallMaxY, houseMaxY) - Mathf.Max(wallMinY, houseMinY);
+                    if (overlapX <= 0f || overlapY <= 0f) continue;
+
+                    float area = overlapX * overlapY;
+                    Assert.Less(area, toleranciaArea,
+                        $"Parede '{wall.Name}' da Zona 1 invade a casa '{house.Name}' com área {area:F3} (além da tolerância de canto).");
+                }
+            }
         }
 
         [Test]
@@ -213,6 +284,52 @@ namespace FavelaAmarela.Level.Tests
                 Assert.GreaterOrEqual(wallMinY, floorMinY, $"'{wall.Name}' ({wall.ParentName}) transborda para o Sul do seu chão.");
                 Assert.LessOrEqual(wallMaxY, floorMaxY,    $"'{wall.Name}' ({wall.ParentName}) transborda para o Norte do seu chão.");
             }
+        }
+
+        // ── 8. Zona 5: Transição Dimensional (barreira anômala) ─────────────
+
+        [Test]
+        public void Bug3_ParedeSulDeZ4_DeveSerBarreiraAnomala_ELargarComOOverlapReal()
+        {
+            var z4 = _layout.Rooms[3];
+            var z5 = _layout.Rooms[4];
+
+            float z4SouthY = z4.Center.y - z4.Height * 0.5f;
+            float z4MinX = z4.Center.x - z4.Width * 0.5f;
+            float z4MaxX = z4.Center.x + z4.Width * 0.5f;
+            float z5MinX = z5.Center.x - z5.Width * 0.5f;
+            float z5MaxX = z5.Center.x + z5.Width * 0.5f;
+            float expectedOverlap = Mathf.Min(z4MaxX, z5MaxX) - Mathf.Max(z4MinX, z5MinX);
+
+            var anomalyWalls = _layout.Walls
+                .Where(w => w.ParentName == "Zona4_PracaDoCerco"
+                            && Mathf.Abs(w.Center.y - z4SouthY) < _cfg.WallThickness
+                            && w.IsAnomalyBarrier)
+                .ToList();
+
+            Assert.AreEqual(1, anomalyWalls.Count, "Deve existir exatamente uma parede anômala na fronteira Sul da Zona 4.");
+            Assert.AreEqual(expectedOverlap, anomalyWalls[0].Size.x, 0.01f,
+                "Largura da barreira anômala deve ser igual à sobreposição real entre Zona4 e Zona5.");
+        }
+
+        [Test]
+        public void Zona5TransicaoDimensional_NaoDeveDesenharParedePropriaNoNorte()
+        {
+            var z5 = _layout.Rooms[4];
+            Assert.AreEqual(Side.North, z5.FullyOpenSides,
+                "Zona5 não deve desenhar parede própria no lado Norte — a fronteira é de responsabilidade da Zona4 (convenção do S-Path).");
+
+            bool hasOwnNorthWall = _layout.Walls.Any(w => w.ParentName == "Zona5_TransicaoDimensional"
+                && Mathf.Abs(w.Center.y - (z5.Center.y + z5.Height * 0.5f)) < _cfg.WallThickness);
+            Assert.IsFalse(hasOwnNorthWall, "Zona5 não deve ter nenhuma parede própria na fronteira Norte.");
+        }
+
+        [Test]
+        public void NenhumaOutraParede_AlemDaFronteiraZ4Z5_DeveEstarMarcadaComoAnomalyBarrier()
+        {
+            var anomalyWalls = _layout.Walls.Where(w => w.IsAnomalyBarrier).ToList();
+            Assert.AreEqual(1, anomalyWalls.Count,
+                "Apenas a fronteira Zona4→Zona5 deve gerar parede anômala no layout atual.");
         }
     }
 }

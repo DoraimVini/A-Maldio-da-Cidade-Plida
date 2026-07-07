@@ -57,12 +57,12 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         [Test]
-        public void Alerta_VoltaParaErrante_SeNaoHouverEstimuloPor4s()
+        public void Alerta_VoltaParaErrante_SeNaoHouverEstimuloPor8s()
         {
             fsm.ReceberEstimuloSonoro(Vector2.zero, 7f, raioEfetivo: 8.5f);
             Assert.AreEqual(CultistaState.Alerta, fsm.CurrentState);
 
-            fsm.Tick(4.1f);
+            fsm.Tick(8.1f);
             Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
         }
 
@@ -83,16 +83,16 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         [Test]
-        public void Caca_VoltaParaErrante_SePerderRastroPor5s()
+        public void Caca_VoltaParaErrante_SePerderRastroPor10s()
         {
             fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
             fsm.Tick(1.0f);
             fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
             fsm.Tick(0.6f);
-            
+
             Assert.AreEqual(CultistaState.Caca, fsm.CurrentState);
 
-            fsm.Tick(5.1f);
+            fsm.Tick(10.1f);
 
             Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
         }

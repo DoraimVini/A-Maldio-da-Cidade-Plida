@@ -29,28 +29,60 @@ namespace FavelaAmarela.Level.Core
 
             // --- Zona 1: Rua de Entrada ---
             var z1Center = Vector2.zero;
-            layout.Rooms.Add(new RoomSpec("Zona1_RuaEntrada", z1Center, cfg.Zone1Length, cfg.Zone1Width, Side.East));
+            float z1MinX = z1Center.x - cfg.Zone1Length * 0.5f;
+            float z1MaxX = z1Center.x + cfg.Zone1Length * 0.5f;
+            float z1MinY = z1Center.y - cfg.Zone1Width * 0.5f;
+            float z1MaxY = z1Center.y + cfg.Zone1Width * 0.5f;
 
             // --- Zona 2: Vila das Casas ---
             // Conecta-se à Zona 1 por sobreposição interior: a abertura Leste
             // da Zona 1 (x = z1Center.x + Zone1Length/2) cai dentro do chão da
             // Zona 2, não numa de suas próprias paredes de fronteira — mesma
             // técnica usada para compor formas em L a partir de retângulos.
-            // Já validado: não há parede de nenhum dos dois lados nessa faixa,
-            // então a conexão é limpa. Fórmula original preservada (já
-            // aprovada no layout visualizado), apenas o Norte foi fechado.
+            // Calculamos o centro/bounds da Zona 2 ANTES de fechar a Zona 1
+            // porque as duas salas se sobrepõem de propósito no trecho
+            // x:[z2MinX, z1MaxX] — ver BUG abaixo.
             var z2Center = new Vector2(
                 z1Center.x + cfg.Zone1Length - cfg.Zone2Width * 0.5f,
                 z1Center.y - cfg.Zone2Length * 0.5f + cfg.Zone1Width * 0.5f);
-            layout.Rooms.Add(new RoomSpec("Zona2_VilaDasCasas", z2Center, cfg.Zone2Width, cfg.Zone2Length, Side.South));
+            float z2MinX = z2Center.x - cfg.Zone2Width * 0.5f;
+            float z2MaxX = z2Center.x + cfg.Zone2Width * 0.5f;
+            float z2MinY = z2Center.y - cfg.Zone2Length * 0.5f;
+            float z2MaxY = z2Center.y + cfg.Zone2Length * 0.5f;
+
+            // BUG (achado em playtest): a sobreposição Z1↔Z2 é só de CHÃO —
+            // "não há parede de nenhum dos dois lados nessa faixa" dizia o
+            // comentário original, mas isso nunca foi garantido de verdade: as
+            // paredes Norte/Sul da Zona 1 corriam pelo comprimento inteiro
+            // (x:[z1MinX,z1MaxX]), sem descontar a faixa de sobreposição. A
+            // parede Sul da Zona 1 atravessava o telhado da Casa_1 (que mora
+            // bem nessa faixa) e a Norte duplicava por cima da parede Norte da
+            // Zona 2. Fechamos as duas como "porta" cobrindo exatamente a faixa
+            // de sobreposição — como essa faixa termina na própria borda leste
+            // da Zona 1, o efeito é truncar a parede ali em vez de furar o meio.
+            var z1NorteOverlap = MakeOverlapDoorway(Side.North, z1MinX, z1MaxX, z2MinX, z2MaxX, z1Center.x);
+            var z1SulOverlap = MakeOverlapDoorway(Side.South, z1MinX, z1MaxX, z2MinX, z2MaxX, z1Center.x);
+
+            layout.Rooms.Add(new RoomSpec("Zona1_RuaEntrada", z1Center, cfg.Zone1Length, cfg.Zone1Width,
+                Side.East, new[] { z1NorteOverlap, z1SulOverlap }));
+
+            // Zona 1 → Zona 2: a Zona 1 é um corredor que encosta na Zona 2 pela
+            // face Oeste desta. Sem porta, a parede Oeste sólida da Zona 2 corta
+            // justamente a faixa de sobreposição (o jogador nascia preso na Zona
+            // 1). Abrimos essa parede exatamente na sobreposição em Y entre os
+            // dois chãos — mesma técnica de porta-por-overlap das demais
+            // fronteiras. (O lado Norte da Zona 2 segue fechado; a conexão real
+            // sempre foi por aqui, não pelo Norte.)
+            var z1z2Doorway = MakeOverlapDoorway(Side.West, z1MinY, z1MaxY, z2MinY, z2MaxY, z2Center.y);
+
+            layout.Rooms.Add(new RoomSpec("Zona2_VilaDasCasas", z2Center, cfg.Zone2Width, cfg.Zone2Length,
+                Side.South, new[] { z1z2Doorway }));
 
             var vilaTopLeft = new Vector2(z2Center.x - cfg.Zone2Width * 0.5f, z2Center.y + cfg.Zone2Length * 0.5f);
             layout.Houses.Add(new HouseSpec("Casa_1", vilaTopLeft + new Vector2(3f, -4f), cfg.HouseSize, cfg.HouseDoorGap));
             layout.Houses.Add(new HouseSpec("Casa_2", vilaTopLeft + new Vector2(9f, -7f), cfg.HouseSize, cfg.HouseDoorGap));
             layout.Houses.Add(new HouseSpec("Casa_3", vilaTopLeft + new Vector2(5f, -13f), cfg.HouseSize, cfg.HouseDoorGap));
 
-            float z2MinX = z2Center.x - cfg.Zone2Width * 0.5f;
-            float z2MaxX = z2Center.x + cfg.Zone2Width * 0.5f;
             float z2SouthY = z2Center.y - cfg.Zone2Length * 0.5f;
 
             // --- Zona 3: Beco do Vento (CORRIGIDA) ---
@@ -79,7 +111,22 @@ namespace FavelaAmarela.Level.Core
 
             layout.Rooms.Add(new RoomSpec("Zona3_BecoDoVento", z3Center, cfg.Zone3Length, cfg.Zone3Width,
                 Side.None, new[] { z2z3Doorway, z3z4Doorway }));
-            layout.Rooms.Add(new RoomSpec("Zona4_PracaDoCerco", z4Center, cfg.Zone4Width, cfg.Zone4Length, Side.North));
+
+            // --- Zona 5: Transição Dimensional ---
+            // Pendurada ao Sul da Praça do Cerco (antes um beco sem saída de
+            // verdade). A fronteira Zona4→Zona5 não é uma porta comum: é uma
+            // parede que parece sólida e bloqueia o jogador andando
+            // normalmente, mas é marcada como barreira anômala — atravessável
+            // só durante o Salto Dimensional (ver LevelBlockoutGenerator).
+            var z5Center = new Vector2(z4Center.x, z4Center.y - cfg.Zone4Length * 0.5f - cfg.Zone5Width * 0.5f);
+            float z5MinX = z5Center.x - cfg.Zone5Length * 0.5f;
+            float z5MaxX = z5Center.x + cfg.Zone5Length * 0.5f;
+
+            var z4z5Barrier = MakeOverlapDoorway(Side.South, z4MinX, z4MaxX, z5MinX, z5MaxX, z4Center.x, isAnomalyBarrier: true);
+
+            layout.Rooms.Add(new RoomSpec("Zona4_PracaDoCerco", z4Center, cfg.Zone4Width, cfg.Zone4Length,
+                Side.North, new[] { z4z5Barrier }));
+            layout.Rooms.Add(new RoomSpec("Zona5_TransicaoDimensional", z5Center, cfg.Zone5Length, cfg.Zone5Width, Side.North));
 
             foreach (var room in layout.Rooms)
                 BuildRoomGeometry(room, cfg, layout);
@@ -98,13 +145,13 @@ namespace FavelaAmarela.Level.Core
         /// o bug de "parede cobrindo a porta" quanto vazamentos para áreas
         /// sem sala nenhuma do outro lado.
         /// </summary>
-        private static Doorway MakeOverlapDoorway(Side side, float aMinX, float aMaxX, float bMinX, float bMaxX, float roomCenterX)
+        private static Doorway MakeOverlapDoorway(Side side, float aMinX, float aMaxX, float bMinX, float bMaxX, float roomCenterX, bool isAnomalyBarrier = false)
         {
             float overlapMin = Mathf.Max(aMinX, bMinX);
             float overlapMax = Mathf.Min(aMaxX, bMaxX);
             float width = Mathf.Max(0f, overlapMax - overlapMin);
             float offset = (overlapMin + overlapMax) * 0.5f - roomCenterX;
-            return new Doorway(side, width, offset);
+            return new Doorway(side, width, offset, isAnomalyBarrier);
         }
 
         private static void BuildRoomGeometry(RoomSpec room, LevelBlockoutConfig cfg, LevelBlockoutLayout layout)
@@ -134,33 +181,45 @@ namespace FavelaAmarela.Level.Core
 
             bool isHorizontalAxis = side == Side.North || side == Side.South; // parede corre ao longo de X
 
+            // Portas comuns viram buraco vazio (comportamento original). Barreiras
+            // anômalas NÃO entram nessa lista — são emitidas à parte, como um
+            // segmento de parede próprio, sem cornerInset (a barreira preenche o
+            // vão inteiro, não é um buraco a contornar).
             var gaps = new List<(float from, float to)>();
+            var anomalySegments = new List<(float from, float to)>();
             foreach (var d in room.Doorways)
             {
                 if (d.Side != side || d.Width <= 0f) continue;
-                gaps.Add((d.Offset - d.Width * 0.5f, d.Offset + d.Width * 0.5f));
+                var range = (d.Offset - d.Width * 0.5f, d.Offset + d.Width * 0.5f);
+                if (d.IsAnomalyBarrier) anomalySegments.Add(range);
+                else gaps.Add(range);
             }
 
             float wallHalf = fullLength * 0.5f;
             if (gaps.Count == 0)
             {
-                EmitSegment(layout, room, side, -wallHalf, wallHalf, localCenter, thickness, isHorizontalAxis, 0);
-                return;
+                EmitSegment(layout, room, side, -wallHalf, wallHalf, localCenter, thickness, isHorizontalAxis, 0, isAnomalyBarrier: false);
+            }
+            else
+            {
+                gaps.Sort((a, b) => a.from.CompareTo(b.from));
+                float cursor = -wallHalf;
+                int segIndex = 0;
+                foreach (var (from, to) in gaps)
+                {
+                    EmitSegment(layout, room, side, cursor, from + cornerInset, localCenter, thickness, isHorizontalAxis, segIndex++, isAnomalyBarrier: false);
+                    cursor = to - cornerInset;
+                }
+                EmitSegment(layout, room, side, cursor, wallHalf, localCenter, thickness, isHorizontalAxis, segIndex, isAnomalyBarrier: false);
             }
 
-            gaps.Sort((a, b) => a.from.CompareTo(b.from));
-            float cursor = -wallHalf;
-            int segIndex = 0;
-            foreach (var (from, to) in gaps)
-            {
-                EmitSegment(layout, room, side, cursor, from + cornerInset, localCenter, thickness, isHorizontalAxis, segIndex++);
-                cursor = to - cornerInset;
-            }
-            EmitSegment(layout, room, side, cursor, wallHalf, localCenter, thickness, isHorizontalAxis, segIndex);
+            int anomalyIndex = 0;
+            foreach (var (from, to) in anomalySegments)
+                EmitSegment(layout, room, side, from, to, localCenter, thickness, isHorizontalAxis, anomalyIndex++, isAnomalyBarrier: true);
         }
 
         private static void EmitSegment(LevelBlockoutLayout layout, RoomSpec room, Side side,
-            float from, float to, Vector2 localCenter, float thickness, bool isHorizontalAxis, int index)
+            float from, float to, Vector2 localCenter, float thickness, bool isHorizontalAxis, int index, bool isAnomalyBarrier)
         {
             float length = to - from;
             if (length <= 0.001f) return; // porta consumiu o segmento inteiro, nada a construir
@@ -171,7 +230,8 @@ namespace FavelaAmarela.Level.Core
                 : new Vector2(localCenter.x, mid);
 
             var size = isHorizontalAxis ? new Vector2(length, thickness) : new Vector2(thickness, length);
-            layout.Walls.Add(new WallSpec($"Wall_{side}_{index}", room.Name, room.Center + segCenter, size));
+            string name = isAnomalyBarrier ? $"AnomalyWall_{side}_{index}" : $"Wall_{side}_{index}";
+            layout.Walls.Add(new WallSpec(name, room.Name, room.Center + segCenter, size, isAnomalyBarrier));
         }
 
         private static void BuildHouseGeometry(HouseSpec house, LevelBlockoutConfig cfg, LevelBlockoutLayout layout)

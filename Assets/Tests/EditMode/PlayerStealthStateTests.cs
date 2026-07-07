@@ -14,9 +14,9 @@ namespace FavelaAmarela.Tests
 
         // Default values from PlayerStealthState constructor
         private const float DefaultSneakSpeed = 2.0f;
-        private const float DefaultSneakNoise = 1.0f;
+        private const float DefaultSneakNoise = 2.0f;
         private const float DefaultWalkSpeed = 4.5f;
-        private const float DefaultWalkNoise = 4.0f;
+        private const float DefaultWalkNoise = 5.5f;
         private const float DefaultRunSpeed = 7.5f;
         private const float DefaultRunNoise = 8.5f;
 

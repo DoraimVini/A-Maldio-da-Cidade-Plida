@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using FavelaAmarela.Level.Runtime;
 using FavelaAmarela.Runtime.GameLoop;
 using FavelaAmarela.Player;
@@ -39,7 +40,8 @@ namespace FavelaAmarela.Editor
                 Object.DestroyImmediate(player);
             }
             player = new GameObject("Player_Damiao");
-            
+            player.tag = "Player"; // necessário para ColapsoTrigger e QuedaZ4Z5Trigger (OnTriggerEnter2D + CompareTag)
+
             // 1. Input deve ser injetado ANTES de scripts que dependem dele no Awake()
             var playerInput = player.AddComponent<PlayerInput>();
             playerInput.actions = AssetDatabase.LoadAssetAtPath<InputActionAsset>("Assets/InputSystem_Actions.inputactions");
@@ -48,6 +50,7 @@ namespace FavelaAmarela.Editor
             // 2. Comportamentos do Player
             player.AddComponent<PlayerMovement>();
             player.AddComponent<AnomalyPowerBridge>();
+            player.AddComponent<EsquivaBridge>();
             
             // 3. Física e Visual (RequireComponent do PlayerMovement já injeta Rigidbody2D e BoxCollider2D)
             var rb = player.GetComponent<Rigidbody2D>();
@@ -89,15 +92,21 @@ namespace FavelaAmarela.Editor
 
                 cultistaGo = new GameObject("Espectro_Hali");
                 cultistaGo.AddComponent<CultistaAI>(); // CultistaAI injeta SpriteRenderer e Rigidbody2D
-                
+
                 var crb = cultistaGo.GetComponent<Rigidbody2D>();
                 crb.gravityScale = 0f;
-                cultistaGo.AddComponent<BoxCollider2D>(); // BoxCollider2D precisa ser adicionado
-                
+
+                // O sprite precisa ser atribuído ANTES do BoxCollider2D, senão o
+                // collider auto-dimensiona para ~zero (sem bounds de sprite) e o
+                // inimigo atravessa as paredes. Depois forçamos o tamanho pelos
+                // bounds do sprite para garantir um collider sólido e visível.
                 var csr = cultistaGo.GetComponent<SpriteRenderer>();
                 if (csr == null) csr = cultistaGo.AddComponent<SpriteRenderer>();
                 csr.sprite = GetFirstSprite("Assets/Espectro_Hali_Placeholder.aseprite");
-                
+
+                var ccol = cultistaGo.AddComponent<BoxCollider2D>();
+                if (csr.sprite != null) ccol.size = csr.sprite.bounds.size;
+
                 cultistaPrefab = PrefabUtility.SaveAsPrefabAsset(cultistaGo, prefabPath);
                 Object.DestroyImmediate(cultistaGo);
             }
@@ -122,6 +131,69 @@ namespace FavelaAmarela.Editor
 
                 var hud = PrefabUtility.InstantiatePrefab(hudPrefab) as GameObject;
                 hud.name = "HUD_ResilienciaBar";
+            }
+
+            // 6. Screen Fader (mascara transições roteirizadas, ex.: a queda Z4→Z5)
+            var faderGo = GameObject.Find("ScreenFader");
+            if (faderGo != null) Object.DestroyImmediate(faderGo);
+
+            faderGo = new GameObject("ScreenFader");
+            var faderCanvas = faderGo.AddComponent<Canvas>();
+            faderCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            faderCanvas.sortingOrder = 100; // por cima do HUD (Canvas sortingOrder 0)
+            faderGo.AddComponent<CanvasScaler>();
+            faderGo.AddComponent<GraphicRaycaster>();
+
+            var fadeImageGo = new GameObject("FadeImage");
+            fadeImageGo.transform.SetParent(faderGo.transform, false);
+            var fadeImage = fadeImageGo.AddComponent<Image>();
+            fadeImage.color = new Color(0f, 0f, 0f, 0f); // começa transparente
+            fadeImage.raycastTarget = false; // não deve bloquear clique quando invisível
+            var fadeRect = fadeImage.rectTransform;
+            fadeRect.anchorMin = Vector2.zero;
+            fadeRect.anchorMax = Vector2.one;
+            fadeRect.offsetMin = Vector2.zero;
+            fadeRect.offsetMax = Vector2.zero;
+
+            var fader = faderGo.AddComponent<ScreenFader>();
+            var faderSO = new SerializedObject(fader);
+            faderSO.FindProperty("fadeImage").objectReferenceValue = fadeImage;
+            faderSO.ApplyModifiedProperties();
+
+            // 7. Trigger de queda Z4 → Z5 (Damião cercado, chão cede, cai na Zona 5;
+            // a barreira anômala entre as duas zonas já bloqueia a volta a pé)
+            var z4Root = GameObject.Find("Zona4_PracaDoCerco");
+            var z5Root = GameObject.Find("Zona5_TransicaoDimensional");
+            if (z4Root != null && z5Root != null)
+            {
+                var z4Floor = z4Root.transform.Find("Floor");
+                var z5Floor = z5Root.transform.Find("Floor");
+                if (z4Floor != null && z5Floor != null)
+                {
+                    var destinoGo = GameObject.Find("QuedaZ4Z5_Destino");
+                    if (destinoGo != null) Object.DestroyImmediate(destinoGo);
+                    destinoGo = new GameObject("QuedaZ4Z5_Destino");
+                    destinoGo.transform.position = z5Floor.position;
+
+                    var triggerGo = GameObject.Find("Trigger_QuedaZ4Z5");
+                    if (triggerGo != null) Object.DestroyImmediate(triggerGo);
+                    triggerGo = new GameObject("Trigger_QuedaZ4Z5");
+                    triggerGo.transform.position = z4Floor.position;
+
+                    var floorSr = z4Floor.GetComponent<SpriteRenderer>();
+                    Vector2 triggerSize = floorSr != null ? (Vector2)floorSr.bounds.size : new Vector2(10f, 10f);
+
+                    var triggerCol = triggerGo.AddComponent<BoxCollider2D>();
+                    triggerCol.isTrigger = true;
+                    triggerCol.size = triggerSize * 0.8f; // menor que a sala inteira, evita disparar já na porta
+
+                    var quedaTrigger = triggerGo.AddComponent<QuedaZ4Z5Trigger>();
+                    var qtSO = new SerializedObject(quedaTrigger);
+                    qtSO.FindProperty("destino").objectReferenceValue = destinoGo.transform;
+                    qtSO.FindProperty("isoCameraController").objectReferenceValue = isoCam;
+                    qtSO.FindProperty("fader").objectReferenceValue = fader;
+                    qtSO.ApplyModifiedProperties();
+                }
             }
 
             Debug.Log("Cena de Playtest montada com sucesso! Você pode dar Play.");

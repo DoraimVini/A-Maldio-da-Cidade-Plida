@@ -30,6 +30,10 @@ namespace FavelaAmarela.CameraSystem
         private Vector3 velocity = Vector3.zero;
         private UnityEngine.Camera cam;
 
+        // --- Shake state ---
+        private float shakeTimeRemaining;
+        private float shakeMagnitude;
+
         private void Awake()
         {
             cam = GetComponent<UnityEngine.Camera>();
@@ -64,6 +68,24 @@ namespace FavelaAmarela.CameraSystem
                 ref velocity,
                 smoothTime
             );
+
+            if (shakeTimeRemaining > 0f)
+            {
+                shakeTimeRemaining -= Time.deltaTime;
+                Vector2 shakeOffset = UnityEngine.Random.insideUnitCircle * shakeMagnitude;
+                transform.position += new Vector3(shakeOffset.x, shakeOffset.y, 0f);
+            }
+        }
+
+        /// <summary>
+        /// Sacode a câmera por <paramref name="duration"/> segundos, com deslocamento
+        /// aleatório de até <paramref name="magnitude"/> unidades por frame. Reaproveitável
+        /// por qualquer evento de impacto (ex.: chão desmoronando na queda Z4→Z5).
+        /// </summary>
+        public void Shake(float duration, float magnitude)
+        {
+            shakeTimeRemaining = duration;
+            shakeMagnitude = magnitude;
         }
 
         /// <summary>
