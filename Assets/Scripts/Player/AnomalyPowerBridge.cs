@@ -18,10 +18,24 @@ namespace FavelaAmarela.Player
         [SerializeField] private float leapResilienceCost = 10f;
         [SerializeField] private float leapSpeedMultiplier = 3.5f;
 
+        [Header("Progressão")]
+        [Tooltip("Ligar só para testar o Salto isolado, sem o patuá. No jogo real, Damião começa sem o Salto — ele é destravado ao encontrar o patuá na Zona 5 (ver DesbloquearSalto).")]
+        [SerializeField] private bool desbloqueadoNoInicio = false;
+
         private DimensionalLeap dimensionalLeap;
         private float lastUseTime = -999f;
-        
+        private bool _saltoDesbloqueado;
+
         private ResilienciaMental _resiliencia;
+
+        /// <summary>Se o Salto Dimensional já foi destravado (ver <see cref="DesbloquearSalto"/>).</summary>
+        public bool SaltoDesbloqueado => _saltoDesbloqueado;
+
+        /// <summary>
+        /// Destrava o Salto Dimensional permanentemente. Chamado pelo pickup do
+        /// patuá na Zona 5 — Damião não nasce com essa habilidade.
+        /// </summary>
+        public void DesbloquearSalto() => _saltoDesbloqueado = true;
 
         public void Bind(ResilienciaMental resiliencia)
         {
@@ -37,10 +51,12 @@ namespace FavelaAmarela.Player
         private void Awake()
         {
             dimensionalLeap = new DimensionalLeap(leapDuration, leapCooldown, leapResilienceCost);
+            _saltoDesbloqueado = desbloqueadoNoInicio;
         }
 
         public void TryActivateLeap(Vector2 direction)
         {
+            if (!_saltoDesbloqueado) return;
             if (IsLeaping) return;
             if (direction == Vector2.zero) return;
 
