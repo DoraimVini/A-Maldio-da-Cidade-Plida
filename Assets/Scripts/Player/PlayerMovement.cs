@@ -30,8 +30,8 @@ namespace FavelaAmarela.Player
         private readonly float runNoise;
 
         public PlayerStealthState(
-            float sneakSpeed = 2.0f, float sneakNoise = 1.0f,
-            float walkSpeed = 4.5f, float walkNoise = 4.0f,
+            float sneakSpeed = 2.0f, float sneakNoise = 2.0f,
+            float walkSpeed = 4.5f, float walkNoise = 5.5f,
             float runSpeed = 7.5f, float runNoise = 8.5f)
         {
             this.sneakSpeed = sneakSpeed;
@@ -61,8 +61,19 @@ namespace FavelaAmarela.Player
         public float GetCurrentNoiseEmission(bool isMoving, float stormIntensity)
         {
             if (!isMoving) return 0f;
+            return AplicarAbafamentoTempestade(NoiseRadius, stormIntensity);
+        }
+
+        /// <summary>
+        /// Aplica o abafamento de tempestade a um raio de ruído base. Extraído de
+        /// <see cref="GetCurrentNoiseEmission"/> para ser reaproveitado por ruídos
+        /// pontuais (ex.: o pulso da Esquiva), que não passam pelo fluxo contínuo
+        /// de "está se movendo neste frame".
+        /// </summary>
+        public static float AplicarAbafamentoTempestade(float raioBase, float stormIntensity)
+        {
             float dampening = 1.0f - Mathf.Clamp01(stormIntensity * 0.6f);
-            return NoiseRadius * dampening;
+            return raioBase * dampening;
         }
     }
 
@@ -78,6 +89,10 @@ namespace FavelaAmarela.Player
     {
         [Header("Movement Settings")]
         [SerializeField] private bool useIsometricGridAlignment = true;
+
+        [Header("Esquiva")]
+        [Tooltip("Raio de ruído emitido no instante da Esquiva. Antes deste fix a Esquiva era 100% silenciosa (o early-return do FixedUpdate pulava o bloco de som), o que deixava o combo Furtivo+Esquiva quebrar a percepção do Cultista na hora.")]
+        [SerializeField] private float esquivaNoiseRadius = 6.5f;
 
         [Header("Debug")]
         [SerializeField] private bool showNoiseGizmo = true;
@@ -100,6 +115,12 @@ namespace FavelaAmarela.Player
         private bool isLeaping;
         private Vector2 leapVelocity;
         private InputAction leapAction;
+
+        // --- Esquiva (dodge) State ---
+        private EsquivaBridge esquivaBridge;
+        private bool isEsquivando;
+        private Vector2 esquivaVelocity;
+        private InputAction dodgeAction;
 
         public PlayerStealthState StealthState => stealthState;
         public bool IsMoving => isMoving;
@@ -129,6 +150,7 @@ namespace FavelaAmarela.Player
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
             anomalyBridge = GetComponent<AnomalyPowerBridge>();
+            esquivaBridge = GetComponent<EsquivaBridge>();
 
             // --- POCO init ---
             stealthState = new PlayerStealthState();
@@ -140,7 +162,8 @@ namespace FavelaAmarela.Player
                 moveAction  = playerInput.actions.FindAction("Move");
                 sneakAction = playerInput.actions.FindAction("Crouch");
                 runAction   = playerInput.actions.FindAction("Sprint");
-                leapAction  = playerInput.actions.FindAction("Jump"); // Use Jump or Dash
+                leapAction  = playerInput.actions.FindAction("SaltoDimensional"); // botão direito do mouse
+                dodgeAction = playerInput.actions.FindAction("Esquiva"); // Espaço
 
                 if (moveAction == null)
                     Debug.LogWarning("[PlayerMovement] 'Move' action not found in Input Actions asset.", this);
@@ -157,6 +180,10 @@ namespace FavelaAmarela.Player
             {
                 anomalyBridge.OnDimensionalLeapActivated += HandleLeapActivated;
             }
+            if (esquivaBridge != null)
+            {
+                esquivaBridge.OnEsquivaActivada += HandleEsquivaActivated;
+            }
         }
 
         private void OnDisable()
@@ -164,6 +191,10 @@ namespace FavelaAmarela.Player
             if (anomalyBridge != null)
             {
                 anomalyBridge.OnDimensionalLeapActivated -= HandleLeapActivated;
+            }
+            if (esquivaBridge != null)
+            {
+                esquivaBridge.OnEsquivaActivada -= HandleEsquivaActivated;
             }
         }
 
@@ -187,9 +218,35 @@ namespace FavelaAmarela.Player
             gameObject.layer = LayerMask.NameToLayer("Default"); // Restore layer
         }
 
+        private void HandleEsquivaActivated(Vector2 direction, float duration, float speedMultiplier)
+        {
+            isEsquivando = true;
+
+            // Esquiva é movimento físico comum: colide com paredes normalmente,
+            // diferente do Salto (que fica intangível). Nenhuma troca de layer aqui.
+            Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
+            esquivaVelocity = finalDirection * (stealthState.Speed * speedMultiplier);
+
+            // A Esquiva é um movimento brusco — precisa fazer barulho mesmo em modo
+            // Furtivo, senão Furtivo+Esquiva vira um "apagão sonoro" que reseta o
+            // temporizador de percepção do Cultista (ver CultistaFSM.TimeSinceLastStimulus).
+            if (_soundBroadcaster != null && _environment != null)
+            {
+                float noise = PlayerStealthState.AplicarAbafamentoTempestade(esquivaNoiseRadius, _environment.StormIntensity);
+                _soundBroadcaster.Emitir(new SomEmitido(transform.position, noise));
+            }
+
+            Invoke(nameof(EndEsquiva), duration);
+        }
+
+        private void EndEsquiva()
+        {
+            isEsquivando = false;
+        }
+
         private void Update()
         {
-            if (isLeaping) return; // Lock input while leaping
+            if (isLeaping || isEsquivando) return; // Lock input while leaping/esquivando
 
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
@@ -200,6 +257,13 @@ namespace FavelaAmarela.Player
             {
                 anomalyBridge.TryActivateLeap(inputDirection);
                 if (anomalyBridge.IsLeaping) return; // Successful leap
+            }
+
+            // Trigger Esquiva
+            if (dodgeAction != null && dodgeAction.WasPressedThisFrame() && esquivaBridge != null)
+            {
+                esquivaBridge.TryActivateEsquiva(inputDirection);
+                if (esquivaBridge.IsEsquivando) return; // Successful esquiva
             }
 
             // Determine stealth mode from modifier keys
@@ -216,6 +280,12 @@ namespace FavelaAmarela.Player
             if (isLeaping)
             {
                 rb.linearVelocity = leapVelocity;
+                return;
+            }
+
+            if (isEsquivando)
+            {
+                rb.linearVelocity = esquivaVelocity;
                 return;
             }
 
