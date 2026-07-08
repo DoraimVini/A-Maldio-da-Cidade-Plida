@@ -4,6 +4,7 @@ namespace FavelaAmarela.Core.Enemies
     {
         Errante,
         Alerta,
-        Caca
+        Caca,
+        Atordoado
     }
 }

@@ -20,6 +20,8 @@ namespace FavelaAmarela.Core.Enemies
         /// </summary>
         public Vector2? UltimaOrigemConhecida { get; private set; }
 
+        private float _duracaoAtordoamento;
+
         public event Action<CultistaState, CultistaState> OnStateChanged;
 
         public CultistaFSM(CultistaState initialState = CultistaState.Errante)
@@ -30,6 +32,7 @@ namespace FavelaAmarela.Core.Enemies
 
         public void ReceberEstimuloSonoro(Vector2 origemSom, float distanciaAoJogador, float raioEfetivo)
         {
+            if (CurrentState == CultistaState.Atordoado) return;
             if (raioEfetivo <= 0f) return;
             if (distanciaAoJogador > raioEfetivo) return;
 
@@ -40,6 +43,19 @@ namespace FavelaAmarela.Core.Enemies
             {
                 ChangeState(CultistaState.Alerta);
             }
+        }
+
+        /// <summary>
+        /// Interrompe o Cultista imediatamente, qualquer que seja o estado atual
+        /// (ex.: um golpe de <see cref="FavelaAmarela.Core.Abilities.BarraEnferrujada"/>
+        /// que rolou atordoamento). Depois de <paramref name="duracaoSegundos"/>,
+        /// volta para Errante — atordoado o suficiente para perder o rastro.
+        /// </summary>
+        public void AtordoarPor(float duracaoSegundos)
+        {
+            if (duracaoSegundos <= 0f) return;
+            _duracaoAtordoamento = duracaoSegundos;
+            ChangeState(CultistaState.Atordoado);
         }
 
         public void Tick(float dt)
@@ -65,6 +81,13 @@ namespace FavelaAmarela.Core.Enemies
             {
                 // Perde o rastro após 10s sem ouvir nada
                 if (TimeSinceLastStimulus >= 10f)
+                {
+                    ChangeState(CultistaState.Errante);
+                }
+            }
+            else if (CurrentState == CultistaState.Atordoado)
+            {
+                if (TimeInState >= _duracaoAtordoamento)
                 {
                     ChangeState(CultistaState.Errante);
                 }

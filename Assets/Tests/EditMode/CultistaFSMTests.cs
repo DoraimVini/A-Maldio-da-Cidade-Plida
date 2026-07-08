@@ -133,5 +133,56 @@ namespace FavelaAmarela.Tests.EditMode
             fsm.ReceberEstimuloSonoro(new Vector2(30f, 30f), 1f, 0f);
             Assert.AreEqual(origemValida, fsm.UltimaOrigemConhecida);
         }
+
+        [Test]
+        public void AtordoarPor_DeErrante_TransicionaParaAtordoado()
+        {
+            fsm.AtordoarPor(2f);
+            Assert.AreEqual(CultistaState.Atordoado, fsm.CurrentState);
+        }
+
+        [Test]
+        public void AtordoarPor_DeCaca_TransicionaParaAtordoado()
+        {
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
+            fsm.Tick(1.0f);
+            fsm.ReceberEstimuloSonoro(Vector2.zero, 5f, raioEfetivo: 8.5f);
+            fsm.Tick(0.6f);
+            Assert.AreEqual(CultistaState.Caca, fsm.CurrentState);
+
+            fsm.AtordoarPor(2f);
+            Assert.AreEqual(CultistaState.Atordoado, fsm.CurrentState);
+        }
+
+        [Test]
+        public void AtordoarPor_DuracaoZeroOuNegativa_NenhumaTransicao()
+        {
+            fsm.AtordoarPor(0f);
+            Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
+
+            fsm.AtordoarPor(-1f);
+            Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
+        }
+
+        [Test]
+        public void Atordoado_VoltaParaErrante_AposDuracaoPassar()
+        {
+            fsm.AtordoarPor(2f);
+            fsm.Tick(1.9f);
+            Assert.AreEqual(CultistaState.Atordoado, fsm.CurrentState);
+
+            fsm.Tick(0.2f);
+            Assert.AreEqual(CultistaState.Errante, fsm.CurrentState);
+        }
+
+        [Test]
+        public void Atordoado_IgnoraEstimuloSonoro()
+        {
+            fsm.AtordoarPor(3f);
+            fsm.ReceberEstimuloSonoro(new Vector2(1f, 1f), 1f, raioEfetivo: 10f);
+
+            Assert.AreEqual(CultistaState.Atordoado, fsm.CurrentState);
+            Assert.IsNull(fsm.UltimaOrigemConhecida);
+        }
     }
 }

@@ -115,12 +115,19 @@ namespace FavelaAmarela.Player
         private bool isLeaping;
         private Vector2 leapVelocity;
         private InputAction leapAction;
+        private int _leapIntangibleLayer;
+        private int _originalLayer;
 
         // --- Esquiva (dodge) State ---
         private EsquivaBridge esquivaBridge;
         private bool isEsquivando;
         private Vector2 esquivaVelocity;
         private InputAction dodgeAction;
+
+        // --- Mão Física (ataque) State ---
+        private MaoFisicaBridge maoFisicaBridge;
+        private bool isAtacando;
+        private InputAction attackAction;
 
         public PlayerStealthState StealthState => stealthState;
         public bool IsMoving => isMoving;
@@ -151,6 +158,14 @@ namespace FavelaAmarela.Player
 
             anomalyBridge = GetComponent<AnomalyPowerBridge>();
             esquivaBridge = GetComponent<EsquivaBridge>();
+            maoFisicaBridge = GetComponent<MaoFisicaBridge>();
+
+            // Cacheia a layer original do Damião (definida no Inspector) para restaurá-la
+            // após o Salto Dimensional, em vez de assumir um nome fixo. A camada de
+            // intangibilidade do Salto ("Ignore Raycast") faz o Damião atravessar
+            // barreiras anômalas durante o dash.
+            _originalLayer = gameObject.layer;
+            _leapIntangibleLayer = LayerMask.NameToLayer("Ignore Raycast");
 
             // --- POCO init ---
             stealthState = new PlayerStealthState();
@@ -164,6 +179,7 @@ namespace FavelaAmarela.Player
                 runAction   = playerInput.actions.FindAction("Sprint");
                 leapAction  = playerInput.actions.FindAction("SaltoDimensional"); // botão direito do mouse
                 dodgeAction = playerInput.actions.FindAction("Esquiva"); // Espaço
+                attackAction = playerInput.actions.FindAction("Attack"); // botão esquerdo do mouse
 
                 if (moveAction == null)
                     Debug.LogWarning("[PlayerMovement] 'Move' action not found in Input Actions asset.", this);
@@ -184,6 +200,10 @@ namespace FavelaAmarela.Player
             {
                 esquivaBridge.OnEsquivaActivada += HandleEsquivaActivated;
             }
+            if (maoFisicaBridge != null)
+            {
+                maoFisicaBridge.OnAtaqueExecutado += HandleAtaqueExecutado;
+            }
         }
 
         private void OnDisable()
@@ -196,6 +216,10 @@ namespace FavelaAmarela.Player
             {
                 esquivaBridge.OnEsquivaActivada -= HandleEsquivaActivated;
             }
+            if (maoFisicaBridge != null)
+            {
+                maoFisicaBridge.OnAtaqueExecutado -= HandleAtaqueExecutado;
+            }
         }
 
         private void HandleLeapActivated(Vector2 direction, float duration, float speedMultiplier)
@@ -206,8 +230,8 @@ namespace FavelaAmarela.Player
             Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
             leapVelocity = finalDirection * (stealthState.Speed * speedMultiplier);
 
-            // Make player invincible/intangible during leap
-            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast"); // Example intangible layer
+            // Torna o Damião intangível durante o Salto (atravessa barreiras anômalas)
+            gameObject.layer = _leapIntangibleLayer;
 
             Invoke(nameof(EndLeap), duration);
         }
@@ -215,7 +239,7 @@ namespace FavelaAmarela.Player
         private void EndLeap()
         {
             isLeaping = false;
-            gameObject.layer = LayerMask.NameToLayer("Default"); // Restore layer
+            gameObject.layer = _originalLayer; // Restaura a layer capturada no Awake
         }
 
         private void HandleEsquivaActivated(Vector2 direction, float duration, float speedMultiplier)
@@ -244,9 +268,20 @@ namespace FavelaAmarela.Player
             isEsquivando = false;
         }
 
+        private void HandleAtaqueExecutado(Vector2 direction, float duration)
+        {
+            isAtacando = true;
+            Invoke(nameof(EndAtaque), duration);
+        }
+
+        private void EndAtaque()
+        {
+            isAtacando = false;
+        }
+
         private void Update()
         {
-            if (isLeaping || isEsquivando) return; // Lock input while leaping/esquivando
+            if (isLeaping || isEsquivando || isAtacando) return; // Lock input durante ações exclusivas
 
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
@@ -264,6 +299,13 @@ namespace FavelaAmarela.Player
             {
                 esquivaBridge.TryActivateEsquiva(inputDirection);
                 if (esquivaBridge.IsEsquivando) return; // Successful esquiva
+            }
+
+            // Trigger Ataque (Mão Física)
+            if (attackAction != null && attackAction.WasPressedThisFrame() && maoFisicaBridge != null)
+            {
+                maoFisicaBridge.TryAtacar(inputDirection);
+                if (maoFisicaBridge.IsAtacando) return; // Ataque bem-sucedido
             }
 
             // Determine stealth mode from modifier keys
@@ -286,6 +328,12 @@ namespace FavelaAmarela.Player
             if (isEsquivando)
             {
                 rb.linearVelocity = esquivaVelocity;
+                return;
+            }
+
+            if (isAtacando)
+            {
+                rb.linearVelocity = Vector2.zero;
                 return;
             }
 

@@ -1,4 +1,5 @@
 using UnityEngine;
+using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Enemies;
 using FavelaAmarela.Core.Stealth;
 using FavelaAmarela.Runtime.GameLoop;
@@ -118,6 +119,19 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             float distancia = Vector2.Distance(transform.position, som.Origem);
             _fsm.ReceberEstimuloSonoro(som.Origem, distancia, som.RaioEfetivo);
+        }
+
+        /// <summary>
+        /// Recebe o resultado de um golpe de arma física (ex.: <see cref="MaoFisicaBridge"/>
+        /// com a <see cref="BarraEnferrujada"/>). Só reage se o golpe rolou
+        /// atordoamento — a chance em si é decidida pela arma, não aqui.
+        /// </summary>
+        public void ReceberGolpeFisico(ArmaResult resultado)
+        {
+            if (resultado.Atordoou)
+            {
+                _fsm.AtordoarPor(resultado.DuracaoAtordoamento);
+            }
         }
 
         private void HandleStateChanged(CultistaState anterior, CultistaState atual)
