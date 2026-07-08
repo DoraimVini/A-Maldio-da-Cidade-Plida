@@ -66,6 +66,12 @@ Docs/KnowledgeBundle/
     └── *.md
 ```
 
+### 3.2 Studio Knowledge Base (Regras Globais de Engenharia)
+As regras primordiais de arquitetura de software deste estúdio (POCO vs MonoBehaviour, Pipelines HD-2D e Codificação Iterativa) não vivem neste repositório.
+Sempre que você for desenhar a fundação de um novo script ou lidar com importação de sprites de Inteligência Artificial, você DEVE usar as suas ferramentas nativas de busca (Grep/Read) para vasculhar o diretório raiz do estúdio em:
+`C:\Users\Vini\Desktop\Studio_Knowledge_Base`
+Leia os arquivos lá antes de cometer erros arquiteturais clássicos da Unity.
+
 ## 4. Regras de Ouro
 1. **Nunca aloque lixo em `Update`/`FixedUpdate`/`LateUpdate`.** Sem `new`, `GetComponent` em hot path, `FindObjectOfType`, LINQ dentro de loops. Cache em `Awake`/`Start`. Prefira `readonly struct` para event args (ver `SomEmitido`, `ResilienciaChangedArgs`).
 2. **Documentação XML obrigatória em todo membro público (`/// <summary>`), em português** — é a convenção já usada em todo o código (`ResilienciaMental`, `PlayerStealthState`, `CultistaFSM`), inclusive citando o vocabulário diegético do lore-enforcer diretamente no doc.
