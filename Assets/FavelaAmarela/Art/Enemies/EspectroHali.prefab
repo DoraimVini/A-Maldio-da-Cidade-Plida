@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 9112537363727215149}
   - component: {fileID: 438514192186063642}
   - component: {fileID: 5903542959564898073}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: EspectroHali
   m_TagString: Untagged
   m_Icon: {fileID: 0}

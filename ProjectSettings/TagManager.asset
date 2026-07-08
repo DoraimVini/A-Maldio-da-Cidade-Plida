@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Player
+  - Interactable
+  - PontoDeLuz
   layers:
   - Default
   - TransparentFX
@@ -12,11 +14,11 @@ TagManager:
   - AnomalyBarrier
   - Water
   - UI
+  - Enemy
   - 
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Obstacle
+  - Pickup
   - 
   - 
   - 
