@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using FavelaAmarela.Core.Stealth;
 using FavelaAmarela.Core.Environment;
+using FavelaAmarela.Core.Player;
+using FavelaAmarela.Runtime.Config;
 
 namespace FavelaAmarela.Player
 {
@@ -18,6 +20,13 @@ namespace FavelaAmarela.Player
     /// </summary>
     public class PlayerStealthState
     {
+        /// <summary>
+        /// Quanto a tempestade abafa o ruído do jogador (0 = não abafa, 1 = abafa tudo
+        /// na intensidade máxima). Constante de game-feel; nomeada aqui para não ficar
+        /// como literal solto dentro do cálculo.
+        /// </summary>
+        private const float FatorAbafamentoTempestade = 0.6f;
+
         public MovementMode CurrentMode { get; private set; } = MovementMode.Walking;
         public float Speed { get; private set; }
         public float NoiseRadius { get; private set; }
@@ -72,7 +81,7 @@ namespace FavelaAmarela.Player
         /// </summary>
         public static float AplicarAbafamentoTempestade(float raioBase, float stormIntensity)
         {
-            float dampening = 1.0f - Mathf.Clamp01(stormIntensity * 0.6f);
+            float dampening = 1.0f - Mathf.Clamp01(stormIntensity * FatorAbafamentoTempestade);
             return raioBase * dampening;
         }
     }
@@ -90,6 +99,12 @@ namespace FavelaAmarela.Player
         [Header("Movement Settings")]
         [SerializeField] private bool useIsometricGridAlignment = true;
 
+        [Tooltip("Asset de velocidades/ruídos por modo furtivo. Se vazio, usa os defaults do POCO.")]
+        [SerializeField] private LocomocaoConfig locomocaoConfig;
+
+        // Período (s) entre broadcasts de som ao andar. Nomeado para não ficar como literal no FixedUpdate.
+        private const float IntervaloBroadcastSom = 0.15f;
+
         [Header("Esquiva")]
         [Tooltip("Raio de ruído emitido no instante da Esquiva. Antes deste fix a Esquiva era 100% silenciosa (o early-return do FixedUpdate pulava o bloco de som), o que deixava o combo Furtivo+Esquiva quebrar a percepção do Cultista na hora.")]
         [SerializeField] private float esquivaNoiseRadius = 6.5f;
@@ -105,6 +120,10 @@ namespace FavelaAmarela.Player
         private Vector2 inputDirection;
         private bool isMoving;
 
+        // Fonte única de verdade das ações exclusivas (Esquiva/Salto/Ataque).
+        // Substitui as antigas flags-espelho isLeaping/isEsquivando/isAtacando.
+        private PlayerStateMachine _fsm;
+
         // Input System actions (cached in Awake)
         private InputAction moveAction;
         private InputAction sneakAction;
@@ -112,7 +131,6 @@ namespace FavelaAmarela.Player
 
         // --- Leap State ---
         private AnomalyPowerBridge anomalyBridge;
-        private bool isLeaping;
         private Vector2 leapVelocity;
         private InputAction leapAction;
         private int _leapIntangibleLayer;
@@ -120,13 +138,11 @@ namespace FavelaAmarela.Player
 
         // --- Esquiva (dodge) State ---
         private EsquivaBridge esquivaBridge;
-        private bool isEsquivando;
         private Vector2 esquivaVelocity;
         private InputAction dodgeAction;
 
         // --- Mão Física (ataque) State ---
         private MaoFisicaBridge maoFisicaBridge;
-        private bool isAtacando;
         private InputAction attackAction;
 
         public PlayerStealthState StealthState => stealthState;
@@ -145,6 +161,10 @@ namespace FavelaAmarela.Player
 
         private void Awake()
         {
+            // FSM de ações exclusivas criada antes de qualquer early-return abaixo, para
+            // nunca ficar nula em Update/FixedUpdate mesmo se o Awake abortar cedo (ex.: rb nulo).
+            _fsm = new PlayerStateMachine();
+
             // --- Rigidbody2D setup for top-down 2D ---
             rb = GetComponent<Rigidbody2D>();
             if (rb == null)
@@ -160,6 +180,12 @@ namespace FavelaAmarela.Player
             esquivaBridge = GetComponent<EsquivaBridge>();
             maoFisicaBridge = GetComponent<MaoFisicaBridge>();
 
+            // FSM injetada nos bridges, que passam a consultá-la para exclusão mútua
+            // em vez de manter flags próprias.
+            if (anomalyBridge != null) anomalyBridge.BindStateMachine(_fsm);
+            if (esquivaBridge != null) esquivaBridge.BindStateMachine(_fsm);
+            if (maoFisicaBridge != null) maoFisicaBridge.BindStateMachine(_fsm);
+
             // Cacheia a layer original do Damião (definida no Inspector) para restaurá-la
             // após o Salto Dimensional, em vez de assumir um nome fixo. A camada de
             // intangibilidade do Salto ("Ignore Raycast") faz o Damião atravessar
@@ -168,7 +194,18 @@ namespace FavelaAmarela.Player
             _leapIntangibleLayer = LayerMask.NameToLayer("Ignore Raycast");
 
             // --- POCO init ---
-            stealthState = new PlayerStealthState();
+            if (locomocaoConfig != null)
+            {
+                stealthState = new PlayerStealthState(
+                    locomocaoConfig.SneakSpeed, locomocaoConfig.SneakNoise,
+                    locomocaoConfig.WalkSpeed, locomocaoConfig.WalkNoise,
+                    locomocaoConfig.RunSpeed, locomocaoConfig.RunNoise);
+            }
+            else
+            {
+                Debug.LogWarning("[PlayerMovement] LocomocaoConfig não atribuído; usando defaults do POCO.", this);
+                stealthState = new PlayerStealthState();
+            }
 
             // --- Input System: safe lookup via FindAction (returns null, never throws) ---
             var playerInput = GetComponent<PlayerInput>();
@@ -200,9 +237,9 @@ namespace FavelaAmarela.Player
             {
                 esquivaBridge.OnEsquivaActivada += HandleEsquivaActivated;
             }
-            if (maoFisicaBridge != null)
+            if (_fsm != null)
             {
-                maoFisicaBridge.OnAtaqueExecutado += HandleAtaqueExecutado;
+                _fsm.OnStateChanged += HandleFsmStateChanged;
             }
         }
 
@@ -216,36 +253,26 @@ namespace FavelaAmarela.Player
             {
                 esquivaBridge.OnEsquivaActivada -= HandleEsquivaActivated;
             }
-            if (maoFisicaBridge != null)
+            if (_fsm != null)
             {
-                maoFisicaBridge.OnAtaqueExecutado -= HandleAtaqueExecutado;
+                _fsm.OnStateChanged -= HandleFsmStateChanged;
             }
         }
 
         private void HandleLeapActivated(Vector2 direction, float duration, float speedMultiplier)
         {
-            isLeaping = true;
-            
-            // Convert leap direction to isometric if needed
+            // A FSM já marcou o estado Saltando; aqui só calculamos o vetor de dash
+            // e tornamos Damião intangível. O fim do Salto (restaurar a layer) é tratado
+            // em HandleFsmStateChanged, disparado quando a FSM volta a Livre.
             Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
             leapVelocity = finalDirection * (stealthState.Speed * speedMultiplier);
 
             // Torna o Damião intangível durante o Salto (atravessa barreiras anômalas)
             gameObject.layer = _leapIntangibleLayer;
-
-            Invoke(nameof(EndLeap), duration);
-        }
-
-        private void EndLeap()
-        {
-            isLeaping = false;
-            gameObject.layer = _originalLayer; // Restaura a layer capturada no Awake
         }
 
         private void HandleEsquivaActivated(Vector2 direction, float duration, float speedMultiplier)
         {
-            isEsquivando = true;
-
             // Esquiva é movimento físico comum: colide com paredes normalmente,
             // diferente do Salto (que fica intangível). Nenhuma troca de layer aqui.
             Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
@@ -259,29 +286,25 @@ namespace FavelaAmarela.Player
                 float noise = PlayerStealthState.AplicarAbafamentoTempestade(esquivaNoiseRadius, _environment.StormIntensity);
                 _soundBroadcaster.Emitir(new SomEmitido(transform.position, noise));
             }
-
-            Invoke(nameof(EndEsquiva), duration);
         }
 
-        private void EndEsquiva()
+        /// <summary>
+        /// Reage às transições da FSM de ações. Hoje só cuida do fim do Salto: quando a
+        /// FSM sai de Saltando (por duração esgotada ou cancelamento), restaura a layer
+        /// original capturada no Awake — antes isso vivia no Invoke(EndLeap) do bridge.
+        /// </summary>
+        private void HandleFsmStateChanged(PlayerState anterior, PlayerState novo)
         {
-            isEsquivando = false;
-        }
-
-        private void HandleAtaqueExecutado(Vector2 direction, float duration)
-        {
-            isAtacando = true;
-            Invoke(nameof(EndAtaque), duration);
-        }
-
-        private void EndAtaque()
-        {
-            isAtacando = false;
+            if (anterior == PlayerState.Saltando)
+                gameObject.layer = _originalLayer;
         }
 
         private void Update()
         {
-            if (isLeaping || isEsquivando || isAtacando) return; // Lock input durante ações exclusivas
+            // Avança o relógio das ações exclusivas (substitui os Invoke(EndX) do modelo antigo).
+            _fsm.Tick(Time.deltaTime);
+
+            if (!_fsm.EstaLivre) return; // Lock de input enquanto uma ação exclusiva está em curso
 
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
@@ -291,21 +314,21 @@ namespace FavelaAmarela.Player
             if (leapAction != null && leapAction.WasPressedThisFrame() && anomalyBridge != null)
             {
                 anomalyBridge.TryActivateLeap(inputDirection);
-                if (anomalyBridge.IsLeaping) return; // Successful leap
+                if (!_fsm.EstaLivre) return; // Salto pegou
             }
 
             // Trigger Esquiva
             if (dodgeAction != null && dodgeAction.WasPressedThisFrame() && esquivaBridge != null)
             {
                 esquivaBridge.TryActivateEsquiva(inputDirection);
-                if (esquivaBridge.IsEsquivando) return; // Successful esquiva
+                if (!_fsm.EstaLivre) return; // Esquiva pegou
             }
 
             // Trigger Ataque (Mão Física)
             if (attackAction != null && attackAction.WasPressedThisFrame() && maoFisicaBridge != null)
             {
                 maoFisicaBridge.TryAtacar(inputDirection);
-                if (maoFisicaBridge.IsAtacando) return; // Ataque bem-sucedido
+                if (!_fsm.EstaLivre) return; // Ataque pegou
             }
 
             // Determine stealth mode from modifier keys
@@ -319,22 +342,17 @@ namespace FavelaAmarela.Player
 
         private void FixedUpdate()
         {
-            if (isLeaping)
+            switch (_fsm.CurrentState)
             {
-                rb.linearVelocity = leapVelocity;
-                return;
-            }
-
-            if (isEsquivando)
-            {
-                rb.linearVelocity = esquivaVelocity;
-                return;
-            }
-
-            if (isAtacando)
-            {
-                rb.linearVelocity = Vector2.zero;
-                return;
+                case PlayerState.Saltando:
+                    rb.linearVelocity = leapVelocity;
+                    return;
+                case PlayerState.Esquivando:
+                    rb.linearVelocity = esquivaVelocity;
+                    return;
+                case PlayerState.Atacando:
+                    rb.linearVelocity = Vector2.zero; // ataque trava Damião no lugar
+                    return;
             }
 
             if (!isMoving)
@@ -354,7 +372,7 @@ namespace FavelaAmarela.Player
             if (_soundBroadcaster != null && _environment != null)
             {
                 _soundTimer += Time.fixedDeltaTime;
-                if (_soundTimer >= 0.15f)
+                if (_soundTimer >= IntervaloBroadcastSom)
                 {
                     _soundTimer = 0f;
                     float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, _environment.StormIntensity);

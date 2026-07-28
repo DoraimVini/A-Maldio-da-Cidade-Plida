@@ -1,74 +1,83 @@
 ---
 type: Game System
-title: Habilidades Anômalas
-description: Sistema de poderes sobrenaturais baseado na interface IAnomalyPower.
-tags: [abilities, powers, anomaly, design-pattern]
-timestamp: 2026-07-07T11:00:00Z
+title: Sistema de Habilidades Anômalas e Equipamentos
+description: Lógica de poderes baseados em IAnomalyPower e armas físicas baseadas em IArma (Sistema de 2 Slots)
+tags: [abilities, powers, combat, weapons, design-pattern, poco]
+timestamp: 2026-07-10T15:00:00Z
 ---
 
-# Sistema de Habilidades Anômalas
+# Sistema de Habilidades e Equipamentos (2 Slots)
 
-O protagonista Damião possui acesso a poderes sobrenaturais (Anomalias) causados pela influência de Carcosa. Cada habilidade anômala **custa Resiliência Mental** — distorcer a realidade cobra um preço na sanidade.
+Para manter a interface minimalista de horror e seguir a filosofia arquitetural do projeto (composição sobre herança via C# puro), o sistema de equipamentos e progressão de Damião baseia-se em **dois slots de ação ativos** e **itens consumíveis rápidos**.
 
-## Contrato: IAnomalyPower
+---
 
-Toda habilidade anômala implementa a interface `IAnomalyPower`:
+## 1. O Sistema de 2 Slots (Físico vs. Anômalo)
 
-| Membro | Retorno | Descrição |
-|--------|---------|-----------|
-| `PowerName` | `string` | Nome diegético da habilidade |
-| `CanActivate(currentResilience, timeSinceLastUse)` | `bool` | Verifica cooldown e custo de RM |
-| `Execute(currentResilience)` | `PowerResult` | Executa e retorna resultado |
+Inspirado em *Source of Madness*, Damião pode carregar exatamente dois itens ou habilidades ativas de cada vez (um em cada mão). Esta decisão elimina grades de inventário complexas.
 
-## PowerResult
+```
+                  ┌──────────────────────────────┐
+                  │      DAMIÃO (Equipamentos)   │
+                  └──────────────┬───────────────┘
+                                 │
+        ┌────────────────────────┴────────────────────────┐
+        ▼                                                 ▼
+   SLOT 1: MÃO FÍSICA                               SLOT 2: MÃO ANÔMALA
+   - Interface: IArma                               - Interface: IAnomalyPower
+   - Categoria: Mundana                             - Categoria: Sobrenatural
+   - Consumo: Apenas Cooldown                       - Consumo: Resiliência Mental + Cooldown
+   - Exemplos: Barra Enferrujada, Lâminas           - Exemplos: Salto Dimensional, Talismãs
+```
 
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| `Success` | `bool` | Se a habilidade foi executada |
-| `DurationSeconds` | `float` | Duração do efeito |
-| `CooldownSeconds` | `float` | Tempo até poder usar de novo |
-| `ResilienceCost` | `float` | Quanto de RM foi consumido |
+### 1.1 Mão Física (`IArma.cs`)
+Reservada para ferramentas físicas e armas brancas. O jogador pode usá-las livremente, dependendo apenas do tempo de recarga da própria arma.
+*   **Contrato POCO:**
+    ```csharp
+    public interface IArma
+    {
+        string NomeDaArma { get; }
+        bool CanActivate(float tempoDesdeUltimoUso);
+        ArmaResult Execute();
+    }
+    ```
+*   **Armas Cadastradas:**
+    *   **Barra Enferrujada (Implementada):** Causa dano físico leve. Possui $35\%$ de chance de infligir estado `Atordoado` no cultista por $2.0$ segundos (injetável via gerador de números aleatórios para testes).
+    *   **Lâmina do Sinal (Planejada):** Causa dano físico moderado. Se o ataque atingir o inimigo por trás enquanto o jogador estiver em stealth (`PlayerStealthState.Agachado`), inflige dano crítico e atordoamento de $4.0$ segundos.
 
-## Habilidades Implementadas
+### 1.2 Mão Anômala (`IAnomalyPower.cs`)
+Reservada para manifestações dimensionais de Carcosa. Distorcer a realidade consome a estabilidade neural de Damião, drenando sanidade a cada uso.
+*   **Contrato POCO:**
+    ```csharp
+    public interface IAnomalyPower
+    {
+        string PowerName { get; }
+        bool CanActivate(float resilienciaAtual, float tempoDesdeUltimoUso);
+        PowerResult Execute(float resilienciaAtual);
+    }
+    ```
+*   **Poderes Cadastrados:**
+    *   **Salto Dimensional (Implementado):** Teleporta Damião no plano XY, atravessando colisões. Custa $15.0$ de Resiliência Mental por uso e emite um pulso de som de $8.0$ metros de raio.
+    *   **Talismã do Vento Negro (Planejado):** Cria um cone de vento que empurra cultistas leves para trás e apaga postes de luz no raio do efeito. Custa $20.0$ de Resiliência Mental.
 
-- [Salto Dimensional](dimensional_leap.md) — Ghost Dash (implementa `IAnomalyPower`)
-- [Esquiva](esquiva.md) — Dodge físico (**NÃO** implementa `IAnomalyPower` — sem custo de RM)
+---
 
-## Regra de Design
+## 2. Barra de Ações Rápidas (Itens Consumíveis)
 
-Habilidades que distorcem a realidade de Carcosa **DEVEM** implementar `IAnomalyPower` e ter custo de Resiliência Mental. Habilidades puramente físicas (como a Esquiva) **NÃO** implementam essa interface.
+Além dos dois slots ativos, Damião tem acesso a uma hotbar de consumíveis rápidos no HUD:
+*   **Funcionamento:** Itens são empilháveis até um limite rígido de 3 unidades por tipo. O uso é instantâneo e serve para gestão de sanidade emergencial em combate ou escuridão.
+*   **Exemplos de Itens:**
+    *   *Chá Calmante:* Restaura $40.0$ de Resiliência Mental. Tempo de consumo: $1.0$ segundo (durante o qual Damião fica lento).
+    *   *Sino de Estática:* Emite um ruído estridente de $15.0$ metros no ponto de impacto ao ser lançado, servindo para atrair cultistas para longe do caminho seguro.
 
-## Contrato: IArma (Famílias de Arma)
+---
 
-Espelha `IAnomalyPower`, mas para armas equipadas na **Mão Física** — mundanas, sem custo de RM. Cada família de arma implementa `IArma` e define seu próprio "verbo de combate" (composição, não uma árvore de herança).
+## 3. Progressão de Habilidades (Sem Árvores de RPG)
 
-| Membro | Retorno | Descrição |
-|--------|---------|-----------|
-| `NomeDaArma` | `string` | Nome diegético da arma |
-| `CanActivate(timeSinceLastUse)` | `bool` | Só cooldown, sem custo de recurso |
-| `Execute()` | `ArmaResult` | Executa e retorna resultado (`Success`, `DurationSeconds`, `CooldownSeconds`, `Atordoou`, `DuracaoAtordoamento`) |
+Para evitar árvores de habilidades genéricas que quebram o tom de horror, a progressão baseia-se em **Composição Dinâmica**:
+1.  **Desbloqueio de Módulos:** Damião encontra "Fragmentos de Hali" ou patuás esculpidos pelo cenário. Cada patuá é um script POCO que herda de `IAnomalyPower` ou `IArma`.
+2.  **Troca nos Refúgios:** A substituição das habilidades equipadas nas mãos **só pode ser feita fisicamente sob a luz de um poste de luz seguro** (Refúgio). Isso impede a troca rápida de poderes no meio de perseguições, exigindo planejamento.
+3.  **Gating Inicial:** O jogador começa o jogo sem arma física e sem o Salto Dimensional (`MaoFisicaBridge.desbloqueadaNoInicio == false`). O desbloqueio de ambos ocorre de forma dramática ao cair no subterrâneo (Zona 5), alterando instantaneamente a forma como o jogador lida com os cultistas.
 
-### Famílias de arma planejadas (roadmap, decisão de 2026-07-07)
-
-Inspirado em *Source of Madness*: equipamento em **2 slots** (Mão Física + Mão Anômala), não uma grade de inventário. Famílias candidatas:
-
-| Família | Tipo | Status |
-|---------|------|--------|
-| **Barra Enferrujada** | Física (`IArma`) | ✅ Implementada (Core) — 35% de chance de atordoar por golpe |
-| **Lâmina do Sinal** | Física (`IArma`) | Planejada — bônus de dano se atacar por trás em modo Furtivo |
-| **Talismã do Vento Negro** | Anômala (`IAnomalyPower`) | Planejada — empurra inimigos, custa RM |
-| Garra Enegrecida, Vidro da Máscara | — | Ideias de brainstorm, não priorizadas ainda |
-
-A Barra Enferrujada não garante atordoamento a cada golpe — a chance é decidida pela própria arma (`Func<double>` injetável pra testes determinísticos), e a FSM do alvo (ver [IA do Cultista](cultista_ai.md)) só executa o atordoamento quando mandada via `AtordoarPor(duração)`.
-
-### Gating da Mão Física (progressão)
-
-Igual ao Salto Dimensional: Damião **não nasce armado**. `MaoFisicaBridge.desbloqueadaNoInicio` é `false` por padrão, e `TryAtacar()` retorna sem efeito até `DesbloquearArma()` ser chamado — previsto pra acontecer junto do pickup do patuá na Zona 5 (mesma zona, mesmo momento de virada de poder: Damião sai da Zona 4 indefeso e chega na Zona 5 com Salto **e** arma de uma vez).
-
-## Guardrails de Combate
-
-Ver o documento agnóstico de projeto em `Studio_Knowledge_Base/generic_systems/realtime_combat_patterns.md` (referência Death Trash > Last Epoch — combate lento, com peso e consequência, não build-heavy). Regras específicas *deste* projeto:
-
-- Combate continua **secundário ao stealth** — é a exceção arriscada, não o loop principal. Nada de encontros com hordas.
-- **Números de dano flutuantes são desejados** — não é incompatível com terminologia diegética, só troca o rótulo (ex.: "-12 Trauma" em vez de "-12 HP" genérico). Ainda não implementado; quando for, seguir a skill `favela-lore-enforcer` pro texto exato.
-- Evitar HUD de vida numérica gigante estilo boss fight, e evitar árvore de talentos com dezenas de modificadores simultâneos — o "inventário enxuto" (seção 1 do `CLAUDE.md` raiz) continua valendo.
+### Decisão de nomenclatura (2026-07-28)
+Resolvido: o pickup existente na Zona 5 (`PatuaPickup.cs`), que destrava o Salto Dimensional e colidia de nome com a nova relíquia lendária **Patuá das Luas Gêmeas** (recompensa da quest da Rainha Cassilda, item diferente), passa a se chamar **"Fragmento de Hali do Salto"**. Renomeação de código (classe/prefab/textos de UI) pendente da Fatia 3 do roadmap (pickup genérico de relíquia).

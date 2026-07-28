@@ -1,5 +1,5 @@
 ---
-type: Lore Document
+type: Lore Reference
 title: Bestiário Canônico de Carcosa
 description: Compêndio completo das abominações do Mito em Amarelo, unindo origem literária e mecânicas de gameplay.
 tags: [lore, enemies, hastur, carcosa, lovecraft, chambers]

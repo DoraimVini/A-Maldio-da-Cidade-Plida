@@ -11,6 +11,7 @@ Este bundle OKF contém a base de conhecimento completa do projeto, organizada p
 
 ## Navegação do Catálogo
 
+- [Documento de Design Mestre (GDD)](GDD_Mestre.md) — Visão geral, pilares de design e HUD diegético do jogo
 - [Arquitetura](architecture/index.md) — Decisões arquiteturais, padrões e convenções estruturais
 - [Sistemas de Jogo](systems/index.md) — Regras de game design, mecânicas e fórmulas
 - [Scripts](scripts/index.md) — Documentação de implementação dos scripts C#

@@ -72,6 +72,13 @@ Sempre que você for desenhar a fundação de um novo script ou lidar com import
 `C:\Users\Vini\Desktop\Studio_Knowledge_Base`
 Leia os arquivos lá antes de cometer erros arquiteturais clássicos da Unity.
 
+### 3.3 Integração com o Obsidian e Devlog
+- **Cofre Obsidian:** A pasta `Docs/KnowledgeBundle/` está conectada por link simbólico (Junction) ao cofre Obsidian em `C:\Users\Vini\Desktop\Studio_Knowledge_Base\Projeto_Amarelo`. Qualquer arquivo criado ou modificado em `Docs/KnowledgeBundle/` aparecerá instantaneamente no Obsidian do Vini.
+- **Rotina de Devlog:** Ao finalizar com sucesso qualquer tarefa de codificação ou design, você DEVE documentar as alterações no arquivo `Docs/KnowledgeBundle/log.md`. 
+  - Use a estrutura: `## AAAA-MM-DD — [Título Curto do Devlog]`
+  - Liste de forma concisa e técnica todas as modificações realizadas no Core, Runtime, Testes e Documentação.
+  - Faça isso de forma semelhante a uma mensagem de commit detalhada do GitHub.
+
 ## 4. Regras de Ouro
 1. **Nunca aloque lixo em `Update`/`FixedUpdate`/`LateUpdate`.** Sem `new`, `GetComponent` em hot path, `FindObjectOfType`, LINQ dentro de loops. Cache em `Awake`/`Start`. Prefira `readonly struct` para event args (ver `SomEmitido`, `ResilienciaChangedArgs`).
 2. **Documentação XML obrigatória em todo membro público (`/// <summary>`), em português** — é a convenção já usada em todo o código (`ResilienciaMental`, `PlayerStealthState`, `CultistaFSM`), inclusive citando o vocabulário diegético do lore-enforcer diretamente no doc.

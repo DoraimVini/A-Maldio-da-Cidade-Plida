@@ -147,6 +147,20 @@ namespace FavelaAmarela.Core.Combat
         /// </summary>
         public void ForcarColapso() => Alterar(-_atual);
 
+        /// <summary>
+        /// Restaura a Resiliência a um valor absoluto salvo (carregamento de save).
+        /// Diferente de <see cref="Ancorar"/>/<see cref="SofrerTrauma"/>, não é uma
+        /// mudança diegética (cura/dano) — é reconstrução de estado a partir do disco.
+        /// O valor é clampado a [0, <see cref="Max"/>] e dispara <see cref="OnChanged"/>
+        /// para a UI ressincronizar. Não dispara evento se o valor salvo já for o atual.
+        /// </summary>
+        /// <param name="valor">Valor absoluto a restaurar (será clampado).</param>
+        public void Restaurar(float valor)
+        {
+            float alvo = Clamp(valor, 0f, Max);
+            Alterar(alvo - _atual);
+        }
+
         // ── Núcleo privado ───────────────────────────────────────────────────
 
         private void Alterar(float delta)

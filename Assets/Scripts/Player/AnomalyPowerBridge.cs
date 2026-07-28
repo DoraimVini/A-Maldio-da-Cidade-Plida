@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
+using FavelaAmarela.Core.Player;
+using FavelaAmarela.Runtime.Config;
 namespace FavelaAmarela.Player
 {
     /// <summary>
@@ -12,10 +14,11 @@ namespace FavelaAmarela.Player
     [AddComponentMenu("Favela Amarela/Anomaly Power Bridge")]
     public class AnomalyPowerBridge : MonoBehaviour
     {
-        [Header("Ability Settings")]
-        [SerializeField] private float leapDuration = 0.2f;
-        [SerializeField] private float leapCooldown = 1.0f;
-        [SerializeField] private float leapResilienceCost = 10f;
+        [Header("Configuração")]
+        [Tooltip("Asset de tunagem do Salto (duração/cooldown/custo). Se vazio, usa os defaults do POCO.")]
+        [SerializeField] private SaltoDimensionalConfig config;
+
+        [Tooltip("Multiplicador de velocidade do dash — concern de feel do adaptador, não do POCO.")]
         [SerializeField] private float leapSpeedMultiplier = 3.5f;
 
         [Header("Progressão")]
@@ -27,6 +30,7 @@ namespace FavelaAmarela.Player
         private bool _saltoDesbloqueado;
 
         private ResilienciaMental _resiliencia;
+        private PlayerStateMachine _fsm;
 
         /// <summary>Se o Salto Dimensional já foi destravado (ver <see cref="DesbloquearSalto"/>).</summary>
         public bool SaltoDesbloqueado => _saltoDesbloqueado;
@@ -42,49 +46,53 @@ namespace FavelaAmarela.Player
             _resiliencia = resiliencia;
         }
 
+        /// <summary>Injeta a FSM de estado do jogador (chamado por <see cref="PlayerMovement"/> no Awake).</summary>
+        public void BindStateMachine(PlayerStateMachine fsm) => _fsm = fsm;
+
         // Events that other components (like VFX, Audio, Physics) can subscribe to
         public event Action<Vector2, float, float> OnDimensionalLeapActivated; // direction, duration, speedMultiplier
         public event Action<float> OnResilienceConsumed;
 
-        public bool IsLeaping { get; private set; }
+        /// <summary>true enquanto a FSM do jogador estiver no estado Saltando (fonte única de verdade).</summary>
+        public bool IsLeaping => _fsm != null && _fsm.CurrentState == PlayerState.Saltando;
 
         private void Awake()
         {
-            dimensionalLeap = new DimensionalLeap(leapDuration, leapCooldown, leapResilienceCost);
+            if (config != null)
+            {
+                dimensionalLeap = new DimensionalLeap(config.LeapDuration, config.LeapCooldown, config.LeapResilienceCost);
+            }
+            else
+            {
+                Debug.LogWarning("[AnomalyPowerBridge] SaltoDimensionalConfig não atribuído; usando defaults do POCO.", this);
+                dimensionalLeap = new DimensionalLeap();
+            }
+
             _saltoDesbloqueado = desbloqueadoNoInicio;
         }
 
         public void TryActivateLeap(Vector2 direction)
         {
             if (!_saltoDesbloqueado) return;
-            if (IsLeaping) return;
             if (direction == Vector2.zero) return;
-
             if (_resiliencia == null) return;
+            if (_fsm == null) return; // fallback seguro: sem FSM injetada, a ação não dispara
+            if (!_fsm.EstaLivre) return; // portão barato antes do Execute (que é irreversível)
 
-            if (dimensionalLeap.CanActivate(_resiliencia.Atual, Time.time - lastUseTime))
-            {
-                var result = dimensionalLeap.Execute(_resiliencia.Atual);
-                if (result.Success)
-                {
-                    lastUseTime = Time.time;
-                    _resiliencia.SofrerTrauma(result.ResilienceCost);
-                    
-                    IsLeaping = true;
-                    
-                    // Broadcast events
-                    OnResilienceConsumed?.Invoke(result.ResilienceCost);
-                    OnDimensionalLeapActivated?.Invoke(direction, result.DurationSeconds, leapSpeedMultiplier);
+            if (!dimensionalLeap.CanActivate(_resiliencia.Atual, Time.time - lastUseTime)) return;
 
-                    // End leap after duration
-                    Invoke(nameof(EndLeap), result.DurationSeconds);
-                }
-            }
-        }
+            var result = dimensionalLeap.Execute(_resiliencia.Atual);
+            if (!result.Success) return;
 
-        private void EndLeap()
-        {
-            IsLeaping = false;
+            // Commit da exclusão mútua (revalida; em thread única o estado não mudou desde EstaLivre).
+            if (!_fsm.TryEntrarAcao(PlayerState.Saltando, result.DurationSeconds)) return;
+
+            lastUseTime = Time.time;
+            _resiliencia.SofrerTrauma(result.ResilienceCost);
+
+            // Broadcast events
+            OnResilienceConsumed?.Invoke(result.ResilienceCost);
+            OnDimensionalLeapActivated?.Invoke(direction, result.DurationSeconds, leapSpeedMultiplier);
         }
     }
 }

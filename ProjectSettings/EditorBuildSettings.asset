@@ -8,5 +8,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/Deserto_Hali.unity
+    guid: 1d151cf58971c634e937878870ada835
+  - enabled: 1
+    path: Assets/Scenes/Playtest_RuinasPalidas.unity
+    guid: eb7aca6cd58b2d741bba3ccecd174c92
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 3590b91b4603b465dbb4216d601bff33, type: 3}

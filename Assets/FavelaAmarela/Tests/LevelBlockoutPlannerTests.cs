@@ -36,9 +36,9 @@ namespace FavelaAmarela.Level.Tests
         // ── 1. Estrutura básica ──────────────────────────────────────────────
 
         [Test]
-        public void Layout_DeveTerCincoZonas()
+        public void Layout_DeveTerNoveZonas()
         {
-            Assert.AreEqual(5, _layout.Rooms.Count, "S-Path deve ter exatamente 5 salas.");
+            Assert.AreEqual(9, _layout.Rooms.Count, "S-Path deve ter exatamente 9 salas (Fase 1 expandida).");
         }
 
         [Test]
@@ -49,6 +49,10 @@ namespace FavelaAmarela.Level.Tests
             Assert.AreEqual("Zona3_BecoDoVento",          _layout.Rooms[2].Name);
             Assert.AreEqual("Zona4_PracaDoCerco",         _layout.Rooms[3].Name);
             Assert.AreEqual("Zona5_TransicaoDimensional", _layout.Rooms[4].Name);
+            Assert.AreEqual("Zona6_CriptaDosPrimeiros",   _layout.Rooms[5].Name);
+            Assert.AreEqual("Zona7_FendaDosSussurros",    _layout.Rooms[6].Name);
+            Assert.AreEqual("Zona8_Ossario",              _layout.Rooms[7].Name);
+            Assert.AreEqual("Zona9_TronoDoVulto",         _layout.Rooms[8].Name);
         }
 
         [Test]

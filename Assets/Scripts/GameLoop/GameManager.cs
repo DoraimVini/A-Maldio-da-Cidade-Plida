@@ -4,6 +4,7 @@ using FavelaAmarela.Core.GameLoop;
 using FavelaAmarela.Core.Stealth;
 using FavelaAmarela.Core.Environment;
 using FavelaAmarela.Player;
+using FavelaAmarela.Runtime.Environment;
 using FavelaAmarela.Runtime.UI;
 using UnityEngine.InputSystem;
 
@@ -22,14 +23,30 @@ namespace FavelaAmarela.Runtime.GameLoop
         public SoundBroadcastService SoundBroadcaster { get; private set; }
         public EnvironmentState Environment { get; private set; }
 
+        /// <summary>Driver da tempestade na cena (achado no bootstrap). Permite a scripts como o <c>QuedaZ4Z5Trigger</c> mudar a faixa da tempestade sem nova referência de Inspector.</summary>
+        public TempestadeAmbiente TempestadeAmbiente { get; private set; }
+
+        /// <summary>
+        /// Verdadeiro enquanto Damião está preso numa sequência roteirizada (ex.: a
+        /// queda Z4→Z5) e não pode agir. Fontes de morte instantânea por toque/ambiente
+        /// (Coisa do Cemitério, <c>ColapsoTrigger</c>) devem respeitar isto e NÃO aplicar
+        /// o Colapso — durante a cutscene há só a tensão da ameaça se aproximando, não dano.
+        /// </summary>
+        public bool JogadorInvulneravel { get; private set; }
+
+        /// <summary>Liga/desliga a invulnerabilidade de cutscene (ver <see cref="JogadorInvulneravel"/>).</summary>
+        public void DefinirInvulneravel(bool valor) => JogadorInvulneravel = valor;
+
         [Header("Configurações Iniciais")]
         [SerializeField] private float maxResiliencia = 100f;
         [SerializeField] private float fracaoPanico = 0.25f;
 
         [Header("Referências Opcionais")]
-        [SerializeField] private GameObject telaVitoria;
+        [SerializeField] private GameObject telaTransicaoDeFase;
         [SerializeField] private GameObject telaPause;
         [SerializeField] private GameObject gameplayRoot;
+        [Tooltip("Sequência de morte (dissolução + frase) tocada ao entrar em Colapso.")]
+        [SerializeField] private SequenciaDeColapso sequenciaColapso;
 
         private void Awake()
         {
@@ -70,6 +87,15 @@ namespace FavelaAmarela.Runtime.GameLoop
             var player = FindAnyObjectByType<PlayerMovement>();
             if (player != null)
                 player.Bind(SoundBroadcaster, Environment);
+
+            // Busca o driver da tempestade e o overlay visual e injeta
+            TempestadeAmbiente = FindAnyObjectByType<TempestadeAmbiente>();
+            if (TempestadeAmbiente != null)
+                TempestadeAmbiente.Bind(Environment);
+
+            var tempestadeOverlay = FindAnyObjectByType<TempestadeVisualOverlay>();
+            if (tempestadeOverlay != null)
+                tempestadeOverlay.Bind(Environment);
         }
 
         private void Update()
@@ -87,12 +113,18 @@ namespace FavelaAmarela.Runtime.GameLoop
         private void HandleStateChanged(GameState anterior, GameState atual)
         {
             // Lida com o timescale
-            Time.timeScale = (atual == GameState.Pausado || atual == GameState.Vitoria) ? 0f : 1f;
+            Time.timeScale = (atual == GameState.Pausado || atual == GameState.TransicaoDeFase) ? 0f : 1f;
 
             // Ativa/Desativa GameObjects baseado no estado
             if (telaPause != null) telaPause.SetActive(atual == GameState.Pausado);
-            if (telaVitoria != null) telaVitoria.SetActive(atual == GameState.Vitoria);
+            if (telaTransicaoDeFase != null) telaTransicaoDeFase.SetActive(atual == GameState.TransicaoDeFase);
             if (gameplayRoot != null) gameplayRoot.SetActive(atual == GameState.Gameplay || atual == GameState.Colapso);
+
+            // Colapso Mental = Game Over diegético: toca a sequência de morte.
+            if (atual == GameState.Colapso && sequenciaColapso != null)
+            {
+                sequenciaColapso.Tocar();
+            }
 
             if (atual == GameState.Menu)
             {
@@ -108,9 +140,13 @@ namespace FavelaAmarela.Runtime.GameLoop
             }
         }
 
-        public void TriggerVitoria()
+        /// <summary>
+        /// Dispara a transição de fim de fase/dungeon (ex.: ao vencer o miniboss de um portão de
+        /// saída). Não é uma tela de "Vitória" — ver <see cref="GameState.TransicaoDeFase"/>.
+        /// </summary>
+        public void TriggerTransicaoDeFase()
         {
-            StateMachine.TryTransition(GameState.Vitoria);
+            StateMachine.TryTransition(GameState.TransicaoDeFase);
         }
 
         private void OnDestroy()

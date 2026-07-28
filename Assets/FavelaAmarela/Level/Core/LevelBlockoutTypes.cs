@@ -169,5 +169,23 @@ namespace FavelaAmarela.Level.Core
         [Header("Zona 5: Transição Dimensional (Sul da Praça)")]
         public float Zone5Length = 10f;
         public float Zone5Width = 8f;
+
+        // Zonas 6-9: descida de combate abaixo da Z5 (o "jogo de verdade" abre aqui,
+        // culminando na arena do miniboss). Length = largura em X, Width = altura em Y.
+        [Header("Zona 6: Cripta dos Primeiros (arena)")]
+        public float Zone6Length = 12f;
+        public float Zone6Width = 10f;
+
+        [Header("Zona 7: Fenda dos Sussurros (corredor)")]
+        public float Zone7Length = 4f;
+        public float Zone7Width = 4.5f;
+
+        [Header("Zona 8: Ossário (arena maior)")]
+        public float Zone8Length = 14f;
+        public float Zone8Width = 14f;
+
+        [Header("Zona 9: Trono do Vulto (arena do miniboss)")]
+        public float Zone9Length = 16f;
+        public float Zone9Width = 12f;
     }
 }

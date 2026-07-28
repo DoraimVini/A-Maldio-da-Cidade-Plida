@@ -31,6 +31,13 @@ namespace FavelaAmarela.Level.Runtime
         [SerializeField] private Color floorColor = new(0.2f, 0.18f, 0.15f, 0.5f);
         [SerializeField] private Color anomalyWallColor = new(0.55f, 0.15f, 0.65f, 1f);
 
+        [Header("Paredes isométricas (em pé)")]
+        [Tooltip("Sprite da parede 'em pé' — tileável na horizontal, pivot na base. Se nulo, cai no retângulo chapado antigo (blockout).")]
+        [SerializeField] private Sprite wallSprite;
+
+        [Tooltip("Altura visual da parede, em unidades de mundo, acima da base (footprint).")]
+        [SerializeField] private float wallHeight = 1.5f;
+
         [Header("Runtime")]
         [SerializeField] private Transform generationRoot;
 
@@ -135,7 +142,12 @@ namespace FavelaAmarela.Level.Runtime
         /// </summary>
         private void SpawnWall2D(string name, Transform parent, Vector2 worldCenter, Vector2 size, bool isAnomalyBarrier)
         {
-            var color = isAnomalyBarrier ? anomalyWallColor : wallColor;
+            // Com sprite de parede, paredes normais usam tint branco (a arte já tem cor
+            // de pedra); paredes anômalas mantêm o tint roxo para se destacarem. Sem
+            // sprite (fallback blockout), volta às cores chapadas antigas.
+            var color = isAnomalyBarrier
+                ? anomalyWallColor
+                : (wallSprite != null ? Color.white : wallColor);
             var go = CreateSpriteObject(name, parent, worldCenter, size, color, isTrigger: false);
 
             if (isAnomalyBarrier)
@@ -185,17 +197,35 @@ namespace FavelaAmarela.Level.Runtime
             var go = new GameObject(name);
             go.transform.SetParent(parent);
             go.transform.position = new Vector3(worldCenter.x, worldCenter.y, 0f);
-            go.transform.localScale = new Vector3(size.x, size.y, 1f);
 
             var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = WhitePixelSprite();
-            sr.color = color;
-            // FilterMode.Point já definido no sprite; não mexemos aqui
-
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = isTrigger;
-            col.size = Vector2.one; // collider escala junto com o Transform
-            col.edgeRadius = 0f;    // sem radius, faz colisão quadrada limpa
+            col.edgeRadius = 0f; // sem radius, faz colisão quadrada limpa
+
+            if (wallSprite != null)
+            {
+                // Modo isométrico "parede em pé": o Transform NÃO é escalado.
+                // O sprite (pivot na base) sobe <see cref="wallHeight"/> unidades a partir
+                // da base, tileado ao longo do comprimento; o collider continua sendo só o
+                // footprint (dimensão real da parede). Assim a parede ganha altura e oclui
+                // o jogador que passa atrás, sem inflar a colisão nem distorcer a arte (o
+                // retângulo esticado antigo achatava qualquer silhueta angulada).
+                go.transform.localScale = Vector3.one;
+                sr.sprite = wallSprite;
+                sr.drawMode = SpriteDrawMode.Tiled;
+                sr.size = new Vector2(size.x, wallHeight);
+                sr.color = color;
+                col.size = size;
+            }
+            else
+            {
+                // Fallback de blockout: retângulo 1×1 branco esticado por localScale.
+                go.transform.localScale = new Vector3(size.x, size.y, 1f);
+                sr.sprite = WhitePixelSprite();
+                sr.color = color;
+                col.size = Vector2.one; // collider escala junto com o Transform
+            }
 
             return go;
         }
