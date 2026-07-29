@@ -6,7 +6,7 @@ namespace FavelaAmarela.Core.GameLoop
     /// Fornece uma frase diegética de fim de jogo (Colapso Mental — o "Game Over"
     /// diegético, ver favela-lore-enforcer), sorteada de um pool no vocabulário do
     /// lore (Hastur, Rei em Amarelo, Carcosa, Cultista Amarelo). POCO puro, com RNG
-    /// injetável (mesmo padrão de <c>BarraEnferrujada</c>) — testável sem Unity.
+    /// injetável (RNG determinístico para testes) — testável sem Unity.
     /// </summary>
     public sealed class FrasesDeColapso
     {

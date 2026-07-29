@@ -3,108 +3,121 @@ using UnityEngine;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Player;
-using FavelaAmarela.Runtime.Config;
 
 namespace FavelaAmarela.Player
 {
     /// <summary>
-    /// MonoBehaviour Bridge conectando a arma equipada na Mão Física (hoje fixa em
-    /// <see cref="BarraEnferrujada"/>) à Unity. Espelha <see cref="EsquivaBridge"/>
-    /// e <see cref="AnomalyPowerBridge"/>: instancia o POCO em Awake, expõe
-    /// TryAtacar() pro <see cref="PlayerMovement"/> chamar, e resolve o próprio
-    /// golpe (quem foi atingido) via <c>Physics2D.OverlapCircleAll</c> — arma
-    /// física não tem custo de Resiliência Mental nem atravessa paredes.
+    /// Bridge da Mão Física: conecta a arma equipada (um <see cref="IArmaComHabilidade"/>)
+    /// à Unity. A arma <b>não é mais fixa</b> — Damião começa desarmado e equipa uma
+    /// arma da Tumba em runtime (o baú sorteia entre Cravo de Aklo, Estilete de Irem e
+    /// Alfanje de Alhazred). Expõe <see cref="TryAtacar"/> (ataque básico) e
+    /// <see cref="TryUsarHabilidade"/> (habilidade, botão separado) para o
+    /// <c>PlayerMovement</c>, e resolve o golpe contra qualquer <see cref="IDanificavel"/>
+    /// (Cultista, Aparição Primordial/boss) — não mais só o Cultista.
     /// </summary>
     [AddComponentMenu("Favela Amarela/Mao Fisica Bridge")]
     public class MaoFisicaBridge : MonoBehaviour
     {
-        [Header("Configuração da Arma")]
-        [Tooltip("Asset de tunagem da Barra Enferrujada. Se vazio, usa os defaults do POCO.")]
-        [SerializeField] private BarraEnferrujadaConfig config;
+        /// <summary>Armas da Tumba para equipar em teste isolado (no jogo real vem do baú).</summary>
+        public enum ArmaDeTeste { Nenhuma, CravoDeAklo, EstileteDeIrem, AlfanjeDeAlhazred }
+
+        [Header("Arma (equipada pelo baú no jogo; aqui só para teste isolado)")]
+        [Tooltip("No jogo real Damião começa DESARMADO — a arma vem do baú da Tumba. Escolha uma aqui só para testar o combate.")]
+        [SerializeField] private ArmaDeTeste armaInicialParaTeste = ArmaDeTeste.Nenhuma;
 
         [Header("Alcance do Golpe")]
         [SerializeField] private float alcance = 1.2f;
         [SerializeField] private LayerMask camadaInimigos;
 
-        [Header("Progressão")]
-        [Tooltip("Ligar só para testar o combate isolado. No jogo real, Damião começa DESARMADO — a arma é adquirida junto do patuá na Zona 5 (ver DesbloquearArma).")]
-        [SerializeField] private bool desbloqueadaNoInicio = false;
-
-        private IArma armaEquipada;
-        private float lastUseTime = -999f;
-        private bool _armaDesbloqueada;
+        private IArmaComHabilidade _armaEquipada;
+        private float _lastUseTime = -999f;
+        private float _lastAbilityUseTime = -999f;
         private PlayerStateMachine _fsm;
 
-        // Buffer pré-alocado + filtro para resolver o golpe sem alocar lixo por ataque
-        // (Regra de Ouro 1). 8 slots cobrem o alcance melee — se mais de 8 inimigos se
-        // sobrepuserem no raio, o excedente é ignorado, o que é aceitável para um golpe corpo-a-corpo.
+        // Buffer pré-alocado + filtro para resolver o golpe sem alocar lixo por golpe
+        // (Regra de Ouro 1). 8 slots cobrem o alcance melee.
         private readonly Collider2D[] _hitBuffer = new Collider2D[8];
         private ContactFilter2D _filtroInimigos;
 
-        /// <summary>Direção e duração do golpe ativado.</summary>
+        /// <summary>Direção e duração do ataque básico executado.</summary>
         public event Action<Vector2, float> OnAtaqueExecutado;
 
-        /// <summary>true enquanto a FSM do jogador estiver no estado Atacando (fonte única de verdade).</summary>
+        /// <summary>Direção e duração da habilidade da arma executada.</summary>
+        public event Action<Vector2, float> OnHabilidadeExecutada;
+
+        /// <summary>true enquanto a FSM do jogador estiver Atacando (fonte única de verdade).</summary>
         public bool IsAtacando => _fsm != null && _fsm.CurrentState == PlayerState.Atacando;
 
-        /// <summary>Injeta a FSM de estado do jogador (chamado por <see cref="PlayerMovement"/> no Awake).</summary>
+        /// <summary>Injeta a FSM de estado do jogador (chamado por <c>PlayerMovement</c> no Awake).</summary>
         public void BindStateMachine(PlayerStateMachine fsm) => _fsm = fsm;
 
-        /// <summary>Se a arma da Mão Física já foi adquirida (ver <see cref="DesbloquearArma"/>).</summary>
-        public bool ArmaDesbloqueada => _armaDesbloqueada;
+        /// <summary>Se há uma arma equipada na Mão Física.</summary>
+        public bool TemArmaEquipada => _armaEquipada != null;
+
+        /// <summary>Nome diegético da arma equipada, ou vazio se desarmado.</summary>
+        public string NomeDaArmaEquipada => _armaEquipada?.NomeDaArma ?? "";
+
+        /// <summary>Nome da habilidade da arma equipada, ou vazio se desarmado.</summary>
+        public string NomeDaHabilidade => _armaEquipada?.NomeHabilidade ?? "";
 
         /// <summary>
-        /// Equipa uma arma na Mão Física permanentemente. Chamado pelo pickup da
-        /// arma inicial na Zona 5 — Damião não nasce armado; toda a primeira metade
-        /// do jogo é desarmada, só furtividade.
+        /// Equipa uma arma na Mão Física (chamado pelo baú da Tumba). Substitui a arma
+        /// anterior — o slot de Mão Física é único (troca só sob a luz de um Refúgio, no design).
         /// </summary>
-        public void DesbloquearArma() => _armaDesbloqueada = true;
+        public void EquiparArma(IArmaComHabilidade arma) => _armaEquipada = arma;
 
         private void Awake()
         {
-            if (config != null)
-            {
-                armaEquipada = new BarraEnferrujada(config.Duration, config.Cooldown, config.ProbabilidadeAtordoar, config.DuracaoAtordoamento);
-            }
-            else
-            {
-                Debug.LogWarning("[MaoFisicaBridge] BarraEnferrujadaConfig não atribuído; usando defaults do POCO.", this);
-                armaEquipada = new BarraEnferrujada();
-            }
-
-            _armaDesbloqueada = desbloqueadaNoInicio;
-
-            // Fallback seguro: se "Camada Inimigos" ficou sem valor no Inspector
-            // (LayerMask 0 = nenhuma camada), usa a layer "Enemy" pelo nome.
+            // Fallback seguro: se "Camada Inimigos" ficou sem valor no Inspector, usa "Enemy".
             if (camadaInimigos.value == 0)
-            {
                 camadaInimigos = LayerMask.GetMask("Enemy");
-            }
 
-            // Filtro montado uma vez. useTriggers = true preserva o comportamento
-            // anterior de OverlapCircleAll, que respeitava Physics2D.queriesHitTriggers
-            // (padrão true) — o alvo real (CultistaAI) é filtrado depois por GetComponent.
             _filtroInimigos = new ContactFilter2D();
             _filtroInimigos.useTriggers = true;
             _filtroInimigos.SetLayerMask(camadaInimigos);
+
+            var armaTeste = CriarArmaDeTeste(armaInicialParaTeste);
+            if (armaTeste != null) EquiparArma(armaTeste);
         }
 
+        private static IArmaComHabilidade CriarArmaDeTeste(ArmaDeTeste escolha) => escolha switch
+        {
+            ArmaDeTeste.CravoDeAklo => new CravoDeAklo(),
+            ArmaDeTeste.EstileteDeIrem => new EstileteDeIrem(),
+            ArmaDeTeste.AlfanjeDeAlhazred => new AlfanjeDeAlhazred(),
+            _ => null,
+        };
+
+        /// <summary>Ataque básico da arma equipada, na direção dada.</summary>
         public void TryAtacar(Vector2 direcao)
         {
-            if (!_armaDesbloqueada) return;
+            if (_armaEquipada == null) return;                 // desarmado
             if (direcao == Vector2.zero) return;
-            if (_fsm == null) return; // fallback seguro: sem FSM injetada, a ação não dispara
-            if (!_fsm.EstaLivre) return; // portão barato antes do Execute (que avança o RNG do atordoamento)
-            if (!armaEquipada.CanActivate(Time.time - lastUseTime)) return;
+            if (_fsm == null || !_fsm.EstaLivre) return;
+            if (!_armaEquipada.CanActivate(Time.time - _lastUseTime)) return;
 
-            var resultado = armaEquipada.Execute();
-
-            // Commit da exclusão mútua (revalida; em thread única o estado não mudou desde EstaLivre).
+            var resultado = _armaEquipada.Execute();
             if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
 
-            lastUseTime = Time.time;
+            _lastUseTime = Time.time;
             ResolverGolpe(direcao, resultado);
             OnAtaqueExecutado?.Invoke(direcao, resultado.DurationSeconds);
+        }
+
+        /// <summary>Habilidade da arma equipada (botão separado, cooldown próprio), na direção dada.</summary>
+        public void TryUsarHabilidade(Vector2 direcao)
+        {
+            if (_armaEquipada == null) return;
+            if (direcao == Vector2.zero) return;
+            if (_fsm == null || !_fsm.EstaLivre) return;
+            if (!_armaEquipada.CanActivateHabilidade(Time.time - _lastAbilityUseTime)) return;
+
+            var resultado = _armaEquipada.ExecuteHabilidade();
+            if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
+
+            _lastAbilityUseTime = Time.time;
+            ResolverGolpe(direcao, resultado);
+            OnHabilidadeExecutada?.Invoke(direcao, resultado.DurationSeconds);
         }
 
         private void ResolverGolpe(Vector2 direcao, ArmaResult resultado)

@@ -47,7 +47,7 @@ namespace FavelaAmarela.Core.Enemies
 
         /// <summary>
         /// Interrompe o Cultista imediatamente, qualquer que seja o estado atual
-        /// (ex.: um golpe de <see cref="FavelaAmarela.Core.Abilities.BarraEnferrujada"/>
+        /// (ex.: um golpe de arma física — ver <see cref="FavelaAmarela.Core.Abilities.IArma"/> —
         /// que rolou atordoamento). Depois de <paramref name="duracaoSegundos"/>,
         /// volta para Errante — atordoado o suficiente para perder o rastro.
         /// </summary>

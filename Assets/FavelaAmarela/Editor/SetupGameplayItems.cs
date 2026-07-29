@@ -27,9 +27,8 @@ namespace FavelaAmarela.EditorTools
                 "Assets/FavelaAmarela/Art/Items/Patua.png",
                 "FavelaAmarela.Runtime.GameLoop.PatuaPickup", hint, obrigatorio: true);
 
-            SetupPickup(root, "Arma_Pickup", new Vector3(6f, -36f, 0f),
-                "Assets/FavelaAmarela/Art/Items/BarraEnferrujada.png",
-                "FavelaAmarela.Runtime.GameLoop.ArmaPickup", hint, obrigatorio: false);
+            // (Arma_Pickup removido: a Barra Enferrujada foi descartada — a arma agora
+            //  vem do baú da Tumba, que sorteia uma das 3 armas via RNG.)
 
             EditorSceneManager.MarkSceneDirty(root.scene);
             EditorSceneManager.SaveScene(root.scene);
