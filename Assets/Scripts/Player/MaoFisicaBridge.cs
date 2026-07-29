@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
+using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Player;
 using FavelaAmarela.Runtime.Config;
-using FavelaAmarela.Runtime.Enemies;
 
 namespace FavelaAmarela.Player
 {
@@ -114,8 +114,10 @@ namespace FavelaAmarela.Player
 
             for (int i = 0; i < total; i++)
             {
-                var cultista = _hitBuffer[i].GetComponent<CultistaAI>();
-                if (cultista != null) cultista.ReceberGolpeFisico(resultado);
+                // Mira qualquer IDanificavel (Cultista, Aparição Primordial/boss...), não
+                // mais só o CultistaAI — é isto que permite as armas atingirem o Abdul.
+                var alvo = _hitBuffer[i].GetComponent<IDanificavel>();
+                if (alvo != null) alvo.ReceberGolpe(resultado);
             }
         }
 

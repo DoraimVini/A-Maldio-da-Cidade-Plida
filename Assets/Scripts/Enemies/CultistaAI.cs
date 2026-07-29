@@ -1,5 +1,6 @@
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
+using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Enemies;
 using FavelaAmarela.Core.Stealth;
 using FavelaAmarela.Runtime.GameLoop;
@@ -7,7 +8,7 @@ using FavelaAmarela.Runtime.GameLoop;
 namespace FavelaAmarela.Runtime.Enemies
 {
     [RequireComponent(typeof(SpriteRenderer), typeof(Rigidbody2D))]
-    public class CultistaAI : MonoBehaviour
+    public class CultistaAI : MonoBehaviour, IDanificavel
     {
         private CultistaFSM _fsm;
         private SpriteRenderer _spriteRenderer;
@@ -121,12 +122,16 @@ namespace FavelaAmarela.Runtime.Enemies
             _fsm.ReceberEstimuloSonoro(som.Origem, distancia, som.RaioEfetivo);
         }
 
+        /// <summary>Cultista Amarelo não é boss — leva crítico de furtividade normalmente.</summary>
+        public bool EhAparicaoPrimordial => false;
+
         /// <summary>
-        /// Recebe o resultado de um golpe de arma física (ex.: <see cref="MaoFisicaBridge"/>
-        /// com a <see cref="BarraEnferrujada"/>). Só reage se o golpe rolou
-        /// atordoamento — a chance em si é decidida pela arma, não aqui.
+        /// Recebe o resultado de um golpe de arma física (via <c>MaoFisicaBridge</c>).
+        /// O Cultista não tem barra de vida: só reage ao atordoamento do golpe — o dano
+        /// bruto (<see cref="ArmaResult.Dano"/>) é ignorado aqui, importa para alvos com
+        /// vida (ex.: uma Aparição Primordial).
         /// </summary>
-        public void ReceberGolpeFisico(ArmaResult resultado)
+        public void ReceberGolpe(ArmaResult resultado)
         {
             if (resultado.Atordoou)
             {
