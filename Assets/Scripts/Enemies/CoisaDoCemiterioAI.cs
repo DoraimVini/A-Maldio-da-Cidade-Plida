@@ -22,6 +22,7 @@ namespace FavelaAmarela.Runtime.Enemies
         private CoisaDoCemiterioFSM _fsm;
         private SpriteRenderer _spriteRenderer;
         private Rigidbody2D _rb;
+        private SoundBroadcastService _soundBroadcaster;
 
         [Header("Configurações")]
         [SerializeField] private float velocidadeFarejando = 1.2f;
@@ -68,19 +69,27 @@ namespace FavelaAmarela.Runtime.Enemies
             _rb.linearVelocity = direcao * velocidade;
         }
 
+        /// <summary>
+        /// Injeta o serviço de som (chamado por <c>GameManager.InjetarDependencias()</c>
+        /// no bootstrap, antes do Awake/OnEnable deste componente — mesma garantia de
+        /// ordem que já existe para <c>PlayerMovement.Bind()</c>). Substitui a busca por
+        /// <c>GameManager.Instance</c> a cada (des)inscrição.
+        /// </summary>
+        public void Bind(SoundBroadcastService soundBroadcaster) => _soundBroadcaster = soundBroadcaster;
+
         private void OnEnable()
         {
-            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
+            if (_soundBroadcaster != null)
             {
-                GameManager.Instance.SoundBroadcaster.OnSomEmitido += HandleSomEmitido;
+                _soundBroadcaster.OnSomEmitido += HandleSomEmitido;
             }
         }
 
         private void OnDisable()
         {
-            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
+            if (_soundBroadcaster != null)
             {
-                GameManager.Instance.SoundBroadcaster.OnSomEmitido -= HandleSomEmitido;
+                _soundBroadcaster.OnSomEmitido -= HandleSomEmitido;
             }
         }
 

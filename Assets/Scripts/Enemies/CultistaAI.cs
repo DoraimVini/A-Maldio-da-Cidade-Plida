@@ -3,7 +3,6 @@ using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Enemies;
 using FavelaAmarela.Core.Stealth;
-using FavelaAmarela.Runtime.GameLoop;
 
 namespace FavelaAmarela.Runtime.Enemies
 {
@@ -14,6 +13,7 @@ namespace FavelaAmarela.Runtime.Enemies
         private SpriteRenderer _spriteRenderer;
         private Rigidbody2D _rb;
         private PatrolRoute _patrolRoute;
+        private SoundBroadcastService _soundBroadcaster;
 
         [Header("Patrulha")]
         [SerializeField] private Transform[] waypoints;
@@ -100,19 +100,27 @@ namespace FavelaAmarela.Runtime.Enemies
             _rb.linearVelocity = direcao * velocidade;
         }
 
+        /// <summary>
+        /// Injeta o serviço de som (chamado por <c>GameManager.InjetarDependencias()</c>
+        /// no bootstrap, antes do Awake/OnEnable deste componente — mesma garantia de
+        /// ordem que já existe para <c>PlayerMovement.Bind()</c>). Substitui a busca por
+        /// <c>GameManager.Instance</c> a cada (des)inscrição.
+        /// </summary>
+        public void Bind(SoundBroadcastService soundBroadcaster) => _soundBroadcaster = soundBroadcaster;
+
         private void OnEnable()
         {
-            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
+            if (_soundBroadcaster != null)
             {
-                GameManager.Instance.SoundBroadcaster.OnSomEmitido += HandleSomEmitido;
+                _soundBroadcaster.OnSomEmitido += HandleSomEmitido;
             }
         }
 
         private void OnDisable()
         {
-            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
+            if (_soundBroadcaster != null)
             {
-                GameManager.Instance.SoundBroadcaster.OnSomEmitido -= HandleSomEmitido;
+                _soundBroadcaster.OnSomEmitido -= HandleSomEmitido;
             }
         }
 

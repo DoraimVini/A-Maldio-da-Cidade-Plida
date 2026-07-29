@@ -4,6 +4,7 @@ using FavelaAmarela.Core.GameLoop;
 using FavelaAmarela.Core.Stealth;
 using FavelaAmarela.Core.Environment;
 using FavelaAmarela.Player;
+using FavelaAmarela.Runtime.Enemies;
 using FavelaAmarela.Runtime.Environment;
 using FavelaAmarela.Runtime.UI;
 using UnityEngine.InputSystem;
@@ -11,8 +12,9 @@ using UnityEngine.InputSystem;
 namespace FavelaAmarela.Runtime.GameLoop
 {
     [AddComponentMenu("Favela Amarela/Game Manager")]
-    // Garante que Instance esteja pronto antes do Awake/OnEnable de qualquer outro script da cena
-    // (ex.: CultistaAI se inscreve em GameManager.Instance.SoundBroadcaster no próprio OnEnable).
+    // Garante que Awake() (e InjetarDependencias(), que faz o Bind() dos POCOs nos
+    // adapters) termine antes do Awake/OnEnable de qualquer outro script da cena —
+    // ex.: CultistaAI.OnEnable() já encontra o SoundBroadcaster injetado por Bind().
     [DefaultExecutionOrder(-100)]
     public class GameManager : MonoBehaviour
     {
@@ -96,6 +98,17 @@ namespace FavelaAmarela.Runtime.GameLoop
             var tempestadeOverlay = FindAnyObjectByType<TempestadeVisualOverlay>();
             if (tempestadeOverlay != null)
                 tempestadeOverlay.Bind(Environment);
+
+            // Injeta o serviço de som em todos os inimigos sound-first da cena — eles
+            // não buscam mais GameManager.Instance sozinhos no próprio OnEnable
+            // (inconsistência corrigida: agora seguem o mesmo padrão de Bind() do PlayerMovement).
+            // Inclui inativos: um inimigo de emboscada (começa desligado, ligado depois por
+            // trigger) já nasce com o serviço injetado, e seu OnEnable o encontra ao ativar.
+            foreach (var cultista in FindObjectsByType<CultistaAI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                cultista.Bind(SoundBroadcaster);
+
+            foreach (var coisa in FindObjectsByType<CoisaDoCemiterioAI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                coisa.Bind(SoundBroadcaster);
         }
 
         private void Update()
