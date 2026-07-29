@@ -144,6 +144,7 @@ namespace FavelaAmarela.Player
         // --- Mão Física (ataque) State ---
         private MaoFisicaBridge maoFisicaBridge;
         private InputAction attackAction;
+        private InputAction habilidadeArmaAction;
 
         public PlayerStealthState StealthState => stealthState;
         public bool IsMoving => isMoving;
@@ -217,6 +218,7 @@ namespace FavelaAmarela.Player
                 leapAction  = playerInput.actions.FindAction("SaltoDimensional"); // botão direito do mouse
                 dodgeAction = playerInput.actions.FindAction("Esquiva"); // Espaço
                 attackAction = playerInput.actions.FindAction("Attack"); // botão esquerdo do mouse
+                habilidadeArmaAction = playerInput.actions.FindAction("HabilidadeArma"); // tecla Q / ombro direito
 
                 if (moveAction == null)
                     Debug.LogWarning("[PlayerMovement] 'Move' action not found in Input Actions asset.", this);
@@ -329,6 +331,13 @@ namespace FavelaAmarela.Player
             {
                 maoFisicaBridge.TryAtacar(inputDirection);
                 if (!_fsm.EstaLivre) return; // Ataque pegou
+            }
+
+            // Trigger Habilidade da Arma (botão separado do ataque básico)
+            if (habilidadeArmaAction != null && habilidadeArmaAction.WasPressedThisFrame() && maoFisicaBridge != null)
+            {
+                maoFisicaBridge.TryUsarHabilidade(inputDirection);
+                if (!_fsm.EstaLivre) return; // Habilidade pegou
             }
 
             // Determine stealth mode from modifier keys
