@@ -29,12 +29,42 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         [Test]
-        public void Basico_NaoCarregaEfeitosDeHabilidade()
+        public void Basico_NaoCarregaEfeitosDeOutrasArmas()
         {
+            // O básico do Estilete NÃO interrompe conjuração (Cravo) nem repele (Alfanje).
             var r = new EstileteDeIrem().Execute();
             Assert.IsFalse(r.InterrompeConjuracao);
-            Assert.AreEqual(0f, r.SangramentoPorSegundo, 0.0001f);
             Assert.AreEqual(0f, r.ForcaRepulsao, 0.0001f);
+        }
+
+        [Test]
+        public void EstileteBasico_AcumulaSangramento()
+        {
+            // Decisão de design (2026-07-31): o ataque básico do Estilete acumula 1 de
+            // sangramento. É o que torna o teto de 10 acúmulos alcançável — a habilidade
+            // sozinha (cooldown 5 s) levaria quase um minuto para chegar lá.
+            var r = new EstileteDeIrem().Execute();
+            Assert.AreEqual(1, r.AcumulosDeSangramento);
+            Assert.Greater(r.SangramentoPorSegundo, 0f);
+        }
+
+        [Test]
+        public void OutrasArmas_NaoAcumulamSangramento()
+        {
+            // Sangramento é a assinatura do Estilete — Cravo e Alfanje não o aplicam.
+            Assert.AreEqual(0, new CravoDeAklo().Execute().AcumulosDeSangramento);
+            Assert.AreEqual(0, new CravoDeAklo().ExecuteHabilidade().AcumulosDeSangramento);
+            Assert.AreEqual(0, new AlfanjeDeAlhazred().Execute().AcumulosDeSangramento);
+            Assert.AreEqual(0, new AlfanjeDeAlhazred().ExecuteHabilidade().AcumulosDeSangramento);
+        }
+
+        [Test]
+        public void EstileteHabilidade_AcumulaMaisQueOBasico()
+        {
+            var arma = new EstileteDeIrem();
+            Assert.Greater(arma.ExecuteHabilidade().AcumulosDeSangramento,
+                           arma.Execute().AcumulosDeSangramento,
+                           "A habilidade é o empurrão guardado para a janela de dano.");
         }
 
         // ── Habilidades-assinatura ───────────────────────────────────────────
@@ -66,6 +96,43 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.Greater(r.ForcaRepulsao, 0f, "Golpe do Deserto deve repelir.");
             Assert.IsTrue(r.Atordoou, "Golpe do Deserto deve atordoar brevemente.");
             Assert.Greater(r.DuracaoAtordoamento, 0f);
+        }
+
+        // ── Mão Vazia (golpe desarmado) ──────────────────────────────────────
+
+        [Test]
+        public void MaoVazia_Basico_TemSucessoMasDanoZero()
+        {
+            var r = new MaoVazia().Execute();
+            Assert.IsTrue(r.Success, "O gesto desarmado deve executar (entra no estado Atacando).");
+            Assert.AreEqual(0f, r.Dano, 0.0001f,
+                "Mão Vazia causa dano ZERO por decisão de design — bater de mão vazia não mata.");
+        }
+
+        [Test]
+        public void MaoVazia_NaoAtordoaNemRepeleNemInterrompe()
+        {
+            var r = new MaoVazia().Execute();
+            Assert.IsFalse(r.Atordoou);
+            Assert.IsFalse(r.InterrompeConjuracao);
+            Assert.AreEqual(0f, r.ForcaRepulsao, 0.0001f);
+            Assert.AreEqual(0f, r.SangramentoPorSegundo, 0.0001f);
+        }
+
+        [Test]
+        public void MaoVazia_RespeitaCooldownProprio()
+        {
+            var mao = new MaoVazia(cooldown: 0.25f);
+            Assert.IsFalse(mao.CanActivate(0.24f));
+            Assert.IsTrue(mao.CanActivate(0.25f));
+        }
+
+        [Test]
+        public void MaoVazia_NaoTemHabilidade()
+        {
+            // Sem arma não há habilidade em botão separado — contrato explícito.
+            Assert.IsFalse(new MaoVazia() is IArmaComHabilidade,
+                "MaoVazia não deve implementar IArmaComHabilidade.");
         }
 
         // ── Cooldowns ────────────────────────────────────────────────────────

@@ -67,6 +67,27 @@ namespace FavelaAmarela.Core.Player
         }
 
         /// <summary>
+        /// Impõe um estado <b>contra a vontade do jogador</b>, interrompendo o que estiver
+        /// em curso — é o caminho dos atordoamentos (hoje, o congelamento pelos Cones de
+        /// Gelo de Abdul).
+        ///
+        /// <para>Diferente de <see cref="TryEntrarAcao"/>, que existe para ações
+        /// <em>escolhidas</em> e por isso recusa se já houver ação em curso: um efeito de
+        /// controle não pode falhar só porque o jogador estava no meio de uma esquiva —
+        /// seria justamente a janela para ignorá-lo.</para>
+        /// </summary>
+        /// <param name="estado">Estado imposto. Pedir <see cref="PlayerState.Livre"/> não faz nada (use <see cref="ForcarLivre"/>).</param>
+        /// <param name="duracao">Segundos até voltar a Livre.</param>
+        public void ForcarEstado(PlayerState estado, float duracao)
+        {
+            if (estado == PlayerState.Livre) return;
+            if (duracao <= 0f) return;
+
+            TempoRestante = duracao;
+            ChangeState(estado);
+        }
+
+        /// <summary>
         /// Interrompe imediatamente a ação atual e volta a Livre (ex.: futuro
         /// "tomar dano cancela a esquiva"). Sem efeito se já estiver Livre.
         /// </summary>

@@ -25,9 +25,9 @@ namespace FavelaAmarela.Core.Abilities
         private readonly float duracaoAtordoamento;
 
         public AlfanjeDeAlhazred(
-            float duracaoBasico = 0.45f, float cooldownBasico = 0.7f, float danoBasico = 12f,
-            float duracaoHabilidade = 0.5f, float cooldownHabilidade = 5f, float danoHabilidade = 8f,
-            float forcaRepulsao = 6f, float duracaoAtordoamento = 1f)
+            float duracaoBasico = 0.45f, float cooldownBasico = 0.7f, float danoBasico = 45f,
+            float duracaoHabilidade = 0.5f, float cooldownHabilidade = 5f, float danoHabilidade = 40f,
+            float forcaRepulsao = 6f, float duracaoAtordoamento = 2f)
         {
             this.duracaoBasico = duracaoBasico;
             this.cooldownBasico = cooldownBasico;

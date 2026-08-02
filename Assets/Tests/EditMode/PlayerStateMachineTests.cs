@@ -23,10 +23,10 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void TryEntrarAcao_APartirDeLivre_Entra()
         {
-            bool ok = fsm.TryEntrarAcao(PlayerState.Saltando, 0.2f);
+            bool ok = fsm.TryEntrarAcao(PlayerState.Esquivando, 0.2f);
 
             Assert.IsTrue(ok);
-            Assert.AreEqual(PlayerState.Saltando, fsm.CurrentState);
+            Assert.AreEqual(PlayerState.Esquivando, fsm.CurrentState);
             Assert.AreEqual(0.2f, fsm.TempoRestante, 0.0001f);
         }
 
@@ -65,7 +65,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void ForcarLivre_InterrompeAcao()
         {
-            fsm.TryEntrarAcao(PlayerState.Saltando, 5f);
+            fsm.TryEntrarAcao(PlayerState.Esquivando, 5f);
 
             fsm.ForcarLivre();
 
@@ -91,7 +91,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void TimeInState_ReiniciaNaTransicao()
         {
-            fsm.TryEntrarAcao(PlayerState.Saltando, 10f);
+            fsm.TryEntrarAcao(PlayerState.Esquivando, 10f);
             fsm.Tick(0.5f);
             Assert.AreEqual(0.5f, fsm.TimeInState, 0.0001f);
 

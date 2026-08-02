@@ -23,8 +23,8 @@ namespace FavelaAmarela.Core.Abilities
         private readonly float danoHabilidade;
 
         public CravoDeAklo(
-            float duracaoBasico = 0.35f, float cooldownBasico = 0.5f, float danoBasico = 8f,
-            float duracaoHabilidade = 0.4f, float cooldownHabilidade = 6f, float danoHabilidade = 6f)
+            float duracaoBasico = 0.35f, float cooldownBasico = 0.5f, float danoBasico = 40f,
+            float duracaoHabilidade = 0.4f, float cooldownHabilidade = 6f, float danoHabilidade = 30f)
         {
             this.duracaoBasico = duracaoBasico;
             this.cooldownBasico = cooldownBasico;

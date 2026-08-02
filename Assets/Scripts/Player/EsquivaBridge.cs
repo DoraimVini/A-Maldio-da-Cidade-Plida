@@ -8,7 +8,7 @@ namespace FavelaAmarela.Player
 {
     /// <summary>
     /// MonoBehaviour Bridge conectando o POCO <see cref="Esquiva"/> à Unity.
-    /// Espelha o papel de <see cref="AnomalyPowerBridge"/>, mas para um movimento
+    /// Espelha o papel dos demais bridges de ação do jogador, mas para um movimento
     /// físico comum — sem custo de Resiliência Mental e sem tornar Damião intangível
     /// (a Esquiva colide com paredes normalmente; só o Salto Dimensional atravessa
     /// barreiras anômalas).

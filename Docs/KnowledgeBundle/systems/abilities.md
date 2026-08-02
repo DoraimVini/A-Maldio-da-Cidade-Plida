@@ -27,7 +27,8 @@ Inspirado em *Source of Madness*, Damião pode carregar exatamente dois itens ou
    - Interface: IArma                               - Interface: IAnomalyPower
    - Categoria: Mundana                             - Categoria: Sobrenatural
    - Consumo: Apenas Cooldown                       - Consumo: Resiliência Mental + Cooldown
-   - Exemplos: Barra Enferrujada, Lâminas           - Exemplos: Salto Dimensional, Talismãs
+   - Exemplos: Cravo de Aklo, Estilete             - Exemplos: (nenhum implementado hoje)
+     de Irem, Alfanje de Alhazred, Mão Vazia
 ```
 
 ### 1.1 Mão Física (`IArma.cs`)
@@ -57,7 +58,7 @@ Reservada para manifestações dimensionais de Carcosa. Distorcer a realidade co
     }
     ```
 *   **Poderes Cadastrados:**
-    *   **Salto Dimensional (Implementado):** Teleporta Damião no plano XY, atravessando colisões. Custa $15.0$ de Resiliência Mental por uso e emite um pulso de som de $8.0$ metros de raio.
+    > ⚠️ **Nenhum poder anômalo implementado hoje (2026-07-30).** O único que existia — o **Salto Dimensional** — foi **integralmente removido do jogo**. A interface `IAnomalyPower` foi mantida por decisão explícita: continua sendo o contrato para poderes futuros e o padrão que a árvore de habilidades deve seguir.
     *   **Talismã do Vento Negro (Planejado):** Cria um cone de vento que empurra cultistas leves para trás e apaga postes de luz no raio do efeito. Custa $20.0$ de Resiliência Mental.
 
 ---
@@ -77,7 +78,10 @@ Além dos dois slots ativos, Damião tem acesso a uma hotbar de consumíveis rá
 Para evitar árvores de habilidades genéricas que quebram o tom de horror, a progressão baseia-se em **Composição Dinâmica**:
 1.  **Desbloqueio de Módulos:** Damião encontra "Fragmentos de Hali" ou patuás esculpidos pelo cenário. Cada patuá é um script POCO que herda de `IAnomalyPower` ou `IArma`.
 2.  **Troca nos Refúgios:** A substituição das habilidades equipadas nas mãos **só pode ser feita fisicamente sob a luz de um poste de luz seguro** (Refúgio). Isso impede a troca rápida de poderes no meio de perseguições, exigindo planejamento.
-3.  **Gating Inicial:** O jogador começa o jogo sem arma física e sem o Salto Dimensional (`MaoFisicaBridge.desbloqueadaNoInicio == false`). O desbloqueio de ambos ocorre de forma dramática ao cair no subterrâneo (Zona 5), alterando instantaneamente a forma como o jogador lida com os cultistas.
+3.  **Gating Inicial:** O jogador começa **desarmado** — o golpe de Mão Vazia existe (faz barulho, entra no estado Atacando) mas causa **dano 0**. A primeira arma vem do **baú da Câmara do Baú (Zona 6b)**, por sorteio RNG entre as três armas da Tumba, alterando instantaneamente a forma como o jogador lida com os cultistas.
 
-### Decisão de nomenclatura (2026-07-28)
-Resolvido: o pickup existente na Zona 5 (`PatuaPickup.cs`), que destrava o Salto Dimensional e colidia de nome com a nova relíquia lendária **Patuá das Luas Gêmeas** (recompensa da quest da Rainha Cassilda, item diferente), passa a se chamar **"Fragmento de Hali do Salto"**. Renomeação de código (classe/prefab/textos de UI) pendente da Fatia 3 do roadmap (pickup genérico de relíquia).
+### Decisão de nomenclatura (2026-07-28, revogada em 2026-07-30)
+~~O pickup da Zona 5 (`PatuaPickup.cs`) passa a se chamar "Fragmento de Hali do Salto".~~
+**Revogado:** o Salto Dimensional foi removido do jogo, então o nome perdeu sentido. O
+`PatuaPickup` continua na Zona 5, agora coletado por **interação (botão E)**, mas **seu
+efeito está pendente de definição** — ver `TODO(design)` em `Interagir()`.

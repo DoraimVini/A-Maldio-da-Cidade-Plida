@@ -6,6 +6,23 @@ description: Sistema de combate focado em armas e tipos de dano (Priming), adapt
 
 # Sistema de Combate: Arsenal de Carcosa (Hardcore Tático)
 
+> ⚠️ **VISÃO ASPIRACIONAL — NÃO É O QUE ESTÁ SENDO CONSTRUÍDO.** Este documento descreve
+> um sistema de combate maximalista (famílias de dano, *Priming* de combos, defesas em
+> camadas, hibridização, `DamageManager`) que **diverge da decisão real** tomada para a
+> Tumba de Alhazred. O combate decidido é **enxuto**: 3 armas nomeadas (Cravo de Aklo,
+> Estilete de Irem, Alfanje de Alhazred), cada uma com ataque básico + uma habilidade em
+> botão separado, sem sistema de famílias/Priming/hibridização. A verdade corrente do
+> combate está em [Vitalidade](vitalidade.md) e [Ficha de Atributos](ficha_de_atributos.md),
+> no `MaoFisicaBridge`/`IArmaComHabilidade` e nas 3 armas em `Core/Abilities`. Trate este
+> arquivo como referência de humor/tom, não como especificação a implementar.
+>
+> **Sobre loot/raridade especificamente (correção 2026-07-29):** ao contrário do que uma
+> versão anterior deste aviso dizia, loot com raridade e níveis de personagem **não foram
+> rejeitados** — estão **previstos** (ver `CLAUDE.md` §1), só que com escopo deliberadamente
+> contido (nada de profundidade de build tipo Path of Exile/Last Epoch). O que segue fora
+> de escopo aqui é especificamente o sistema de *Priming*/famílias/hibridização deste
+> documento — não a existência de raridade em si.
+
 Este sistema funciona como uma alternativa tática para quando o Stealth falha. Ele baseia-se em tipos de dano nativos (Famílias de Armas), _Priming_ (preparação de status para combos) e quebra de defesas em camadas.
 
 > **Importante:** Como o Favela Amarela foca primariamente em furtividade, este combate denso existe para encontros que escalam para o confronto aberto, ou para situações onde o jogador decide enfrentar perigos para garantir recompensas específicas (armas, afixos ou recursos).

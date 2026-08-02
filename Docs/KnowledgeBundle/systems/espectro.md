@@ -10,7 +10,7 @@ timestamp: 2026-07-07T17:00:00Z
 
 O **Espectro** é uma manifestação espectral de Carcosa — diferente do Cultista Amarelo (humano corrompido), o Espectro não tem corpo físico constante: ele materializa e se move em direção a um alvo por vontade da Cidade Pálida, não por instinto ou percepção sonora.
 
-Hoje o Espectro só é usado em **momentos roteirizados** (cutscenes), como o [Cerco da Zona 4](queda_z4_z5.md). Ele não participa da IA reativa normal de stealth (isso é papel do [Cultista](cultista_ai.md)).
+Hoje o Espectro só é usado em **momentos roteirizados** (cutscenes). O caso que existia — o Cerco da Zona 4 — foi **removido da cena** em 2026-07-30, junto com o resto do legado das Ruínas Pálidas. Ele não participa da IA reativa normal de stealth (isso é papel do [Cultista](cultista_ai.md)).
 
 ## Estados (EspectroFSM)
 

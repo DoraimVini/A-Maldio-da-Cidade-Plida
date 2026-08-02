@@ -20,15 +20,42 @@ namespace FavelaAmarela.Core.Enemies
         /// </summary>
         public Vector2? UltimaOrigemConhecida { get; private set; }
 
+        /// <summary>
+        /// Se o alvo (Damião) está ao alcance de golpe corpo-a-corpo. Alimentado pelo
+        /// adaptador Runtime a cada tick (proximidade física por <c>OverlapCircle</c> na
+        /// layer Player — <b>não é visão</b>, é toque; coerente com a percepção só-som).
+        /// </summary>
+        public bool AlvoAoAlcance { get; private set; }
+
         private float _duracaoAtordoamento;
+
+        // Cadência do estado Atacar: intervalo entre golpes desferidos no alvo.
+        private readonly float _cadenciaDeAtaque;
+        private float _timerAtaque;
 
         public event Action<CultistaState, CultistaState> OnStateChanged;
 
-        public CultistaFSM(CultistaState initialState = CultistaState.Errante)
+        /// <summary>
+        /// Disparado a cada golpe corpo-a-corpo desferido no estado <see cref="CultistaState.Atacar"/>.
+        /// O Runtime traduz em dano na Vitalidade do Damião (aplicando a mitigação por defesa).
+        /// </summary>
+        public event Action OnGolpeDesferido;
+
+        /// <param name="initialState">Estado inicial da FSM.</param>
+        /// <param name="cadenciaDeAtaque">Segundos entre golpes no estado Atacar (default 1,2 s).</param>
+        public CultistaFSM(CultistaState initialState = CultistaState.Errante, float cadenciaDeAtaque = 1.2f)
         {
             CurrentState = initialState;
             TimeSinceLastStimulus = 999f;
+            _cadenciaDeAtaque = cadenciaDeAtaque > 0f ? cadenciaDeAtaque : 1.2f;
         }
+
+        /// <summary>
+        /// Atualiza se o alvo está ao alcance de golpe (chamado pelo Runtime a cada tick).
+        /// É o gatilho de proximidade que leva o Cultista de Caça para Atacar e o segura
+        /// atacando enquanto o Damião não sai do corpo-a-corpo.
+        /// </summary>
+        public void AtualizarAlcanceDoAlvo(bool aoAlcance) => AlvoAoAlcance = aoAlcance;
 
         public void ReceberEstimuloSonoro(Vector2 origemSom, float distanciaAoJogador, float raioEfetivo)
         {
@@ -79,10 +106,33 @@ namespace FavelaAmarela.Core.Enemies
             }
             else if (CurrentState == CultistaState.Caca)
             {
+                // Alvo ao alcance de golpe tem prioridade: engaja o corpo-a-corpo.
+                if (AlvoAoAlcance)
+                {
+                    ChangeState(CultistaState.Atacar);
+                }
                 // Perde o rastro após 10s sem ouvir nada
-                if (TimeSinceLastStimulus >= 10f)
+                else if (TimeSinceLastStimulus >= 10f)
                 {
                     ChangeState(CultistaState.Errante);
+                }
+            }
+            else if (CurrentState == CultistaState.Atacar)
+            {
+                // Enquanto o alvo está no corpo-a-corpo, o estado é governado só pela
+                // proximidade (não pelos timeouts sonoros): desfere um golpe por cadência.
+                if (!AlvoAoAlcance)
+                {
+                    ChangeState(CultistaState.Caca);
+                }
+                else
+                {
+                    _timerAtaque += dt;
+                    if (_timerAtaque >= _cadenciaDeAtaque)
+                    {
+                        _timerAtaque -= _cadenciaDeAtaque;
+                        OnGolpeDesferido?.Invoke();
+                    }
                 }
             }
             else if (CurrentState == CultistaState.Atordoado)
@@ -100,6 +150,11 @@ namespace FavelaAmarela.Core.Enemies
             var old = CurrentState;
             CurrentState = novo;
             TimeInState = 0f;
+
+            // Ao entrar em Atacar, começa a cadência do zero — o primeiro golpe sai
+            // após uma cadência completa (janela de telegrafo para o jogador reagir).
+            if (novo == CultistaState.Atacar) _timerAtaque = 0f;
+
             OnStateChanged?.Invoke(old, novo);
         }
     }

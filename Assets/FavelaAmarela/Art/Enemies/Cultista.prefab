@@ -135,6 +135,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.CultistaAI
   waypoints: []
+  ficha: {fileID: 11400000, guid: 01b505d918c6fb06a0a1fe2a5b6a8e61, type: 2}
   velocidadeErrante: 1
   velocidadeCaca: 3.5
   corErrante: {r: 1, g: 1, b: 1, a: 1}

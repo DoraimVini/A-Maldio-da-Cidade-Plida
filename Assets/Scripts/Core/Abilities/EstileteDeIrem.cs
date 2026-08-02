@@ -25,10 +25,14 @@ namespace FavelaAmarela.Core.Abilities
         private readonly float sangramentoPorSegundo;
         private readonly float duracaoSangramento;
 
+        private readonly int acumulosDoBasico;
+        private readonly int acumulosDaHabilidade;
+
         public EstileteDeIrem(
-            float duracaoBasico = 0.25f, float cooldownBasico = 0.3f, float danoBasico = 5f,
-            float duracaoHabilidade = 0.3f, float cooldownHabilidade = 5f, float danoHabilidade = 3f,
-            float sangramentoPorSegundo = 3f, float duracaoSangramento = 5f)
+            float duracaoBasico = 0.25f, float cooldownBasico = 0.3f, float danoBasico = 25f,
+            float duracaoHabilidade = 0.3f, float cooldownHabilidade = 5f, float danoHabilidade = 15f,
+            float sangramentoPorSegundo = 4f, float duracaoSangramento = 5f,
+            int acumulosDoBasico = 1, int acumulosDaHabilidade = 3)
         {
             this.duracaoBasico = duracaoBasico;
             this.cooldownBasico = cooldownBasico;
@@ -38,18 +42,34 @@ namespace FavelaAmarela.Core.Abilities
             this.danoHabilidade = danoHabilidade;
             this.sangramentoPorSegundo = sangramentoPorSegundo;
             this.duracaoSangramento = duracaoSangramento;
+            this.acumulosDoBasico = acumulosDoBasico;
+            this.acumulosDaHabilidade = acumulosDaHabilidade;
         }
 
         public bool CanActivate(float timeSinceLastUse) => timeSinceLastUse >= cooldownBasico;
 
+        /// <summary>
+        /// Ataque básico: rápido, dano baixo, e <b>abre 1 acúmulo de sangramento</b>. É o
+        /// que torna o acúmulo alcançável — com cooldown de 0,3 s, manter a pressão sobe a
+        /// contagem depressa, enquanto a habilidade sozinha (cooldown 5 s) levaria quase um
+        /// minuto para chegar ao teto.
+        /// </summary>
         public ArmaResult Execute() => new ArmaResult(
             success: true, durationSeconds: duracaoBasico, cooldownSeconds: cooldownBasico,
-            dano: danoBasico);
+            dano: danoBasico,
+            sangramentoPorSegundo: sangramentoPorSegundo, duracaoSangramento: duracaoSangramento,
+            acumulosDeSangramento: acumulosDoBasico);
 
         public bool CanActivateHabilidade(float timeSinceLastAbilityUse) => timeSinceLastAbilityUse >= cooldownHabilidade;
 
+        /// <summary>
+        /// Ferida de Aklo: abre vários acúmulos de uma vez, acelerando o caminho até o
+        /// estouro. É o "empurrão" que o jogador guarda para a janela de vulnerabilidade.
+        /// </summary>
         public ArmaResult ExecuteHabilidade() => new ArmaResult(
             success: true, durationSeconds: duracaoHabilidade, cooldownSeconds: cooldownHabilidade,
-            dano: danoHabilidade, sangramentoPorSegundo: sangramentoPorSegundo, duracaoSangramento: duracaoSangramento);
+            dano: danoHabilidade,
+            sangramentoPorSegundo: sangramentoPorSegundo, duracaoSangramento: duracaoSangramento,
+            acumulosDeSangramento: acumulosDaHabilidade);
     }
 }

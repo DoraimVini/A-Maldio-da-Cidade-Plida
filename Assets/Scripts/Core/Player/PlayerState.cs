@@ -9,16 +9,20 @@ namespace FavelaAmarela.Core.Player
     /// </summary>
     public enum PlayerState
     {
-        /// <summary>Sem ação exclusiva ativa — pode andar e iniciar Esquiva/Salto/Ataque.</summary>
+        /// <summary>Sem ação exclusiva ativa — pode andar e iniciar Esquiva/Ataque.</summary>
         Livre,
 
         /// <summary>Executando uma Esquiva (dash curto).</summary>
         Esquivando,
 
-        /// <summary>Executando o Salto Dimensional (dash intangível).</summary>
-        Saltando,
-
         /// <summary>Executando um golpe da Mão Física (travado no lugar).</summary>
-        Atacando
+        Atacando,
+
+        /// <summary>
+        /// Congelado pelos Cones de Gelo de Abdul (3 acúmulos de frio). Diferente dos
+        /// outros estados, <b>não é uma ação escolhida</b> — é imposto pelo inimigo, então
+        /// entra por <c>ForcarEstado</c> e interrompe o que estiver em curso.
+        /// </summary>
+        Congelado
     }
 }
