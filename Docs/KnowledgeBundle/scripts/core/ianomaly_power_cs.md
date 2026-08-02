@@ -12,7 +12,9 @@ timestamp: 2026-07-09T00:00:00Z
 **Namespace:** `FavelaAmarela.Core.Abilities`
 **Tipo:** `public interface` (+ `public struct PowerResult`)
 
-Contrato base para qualquer habilidade sobrenatural (Anomalia/Salto Dimensional) usada na Mão Anômala de Damião — o mecanismo de composição-sobre-herança citado no CLAUDE.md §4 para poderes plugáveis. Implementado por [DimensionalLeap](dimensional_leap_cs.md).
+Contrato base para qualquer habilidade sobrenatural (Anomalia) usada na Mão Anômala de Damião — o mecanismo de composição-sobre-herança citado no CLAUDE.md §4 para poderes plugáveis.
+
+> ⚠️ **Sem implementações hoje (2026-07-30).** A única classe que implementava esta interface era o `DimensionalLeap`, e o Salto Dimensional foi **integralmente removido do jogo**. A interface foi **mantida por decisão explícita do Vini**: continua sendo o contrato para poderes anômalos futuros (e o padrão que a árvore de habilidades deve seguir). Não apagar por parecer código morto.
 
 ## API Pública
 

@@ -28,11 +28,18 @@ namespace FavelaAmarela.Core.Abilities
         /// </summary>
         public readonly bool InterrompeConjuracao;
 
-        /// <summary>Dano contínuo por segundo aplicado ao alvo (sangramento — habilidade do Estilete de Irem).</summary>
+        /// <summary>Dano contínuo por segundo que <b>cada acúmulo</b> de sangramento contribui (Estilete de Irem).</summary>
         public readonly float SangramentoPorSegundo;
 
         /// <summary>Duração, em segundos, do sangramento (se <see cref="SangramentoPorSegundo"/> &gt; 0).</summary>
         public readonly float DuracaoSangramento;
+
+        /// <summary>
+        /// Quantos acúmulos de sangramento este golpe aplica. O ataque básico do Estilete
+        /// traz 1; a habilidade (Ferida de Aklo) traz vários. Ao chegar ao teto, as feridas
+        /// estouram — ver <c>Sangramento</c>.
+        /// </summary>
+        public readonly int AcumulosDeSangramento;
 
         /// <summary>Força de repulsão (empurrão) aplicada ao alvo, em unidades (habilidade do Alfanje de Alhazred).</summary>
         public readonly float ForcaRepulsao;
@@ -41,8 +48,9 @@ namespace FavelaAmarela.Core.Abilities
             bool atordoou = false, float duracaoAtordoamento = 0f,
             float dano = 0f, bool interrompeConjuracao = false,
             float sangramentoPorSegundo = 0f, float duracaoSangramento = 0f,
-            float forcaRepulsao = 0f)
+            float forcaRepulsao = 0f, int acumulosDeSangramento = 0)
         {
+            AcumulosDeSangramento = acumulosDeSangramento;
             Success = success;
             DurationSeconds = durationSeconds;
             CooldownSeconds = cooldownSeconds;

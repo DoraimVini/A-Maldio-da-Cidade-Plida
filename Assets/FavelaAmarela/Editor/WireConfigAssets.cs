@@ -27,7 +27,6 @@ namespace FavelaAmarela.EditorTools
             var ok = true;
             ok &= AssignField(player, "PlayerMovement", "locomocaoConfig", "Assets/FavelaAmarela/Config/LocomocaoConfig.asset");
             ok &= AssignField(player, "EsquivaBridge", "config", "Assets/FavelaAmarela/Config/EsquivaConfig.asset");
-            ok &= AssignField(player, "AnomalyPowerBridge", "config", "Assets/FavelaAmarela/Config/SaltoDimensionalConfig.asset");
             // (MaoFisicaBridge não tem mais 'config' — a Barra Enferrujada foi descartada;
             //  a arma é equipada pelo baú da Tumba em runtime, não por um asset de config.)
 
