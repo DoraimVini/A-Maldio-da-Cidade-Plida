@@ -1,0 +1,147 @@
+---
+type: Roadmap
+title: Roadmap do Vertical Slice — Estado Real vs. Lista de Produção
+description: Auditoria do que está pronto, parcial e não-começado, contra a lista priorizada do edital. Inclui riscos de escopo.
+tags: [roadmap, escopo, edital, vertical-slice]
+timestamp: 2026-07-31T00:00:00Z
+---
+
+# Roadmap do Vertical Slice — Estado Real
+
+Auditoria feita em **2026-07-31** contra a lista priorizada de produção (12 itens + 2 de
+polimento). Cada item foi verificado **no código e nas cenas**, não por memória.
+
+> ✅ **Escopo decidido em 2026-07-31:** o Vertical Slice são os **14 itens desta lista** —
+> a **Fase 1 completa** e a **última fase do jogo** (Castelo de Carcosa + Rei em Amarelo),
+> não só a Tumba. É um recorte **início + desfecho**, pulando as 4 fases do meio: mostra a
+> abertura do jogo e o confronto final, que é o que faz um edital enxergar o jogo inteiro.
+> O `CLAUDE.md` §1.1 foi reescrito para refletir isso.
+
+---
+
+## Prioridade 1 — Core de Sobrevivência
+
+| # | Item | Estado | Observação |
+|---|---|---|---|
+| 1 | **Status Ailments** | ✅ **Pronto** | Sangramento por acúmulo (10 → estouro percentual) e Congelamento (3 acúmulos → trava o jogador). Ver [armas_da_tumba.md](systems/armas_da_tumba.md). |
+| 2 | **Sistema de Consumíveis** | ⚠️ **Fundação pronta** (2026-08-01) | Inventário completo com **21 testes** (`Inventario`, `DefinicaoDeItem`, `PilhaDeItens`), `ItemConfig` para autoria em asset e `InventarioBridge` aplicando Ancoragem/Estabilização. **Falta:** nenhum item real autorado, nenhuma UI de inventário, e o `InventarioBridge` não está em cena nenhuma. Ver [inventario_e_consumiveis.md](systems/inventario_e_consumiveis.md). |
+| 3 | **Companheiro (RC)** | ⚠️ **Parcial** | Seguir Damião ✅; incapacitação + reanimação num Refúgio ✅ (implementado 2026-07-31). **Falta:** barra no HUD. Ver nota abaixo. |
+
+### ⚠️ Conflito no item 1 — *Lentidão* vs. *Congelamento*
+A lista pede **"Lentidão (Congelamento do Boss)"**. O implementado é **trava total**
+(`PlayerState.Congelado`, ~1,5 s), não redução de velocidade. Foi assim que o design do
+Abdul foi escrito ("3 stacks = Stun"). **Se a intenção for lentidão, é mudança de design a
+confirmar** — não é bug.
+
+### Nota sobre o item 3 — atualizado em 2026-07-31
+1. **Barra "RC":** mantido como `Vitalidade` comum (decisão de 2026-07-30). **Falta só a
+   barra no HUD**, não o recurso.
+2. **Morte do companheiro:** revisado em 2026-07-31 — deixou de ser fim de run permanente
+   (estilo Ashley/RE4) e virou **incapacitação recuperável**: ele cai no lugar, bloqueia os
+   Portões de Carcosa, e é reanimado num `RefugioDeLuz` (novo, versão mínima). Ver
+   [companheiro_mi_go.md](systems/companheiro_mi_go.md).
+3. **"Escudo humano contra projéteis" durante a luta do Abdul continua descartado** — ele
+   não é alvo de nada lá (ainda sob controle de Abdul). Se a intenção for proteção durante
+   *alguma* luta, o candidato natural é o **Byakhee** (onde ele já estará livre), não a Tumba.
+
+---
+
+## Prioridade 2 — O Deserto de Hali
+
+| # | Item | Estado | Observação |
+|---|---|---|---|
+| 4 | **Blockout geográfico** | ✅ **Setores definidos** (2026-08-01) | Os marcos já estavam nas posições certas da topologia (Tumba a oeste, Santuário a noroeste, Templo a leste, Portões ao norte, chegada ao sul). O que faltava eram os **setores como entidades de jogo**: 6 volumes de `TempestadeZonaTrigger` ladrilhando o mapa sem sobrepor, com as faixas de intensidade da tabela §3 do design. Ferramenta: `Tools/FavelaAmarela/Montar setores de tempestade do Deserto`. **Terreno não foi regerado** — só acrescentei volumes. |
+| 5 | **Tempestade de Memória** | ✅ **Funcional no Deserto** (2026-08-01) | Driver + véu visual instalados na cena; o `GameManager` os liga no bootstrap. **Intensidade→detecção já funcionava**: a percepção do Cultista é 100% sonora e a tempestade abafa o ruído do Damião (`PlayerStealthState.AplicarAbafamentoTempestade`) — stealth invertido conforme decidido. **Intensidade→velocidade foi descartada** (decisão do Vini: a tempestade atrapalha só os inimigos). Falta variar a faixa por setor (`TempestadeZonaTrigger`), o que depende do item 4. |
+| 6 | **População de inimigos** | ❌ **Não no deserto** | O Deserto está **vazio**. A Tumba tem só **2 Cultistas** (verificado na cena em 2026-08-01 — a contagem de "41" que constava aqui estava errada). Ou seja, falta povoar as duas áreas, não só o Deserto. |
+| 7 | **A Coisa do Cemitério** | ⚠️ **Existe, sem instância** | `CoisaDoCemiterioAI` + `CoisaDoCemiterioFSM` implementados (caça por faro, insta-kill). A instância foi **removida** da Tumba para dar lugar ao Abdul. Precisa ser colocada no Deserto. |
+
+---
+
+## Prioridade 3 — Encerramento da Fase 1
+
+| # | Item | Estado |
+|---|---|---|
+| 8 | **Quest do Santuário de Yhtill** (Cassilda + fragmentos) | ✅ **Jogável de ponta a ponta** (2026-08-02) — `CancaoIncompleta` + `RecitalDaCancao` (Core, 13 + 9 testes), `CassildaNPC` e `FragmentoDeYhtill` implementados; Cassilda agora é prefab (`Cassilda.prefab`) com todo o conteúdo textual, instanciada e ligada em cena; os 3 fragmentos carregam as 2 primeiras estrofes da Canção de Cassilda; entregar tudo abre um **recital sem punição** das 2 estrofes finais antes do Patuá; o primeiro encontro ganhou a ramificação A/B/C do roteiro do lore (cosmética, via `PainelDeEscolha`). Progresso atravessa as duas cenas via save; o recital e a escolha do primeiro encontro não são persistidos (decisão). **Falta:** só arte — sprites placeholder em Cassilda, fragmentos e piso. Ver [quest_cassilda.md](systems/quest_cassilda.md). |
+| 9 | **Boss Byakhee** | ❌ **Não começado** — zero código. IA aérea + grito infrassônico são mecânicas novas. |
+| 10 | **Transição de Fase** | ⚠️ **Parcial** — `PortalDeCena` e `TransicaoDeFaseTrigger` existem; os Portões em si não. |
+
+---
+
+## Prioridade 4 — O Castelo de Carcosa (**última fase do jogo**)
+
+> O jogo completo tem **6 fases**; o Castelo é a última. Ele não vem "logo depois" da Fase 1
+> na campanha final — o VS salta as 4 fases do meio de propósito, para mostrar abertura e
+> desfecho. Isso é escopo, não continuidade narrativa: a transição Fase 1 → Castelo dentro
+> do VS é um **corte de apresentação**, não o fluxo real do jogo.
+
+| # | Item | Estado |
+|---|---|---|
+| 11 | **Blockout do Castelo** | ❌ **Não começado** — cena inexistente. |
+| 12 | **Boss Rei em Amarelo** | ❌ **Não começado** — zero código. A mecânica de "virar as costas" não existe em nenhuma forma. |
+
+---
+
+## Prioridade 5 — Polimento
+
+| # | Item | Estado |
+|---|---|---|
+| 13 | **Cinemática de abertura** | ❌ Não implementada (design existe em `systems/cinematica_abertura_deserto.md`). |
+| 14 | **Dungeon 2 (Templo da Serpente)** | ❌ Não começada (design completo em `lore/templo_da_serpente.md`). |
+
+---
+
+## O que está pronto e **não aparece na lista**
+
+A **Tumba de Alhazred (Dungeon 1)** — o trabalho das últimas sessões — não é citada em
+nenhum dos 14 itens, mas está essencialmente **jogável de ponta a ponta**:
+
+- Combate completo: ficha de 5 atributos, mitigação por defesa, 3 armas com habilidade própria, golpe desarmado.
+- HUD: Resiliência, Vitalidade, Barra de Ações, prompt de interação, painel de escolha.
+- Interação por botão **E** (baú, patuá, NPC).
+- Baú com sorteio RNG das 3 armas.
+- **Boss Abdul completo**: 2 fases, Escudo Mágico, Pedras de Poder que nascem por fase, Cones de Gelo, esqueletos invocados, janela de exaustão, drop do Necronomicon.
+- Conversa ramificada (lutar × concordar) + traição da trégua.
+- Yug-Neth cativo → libertado → segue Damião; se cair, incapacita e é reanimado num Refúgio.
+
+**Pendência real da Tumba:** **arte**. Verificado — Pedra de Poder, Esqueleto, Cone de Gelo
+e Necronomicon usam o **sprite built-in do Unity** (retângulos coloridos). O Abdul tem
+spritesheet real fatiado em 28 frames, mas **sem Animator** (usa um frame estático).
+
+---
+
+## Consequências da decisão de escopo (2026-07-31)
+
+O VS são os 14 itens desta lista: **Fase 1 completa + a última fase do jogo** (Castelo de
+Carcosa), pulando as 4 fases do meio. A lógica do recorte é de **pitch**, não de
+continuidade: dungeons de abertura mostram o loop de jogo (stealth, combate, armas,
+companheiro) e o Rei em Amarelo mostra onde tudo isso desemboca. Junto disso, o Vini
+**destravou o inventário** (antes "previsto, sem data") porque o item 2 depende dele.
+
+**O volume que isso implica:** 2 bosses novos do zero (Byakhee, Rei em Amarelo), 2 cenas
+novas (Deserto povoado, Castelo), um sistema de quest/NPC, inventário + consumíveis, e arte
+para tudo isso — além da arte que a Tumba já devia.
+
+### Recomendação de ordem (dentro do escopo escolhido)
+
+1. **Item 5 (tempestade) antes do 4 (blockout completo).** A infra já existe e é a mecânica
+   que dá identidade ao Deserto (stealth invertido). Ligar num blockout parcial já produz
+   algo jogável; um blockout perfeito sem tempestade, não.
+2. **Itens 6 e 7 (povoar + Coisa do Cemitério) logo depois do 5.** São baratos — o código
+   de ambos já existe e está testado, é trabalho de posicionamento em cena — e transformam
+   o Deserto de cenário vazio em área jogável.
+3. **Inventário (pré-requisito do item 2) o quanto antes.** Outras coisas vão querer se
+   pendurar nele (Necronomicon, patuá, futuros consumíveis); quanto mais tarde entrar, mais
+   retrabalho nesses pontos.
+4. **Arte pode correr em paralelo com o código.** É o gargalo mais provável do prazo e a
+   única frente que não depende de nenhuma decisão de design pendente — a Tumba inteira já
+   está mecanicamente pronta e travada só nisso.
+5. **A Prioridade 4 (Castelo + Rei em Amarelo) NÃO é candidata a corte** — corrigido em
+   2026-07-31. Cheguei a recomendá-la como primeira coisa a cortar se o prazo apertasse,
+   antes de saber que o Castelo é a **última fase do jogo**. Com o recorte sendo
+   deliberadamente "abertura + desfecho", cortar o Rei em Amarelo remove **metade da tese
+   do VS** e deixa uma demo que não mostra para onde o jogo vai.
+
+   Se for preciso cortar, os candidatos passam a ser os itens que **não** sustentam esse
+   arco: item 14 (Dungeon 2 — Templo da Serpente, explicitamente "polimento"), item 8
+   (quest do Santuário, a única peça de conteúdo secundário) e a profundidade do item 4
+   (um Deserto menor ainda cumpre o papel de mostrar o overworld).

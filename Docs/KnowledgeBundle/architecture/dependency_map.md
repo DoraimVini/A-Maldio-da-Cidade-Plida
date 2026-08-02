@@ -20,7 +20,9 @@ SoundBroadcastService ──emite SomEmitido──▶ CultistaFSM
          ▼
    (Observadores do som: CultistaAI adapter)
 
-ResilienciaMental ◀──custo de RM── DimensionalLeap (IAnomalyPower)
+ResilienciaMental ◀──trauma── (dano anômalo / horror)
+Vitalidade        ◀──dano físico── MitigacaoDeDano ◀── FichaDeAtributos
+AbdulFSM          ──eventos──▶ (escudo, invocações, derrota)
          │
          │ OnChanged
          ▼

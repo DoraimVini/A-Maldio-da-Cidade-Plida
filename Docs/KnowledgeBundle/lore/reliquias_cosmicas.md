@@ -32,4 +32,4 @@ O **Set Lendário de Set** é o conjunto de equipamento obtido no Templo da Serp
 ## 4. O Patuá (Patuá das Luas Gêmeas)
 * **Obtenção:** Recompensa da conclusão da quest narrativa da **Rainha Cassilda** no Santuário de Yhtill. Não é um drop de combate — é a conclusão de um puzzle/diálogo com a Cassilda (decisão 2026-07-28).
 * **Efeito:** Proteção abençoada pela Canção de Cassilda que desacelera o dreno de sanidade no escuro e acelera a regeneração de RM nos Postes de Luz.
-* **Nota de nomeação:** O `PatuaPickup.cs` da Zona 5 existente em código que destrava o Salto Dimensional é um item diferente — rename pendente para "Fragmento de Hali do Salto" (Fatia 3 do roadmap de código).
+* **Nota de nomeação (atualizada 2026-07-30):** O `PatuaPickup.cs` da Zona 5 é um item diferente desta relíquia. Ele **não destrava mais nada** — o Salto Dimensional foi removido do jogo — e seu novo efeito está **pendente de definição**. O rename antes proposto ("Fragmento de Hali do Salto") foi descartado junto com a habilidade.

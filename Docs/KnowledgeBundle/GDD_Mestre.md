@@ -3,16 +3,21 @@ type: GDD
 title: Documento de Design Mestre (GDD)
 description: Documento de Design de Jogo oficial e unificado para A Maldição da Cidade Pálida (Favela Amarela).
 tags: [design, gdd, carcosa, core-vision]
-timestamp: 2026-07-10T15:00:00Z
+timestamp: 2026-07-30T11:00:00-03:00
 ---
 
 # A Maldição da Cidade Pálida (Favela Amarela)
-## Documento de Design Mestre (GDD) — Versão 1.0
+## Documento de Design Mestre (GDD) — Versão 1.3 (Vertical Slice)
 
-* **Data:** 10/07/2026
+* **Data:** 30/07/2026
 * **Autor(es):** Vinícius (Vini) — Lead Designer & Developer / Claude & Antigravity (Assistentes)
-* **Status:** Aprovado para Implementação
+* **Status:** Aprovado para Implementação (Vertical Slice / Edital)
 * **Confidencialidade:** Interna (Estúdio)
+
+### Changelog
+- **v1.3 (2026-07-30):** Varredura de consistência do documento. Removidas todas as menções remanescentes ao **Salto Dimensional** como mecânica ativa (§1.4 curva de sentimento, §3.1 gameplay loop, §5.4 Zona 5, §7.3 SFX, §14 apêndice) — a habilidade foi integralmente removida do jogo. Corrigido nome da arma **Cravo de Aklo** (estava "Cravo de Ferro"). Documentados no §4.3 os elementos de HUD já implementados (Vitalidade, Barra de Ações, Prompt de Interação, Painel de Escolha) e a nova **camada de interação por botão E** (§4.3.1). Adicionado §3.4.1 com a estrutura da luta do Abdul (fases, Escudo Mágico, Pedras de Poder, janela de exaustão). Marcada como pendente de redesenho a Z6 do Templo da Serpente, cujo design dependia do Salto.
+- **v1.2 (2026-07-30):** Companion Yug-Neth (Mi-Go filhote) adicionado ao jogo. Encontro com Alhazred redesenhado como cena de escolha binária (Caminho A: sem luta, sem Necronomicon; Caminho B: luta, dropa Necronomicon). Sistema de Resiliência do Companheiro (RC) e mecânica de proteção adicionados. Yug-Neth é a chave dos Portões das Ruínas. Sprite de Yug-Neth gerada. Docs: `lore/migo_companion.md` (novo), `lore/abdul_alhazred.md` (atualizado).
+- **v1.1 (2026-07-30):** Vertical Slice fechado para edital. Quest de Cassilda expandida (5 Fragmentos de Yhtill + diálogos completos). Templo da Serpente redesenhado com 12 zonas, Boss 1 Nagaraja e Boss 2 Avatar de Set. Boss Byakhee com mecânicas detalhadas. Novo doc: `lore/povo_serpente.md`. Boss 1 do Templo renomeado de "Naga" genérico para **Nagaraja, o Sacerdote do Sinal Escamado**.
 
 ---
 
@@ -34,7 +39,7 @@ timestamp: 2026-07-10T15:00:00Z
 * **Tensão e Paranoia:** O jogador deve sentir que cada passo ruidoso pode atrair a morte e que a própria realidade está colapsando ao seu redor.
 * **Curva de Sentimento:**
   * *Primeiros 5 minutos:* Desorientação, impotência e pavor ao fugir de ameaças no escuro absoluto.
-  * *Após 1 hora:* Adaptação e cálculo, usando o Salto Dimensional com cautela para resolver o layout das vielas.
+  * *Após 1 hora:* Adaptação e cálculo — lendo o layout das vielas, dosando ruído e escolhendo quando evitar e quando encarar um Cultista.
   * *Ao final:* Resignação frente ao horror inevitável de Carcosa.
 
 ### 1.5 Público-Alvo
@@ -77,10 +82,14 @@ Explorando mais o deserto, ele pode encontrar o **Templo da Serpente** (Dungeon 
 Carcosa é uma dimensão onde a física obedece a uma lógica onírica e matemática. Sua arquitetura remete a uma favela corrompida por monumentos de pedra pálida e tentáculos de Hastur. O ambiente flutua na frequência natural de 7.83 Hz.
 
 ### 2.4 Personagens Principais
-* **Damião (Protagonista):** Personagem central do universo *Favela Amarela* (Richard Abelha). Historiador e linguista, físico frágil, obcecado por escrituras antigas. Morre na Terra durante os eventos do curta-metragem e acorda em Carcosa no início do jogo. Possui uma sensibilidade anômala única que o permite interagir com a estática de Carcosa — o que o torna simultaneamente um alvo e um agente capaz de escapar.
+* **Damião (Protagonista):** Jovem morador da Favela do Rato Baleado (Rio de Janeiro), estudante de Direito. Para pagar a faculdade, entrou para o movimento do tráfico local com a ajuda de seu amigo Juninho. Tocados pelo sonho de Hastur, descobrem a seita por trás de uma ONG local (liderada por Natasha). Ao tentar interromper o ritual da seita na igreja para salvar seus amigos e Martha, Damião é capturado e sacrificado — seu ventre é cortado com o símbolo de Hastur. Ao morrer na Terra, acorda nas areias de Carcosa. Sua jornada em Carcosa é uma peregrinação de resgate de memórias e resistência contra a cidade-máquina.
 * **O Rei em Amarelo (Antagonista):** Entidade vestida de farrapos amarelos e portando a Máscara Pálida. Sua observação direta destrói a mente humana. É o antagonista final do jogo completo (Fase 6) e também o chefe final do Vertical Slice/demo (Fase 2: Castelo de Carcosa).
-* **Rainha Cassilda:** Figura matriarcal de Yhtill, presente no Santuário de Yhtill como NPC de quest. Entrega o Patuá como conclusão do seu puzzle narrativo. Não é uma inimiga.
-* **Abdul Alhazred:** Autor lendário do *Necronomicon*. Miniboss da Tumba de Alhazred (Dungeon 1). Sua essência persiste nas profundezas da dungeon que carrega seu nome.
+* **Rainha Cassilda:** Figura matriarcal de Yhtill, presente no Santuário de Yhtill como NPC de quest principal. Propõe a quest "A Canção Incompleta": coletar os 5 Fragmentos de Yhtill (diários/cartas dos nobres perdidos) espalhados pelo Deserto e pelas Dungeons. Recompensa: Patuá das Luas Gêmeas. Diálogos completos em `lore/cassilda_e_byakhee.md`.
+* **Abdul Alhazred:** Autor lendário do *Necronomicon*. Miniboss da Tumba de Alhazred (Dungeon 1, Z9 — Tumba de Abdul). Sua essência persiste nas profundezas da dungeon que carrega seu nome. Design completo da luta em `lore/abdul_alhazred.md`.
+* **Nagaraja, o Sacerdote do Sinal Escamado:** Boss 1 do Templo da Serpente (Dungeon 2, Z10). Serpent Person de 2,5m, metade humanoide / metade serpente. Único de sua raça consciente do aprisionamento em Carcosa. Design completo em `lore/templo_da_serpente.md`.
+* **O Avatar de Set:** Boss 2 do Templo da Serpente (Dungeon 2, Z11). Fragmento da consciência divina de Set aprisionado por Hastur no Deserto de Hali. Ser colossal de 4m, não-senciente no sentido humano, pura força primordial. Dropa o Elmo de Set (garantido). Design em `lore/templo_da_serpente.md`.
+* **O Byakhee:** Miniboss dos Portões das Ruínas (fim da Fase 1). Guardião alado biológico de Carcosa. Luta aérea com grito infrassônico que drena RM passivamente. Dropa o Anel do Sinal Amarelo. Design em `lore/cassilda_e_byakhee.md`.
+* **Yug-Neth (Mi-Go Filhote — Companion):** Mi-Go filhote aprisionado por Abdul Alhazred na Zona 9 da Tumba. Libertado por Damião no encontro com Alhazred (em ambos os caminhos). Comunica-se por bioluminescência (pontos dourados no corpo). **É a chave dimensional dos Portões das Ruínas** — o jogador não sabe disso até a cena de chegada aos Portões. Não ataca. Design e mecânicas completas em `lore/migo_companion.md`.
 
 ### 2.5 Facções, Criaturas e Raças
 * **Irmandade do Sinal Amarelo:** Cultistas que costuraram os próprios olhos e caçam Damião usando apenas a audição.
@@ -110,7 +119,7 @@ O jogo começa com Damião acordando no **Deserto de Hali** — imediatamente ap
 [Explorar no Escuro / Dreno de RM] ──▶ [Detectar Cultistas por Som/IA]
                 │                                    │
                 ▼                                    ▼
-       [Esconder-se / Evasão] ──▶ [Usar Salto Dimensional (Custa RM)]
+       [Esconder-se / Evasão] ──▶ [Esquivar ou Encarar (Combate)]
                 │                                    │
                 └─────────────────┬──────────────────┘
                                   ▼
@@ -119,21 +128,43 @@ O jogo começa com Damião acordando no **Deserto de Hali** — imediatamente ap
 
 ### 3.2 Mecânicas Core
 * **Movimentação Isométrica:** Movimento em 8 direções no plano XY com velocidade adaptada ao estado mental (Focado ganha +10% de velocidade).
-* **Furtividade baseada em Som e Luz:**
-  * **Agachar:** Reduz a velocidade, reduz a hitbox física e diminui o atrito/ruído emitido.
-  * **Sombra física:** Ficar em áreas não iluminadas oculta o jogador, mas drena a RM.
-* **Esquiva Física:** Um desvio rápido que não consome RM, mas tem tempo de recarga (2.5s).
-* **Salto Dimensional (Ghost Dash):** Teleporte de curta distância que atravessa paredes e obstáculos, custando RM e emitindo estática sonora.
+* **Furtividade baseada em Som, Faro e Luz:**
+  * **Agachar:** Reduz a velocidade, reduz a hitbox física e diminui em 80% o ruído emitido.
+  * **Detecção por Faro (Sseth Farejador):** Inimigos farejadores detectam por proximidade em área. Podem ser neutralizados com o *Frasco de Incenso*.
+  * **Tempestade de Memória:** O vento forte no Overworld do Deserto abafa 100% o som dos passos.
+* **Esquiva Física:** Um desvio rápido que não consome RM, mas tem tempo de recarga (2.5s). *(Nota: O Salto Dimensional foi integralmente removido do jogo).*
+* **Companheiro Yug-Neth (Mi-Go Filhote):** Após ser libertado na Tumba de Alhazred, Yug-Neth segue Damião pelo jogo. Não combate, mas oferece efeitos passivos (bioluminescência ilumina 1 unidade de raio; confunde Nagas; revela posição do Byakhee). **Mecânica de Proteção:** Yug-Neth possui uma barra de **Resiliência do Companheiro (RC)**. Se a RC chegar a zero por ataques inimigos → **Colapso do Companheiro = Game Over**. Damião deve se posicionar entre inimigos e Yug-Neth para bloquear projéteis.
 
-### 3.3 Sistema de Combate (Detalhado)
-* **Combate Físico (Mão Física):** Damião pode desferir golpes usando a **Barra Enferrujada** (35% de chance de atordoar por golpe). O atordoamento (Stun) interrompe o cultista e dá tempo para Damião fugir e voltar ao stealth.
-* **Inexistência de HP:** Não há barra de vida. Ataques inimigos drenam diretamente a *Resiliência Mental* (10 a 25 RM). Se a RM chegar a zero, ocorre o **Colapso** (Game Over).
+### 3.3 Sistema de Combate Físico & Dupla Barra
+* **Dupla Barra de Sobrevivência:** Damião possui **Resiliência Mental (RM - 100 max)** para estabilidade psíquica e **Vitalidade Corpórea (Vit - 100 max)** para integridade física. Ataques de armas tiram Vitalidade Corpórea; terror/escuridão tira RM.
+* **Mão Física (As 3 Armas Rituais do Baú RNG — Zona 6b):** Damião começa desarmado (golpe de mão vazia com Dano 0). Na Câmara do Baú (Zona 6b), obtém por sorteio RNG 1 de 3 armas rituais:
+  1. **Cravo de Aklo:** Dano 40, Defesa 30 (mitigação pesada). Habilidade *interrompe a canalização* anômala do boss.
+  2. **Estilete de Irem:** Dano 25, Defesa 15 + Sangramento (15/s).
+  3. **Alfanje de Alhazred:** Dano 60, Defesa 40 + Habilidade *Golpe do Deserto* (Stun 2.5s).
+* **Ficha de Atributos e Mitigação:** Todas as unidades possuem Ficha de Atributos com 5 atributos (Vitalidade, Ataque, Defesa, Conjuração, Resistência Anômala) e mitigação por fórmula subtrativa com piso ($\max(\text{bruto} \times 0.15, \text{bruto} - \text{defesa})$).
 
-### 3.4 Progressão e RPG (Slots de Equipamento)
-* **Equipamento Minimalista:** Sem árvores de talentos complexas. A progressão ocorre pela troca de módulos nos 2 slots principais:
-  * **Mão Física:** Barra Enferrujada (Stun) ou Lâmina do Sinal (bônus por trás).
-  * **Mão Anômala:** Salto Dimensional (Dash) ou Talismã do Vento Negro (Empurrão).
-* **Gating de Entrada:** Damião começa o jogo desarmado e sem poderes. Ambos são desbloqueados simultaneamente no início da Zona 5.
+### 3.4 Consumíveis Rápidos & Relíquias (Árvore de Itens)
+* **Hotbar de Consumíveis Rápidos:** Chá Calmante (+40 RM), Frasco de Incenso (corta faro), Sino de Estática (distração por som 15m), Frasco de Veneno de Yig (-10 Defesa no boss), Fragmento de Yuggoth (+25 RC do companheiro).
+* **Relíquias Ancestrais:** O Necronomicon (tradução Aklo), Patuá de Malik Nazinga (linha de conexão ancestral), Patuá das Luas Gêmeas (-40% dreno de RM no escuro), Anel do Sinal Amarelo (-30% detecção de cultistas).
+* **Set Lendário de Set (4 Peças):** Elmo, Peitoral, Grevas e Arma de Set. O conjunto completo desbloqueia o confronto contra o Avatar de Nyarlathotep no Castelo.
+
+### 3.4.1 Luta de Aparição Primordial — Abdul Alhazred (Zona 9)
+O boss da Dungeon 1 é uma **luta em fases governada pelo Escudo Mágico** — dano só entra
+quando o escudo está baixo, então "bater até cair" não funciona. *(Implementado; detalhes em
+[`systems/boss_abdul.md`](systems/boss_abdul.md).)*
+
+* **Fase 1 (100% → 35%):** escudo impenetrável sustentado por **Pedras de Poder**, que se
+  manifestam na arena quando ele desperta (não ficam plantadas na cripta antes disso).
+  Quebrar uma derruba o escudo por alguns segundos — a única janela de dano. Ele invoca
+  esqueletos em cadência para pressionar o jogador enquanto ele procura as Pedras.
+* **Fase 2 (< 35%):** o escudo vira permanente e as Pedras somem. Ele passa a alternar
+  **Cones de Gelo** (3 stacks congelam Damião) e invocações, gastando "mana"; após 3 magias
+  a mana esgota, o escudo cai e abre a **janela de exaustão** — o momento do golpe de misericórdia.
+* **Imune a crítico de furtividade:** Aparições Primordiais não caem por stealth. A
+  furtividade serve para *chegar* até a luta, não para resolvê-la.
+* **Escolha antes da luta:** conversar com ele abre uma bifurcação — *lutar* (dropa o
+  Necronomicon) ou *concordar* (poupa Abdul, sem Necronomicon). Yug-Neth é libertado nos
+  dois caminhos. Atacá-lo depois de poupado **reabre a luta** (traição da trégua).
 
 ### 3.5 Economia Interna e Recursos
 * **Resiliência Mental (RM):** O único recurso ativo (0.0 a 100.0).
@@ -167,7 +198,19 @@ O encerramento da Zona 5 (fuga do subterrâneo) **não é fim de fase** — é o
 
 ### 4.3 HUD (In-Game)
 * Um medidor circular de **Resiliência Mental** muito discreto no canto da tela (sinalizado como batimento de sinal).
+* **Barra de Vitalidade Corpórea** (`VitalidadeBar`) — a integridade física de Damião, separada da RM. *(Implementado.)*
+* **Barra de Ações** (`BarraDeAcoes`) — slots mostrando a arma equipada e a habilidade dela, com indicador de recarga. Fica vazia enquanto Damião está desarmado. *(Implementado.)*
+* **Prompt de Interação** (`PromptDeInteracao`) — aparece quando há algo usável ao alcance, no formato `E — {ação}` (ex.: "E — Abrir o baú"). Some quando não há alvo. *(Implementado.)*
+* **Painel de Escolha** (`PainelDeEscolha`) — caixa de diálogo com opções navegáveis (setas + E), usada na conversa com Alhazred. *(Implementado.)*
 * Dois pequenos ícones no canto inferior esquerdo indicando o módulo ativo em cada mão.
+
+### 4.3.1 Interação com o Mundo (botão E)
+Objetos do mundo são usados por **interação deliberada**, não por encostar: Damião chega
+perto, o prompt aparece e **o jogador decide** apertar **E** (ou o botão Norte do gamepad).
+Vale para colecionáveis (baú da Tumba, patuá) e para conversar com NPCs (Alhazred).
+Gatilhos de *travessia* (transição de cena, zonas de tempestade, dicas de tutorial)
+continuam automáticos de propósito — são eventos de passagem, não objetos que se "usa".
+Detalhes em [`systems/interacao.md`](systems/interacao.md). *(Implementado.)*
 
 ### 4.4 Menus e Painéis
 * **Diário de Tradução (OKF Logs):** Aba onde Damião lê documentos traduzidos e anota pistas para entender a Cidade Pálida.
@@ -198,13 +241,38 @@ As **"Ruínas Pálidas"** — hoje a **Tumba de Alhazred, Dungeon 1 da Fase 1 (D
 * **Linguagem Visual:** Postes de luz amarela atuam como faróis direcionando o caminho seguro do jogador.
 
 ### 5.4 Lista de Fases / Regiões
-> **Lista parcial (Zonas 1-5).** O blockout real já tem Zonas 6-9 (`Zona6_CriptaDosPrimeiros`, `Zona7_FendaDosSussurros`, `Zona8_Ossario`, `Zona9_TronoDoVulto` — arena do miniboss final da dungeon) implementadas em `Assets/Scenes/Playtest_RuinasPalidas.unity`, ainda não documentadas aqui. Sinalizado em 2026-07-28, não preenchido nesta rodada (é levantamento de conteúdo, não reconciliação de estrutura).
 
-* **Zona 1 (Rua de Entrada):** Trecho de subida com 2 cultistas errantes. Introdução aos postes de luz.
-* **Zona 2 (Vila das Casas):** Área ampla com 3 casas modulares que o jogador pode adentrar para contornar patrulhas.
-* **Zona 3 (Beco do Vento):** Vielas estreitas com vento forte que desacelera o movimento mas abafa 100% o barulho dos passos.
-* **Zona 4 (Praça do Cerco):** Ponto de arena fechada. O jogador é cercado por cultistas e o chão desaba sob seus pés.
-* **Zona 5 (Subterrâneo - Ruínas de Hali):** Zona de terror puro. Sem luz. O jogador encontra a Barra Enferrujada e o Salto para conseguir escapar.
+#### Dungeon 1 — Tumba de Alhazred (Zonas 1-9, S-Path)
+> Implementado em `Assets/Scenes/Playtest_RuinasPalidas.unity`. Zonas 1-5 documentadas abaixo; Z6-9 implementadas mas pendentes de documentação textual.
+
+* **Zona 1 (Rua de Entrada):** Trecho de subida com 2 Cultistas Errantes. Introdução aos postes de luz. **[Fragmento de Yhtill nº1 não está aqui — está no Overworld: Garganta de Pedra Pálida]**
+* **Zona 2 (Vila das Casas):** Área ampla com 3 casas modulares. **Fragmento de Yhtill nº2 (Lord Morthis)** escondido sob soleira.
+* **Zona 3 (Beco do Vento):** Vielas estreitas com vento que abafa passos.
+* **Zona 4 (Praça do Cerco):** Arena fechada, chão desaba → queda para Zona 5.
+* **Zona 5 (Subterrâneo - Ruínas de Hali):** Terror puro, sem luz. Contém o **patuá** — item cujo efeito foi revisto e está **pendente de definição** (não destrava mais o Salto Dimensional, removido do jogo).
+* **Zona 6b (Câmara do Baú):** Sala lateral a Leste da Z6, baú sorteia uma das três armas. **Fragmento de Yhtill nº3 (Lady Vaine)** encontrado aqui.
+* **Zona 9 (Tumba de Abdul):** Encontro com Alhazred — **Cena de Escolha** (concordar = sem luta + sem Necronomicon; recusar = Boss Fight + Necronomicon + mecânica de proteção de Yug-Neth). Yug-Neth libertado em ambos os caminhos e se torna companion.
+
+#### Deserto Aberto (Overworld)
+* **Garganta de Pedra Pálida (área inicial):** **Fragmento de Yhtill nº1 (Lady Seraphel)** em fenda de pedra.
+* **Santuário de Yhtill:** Rainha Cassilda — Quest "A Canção Incompleta" (5 Fragmentos). Diálogos em visual novel style. Recompensa: Patuá das Luas Gêmeas.
+* **Portões das Ruínas:** Boss Byakhee. Drop: Anel do Sinal Amarelo. Abertura dos Portões = transição para Fase 2.
+
+#### Dungeon 2 — Templo da Serpente (Zonas 1-12, Semi-obrigatória)
+> Novo conteúdo para o Vertical Slice (2026-07-30). Design completo em `lore/templo_da_serpente.md`.
+
+* **Z1 (Átrio das Escamas):** Chão de escamas que amplifica som; introdução ao Sseth Farejador.
+* **Z2 (Corredor dos Glifos):** Lore dos Serpent People em afrescos. **Fragmento de Yhtill nº4 (Lord Aldaron I)** atrás de painel falso.
+* **Z3 (Câmara dos Sseth):** 4 Sseth Comuns + 1 Farejador. Fogueira ritual de luz maligna.
+* **Z4 (Salão dos Nagas):** 2 Nagas Guerreiros (elite). Estátuas de Set como cobertura. **Fragmento de Yhtill nº5 (Lord Aldaron II)** no pedestal.
+* **Z5 (O Poço de Yig):** Larvas de Yig. Mecânica de distração com objetos no poço.
+* **Z6 (Câmara do Veneno):** Névoa tóxica + 1 Espectro Escamado. ⚠️ *Design pendente de redesenho: dependia do Salto Dimensional como ferramenta de travessia, removido do jogo.*
+* **Z7 (Cripta das Larvas):** Ovos de Yig sensíveis a vibração. Stealth absoluto. Drop RNG: Peitoral de Set.
+* **Z8 (Galeria das Visões de Set):** Espelhos de obsidiana + 2 Sseth. Reflexos de Set.
+* **Z9 (Santuário do Olho):** Cristal pulsante de Set. Ponto de Ancoragem (único do Templo).
+* **Z10 (Câmara do Trono):** ★ **BOSS 1: Nagaraja, o Sacerdote do Sinal Escamado** ★ Drop: 1 peça RNG do Set Lendário.
+* **Z11 (A Fenda de Set):** Zona de transição. ★ **BOSS 2: O Avatar de Set** ★ Drop: Elmo de Set (garantido) + 1 peça RNG.
+* **Z12 (Saída — O Deserto Coberto de Escamas):** Retorno ao Overworld. Cena narrativa do Diário de Damião.
 
 ---
 
@@ -233,7 +301,7 @@ As **"Ruínas Pálidas"** — hoje a **Tumba de Alhazred, Dungeon 1 da Fase 1 (D
 
 ### 7.3 Efeitos Sonoros (SFX)
 * Ruído físico de passos variando conforme a velocidade (agachado = silêncio, corrida = barulho alto).
-* Som de estática elétrica do Salto Dimensional.
+* Impacto de arma na carne e no gesso da máscara (Mão Física); estilhaço das Pedras de Poder.
 
 ---
 
@@ -274,7 +342,7 @@ As **"Ruínas Pálidas"** — hoje a **Tumba de Alhazred, Dungeon 1 da Fase 1 (D
 * **Vitória / "You Win":** Não se aplica (RPG, não roguelike). Fim de fase é **Transição**; a vitória é o desfecho da história, ao fim da Fase 6.
 * **Posto de Cura:** Poste de Luz / Refúgio.
 * **Inimigo:** Cultista Amarelo.
-* **Dash:** Salto Dimensional.
+* **Dash:** Esquiva (movimento físico, sem custo de RM).
 
 ### B – Referências
 * *The King in Yellow* (Livro de Robert W. Chambers).
