@@ -13,12 +13,12 @@ GameObject:
   - component: {fileID: 8157138521160616745}
   - component: {fileID: 2043557494436032994}
   - component: {fileID: 3169780706233688791}
-  - component: {fileID: 8049768320064132310}
   - component: {fileID: 8662597353293798190}
   - component: {fileID: 2310578032248543626}
   - component: {fileID: 3485682494645962060}
   - component: {fileID: 7750164519107673059}
-  m_Layer: 0
+  - component: {fileID: 4829173650284917362}
+  m_Layer: 8
   m_Name: Player_Damiao
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 2, y: 3}
+    oldSize: {x: 1, y: 1.5}
     newSize: {x: 2, y: 3}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -160,21 +160,6 @@ MonoBehaviour:
   esquivaNoiseRadius: 6.5
   showNoiseGizmo: 1
   debugStormIntensity: 0
---- !u!114 &8049768320064132310
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6566763281958862316}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d6086cf93599344cb7badf04101ab15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.AnomalyPowerBridge
-  config: {fileID: 11400000, guid: 5c72d3dfc1434a3e8ad211305cd936d8, type: 2}
-  leapSpeedMultiplier: 3.5
-  desbloqueadoNoInicio: 0
 --- !u!114 &8662597353293798190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,12 +244,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8115426f2e1201478182a2323bcdc99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.MaoFisicaBridge
-  config: {fileID: 11400000, guid: 0642bdf1b4ed44ae99f35d565cd6f6c2, type: 2}
+  armaInicialParaTeste: 0
   alcance: 1.2
   camadaInimigos:
     serializedVersion: 2
     m_Bits: 0
-  desbloqueadaNoInicio: 0
 --- !u!114 &7750164519107673059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -279,3 +263,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.DynamicYSort
   fator: 10
   offsetPes: 0
+--- !u!114 &4829173650284917362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566763281958862316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dc1278754f05954d8ae5581f6f07aeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.VitalidadeBridge
+  ficha: {fileID: 11400000, guid: 490cfe25c963bc04a844b6d81e271eea, type: 2}
+  ehAparicaoPrimordial: 0
+  mostrarNumerosDeDano: 1
+  corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}
