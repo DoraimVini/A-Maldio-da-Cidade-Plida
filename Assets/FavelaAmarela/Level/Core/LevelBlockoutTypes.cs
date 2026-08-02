@@ -184,8 +184,16 @@ namespace FavelaAmarela.Level.Core
         public float Zone8Length = 14f;
         public float Zone8Width = 14f;
 
-        [Header("Zona 9: Trono do Vulto (arena do miniboss)")]
+        [Header("Zona 9: Tumba de Abdul (arena do boss)")]
         public float Zone9Length = 16f;
         public float Zone9Width = 12f;
+
+        // Câmara lateral pendurada a LESTE da Zona 6, logo após a entrada da dungeon.
+        // Guarda o baú da Tumba: o jogador pega a arma antes de encarar os Cultistas do
+        // caminho (Zonas 6-8). É lateral de propósito — pendurar aqui não desloca
+        // nenhuma zona existente, então os inimigos já posicionados na cena não se mexem.
+        [Header("Zona 6b: Câmara do Baú (sala lateral da Cripta)")]
+        public float Zone6bLength = 7f;
+        public float Zone6bWidth = 6f;
     }
 }

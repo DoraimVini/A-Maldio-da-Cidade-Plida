@@ -18,7 +18,7 @@ Controlador de câmera ortográfica 2D para a visão isométrica top-down. Anexa
 
 ## API Pública
 - `Shake(float duration, float magnitude)`: sacode a câmera por `duration` segundos com deslocamento aleatório de até `magnitude` unidades por frame (`LateUpdate`). Reaproveitável por qualquer evento de impacto (ex.: chão desmoronando na queda Z4→Z5).
-- `SetZoom(float newSize)`: atualiza `orthographicSize` em runtime (ex.: zoom durante o Salto Dimensional).
+- `SetZoom(float newSize)`: atualiza `orthographicSize` em runtime (ex.: aproximar na arena durante a luta do Abdul).
 - `SetTarget(Transform newTarget)`: troca o alvo seguido.
 
 ## Robustez

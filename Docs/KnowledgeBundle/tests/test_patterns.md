@@ -21,7 +21,14 @@ Toda lógica em `Core/` é testável **sem a Unity rodando**. Os testes vivem em
 | `PatrolRouteTests.cs` | `PatrolRoute` |
 | `SoundBroadcastServiceTests.cs` | `SoundBroadcastService` |
 | `GameLoopStateMachineTests.cs` | `GameLoopStateMachine` |
-| `DimensionalLeapTests.cs` | `DimensionalLeap` |
+| `VitalidadeTests.cs` | `Vitalidade` |
+| `MitigacaoDeDanoTests.cs` | `MitigacaoDeDano` |
+| `FichaDeAtributosTests.cs` | `FichaDeAtributos` |
+| `AbdulFSMTests.cs` | `AbdulFSM` |
+| `AcumuloDeCongelamentoTests.cs` | `AcumuloDeCongelamento` |
+| `SeletorDeInteracaoTests.cs` | `SeletorDeInteracao` |
+| `CultistaFSMAtaqueTests.cs` | `CultistaFSM` (estado Atacar) |
+| `FonteBuiltinTests.cs` | gotcha da fonte built-in (Unity 6) |
 | `EsquivaTests.cs` | `Esquiva` |
 | `PlayerStealthStateTests.cs` | `PlayerStealthState` |
 | `EnvironmentStateTests.cs` | `EnvironmentState` |
@@ -30,7 +37,7 @@ Toda lógica em `Core/` é testável **sem a Unity rodando**. Os testes vivem em
 | `CoisaDoCemiterioFSMTests.cs` | `CoisaDoCemiterioFSM` |
 | `TempestadeOsciladorTests.cs` | `TempestadeOscilador` |
 | `AgendadorDeRajadaTests.cs` | `AgendadorDeRajada` |
-| `SaveDataTests.cs` | `SaveData` (round-trip JSON via JsonUtility) |
+| `RegistroDeSaveTests.cs` | `RegistroDeSave` (chaves de persistência + degradação graciosa) |
 
 ### Exceção PlayMode
 

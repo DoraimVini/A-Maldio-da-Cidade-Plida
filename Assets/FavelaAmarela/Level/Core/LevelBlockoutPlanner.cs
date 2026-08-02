@@ -148,6 +148,22 @@ namespace FavelaAmarela.Level.Core
             float z9MinX = z9Center.x - cfg.Zone9Length * 0.5f;
             float z9MaxX = z9Center.x + cfg.Zone9Length * 0.5f;
 
+            // --- Zona 6b: Câmara do Baú (sala lateral, a Leste da Cripta) ---
+            // Fica logo após a entrada da dungeon para o jogador sair armado antes dos
+            // Cultistas das Zonas 6-8. Pendurada de lado justamente para NÃO deslocar as
+            // zonas da descida (o que moveria inimigos e waypoints já posicionados na cena).
+            var z6bCenter = new Vector2(
+                z6Center.x + cfg.Zone6Length * 0.5f + cfg.Zone6bLength * 0.5f,
+                z6Center.y);
+            float z6MinY = z6Center.y - cfg.Zone6Width * 0.5f;
+            float z6MaxY = z6Center.y + cfg.Zone6Width * 0.5f;
+            float z6bMinY = z6bCenter.y - cfg.Zone6bWidth * 0.5f;
+            float z6bMaxY = z6bCenter.y + cfg.Zone6bWidth * 0.5f;
+
+            // Fronteira Leste↔Oeste: a sobreposição é medida em Y (mesmo helper, outro eixo).
+            var z6LesteZ6b = MakeOverlapDoorway(Side.East, z6MinY, z6MaxY, z6bMinY, z6bMaxY, z6Center.y);
+            var z6bOesteZ6 = MakeOverlapDoorway(Side.West, z6MinY, z6MaxY, z6bMinY, z6bMaxY, z6bCenter.y);
+
             // Portas por fronteira (uma pra cada lado do par de salas):
             var z5SulZ6 = MakeOverlapDoorway(Side.South, z5MinX, z5MaxX, z6MinX, z6MaxX, z5Center.x);
             var z6NorteZ5 = MakeOverlapDoorway(Side.North, z5MinX, z5MaxX, z6MinX, z6MaxX, z6Center.x);
@@ -163,12 +179,14 @@ namespace FavelaAmarela.Level.Core
             layout.Rooms.Add(new RoomSpec("Zona5_TransicaoDimensional", z5Center, cfg.Zone5Length, cfg.Zone5Width,
                 Side.North, new[] { z5SulZ6 }));
             layout.Rooms.Add(new RoomSpec("Zona6_CriptaDosPrimeiros", z6Center, cfg.Zone6Length, cfg.Zone6Width,
-                Side.None, new[] { z6NorteZ5, z6SulZ7 }));
+                Side.None, new[] { z6NorteZ5, z6SulZ7, z6LesteZ6b }));
+            layout.Rooms.Add(new RoomSpec("Zona6b_CamaraDoBau", z6bCenter, cfg.Zone6bLength, cfg.Zone6bWidth,
+                Side.None, new[] { z6bOesteZ6 }));
             layout.Rooms.Add(new RoomSpec("Zona7_FendaDosSussurros", z7Center, cfg.Zone7Length, cfg.Zone7Width,
                 Side.None, new[] { z7NorteZ6, z7SulZ8 }));
             layout.Rooms.Add(new RoomSpec("Zona8_Ossario", z8Center, cfg.Zone8Length, cfg.Zone8Width,
                 Side.None, new[] { z8NorteZ7, z8SulZ9 }));
-            layout.Rooms.Add(new RoomSpec("Zona9_TronoDoVulto", z9Center, cfg.Zone9Length, cfg.Zone9Width,
+            layout.Rooms.Add(new RoomSpec("Zona9_TumbaDeAbdul", z9Center, cfg.Zone9Length, cfg.Zone9Width,
                 Side.None, new[] { z9NorteZ8 }));
 
             foreach (var room in layout.Rooms)

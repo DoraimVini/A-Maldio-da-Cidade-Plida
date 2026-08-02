@@ -23,7 +23,7 @@ O **Deserto das Cinzas de Hali** é a área inicial aberta (Fase 1) de *A Maldi�
 * **Localização:** Fenda subterrânea nas ruínas ocidentais do deserto.
 * **Inimigos:** Cultistas cegos e estática anômala.
 * **Chefe Final:** **Abdul Alhazred** (Miniboss), autor do *Necronomicon*.
-* **Nota de implementação (2026-07-28):** esta dungeon corresponde à área já construída em `Assets/Scenes/Playtest_RuinasPalidas.unity` (Zonas 1-9 do S-Path), repropositada — não é conteúdo novo a construir do zero. O stealth urbano, as tempestades e a queda da Zona 4 para a Zona 5 (ver `systems/queda_z4_z5.md`) acontecem dentro desta dungeon, não numa fase separada.
+* **Nota de implementação (2026-07-28):** esta dungeon corresponde à área já construída em `Assets/Scenes/Playtest_RuinasPalidas.unity` (Zonas 1-9 do S-Path), repropositada — não é conteúdo novo a construir do zero. O stealth urbano acontece dentro desta dungeon, não numa fase separada. **Atualização 2026-07-30:** a tempestade de areia e a queda da Zona 4 para a Zona 5 (com o Cerco) foram **removidas desta dungeon** — a Tumba virou uma dungeon única e fechada, e tempestade é fenômeno do deserto a céu aberto (ver `systems/environment.md`).
 
 ---
 

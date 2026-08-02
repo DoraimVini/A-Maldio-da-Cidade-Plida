@@ -34,5 +34,5 @@ CultistaAI (adapter) → CultistaFSM.ReceberEstimuloSonoro()
 
 - Sons **mais altos** (correr, derrubar objetos) têm raio efetivo maior
 - Sons **silenciosos** (andar agachado) têm raio efetivo menor ou zero
-- O [Salto Dimensional](dimensional_leap.md) pode emitir um som ao entrar/sair, alertando inimigos
+- A [Esquiva](esquiva.md) emite um pulso de som ao ser usada — é um movimento brusco, e por isso não é uma saída silenciosa mesmo em modo furtivo
 - `SomEmitido` é uma `readonly struct` para evitar alocação em hot paths

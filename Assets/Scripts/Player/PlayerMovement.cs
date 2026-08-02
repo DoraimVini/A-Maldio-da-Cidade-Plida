@@ -129,17 +129,13 @@ namespace FavelaAmarela.Player
         private InputAction sneakAction;
         private InputAction runAction;
 
-        // --- Leap State ---
-        private AnomalyPowerBridge anomalyBridge;
-        private Vector2 leapVelocity;
-        private InputAction leapAction;
-        private int _leapIntangibleLayer;
-        private int _originalLayer;
-
         // --- Esquiva (dodge) State ---
         private EsquivaBridge esquivaBridge;
         private Vector2 esquivaVelocity;
         private InputAction dodgeAction;
+
+        // --- Congelamento (imposto pelos Cones de Gelo do Abdul) ---
+        private CongelamentoBridge congelamentoBridge;
 
         // --- Mão Física (ataque) State ---
         private MaoFisicaBridge maoFisicaBridge;
@@ -177,22 +173,15 @@ namespace FavelaAmarela.Player
             rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-            anomalyBridge = GetComponent<AnomalyPowerBridge>();
             esquivaBridge = GetComponent<EsquivaBridge>();
             maoFisicaBridge = GetComponent<MaoFisicaBridge>();
+            congelamentoBridge = GetComponent<CongelamentoBridge>();
 
             // FSM injetada nos bridges, que passam a consultá-la para exclusão mútua
             // em vez de manter flags próprias.
-            if (anomalyBridge != null) anomalyBridge.BindStateMachine(_fsm);
             if (esquivaBridge != null) esquivaBridge.BindStateMachine(_fsm);
             if (maoFisicaBridge != null) maoFisicaBridge.BindStateMachine(_fsm);
-
-            // Cacheia a layer original do Damião (definida no Inspector) para restaurá-la
-            // após o Salto Dimensional, em vez de assumir um nome fixo. A camada de
-            // intangibilidade do Salto ("Ignore Raycast") faz o Damião atravessar
-            // barreiras anômalas durante o dash.
-            _originalLayer = gameObject.layer;
-            _leapIntangibleLayer = LayerMask.NameToLayer("Ignore Raycast");
+            if (congelamentoBridge != null) congelamentoBridge.BindStateMachine(_fsm);
 
             // --- POCO init ---
             if (locomocaoConfig != null)
@@ -215,7 +204,6 @@ namespace FavelaAmarela.Player
                 moveAction  = playerInput.actions.FindAction("Move");
                 sneakAction = playerInput.actions.FindAction("Crouch");
                 runAction   = playerInput.actions.FindAction("Sprint");
-                leapAction  = playerInput.actions.FindAction("SaltoDimensional"); // botão direito do mouse
                 dodgeAction = playerInput.actions.FindAction("Esquiva"); // Espaço
                 attackAction = playerInput.actions.FindAction("Attack"); // botão esquerdo do mouse
                 habilidadeArmaAction = playerInput.actions.FindAction("HabilidadeArma"); // tecla Q / ombro direito
@@ -231,46 +219,18 @@ namespace FavelaAmarela.Player
 
         private void OnEnable()
         {
-            if (anomalyBridge != null)
-            {
-                anomalyBridge.OnDimensionalLeapActivated += HandleLeapActivated;
-            }
             if (esquivaBridge != null)
             {
                 esquivaBridge.OnEsquivaActivada += HandleEsquivaActivated;
-            }
-            if (_fsm != null)
-            {
-                _fsm.OnStateChanged += HandleFsmStateChanged;
             }
         }
 
         private void OnDisable()
         {
-            if (anomalyBridge != null)
-            {
-                anomalyBridge.OnDimensionalLeapActivated -= HandleLeapActivated;
-            }
             if (esquivaBridge != null)
             {
                 esquivaBridge.OnEsquivaActivada -= HandleEsquivaActivated;
             }
-            if (_fsm != null)
-            {
-                _fsm.OnStateChanged -= HandleFsmStateChanged;
-            }
-        }
-
-        private void HandleLeapActivated(Vector2 direction, float duration, float speedMultiplier)
-        {
-            // A FSM já marcou o estado Saltando; aqui só calculamos o vetor de dash
-            // e tornamos Damião intangível. O fim do Salto (restaurar a layer) é tratado
-            // em HandleFsmStateChanged, disparado quando a FSM volta a Livre.
-            Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
-            leapVelocity = finalDirection * (stealthState.Speed * speedMultiplier);
-
-            // Torna o Damião intangível durante o Salto (atravessa barreiras anômalas)
-            gameObject.layer = _leapIntangibleLayer;
         }
 
         private void HandleEsquivaActivated(Vector2 direction, float duration, float speedMultiplier)
@@ -291,33 +251,29 @@ namespace FavelaAmarela.Player
         }
 
         /// <summary>
-        /// Reage às transições da FSM de ações. Hoje só cuida do fim do Salto: quando a
-        /// FSM sai de Saltando (por duração esgotada ou cancelamento), restaura a layer
-        /// original capturada no Awake — antes isso vivia no Invoke(EndLeap) do bridge.
+        /// Trava movimento e as ações exclusivas por completo — usado por diálogo
+        /// ramificado (<c>PainelDeEscolha</c>) enquanto o jogador navega opções com o
+        /// mesmo eixo de movimento, para "cima/baixo" não andar o Damião pela cena.
         /// </summary>
-        private void HandleFsmStateChanged(PlayerState anterior, PlayerState novo)
-        {
-            if (anterior == PlayerState.Saltando)
-                gameObject.layer = _originalLayer;
-        }
+        public bool MovimentoBloqueado { get; set; }
 
         private void Update()
         {
             // Avança o relógio das ações exclusivas (substitui os Invoke(EndX) do modelo antigo).
             _fsm.Tick(Time.deltaTime);
 
+            if (MovimentoBloqueado)
+            {
+                inputDirection = Vector2.zero;
+                isMoving = false;
+                return;
+            }
+
             if (!_fsm.EstaLivre) return; // Lock de input enquanto uma ação exclusiva está em curso
 
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
             isMoving = inputDirection.sqrMagnitude > 0.01f;
-
-            // Trigger Leap
-            if (leapAction != null && leapAction.WasPressedThisFrame() && anomalyBridge != null)
-            {
-                anomalyBridge.TryActivateLeap(inputDirection);
-                if (!_fsm.EstaLivre) return; // Salto pegou
-            }
 
             // Trigger Esquiva
             if (dodgeAction != null && dodgeAction.WasPressedThisFrame() && esquivaBridge != null)
@@ -353,14 +309,14 @@ namespace FavelaAmarela.Player
         {
             switch (_fsm.CurrentState)
             {
-                case PlayerState.Saltando:
-                    rb.linearVelocity = leapVelocity;
-                    return;
                 case PlayerState.Esquivando:
                     rb.linearVelocity = esquivaVelocity;
                     return;
                 case PlayerState.Atacando:
                     rb.linearVelocity = Vector2.zero; // ataque trava Damião no lugar
+                    return;
+                case PlayerState.Congelado:
+                    rb.linearVelocity = Vector2.zero; // congelado não anda nem age
                     return;
             }
 

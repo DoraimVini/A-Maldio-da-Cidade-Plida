@@ -9,6 +9,8 @@ timestamp: 2026-07-09T00:00:00Z
 
 # TempestadeVisualOverlay
 
+> ⚠️ **Sem instância na cena atual (2026-07-30).** A tempestade foi removida da Tumba de Alhazred (dungeon fechada — subterrâneo não tem tempestade de areia). O script continua no projeto, previsto para o **Overworld do Deserto de Hali** (`systems/level_design_deserto_hali.md`).
+
 **Namespace:** `FavelaAmarela.Runtime.UI`
 **Tipo:** `public sealed class` (herda de `MonoBehaviour`)
 

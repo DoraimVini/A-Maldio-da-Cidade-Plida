@@ -25,7 +25,7 @@ Diferentes áreas do mapa possuem diferentes intensidades de influência de Hast
 
 ## Tempestade de Areia (StormIntensity)
 
-> **Decisão de design (2026-07-28):** A tempestade de areia foi **relocada da Dungeon 1 (Tumba de Alhazred) para o Overworld do Deserto de Hali**. Subterrâneos não têm tempestade. A dungeon passa a ter StormIntensity = 0 por padrão. Os triggers `Z1_Spawn`, `Z2_Rajadas`, `Z3Z4_Forte` em `Playtest_RuinasPalidas.unity` devem ser removidos/desativados em fatia futura de código. Ver `systems/level_design_deserto_hali.md` §3 para o novo zoneamento do overworld.
+> **Decisão de design (2026-07-28):** A tempestade de areia foi **relocada da Dungeon 1 (Tumba de Alhazred) para o Overworld do Deserto de Hali**. Subterrâneos não têm tempestade. A dungeon passa a ter StormIntensity = 0 por padrão. **FEITO em 2026-07-30:** todos os triggers de tempestade (incluindo o `Z5_Nula`) e o `TempestadeAmbiente`/overlay foram **removidos da cena** `Playtest_RuinasPalidas.unity`, junto com o resto do legado das Ruínas Pálidas — a Tumba virou uma dungeon única e fechada. Os scripts continuam no projeto, prontos para o Overworld. Ver `systems/level_design_deserto_hali.md` §3 para o novo zoneamento do overworld.
 
 `EnvironmentState.StormIntensity` (0..1) hoje só afeta o abafamento sonoro
 (`PlayerStealthState.AplicarAbafamentoTempestade`) — raio de ruído do
@@ -63,7 +63,7 @@ cautela (não por redução de velocidade). Peças:
 
 ### Zoneamento (colocado em cena, 2026-07-10)
 
-> **Nota (2026-07-28):** Este zoneamento pertencia à "Fase 1: Ruínas Pálidas" original. Com a reestruturação, a tempestade de areia foi **relocada para o Overworld do Deserto de Hali**. Os triggers Z1, Z2 e Z3Z4 abaixo são candidatos a remoção em fatia futura — a Dungeon 1 (Tumba de Alhazred) não terá tempestade. O Z5_Nula permanece correto. Ver `systems/level_design_deserto_hali.md` §3.
+> **Nota (2026-07-28):** Este zoneamento pertencia à "Fase 1: Ruínas Pálidas" original. Com a reestruturação, a tempestade de areia foi **relocada para o Overworld do Deserto de Hali**. **FEITO em 2026-07-30:** todos os triggers de tempestade (incluindo o `Z5_Nula`) e o `TempestadeAmbiente`/overlay foram **removidos da cena** `Playtest_RuinasPalidas.unity`, junto com o resto do legado das Ruínas Pálidas — a Tumba virou uma dungeon única e fechada. Os scripts continuam no projeto, prontos para o Overworld. Ver `systems/level_design_deserto_hali.md` §3.
 
 4 triggers de tempestade na cena `Playtest_RuinasPalidas`, sobre o `TempestadeAmbiente` global:
 

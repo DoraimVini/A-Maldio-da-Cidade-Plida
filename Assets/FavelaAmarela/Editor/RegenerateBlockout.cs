@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace FavelaAmarela.EditorTools
     /// </summary>
     public static class RegenerateBlockout
     {
-        [MenuItem("Tools/FavelaAmarela/Regenerate Blockout (9 zonas)")]
+        [MenuItem("Tools/FavelaAmarela/Regenerate Blockout (limites invisíveis)")]
         public static void Regenerate()
         {
             var type = ResolverTipo("FavelaAmarela.Level.Runtime.LevelBlockoutGenerator");
@@ -31,6 +32,12 @@ namespace FavelaAmarela.EditorTools
                 return;
             }
 
+            // Liga o modo "limites invisíveis": paredes viram só colisores (sem sprite).
+            // Evita o warning de Tiled/Full Rect do wallSprite e as paredes chapadas no
+            // ângulo errado, enquanto a arte de parede iso não existir.
+            var campoInvisivel = type.GetField("limitesInvisiveis", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (campoInvisivel != null) campoInvisivel.SetValue(gen, true);
+
             var metodo = type.GetMethod("GenerateBlockout");
             if (metodo == null)
             {
@@ -43,7 +50,7 @@ namespace FavelaAmarela.EditorTools
             var scene = EditorSceneManager.GetActiveScene();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
-            Debug.Log("[RegenBlockout] Blockout re-gerado com as 9 zonas e cena salva.");
+            Debug.Log("[RegenBlockout] Blockout re-gerado com limites INVISÍVEIS (só colisores) e cena salva.");
         }
 
         private static Type ResolverTipo(string fullName)

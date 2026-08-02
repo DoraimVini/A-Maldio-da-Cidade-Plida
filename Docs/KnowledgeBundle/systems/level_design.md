@@ -54,7 +54,7 @@ O nível inicial é dividido em 5 zonas que conectam a entrada à primeira área
 ### Zona 5: Subterrâneo - Ruínas de Hali (Ponto de Virada da Dungeon)
 *   **Foco:** Conquista de poder (Retaliação).
 *   **Desafio:** Área totalmente escura, sem postes de luz iniciais e cultistas no caminho.
-*   **Estrutura:** O jogador acorda vulnerável, mas encontra no centro os dois itens que alteram a jogabilidade: a **Barra Enferrujada** (desbloqueando a Mão Física) e o **Salto Dimensional** (desbloqueando a Mão Anômala).
+*   **Estrutura:** O jogador acorda vulnerável e encontra no centro o **patuá** — item cujo efeito foi revisto e está **pendente de definição** (2026-07-30). A arma da Mão Física não vem daqui: vem do baú da Câmara do Baú (Zona 6b), por sorteio.
 *   **Tempestade (2026-07-10):** Nula (0–0) — área fechada, sem céu, acessível só pela queda forçada da Zona 4.
 
 ---
@@ -63,4 +63,4 @@ O nível inicial é dividido em 5 zonas que conectam a entrada à primeira área
 Conforme novos níveis e mapas forem desenhados:
 - Toda nova zona deve manter um equilíbrio rígido de **Postes de Luz (Pontos de Refúgio)** a cada ~45 segundos de caminhada tensa.
 - Rotas alternativas de stealth devem estar sempre presentes para evitar combate direto.
-- Puzzles ambientais futuros (ex: portais de anomalia) devem usar o **Salto Dimensional** como chave física de travessia.
+- Puzzles ambientais futuros (ex: portais de anomalia) precisam de uma **nova chave de travessia**: o Salto Dimensional, que cumpria esse papel no design antigo, foi removido do jogo (2026-07-30).

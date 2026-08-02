@@ -84,7 +84,7 @@ LEGENDA:
 
 > **Decisão de design (2026-07-28):** A tempestade de areia é **removida da Dungeon 1 (Tumba de Alhazred)** e **relocada para o Overworld do Deserto de Hali**. Subterrâneos não têm tempestade de areia. A dungeon passa a ter StormIntensity = 0 por padrão.
 >
-> **Impacto de código (fatia futura):** Os triggers `TempestadeTrigger_Z1_Spawn`, `TempestadeTrigger_Z2_Rajadas`, `TempestadeTrigger_Z3Z4_Forte` na cena `Playtest_RuinasPalidas.unity` devem ser removidos ou desativados. O `TempestadeTrigger_Z5_Nula` permanece correto (subterrâneo = 0 de qualquer forma).
+> **Impacto de código — **FEITO em 2026-07-30:** todos os triggers de tempestade (incluindo o `Z5_Nula`) e o `TempestadeAmbiente`/overlay foram **removidos da cena** `Playtest_RuinasPalidas.unity`, junto com o resto do legado das Ruínas Pálidas — a Tumba virou uma dungeon única e fechada. Os scripts continuam no projeto, prontos para o Overworld.
 
 | Setor | Intensidade | Visibilidade | Impacto Mecânico |
 | :--- | :---: | :---: | :--- |
@@ -224,9 +224,39 @@ No Overworld, a tempestade cria **stealth passivo** na região central: o vento 
 | 4 | Descoberta do Templo da Serpente | **Drop de mapa** de qualquer inimigo do overworld. Única mecânica oficial de descoberta. |
 | 5 | Sequência de abertura | **Cinemática** — ver `systems/cinematica_abertura_deserto.md` (criado em 2026-07-28). |
 
+## 7.1 IMPLEMENTAÇÃO DOS SETORES (2026-08-01)
+
+Os 6 setores da tabela §3 existem em cena como volumes de `TempestadeZonaTrigger`, sob
+`Setores_Tempestade`. Ladrilham o mapa **sem sobrepor** — importa porque o trigger age no
+`OnTriggerEnter2D`: com volumes sobrepostos, qual "vence" dependeria da ordem de entrada.
+
+Mapa jogável real: **x ∈ [-21,5 ; 21,5], y ∈ [-15,5 ; 15,5]** (43 × 31 un).
+
+| Setor | Centro | Tamanho | Faixa |
+| :--- | :--- | :--- | :--- |
+| `Setor_Entrada` | (0, −11,75) | 43 × 7,5 | 0,00–0,08 |
+| `Setor_TumbaDeAlhazred` | (−15,25, −1) | 12,5 × 14 | 0,22–0,38 |
+| `Setor_SantuarioDeYhtill` | (−15,25, 10,75) | 12,5 × 9,5 | 0,02–0,12 |
+| `Setor_DesertoCentral` | (0, 1) | 18 × 18 | 0,45–0,65 |
+| `Setor_PortoesDasRuinas` | (0, 12,75) | 18 × 5,5 | 0,00–0,10 |
+| `Setor_LesteTemploSerpente` | (15,25, 3,75) | 12,5 × 23,5 | 0,78–0,95 |
+
+A faixa vem da **visibilidade** desta tabela (intensidade ≈ 1 − visibilidade), com banda
+estreita para o oscilador respirar — a tempestade é rajada, não valor fixo.
+
+> **Duas divergências entre o design e o construído**, ambas deliberadas:
+> 1. **O doc diz "5 setores" (§1.3) mas a tabela §3 lista 6 zonas.** Implementei as 6 da
+>    tabela, que é a que tem números acionáveis.
+> 2. **Dimensão:** o doc previa ~22 × 16 un; a cena tem 43 × 31. Não redimensionei — os
+>    marcos já estavam distribuídos e mexer no terreno seria destrutivo. Se a escala
+>    pretendida importar, é decisão de level design, não de código.
+>
+> **Não implementado (decisão do Vini): dreno de RM.** O design pede −2 RM/s no leste e
+> −5 RM/s na margem do Lago. Ele decidiu que a tempestade afeta **só os inimigos** por ora.
+
 ## 8. PENDÊNCIAS RESTANTES
 
-- **Remoção da tempestade da Dungeon 1** — execução em fatia futura de código (remover triggers Z1, Z2, Z3Z4 da cena `Playtest_RuinasPalidas`).
+- ~~Remoção da tempestade da Dungeon 1~~ — **CONCLUÍDO (2026-07-30)**: tempestade inteira removida da cena da Tumba.
 - **Conteúdo da quest de Cassilda** (objetivos, diálogos) — ver `lore/cassilda_e_byakhee.md`.
 - **Conteúdo do Templo da Serpente** (layout, inimigos, chefe) — ver `lore/templo_da_serpente.md`.
 - **Drop rate do Mapa Fragmentado** — a definir no balanceamento.

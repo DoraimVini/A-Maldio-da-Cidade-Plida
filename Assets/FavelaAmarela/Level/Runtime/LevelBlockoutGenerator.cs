@@ -38,6 +38,10 @@ namespace FavelaAmarela.Level.Runtime
         [Tooltip("Altura visual da parede, em unidades de mundo, acima da base (footprint).")]
         [SerializeField] private float wallHeight = 1.5f;
 
+        [Header("Limites invisíveis")]
+        [Tooltip("Se ligado, as paredes viram SÓ colisores (SpriteRenderer desligado): o jogador fica limitado, mas nada é desenhado. Evita as paredes chapadas destoando do isométrico e o warning de Tiled/Full Rect do wallSprite enquanto não há arte de parede iso.")]
+        [SerializeField] private bool limitesInvisiveis = false;
+
         [Header("Runtime")]
         [SerializeField] private Transform generationRoot;
 
@@ -202,6 +206,18 @@ namespace FavelaAmarela.Level.Runtime
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = isTrigger;
             col.edgeRadius = 0f; // sem radius, faz colisão quadrada limpa
+
+            if (limitesInvisiveis)
+            {
+                // Só colisor: o jogador fica limitado, mas nada é desenhado (nem o
+                // placeholder chapado, nem o wallSprite Tiled que exigiria Full Rect).
+                // Resolve o "andar no nada" sem poluir o isométrico com paredes no
+                // ângulo errado, enquanto a arte de parede iso não existe.
+                go.transform.localScale = new Vector3(size.x, size.y, 1f);
+                sr.enabled = false;
+                col.size = Vector2.one;
+                return go;
+            }
 
             if (wallSprite != null)
             {

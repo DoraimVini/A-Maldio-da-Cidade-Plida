@@ -49,7 +49,6 @@ namespace FavelaAmarela.Editor
             
             // 2. Comportamentos do Player
             player.AddComponent<PlayerMovement>();
-            player.AddComponent<AnomalyPowerBridge>();
             player.AddComponent<EsquivaBridge>();
             
             // 3. Física e Visual (RequireComponent do PlayerMovement já injeta Rigidbody2D e BoxCollider2D)

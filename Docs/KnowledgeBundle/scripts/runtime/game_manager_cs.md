@@ -21,7 +21,9 @@ A raiz de composição/injeção de dependências do projeto, citada no CLAUDE.m
 - `Environment` ([EnvironmentState](../core/environment_state_cs.md))
 
 ## `InjetarDependencias()`
-Busca (via `FindAnyObjectByType`) e faz `Bind()`/injeção nos adapters: `HUDController`, [AnomalyPowerBridge](anomaly_power_bridge_cs.md), `PlayerMovement`, [TempestadeAmbiente](tempestade_ambiente_cs.md), [TempestadeVisualOverlay](tempestade_visual_overlay_cs.md).
+Busca (via `FindAnyObjectByType`) e faz `Bind()`/injeção nos adapters: `HUDController`, `PlayerMovement`, [TempestadeAmbiente](tempestade_ambiente_cs.md), [TempestadeVisualOverlay](tempestade_visual_overlay_cs.md), e injeta o `SoundBroadcaster` em todos os inimigos da cena.
+
+Além do bootstrap, expõe **registros pontuais em runtime** — coisas que não existem no `Awake`: `RegistrarYugNeth(YugNethAI)`, chamado quando o companheiro é libertado por Abdul, que assina `OnYugNethAbatido` para encerrar a run com `TipoDeDerrota.EscoltaPerdida`.
 
 ## Reações a eventos Core
 - `StateMachine.OnStateChanged` → controla `Time.timeScale` e ativa/desativa telas (pause, transição de fase, gameplay root).

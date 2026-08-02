@@ -33,6 +33,7 @@ namespace FavelaAmarela.Runtime.GameLoop
         private readonly FrasesDeColapso _frases = new FrasesDeColapso();
         private static readonly int _DitherAmountId = Shader.PropertyToID("_DitherAmount");
         private bool _tocado;
+        private TipoDeDerrota _tipoDeDerrota = TipoDeDerrota.Mental;
 
         private void Awake()
         {
@@ -43,11 +44,19 @@ namespace FavelaAmarela.Runtime.GameLoop
             }
         }
 
-        /// <summary>Dispara a sequência de morte. Idempotente (só toca uma vez).</summary>
-        public void Tocar()
+        /// <summary>Dispara a sequência de morte por Colapso Mental. Idempotente (só toca uma vez).</summary>
+        public void Tocar() => Tocar(TipoDeDerrota.Mental);
+
+        /// <summary>
+        /// Dispara a sequência de morte. Idempotente (só toca uma vez). O
+        /// <paramref name="tipo"/> escolhe o pool de frases: morrer de porrada
+        /// (<see cref="TipoDeDerrota.Corporea"/>) não diz "você abraçou Hastur".
+        /// </summary>
+        public void Tocar(TipoDeDerrota tipo)
         {
             if (_tocado) return;
             _tocado = true;
+            _tipoDeDerrota = tipo;
             StartCoroutine(Sequencia());
         }
 
@@ -77,7 +86,7 @@ namespace FavelaAmarela.Runtime.GameLoop
 
         private IEnumerator MostrarPainel()
         {
-            if (textoColapso != null) textoColapso.text = _frases.Sortear();
+            if (textoColapso != null) textoColapso.text = _frases.Sortear(_tipoDeDerrota);
             if (painelColapso == null) yield break;
 
             painelColapso.gameObject.SetActive(true);

@@ -36,9 +36,10 @@ namespace FavelaAmarela.Level.Tests
         // ── 1. Estrutura básica ──────────────────────────────────────────────
 
         [Test]
-        public void Layout_DeveTerNoveZonas()
+        public void Layout_DeveTerDezZonas()
         {
-            Assert.AreEqual(9, _layout.Rooms.Count, "S-Path deve ter exatamente 9 salas (Fase 1 expandida).");
+            Assert.AreEqual(10, _layout.Rooms.Count,
+                "S-Path deve ter 10 salas: a descida de 9 + a Câmara do Baú lateral.");
         }
 
         [Test]
@@ -50,9 +51,40 @@ namespace FavelaAmarela.Level.Tests
             Assert.AreEqual("Zona4_PracaDoCerco",         _layout.Rooms[3].Name);
             Assert.AreEqual("Zona5_TransicaoDimensional", _layout.Rooms[4].Name);
             Assert.AreEqual("Zona6_CriptaDosPrimeiros",   _layout.Rooms[5].Name);
-            Assert.AreEqual("Zona7_FendaDosSussurros",    _layout.Rooms[6].Name);
-            Assert.AreEqual("Zona8_Ossario",              _layout.Rooms[7].Name);
-            Assert.AreEqual("Zona9_TronoDoVulto",         _layout.Rooms[8].Name);
+            Assert.AreEqual("Zona6b_CamaraDoBau",         _layout.Rooms[6].Name);
+            Assert.AreEqual("Zona7_FendaDosSussurros",    _layout.Rooms[7].Name);
+            Assert.AreEqual("Zona8_Ossario",              _layout.Rooms[8].Name);
+            Assert.AreEqual("Zona9_TumbaDeAbdul",         _layout.Rooms[9].Name);
+        }
+
+        [Test]
+        public void CamaraDoBau_FicaALesteDaCripta_SemDeslocarADescida()
+        {
+            var cripta = _layout.Rooms[5];
+            var camara = _layout.Rooms[6];
+
+            Assert.Greater(camara.Center.x, cripta.Center.x,
+                "A Câmara do Baú é uma sala lateral a Leste da Cripta.");
+            Assert.AreEqual(cripta.Center.y, camara.Center.y, 0.001f,
+                "Deve ficar na mesma faixa Y da Cripta (ligação Leste↔Oeste).");
+
+            // A descida (Zonas 7-9) tem de continuar alinhada em X com a Zona 5:
+            // é isso que garante que nada foi deslocado e que os inimigos já
+            // posicionados na cena seguem válidos.
+            var z5 = _layout.Rooms[4];
+            Assert.AreEqual(z5.Center.x, _layout.Rooms[7].Center.x, 0.001f);
+            Assert.AreEqual(z5.Center.x, _layout.Rooms[8].Center.x, 0.001f);
+            Assert.AreEqual(z5.Center.x, _layout.Rooms[9].Center.x, 0.001f);
+        }
+
+        [Test]
+        public void CamaraDoBau_TemPortaLigandoDeVoltaAcripta()
+        {
+            var camara = _layout.Rooms[6];
+            Assert.AreEqual(1, camara.Doorways.Count,
+                "A Câmara do Baú é um cul-de-sac: só a porta de volta para a Cripta.");
+            Assert.AreEqual(Side.West, camara.Doorways[0].Side);
+            Assert.Greater(camara.Doorways[0].Width, 0f, "A porta precisa ter largura real.");
         }
 
         [Test]

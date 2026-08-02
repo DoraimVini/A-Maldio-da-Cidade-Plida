@@ -1,15 +1,32 @@
 ---
 type: C# Script
 title: PatuaPickup.cs
-description: Pickup do patuá na Zona 5 — destrava o Salto Dimensional permanentemente
+description: Colecionável do patuá na Zona 5 — coletado por interação (botão E); efeito pendente de design
 resource: file:///C:/Users/Vini/Desktop/projeto_amarelo/A%20Maldi%C3%A7%C3%A3o%20da%20Cidade%20P%C3%A1lida/Assets/Scripts/GameLoop/PatuaPickup.cs
-tags: [runtime, gameloop, progression]
-timestamp: 2026-07-09T00:00:00Z
+tags: [runtime, gameloop, progression, interacao]
+timestamp: 2026-07-30T00:00:00Z
 ---
 
 # PatuaPickup
 
 **Namespace:** `FavelaAmarela.Runtime.GameLoop`
-**Tipo:** `public sealed class` (herda de `MonoBehaviour`, `[RequireComponent(Collider2D)]`)
+**Tipo:** `public sealed class` (herda de `MonoBehaviour`, implementa `IInteragivel`, `[RequireComponent(Collider2D)]`)
 
-Trigger de coleta única (flag `_coletado`): ao tocar o `Player`, busca o componente [AnomalyPowerBridge](anomaly_power_bridge_cs.md) do colisor e chama `DesbloquearSalto()` — é aqui que o Salto Dimensional deixa de estar bloqueado (ver [progressão do Salto](../../lore/world_rules.md)). Mostra uma dica opcional via `TutorialHintUI` e desativa o próprio `GameObject` ao coletar.
+Colecionável do patuá na Zona 5. Coletado por **interação deliberada** (botão **E**), não
+por encostar — colecionável é escolha do jogador, e o prompt *"Recolher o patuá"* também
+sinaliza que ali há algo importante. Ver [Interação com o Mundo](../../systems/interacao.md).
+
+> ⚠️ **Efeito pendente de design (2026-07-30).** O patuá foi revisto e **não destrava mais o
+> Salto Dimensional** — essa habilidade foi integralmente removida do jogo. O item continua
+> na cena e coletável, mas seu novo propósito **ainda não foi definido pelo Vini**. Há um
+> `TODO(design)` em `Interagir()` marcando exatamente onde o efeito novo entra. Não inventar
+> um efeito por conta própria.
+
+## Implementação de `IInteragivel`
+
+| Membro | Valor |
+|---|---|
+| `RotuloDeInteracao` | `"Recolher o patuá"` |
+| `PodeInteragir` | `!_coletado` — some do prompt depois de coletado |
+| `PrioridadeDeInteracao` | `10` (item de progressão: ganha de cenário ao lado) |
+| `Interagir(quemInterage)` | Marca coletado, mostra a mensagem no `TutorialHintUI` e desativa o próprio `GameObject` |
