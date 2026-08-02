@@ -19,6 +19,16 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Tooltip("Nome da cena a carregar (sem extensão). Deve estar em Build Settings.")]
         [SerializeField] private string cenaDestino;
 
+        [Tooltip("Onde aparecer na cena destino (identificador de um PontoDeChegada lá). " +
+                 "Vazio = usa a posição padrão do jogador naquela cena.")]
+        [SerializeField] private string chegarEm;
+
+        [Tooltip("Segundos ignorando contato logo após a cena carregar. Impede que chegar " +
+                 "em cima de um portal jogue o jogador de volta na hora.")]
+        [SerializeField] private float carenciaAoCarregar = 0.5f;
+
+        private float _tempoDeAtivacao;
+
         private void Reset()
         {
             // Ao adicionar o componente no Editor, já deixa o collider como trigger.
@@ -28,6 +38,8 @@ namespace FavelaAmarela.Runtime.GameLoop
 
         private void Awake()
         {
+            _tempoDeAtivacao = Time.time + Mathf.Max(0f, carenciaAoCarregar);
+
             if (string.IsNullOrWhiteSpace(cenaDestino))
                 Debug.LogError($"[PortalDeCena] '{name}' está sem cena destino; nenhuma transição vai ocorrer.", this);
         }
@@ -37,11 +49,32 @@ namespace FavelaAmarela.Runtime.GameLoop
             if (!collision.CompareTag("Player")) return;
             if (string.IsNullOrWhiteSpace(cenaDestino)) return; // erro já logado em Awake
 
+            // Carência: chegar numa cena em cima de um portal (o caso normal quando ida e
+            // volta usam a mesma porta) dispararia o trigger no mesmo instante e devolveria
+            // o jogador para a cena de origem — um pingue-pongue infinito. A janela deixa
+            // ele sair de cima da porta antes de ela voltar a valer.
+            if (Time.time < _tempoDeAtivacao) return;
+
+            PontoDeChegada.Pendente = string.IsNullOrWhiteSpace(chegarEm) ? null : chegarEm;
+
+            // Fotografa o estado antes de a cena ser destruída — sem isto, atravessar a
+            // porta faria Damião perder a arma do baú e a Vitalidade sofrida.
+            Persistencia.GerenciadorDeSave.Instancia?.CapturarTudo();
+
             SceneManager.LoadScene(cenaDestino);
         }
 
         /// <summary>Define a cena destino por código (usado pelo gerador do deserto).</summary>
         public void DefinirCenaDestino(string cena) => cenaDestino = cena;
+
+        /// <summary>
+        /// Define em qual <see cref="PontoDeChegada"/> da cena destino o jogador aparece.
+        /// Vazio/nulo mantém a posição padrão do jogador naquela cena.
+        /// </summary>
+        public void DefinirChegada(string identificador) => chegarEm = identificador;
+
+        /// <summary>Identificador do ponto de chegada na cena destino (vazio = padrão).</summary>
+        public string ChegarEm => chegarEm;
 
         /// <summary>Nome da cena destino atualmente configurada (para inspeção/testes de cena).</summary>
         public string CenaDestino => cenaDestino;
