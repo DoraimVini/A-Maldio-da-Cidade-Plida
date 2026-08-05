@@ -23,7 +23,7 @@ namespace FavelaAmarela.EditorTools
         public static void Executar()
         {
             var objetos = Object.FindObjectsByType<ObjetoPersistente>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             if (objetos.Length == 0)
             {
@@ -55,3 +55,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

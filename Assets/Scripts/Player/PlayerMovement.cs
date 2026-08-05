@@ -30,6 +30,7 @@ namespace FavelaAmarela.Player
         public MovementMode CurrentMode { get; private set; } = MovementMode.Walking;
         public float Speed { get; private set; }
         public float NoiseRadius { get; private set; }
+        public bool IsOdorMasked { get; set; } = false;
 
         private readonly float sneakSpeed;
         private readonly float sneakNoise;
@@ -141,9 +142,13 @@ namespace FavelaAmarela.Player
         private MaoFisicaBridge maoFisicaBridge;
         private InputAction attackAction;
         private InputAction habilidadeArmaAction;
+        
+        private float _odorMaskTimer = 0f;
+        private GerenciadorDeVigor _vigor;
 
         public PlayerStealthState StealthState => stealthState;
         public bool IsMoving => isMoving;
+        public Vector2 LookDirection { get; private set; } = Vector2.right;
 
         // --- Injected Services ---
         private SoundBroadcastService _soundBroadcaster;
@@ -182,6 +187,8 @@ namespace FavelaAmarela.Player
             if (esquivaBridge != null) esquivaBridge.BindStateMachine(_fsm);
             if (maoFisicaBridge != null) maoFisicaBridge.BindStateMachine(_fsm);
             if (congelamentoBridge != null) congelamentoBridge.BindStateMachine(_fsm);
+
+            _vigor = GetComponent<GerenciadorDeVigor>();
 
             // --- POCO init ---
             if (locomocaoConfig != null)
@@ -259,6 +266,15 @@ namespace FavelaAmarela.Player
 
         private void Update()
         {
+            if (_odorMaskTimer > 0)
+            {
+                _odorMaskTimer -= Time.deltaTime;
+                if (_odorMaskTimer <= 0)
+                {
+                    StealthState.IsOdorMasked = false;
+                }
+            }
+
             // Avança o relógio das ações exclusivas (substitui os Invoke(EndX) do modelo antigo).
             _fsm.Tick(Time.deltaTime);
 
@@ -274,6 +290,11 @@ namespace FavelaAmarela.Player
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
             isMoving = inputDirection.sqrMagnitude > 0.01f;
+            
+            if (isMoving)
+            {
+                LookDirection = inputDirection.normalized;
+            }
 
             // Trigger Esquiva
             if (dodgeAction != null && dodgeAction.WasPressedThisFrame() && esquivaBridge != null)
@@ -297,12 +318,24 @@ namespace FavelaAmarela.Player
             }
 
             // Determine stealth mode from modifier keys
+            bool podeCorrer = _vigor == null || (!_vigor.EstaExausto && _vigor.VigorAtual > 0f);
+
             if (sneakAction != null && sneakAction.IsPressed())
+            {
                 stealthState.SetMode(MovementMode.Sneaking);
-            else if (runAction != null && runAction.IsPressed())
+            }
+            else if (runAction != null && runAction.IsPressed() && podeCorrer)
+            {
                 stealthState.SetMode(MovementMode.Running);
+                if (isMoving && _vigor != null)
+                {
+                    _vigor.ConsumirCorrida(Time.deltaTime);
+                }
+            }
             else
+            {
                 stealthState.SetMode(MovementMode.Walking);
+            }
         }
 
         private void FixedUpdate()
@@ -374,6 +407,14 @@ namespace FavelaAmarela.Player
             // Outline
             Gizmos.color = new Color(1f, 0.92f, 0.016f, 0.7f);
             Gizmos.DrawWireSphere(transform.position, currentNoise);
+        }
+        public void MascararOdor(float duracaoSegundos)
+        {
+            if (StealthState != null)
+            {
+                StealthState.IsOdorMasked = true;
+                _odorMaskTimer = duracaoSegundos;
+            }
         }
     }
 }

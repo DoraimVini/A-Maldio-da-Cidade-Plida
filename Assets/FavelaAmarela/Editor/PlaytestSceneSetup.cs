@@ -6,7 +6,6 @@ using FavelaAmarela.Runtime.GameLoop;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.Enemies;
 using FavelaAmarela.Runtime.UI;
-using FavelaAmarela.Core.Enemies;
 using FavelaAmarela.CameraSystem;
 using UnityEngine.InputSystem;
 

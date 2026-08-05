@@ -20,14 +20,27 @@ namespace FavelaAmarela.Core.Combat
     {
         private float _atual;
 
-        /// <summary>Teto máximo de vitalidade. Imutável após construção.</summary>
-        public float Max { get; }
+        /// <summary>Teto máximo de vitalidade.</summary>
+        public float Max { get; private set; }
 
         /// <summary>Valor corrente de vitalidade (0 … Max).</summary>
         public float Atual => _atual;
 
         /// <summary>Percentual de vitalidade (0.0 … 1.0), útil para barras de UI.</summary>
         public float Percentual => Max > 0f ? _atual / Max : 0f;
+
+        /// <summary>
+        /// Altera a vitalidade máxima e ajusta o valor atual para manter a proporção.
+        /// </summary>
+        public void SetValorMaximo(float novoMax)
+        {
+            if (novoMax <= 0f) return;
+            float valorAntigo = _atual;
+            float percentualAnterior = Percentual;
+            Max = novoMax;
+            _atual = Max * percentualAnterior;
+            OnChanged?.Invoke(new VitalidadeChangedArgs(valorAntigo, _atual, Max, false));
+        }
 
         /// <summary>
         /// Abatido — a vitalidade chegou a zero (morte física). Para um Cultista,

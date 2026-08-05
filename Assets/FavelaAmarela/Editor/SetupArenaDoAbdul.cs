@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using FavelaAmarela.Level.Core;
 using FavelaAmarela.Runtime.Combat;
+using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Runtime.Enemies;
 using FavelaAmarela.Runtime.GameLoop;
 

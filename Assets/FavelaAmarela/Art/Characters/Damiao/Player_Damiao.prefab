@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3485682494645962060}
   - component: {fileID: 7750164519107673059}
   - component: {fileID: 4829173650284917362}
+  - component: {fileID: 1028256812353556123}
   m_Layer: 8
   m_Name: Player_Damiao
   m_TagString: Player
@@ -96,7 +97,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &2043557494436032994
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -279,3 +280,15 @@ MonoBehaviour:
   ehAparicaoPrimordial: 0
   mostrarNumerosDeDano: 1
   corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}
+--- !u!114 &1028256812353556123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566763281958862316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d508a6a554d224281ee8ccfcaf23f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.GerenciadorEfeitosPassivos

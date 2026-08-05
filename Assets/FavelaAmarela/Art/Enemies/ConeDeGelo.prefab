@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5547912845585565347}
   - component: {fileID: 5694883782560227971}
   - component: {fileID: 2147081589575478032}
+  - component: {fileID: -1261405043309762596}
   m_Layer: 0
   m_Name: ConeDeGelo
   m_TagString: Untagged
@@ -119,8 +120,8 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 0
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!61 &5694883782560227971
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -185,3 +186,17 @@ MonoBehaviour:
   camadasQueBloqueiam:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &-1261405043309762596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7144954348415485153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 828427ee7839cee4a97d51f9c5059441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.DynamicYSort
+  fator: 10
+  offsetPes: 0

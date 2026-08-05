@@ -26,7 +26,7 @@ namespace FavelaAmarela.Runtime.Itens
     {
         [Header("Item")]
         [Tooltip("Qual item este objeto entrega. [ASSET]")]
-        [SerializeField] private ItemConfig item;
+        [SerializeField] private FavelaAmarela.Inventario.ItemDef item;
 
         [Tooltip("Quantos exemplares.")]
         [Min(1)]
@@ -51,7 +51,7 @@ namespace FavelaAmarela.Runtime.Itens
 
         /// <inheritdoc />
         public string RotuloDeInteracao =>
-            item != null ? $"Recolher: {item.NomeVisivel}" : "Recolher";
+            item != null ? $"Recolher: {item.Nome}" : "Recolher";
 
         /// <inheritdoc />
         public bool PodeInteragir => !_coletado;
@@ -65,7 +65,7 @@ namespace FavelaAmarela.Runtime.Itens
         private void Awake()
         {
             if (item == null)
-                Debug.LogError($"[ColetavelDeItem] '{name}' está sem ItemConfig — não entrega nada.", this);
+                Debug.LogError($"[ColetavelDeItem] '{name}' está sem ItemDef — não entrega nada.", this);
         }
 
         private void Start()
@@ -83,20 +83,20 @@ namespace FavelaAmarela.Runtime.Itens
         {
             if (_coletado || item == null) return;
 
-            var inventario = quemInterage.GetComponent<InventarioBridge>();
-            if (inventario == null)
+            var invManager = FavelaAmarela.Inventario.InventoryManager.Instance;
+            if (invManager == null)
             {
-                Debug.LogError("[ColetavelDeItem] Quem interagiu não tem inventário — " +
-                               $"'{item.NomeVisivel}' não pôde ser recolhido.", this);
+                Debug.LogError("[ColetavelDeItem] InventoryManager.Instance não encontrado — " +
+                               $"'{item.Nome}' não pôde ser recolhido.", this);
                 return;
             }
 
-            int naoCoube = inventario.Guardar(item, quantidade);
-            if (naoCoube >= quantidade)
+            bool coube = invManager.Main.Add(new FavelaAmarela.Inventario.ItemInstance(item.Id, quantidade));
+            if (!coube)
             {
                 // Nada coube: o item fica no chão. Perder relíquia por inventário cheio
                 // seria perda silenciosa de progresso.
-                Mostrar($"Não há espaço para {item.NomeVisivel}.");
+                Mostrar($"Não há espaço para {item.Nome}.");
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace FavelaAmarela.Runtime.Itens
                 GerenciadorDeSave.MarcarAconteceu(chaveDeSave);
 
             Mostrar(string.IsNullOrWhiteSpace(mensagem)
-                ? $"Você recolheu: {item.NomeVisivel}."
+                ? $"Você recolheu: {item.Nome}."
                 : mensagem);
 
             gameObject.SetActive(false);

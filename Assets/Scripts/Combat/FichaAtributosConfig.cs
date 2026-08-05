@@ -1,44 +1,64 @@
 using UnityEngine;
 using FavelaAmarela.Core.Combat;
 
-namespace FavelaAmarela.Runtime.Combat
+namespace FavelaAmarela.Core.Combat
 {
     /// <summary>
-    /// Autoria em asset da <see cref="FichaDeAtributos"/> — a "ficha" de uma unidade,
-    /// editável no Inspector como arquivo (um asset por tipo: Ficha_Cultista,
-    /// Ficha_Damiao, Ficha_Abdul...). Adaptador Runtime puro: só serializa os 5
-    /// atributos e cospe o POCO via <see cref="CriarFicha"/> — nenhuma regra de combate
-    /// mora aqui (isso é do Core).
+    /// ScriptableObject que define os atributos base de uma unidade (jogador ou inimigo).
+    /// Usado por VitalidadeBridge e EnemyBase para criar a FichaDeAtributos.
     /// </summary>
-    [CreateAssetMenu(fileName = "Ficha_Nova", menuName = "Favela Amarela/Ficha de Atributos")]
-    public sealed class FichaAtributosConfig : ScriptableObject
+    [CreateAssetMenu(menuName = "Favela Amarela/Ficha de Atributos", fileName = "Ficha_")]
+    public class FichaAtributosConfig : ScriptableObject
     {
-        [Header("Vitalidade (corpo)")]
-        [Tooltip("Teto da Vitalidade corpórea. Escala 0–100.")]
-        [SerializeField] private float vitalidadeMax = 100f;
+        [Header("Atributos Primários")]
+        [Tooltip("Vitalidade Corpórea máxima (HP).")]
+        public float VitalidadeMax = 100f;
 
-        [Header("Ofensivo")]
-        [Tooltip("Poder ofensivo físico — dano bruto do golpe corpo-a-corpo da unidade.")]
-        [SerializeField] private float ataque = 0f;
-        [Tooltip("Poder ofensivo anômalo — dano bruto das magias/conjurações (0 se não conjura).")]
-        [SerializeField] private float conjuracao = 0f;
+        [Tooltip("Resiliência Mental máxima (sanidade). Apenas para o jogador.")]
+        public float ResilienciaMax = 100f;
 
-        [Header("Defensivo")]
-        [Tooltip("Mitigação física — subtraída do dano físico recebido.")]
-        [SerializeField] private float defesa = 0f;
-        [Tooltip("Mitigação anômala — subtraída do dano de conjuração recebido (defesa mágica).")]
-        [SerializeField] private float resistenciaAnomala = 0f;
+        [Header("Combate")]
+        [Tooltip("Dano físico base (usado por inimigos para calcular dano causado).")]
+        public float Ataque = 24f;
+
+        [Tooltip("Defesa física (reduz dano recebido).")]
+        public float Defesa = 5f;
+
+        [Tooltip("Conjuração (dano anômalo base, usado por inimigos que lançam magias).")]
+        public float Conjuracao = 0f;
+
+        [Tooltip("Resistência a dano anômalo.")]
+        public float ResistenciaAnomala = 0f;
+
+        [Header("Movimento (inimigos)")]
+        [Tooltip("Velocidade de patrulha (errante).")]
+        public float VelocidadeErrante = 1.5f;
+
+        [Tooltip("Velocidade de caça (perseguição).")]
+        public float VelocidadeCaca = 3.5f;
+
+        [Tooltip("Alcance do golpe corpo-a-corpo.")]
+        public float AlcanceDeGolpe = 1.2f;
+
+        [Tooltip("Cadência de ataque em segundos.")]
+        public float CadenciaDeAtaque = 1.2f;
 
         /// <summary>
-        /// Cria o POCO de atributos a partir dos valores do asset. Clampa defensivamente
-        /// para nunca estourar a validação do <see cref="FichaDeAtributos"/> por um asset
-        /// mal preenchido (Regra de Ouro 7 — fallback seguro em vez de exceção).
+        /// Cria uma FichaDeAtributos a partir dos valores configurados.
         /// </summary>
-        public FichaDeAtributos CriarFicha() => new FichaDeAtributos(
-            vitalidadeMax: Mathf.Max(1f, vitalidadeMax),
-            ataque: Mathf.Max(0f, ataque),
-            defesa: Mathf.Max(0f, defesa),
-            conjuracao: Mathf.Max(0f, conjuracao),
-            resistenciaAnomala: Mathf.Max(0f, resistenciaAnomala));
+        public FichaDeAtributos CriarFicha()
+        {
+            return new FichaDeAtributos(
+                vitalidadeMax: VitalidadeMax,
+                ataque: Ataque,
+                defesa: Defesa,
+                conjuracao: Conjuracao,
+                resistenciaAnomala: ResistenciaAnomala,
+                velocidadeErrante: VelocidadeErrante,
+                velocidadeCaca: VelocidadeCaca,
+                alcanceDeGolpe: AlcanceDeGolpe,
+                cadenciaDeAtaque: CadenciaDeAtaque
+            );
+        }
     }
 }

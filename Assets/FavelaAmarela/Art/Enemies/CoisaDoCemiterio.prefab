@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6381812262022064846}
   - component: {fileID: 7413081680683689236}
   - component: {fileID: 3718683135698572325}
+  - component: {fileID: 7274526852814612185}
   m_Layer: 6
   m_Name: CoisaDoCemiterio
   m_TagString: Untagged
@@ -119,8 +120,8 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 0
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!114 &7413081680683689236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,7 +132,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46e809ad42be14247a8f852f0ccc359a, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.CoisaDoCemiterioAI
   velocidadeFarejando: 1.2
   velocidadeAlvoPreciso: 2.5
@@ -184,3 +185,17 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.5, y: 3}
   m_EdgeRadius: 0
+--- !u!114 &7274526852814612185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8530644607433014112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 828427ee7839cee4a97d51f9c5059441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.DynamicYSort
+  fator: 10
+  offsetPes: 0

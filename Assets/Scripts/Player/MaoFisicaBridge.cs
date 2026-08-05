@@ -4,6 +4,8 @@ using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Player;
 using FavelaAmarela.Runtime.Combat;
+using FavelaAmarela.Core.Factories;
+using FavelaAmarela.Inventario;
 
 namespace FavelaAmarela.Player
 {
@@ -38,7 +40,7 @@ namespace FavelaAmarela.Player
 
         // Identificador serializável da arma empunhada. A instância de IArmaComHabilidade
         // não sobrevive a uma troca de cena; o enum sim, e a fábrica reconstrói a arma.
-        private ArmaDaTumba? _idDaArmaEquipada;
+        private TipoArmaFisica? _idDaArmaEquipada;
 
         private float _lastUseTime = -999f;
         private float _lastAbilityUseTime = -999f;
@@ -121,9 +123,9 @@ namespace FavelaAmarela.Player
         /// só ela deixa o save saber o que reequipar depois de uma troca de cena — a
         /// instância de <see cref="IArmaComHabilidade"/> sozinha não é serializável.
         /// </summary>
-        public void EquiparArma(ArmaDaTumba qual)
+        public void EquiparArma(TipoArmaFisica qual)
         {
-            EquiparArma(SorteioDeArmaDaTumba.Criar(qual));
+            EquiparArma(WeaponFactory.Criar(qual));
             _idDaArmaEquipada = qual; // depois do Equipar: a sobrecarga base limpa o id
         }
 
@@ -131,7 +133,7 @@ namespace FavelaAmarela.Player
         /// Qual arma da Tumba está empunhada, ou null se desarmado (ou se a arma foi
         /// equipada por uma via que não informou o identificador).
         /// </summary>
-        public ArmaDaTumba? IdDaArmaEquipada => _idDaArmaEquipada;
+        public TipoArmaFisica? IdDaArmaEquipada => _idDaArmaEquipada;
 
         private void Awake()
         {
@@ -146,6 +148,53 @@ namespace FavelaAmarela.Player
             var armaTeste = CriarArmaDeTeste(armaInicialParaTeste);
             if (armaTeste != null) EquiparArma(armaTeste);
         }
+
+        private void Start()
+        {
+            var inv = InventoryManager.Instance;
+            if (inv != null)
+            {
+                inv.Equipment.OnSlotChanged += VerificarSlotDeArma;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            var inv = InventoryManager.Instance;
+            if (inv != null)
+            {
+                inv.Equipment.OnSlotChanged -= VerificarSlotDeArma;
+            }
+        }
+
+        /// <summary>
+        /// Reage ao inventário: quando o slot de Arma muda, reconstrói o POCO da arma pela
+        /// <see cref="WeaponFactory"/>. É o que liga o baú da Tumba à Mão Física sem que o
+        /// baú precise conhecer esta bridge.
+        /// </summary>
+        private void VerificarSlotDeArma(int slotIndex)
+        {
+            // Slot 0 é Weapon (Mão Direita/Arma)
+            if (slotIndex != 0) return;
+
+            var inv = InventoryManager.Instance;
+            if (inv == null) return;
+
+            var slot = inv.Equipment.GetSlot(slotIndex);
+
+            // Slot esvaziado (desequipou): Damião volta a lutar de mão vazia.
+            if (slot == null || slot.Def == null)
+            {
+                EquiparArma(TipoArmaFisica.MaoVazia);
+                return;
+            }
+
+            if (slot.Def.Tipo != ItemType.Arma) return;
+
+            // Sobrecarga com o identificador: só ela deixa o save reequipar depois da troca de cena.
+            EquiparArma(slot.Def.ArmaFisica);
+        }
+
 
         private static IArmaComHabilidade CriarArmaDeTeste(ArmaDeTeste escolha) => escolha switch
         {
@@ -166,12 +215,31 @@ namespace FavelaAmarela.Player
             if (direcao == Vector2.zero) return;
             if (_fsm == null || !_fsm.EstaLivre) return;
 
-            // Desarmado cai na Mão Vazia (dano 0); armado usa a arma equipada.
-            IArma arma = _armaEquipada ?? _maoVazia;
+            ArmaResult resultado;
 
-            if (!arma.CanActivate(Time.time - _lastUseTime)) return;
+            // A arma equipada é a fonte da verdade do golpe — a WeaponFactory já a
+            // reconstruiu a partir do slot do inventário (ver VerificarSlotDeArma), então
+            // não há por que reler o inventário a cada ataque.
+            if (_armaEquipada != null)
+            {
+                var baseResult = _armaEquipada.Execute();
+                float bonusDano = GerenciadorEfeitosPassivos.Instance?.GetBonus(StatType.TraumaFisico) ?? 0f;
+                float danoFinal = baseResult.Dano + bonusDano;
 
-            var resultado = arma.Execute();
+                resultado = new ArmaResult(baseResult.Success, baseResult.DurationSeconds, baseResult.CooldownSeconds,
+                    baseResult.Atordoou, baseResult.DuracaoAtordoamento, danoFinal, baseResult.InterrompeConjuracao,
+                    baseResult.SangramentoPorSegundo, baseResult.DuracaoSangramento, baseResult.ForcaRepulsao, baseResult.AcumulosDeSangramento);
+            }
+            else
+            {
+                // Gesto de mão vazia: dano 0 por design — bônus passivos não se aplicam,
+                // senão desarmado passaria a matar.
+                resultado = _maoVazia.Execute();
+            }
+
+            // Fallback para cooldown baseado no ultimo ataque
+            if (Time.time - _lastUseTime < resultado.DurationSeconds) return;
+
             if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
 
             _lastUseTime = Time.time;
@@ -187,7 +255,14 @@ namespace FavelaAmarela.Player
             if (_fsm == null || !_fsm.EstaLivre) return;
             if (!_armaEquipada.CanActivateHabilidade(Time.time - _lastAbilityUseTime)) return;
 
-            var resultado = _armaEquipada.ExecuteHabilidade();
+            var baseResult = _armaEquipada.ExecuteHabilidade();
+            float bonusDano = FavelaAmarela.Player.GerenciadorEfeitosPassivos.Instance?.GetBonus(FavelaAmarela.Inventario.StatType.TraumaFisico) ?? 0f;
+            float danoFinal = baseResult.Dano + bonusDano;
+
+            var resultado = new ArmaResult(baseResult.Success, baseResult.DurationSeconds, baseResult.CooldownSeconds, 
+                baseResult.Atordoou, baseResult.DuracaoAtordoamento, danoFinal, baseResult.InterrompeConjuracao, 
+                baseResult.SangramentoPorSegundo, baseResult.DuracaoSangramento, baseResult.ForcaRepulsao, baseResult.AcumulosDeSangramento);
+
             if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
 
             _lastAbilityUseTime = Time.time;

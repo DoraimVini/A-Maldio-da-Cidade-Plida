@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using FavelaAmarela.Core.Itens;
+using FavelaAmarela.Inventario;
 using FavelaAmarela.Runtime.Itens;
 using FavelaAmarela.Runtime.Quests;
 using FavelaAmarela.Runtime.Rendering;
@@ -40,41 +40,42 @@ namespace FavelaAmarela.EditorTools
         [MenuItem("Tools/FavelaAmarela/Montar Patua das Luas Gemeas")]
         public static void Executar()
         {
-            var item = GarantirItemConfig();
+            var item = GarantirItemDef();
             var prefab = GarantirPrefab(item);
             LigarNaCassilda(prefab);
         }
 
-        private static ItemConfig GarantirItemConfig()
+        private static ItemDef GarantirItemDef()
         {
-            var existente = AssetDatabase.LoadAssetAtPath<ItemConfig>(CaminhoItem);
+            var existente = AssetDatabase.LoadAssetAtPath<ItemDef>(CaminhoItem);
             if (existente != null) return existente;
 
             if (!AssetDatabase.IsValidFolder(PastaItens))
                 AssetDatabase.CreateFolder("Assets/FavelaAmarela/Config", "Itens");
 
-            var item = ScriptableObject.CreateInstance<ItemConfig>();
+            var item = ScriptableObject.CreateInstance<ItemDef>();
             var so = new SerializedObject(item);
-            so.FindProperty("id").stringValue = "patua_luas_gemeas";
-            so.FindProperty("nome").stringValue = "Patuá das Luas Gêmeas";
-            so.FindProperty("descricao").stringValue = Descricao;
-            so.FindProperty("pilhaMaxima").intValue = 1;   // relíquia: só existe uma
+            so.FindProperty("Id").stringValue = "patua_luas_gemeas";
+            so.FindProperty("Nome").stringValue = "Patuá das Luas Gêmeas";
+            so.FindProperty("Descricao").stringValue = Descricao;
+            so.FindProperty("EmpilhamentoMaximo").intValue = 1;   // relíquia: só existe uma
 
-            // Efeito Nenhum: é relíquia passiva, não consumível. Não some ao ser "usada".
-            so.FindProperty("efeito").enumValueIndex = (int)TipoDeEfeito.Nenhum;
+            // É relíquia passiva, não consumível. Não tem EfeitoDeCombate.
+            so.FindProperty("Tipo").enumValueIndex = (int)ItemType.Amuleto;
+            so.FindProperty("SlotEquipamento").enumValueIndex = (int)EquipmentSlot.Amuleto;
 
             var icone = AssetDatabase.LoadAssetAtPath<Sprite>(SpritePatua);
-            if (icone != null) so.FindProperty("icone").objectReferenceValue = icone;
+            if (icone != null) so.FindProperty("Icone").objectReferenceValue = icone;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             AssetDatabase.CreateAsset(item, CaminhoItem);
             AssetDatabase.SaveAssets();
 
-            Debug.Log($"[Patuá] ItemConfig criado em {CaminhoItem}.", item);
+            Debug.Log($"[Patuá] ItemDef criado em {CaminhoItem}.", item);
             return item;
         }
 
-        private static GameObject GarantirPrefab(ItemConfig item)
+        private static GameObject GarantirPrefab(ItemDef item)
         {
             var existente = AssetDatabase.LoadAssetAtPath<GameObject>(CaminhoPrefab);
             if (existente != null) return existente;

@@ -80,7 +80,7 @@ namespace FavelaAmarela.Runtime.Persistencia
 
             // Enum desconhecido (save de uma versão com outra arma) não pode quebrar o
             // load: fica desarmado, que é o estado padrão seguro.
-            if (!System.Enum.TryParse(estado, out ArmaDaTumba qual))
+            if (!System.Enum.TryParse(estado, out TipoArmaFisica qual))
             {
                 Debug.LogWarning($"[EstadoPersistenteDoJogador] Arma '{estado}' não existe mais — " +
                                  "Damião continua desarmado.", this);

@@ -71,7 +71,7 @@ namespace FavelaAmarela.EditorTools
         private static PortalDeCena AcharPortalMaisProximo(Vector3 origem)
         {
             var portais = Object.FindObjectsByType<PortalDeCena>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             PortalDeCena maisProximo = null;
             float menorDistancia = float.MaxValue;
@@ -139,3 +139,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

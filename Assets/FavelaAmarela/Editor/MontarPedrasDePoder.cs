@@ -84,7 +84,7 @@ namespace FavelaAmarela.EditorTools
         private static int RemoverPedrasSoltasDaCena()
         {
             var soltas = Object.FindObjectsByType<PedraDePoder>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             int total = 0;
             foreach (var pedra in soltas)
@@ -115,3 +115,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254c99bc08b9e1f41bd77fea72f06c9f, type: 3}
+  m_Name: Item_Arma_EstileteDeIrem
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
+  Id: c360f6eeb0b14b5ba40c9ddd16161367
+  Nome: Estilete de Irem
+  Icone: {fileID: 0}
+  Descricao:
+  Tipo: 0
+  SlotEquipamento: 1
+  EmpilhamentoMaximo: 1
+  ArmaFisica: 2
+  Modificadores: []

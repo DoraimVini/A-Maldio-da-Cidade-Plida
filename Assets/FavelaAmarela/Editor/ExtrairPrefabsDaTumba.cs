@@ -39,7 +39,7 @@ namespace FavelaAmarela.EditorTools
 
             // Só a primeira Pedra vira prefab; as demais viram instâncias dela, para o
             // ajuste de arte/collider valer para as quatro de uma vez.
-            var pedras = Object.FindObjectsByType<PedraDePoder>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var pedras = Object.FindObjectsByType<PedraDePoder>(FindObjectsInactive.Include);
             ExtrairFamilia(pedras, $"{PastaEnemies}/PedraDePoder.prefab", relatorio);
 
             var bau = Object.FindAnyObjectByType<BauDaTumba>(FindObjectsInactive.Include);
@@ -108,3 +108,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

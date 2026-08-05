@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Player;
@@ -23,6 +24,7 @@ namespace FavelaAmarela.Player
         private Esquiva esquiva;
         private float lastUseTime = -999f;
         private PlayerStateMachine _fsm;
+        private GerenciadorDeVigor _vigor;
 
         /// <summary>Direção, duração e multiplicador de velocidade da esquiva ativada.</summary>
         public event Action<Vector2, float, float> OnEsquivaActivada;
@@ -44,6 +46,7 @@ namespace FavelaAmarela.Player
                 Debug.LogWarning("[EsquivaBridge] EsquivaConfig não atribuído; usando defaults do POCO.", this);
                 esquiva = new Esquiva();
             }
+            _vigor = GetComponent<GerenciadorDeVigor>();
         }
 
         public void TryActivateEsquiva(Vector2 direction)
@@ -53,6 +56,8 @@ namespace FavelaAmarela.Player
             if (!_fsm.EstaLivre) return; // portão barato antes do Execute (que é irreversível)
             if (!esquiva.CanActivate(Time.time - lastUseTime)) return;
 
+            if (_vigor != null && !_vigor.TentarConsumirEsquiva()) return;
+
             var result = esquiva.Execute();
 
             // Commit da exclusão mútua (revalida; em thread única o estado não mudou desde EstaLivre).
@@ -60,6 +65,21 @@ namespace FavelaAmarela.Player
 
             lastUseTime = Time.time;
             OnEsquivaActivada?.Invoke(direction, result.DurationSeconds, result.SpeedMultiplier);
+
+            StartCoroutine(EsquivaIFramesCoroutine(result.DurationSeconds));
+        }
+
+        private IEnumerator EsquivaIFramesCoroutine(float duration)
+        {
+            int playerLayer = LayerMask.NameToLayer("Player");
+            int enemyLayer = LayerMask.NameToLayer("Enemy");
+
+            if (playerLayer != -1 && enemyLayer != -1)
+            {
+                Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
+                yield return new WaitForSeconds(duration);
+                Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
+            }
         }
     }
 }

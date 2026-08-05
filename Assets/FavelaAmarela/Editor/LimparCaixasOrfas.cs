@@ -71,7 +71,7 @@ namespace FavelaAmarela.EditorTools
             // Include inativos: uma órfã desativada continuaria no arquivo e voltaria a
             // confundir a próxima investigação.
             var todas = Object.FindObjectsByType<RectTransform>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             int removidas = 0;
             foreach (var rt in todas)
@@ -90,3 +90,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

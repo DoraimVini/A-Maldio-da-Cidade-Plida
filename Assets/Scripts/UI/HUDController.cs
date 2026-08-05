@@ -21,6 +21,9 @@ namespace FavelaAmarela.Runtime.UI
         [Header("Views de HUD")]
         [SerializeField] private ResilienciaBar resilienciaBar;
 
+        [Tooltip("Barra do Vigor (Estamina). Alimentada pelo GameManager a partir do Player.")]
+        [SerializeField] private VigorBar vigorBar;
+
         [Tooltip("Barra da Vitalidade corpórea (a 'carne'). Alimentada pelo GameManager.")]
         [SerializeField] private VitalidadeBar vitalidadeBar;
 
@@ -103,27 +106,17 @@ namespace FavelaAmarela.Runtime.UI
         /// Injeta a Mão Física de Damião na barra de ações, para o HUD mostrar a arma
         /// empunhada e a recarga da habilidade. Chamado pelo <c>GameManager</c> no bootstrap.
         /// </summary>
-        /// <summary>
-        /// Injeta o inventário na barra de itens, para as teclas 1–8 acionarem as posições.
-        /// Chamado pelo <c>GameManager</c> no bootstrap.
-        /// </summary>
-        public void InjetarInventario(FavelaAmarela.Runtime.Itens.InventarioBridge fonte)
-        {
-            if (fonte == null)
-            {
-                Debug.LogError("[HUDController] InjetarInventario recebeu null — as teclas " +
-                               "1–8 não vão funcionar.", this);
-                return;
-            }
-
-            if (barraDeItens != null) barraDeItens.Bind(fonte);
-        }
-
         public void InjetarMaoFisica(FavelaAmarela.Player.MaoFisicaBridge fonte)
         {
             if (fonte == null) return;
             if (barraDeAcoes != null)
                 barraDeAcoes.Bind(fonte);
+        }
+
+        public void InjetarVigor(FavelaAmarela.Player.GerenciadorDeVigor fonte)
+        {
+            if (fonte == null) return;
+            if (vigorBar != null) vigorBar.Bind(fonte);
         }
 
         // ── Atalhos de teste (removíveis) ────────────────────────────────────

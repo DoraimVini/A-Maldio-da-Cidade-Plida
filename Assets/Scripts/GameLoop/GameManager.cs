@@ -15,7 +15,7 @@ namespace FavelaAmarela.Runtime.GameLoop
     [AddComponentMenu("Favela Amarela/Game Manager")]
     // Garante que Awake() (e InjetarDependencias(), que faz o Bind() dos POCOs nos
     // adapters) termine antes do Awake/OnEnable de qualquer outro script da cena —
-    // ex.: CultistaAI.OnEnable() já encontra o SoundBroadcaster injetado por Bind().
+    // ex.: EnemyPerception.OnEnable() já encontra o SoundBroadcaster injetado por Bind().
     [DefaultExecutionOrder(-100)]
     public class GameManager : MonoBehaviour
     {
@@ -148,19 +148,9 @@ namespace FavelaAmarela.Runtime.GameLoop
                 if (abdul != null) abdul.AplicarEstadoSalvo(player.gameObject);
             }
 
-            // Inventário: precisa da Resiliência para os itens de Ancoragem terem onde agir.
-            // Sem isto, usar uma Ancoragem seria recusado (o item não some, mas nada acontece).
-            if (player != null)
-            {
-                var inventario = player.GetComponent<Runtime.Itens.InventarioBridge>();
-                if (inventario != null)
-                {
-                    inventario.Bind(Resiliencia);
-
-                    // A barra de itens precisa do inventário para as teclas 1–8 agirem.
-                    if (hud != null) hud.InjetarInventario(inventario);
-                }
-            }
+            // Inventário: O InventoryManager agora é um Singleton e auto-resolve suas 
+            // dependências (BarraDeItens já assina sozinha, e VitalidadeBridge já se 
+            // conecta ao evento de consumo). Não precisamos injetá-lo aqui.
 
             // Yug-Neth é companheiro, não obstáculo: o corpo dele não pode barrar a
             // passagem de Damião (relatado em playtest — ele entalava o jogador na arena).
@@ -180,6 +170,10 @@ namespace FavelaAmarela.Runtime.GameLoop
                 var maoFisica = player.GetComponent<MaoFisicaBridge>();
                 if (maoFisica != null)
                     hud.InjetarMaoFisica(maoFisica);
+
+                var vigor = player.GetComponent<GerenciadorDeVigor>();
+                if (vigor != null)
+                    hud.InjetarVigor(vigor);
             }
             else
             {
@@ -205,8 +199,8 @@ namespace FavelaAmarela.Runtime.GameLoop
             // Migrar é seguro aqui: já se pedia SortMode.None e a injeção é
             // ordem-independente — cada inimigo recebe o mesmo serviço, sem índice
             // nem acumulação entre iterações.
-            foreach (var cultista in FindObjectsByType<CultistaAI>(FindObjectsInactive.Include))
-                cultista.Bind(SoundBroadcaster);
+            foreach (var perception in FindObjectsByType<EnemyPerception>(FindObjectsInactive.Include))
+                perception.Bind(SoundBroadcaster);
 
             foreach (var coisa in FindObjectsByType<CoisaDoCemiterioAI>(FindObjectsInactive.Include))
                 coisa.Bind(SoundBroadcaster);
@@ -244,6 +238,13 @@ namespace FavelaAmarela.Runtime.GameLoop
             if (atual == GameState.Menu)
             {
                 Resiliencia?.EstabilizarCompletamente();
+                
+                // Restaura Vigor quando for pro Menu, assim como a Resiliência
+                var player = FindAnyObjectByType<PlayerMovement>();
+                if (player != null)
+                {
+                    player.GetComponent<GerenciadorDeVigor>()?.RestaurarCompletamente();
+                }
             }
         }
 

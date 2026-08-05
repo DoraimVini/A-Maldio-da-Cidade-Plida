@@ -35,14 +35,14 @@ namespace FavelaAmarela.Runtime.Combat
         [Tooltip("Cor dos números de dano sofridos por esta unidade.")]
         [SerializeField] private Color corDoDano = new Color(1f, 0.35f, 0.35f);
 
-        private FichaDeAtributos _atributos;
+        private FichaDeAtributos _atributosBase;
+        private FichaDeAtributos _atributosFinais;
         private Vitalidade _vitalidade;
-        private EquipamentosBridge _equipamentosBridge;
 
         /// <summary>Atributos finais desta unidade (podem vir de equipamentos ou diretos da ficha base).</summary>
         public FichaDeAtributos Atributos
         {
-            get { GarantirInicializacao(); return _atributos; }
+            get { GarantirInicializacao(); return _atributosFinais; }
         }
 
         /// <summary>Vitalidade corpórea corrente desta unidade. Nunca null.</summary>
@@ -71,47 +71,94 @@ namespace FavelaAmarela.Runtime.Combat
 
         /// <summary>
         /// Cria a ficha e a <see cref="Vitalidade"/> uma única vez, sob demanda.
-        ///
-        /// <para><b>Por que não só no <c>Awake</c>:</b> a Unity não garante ordem de
-        /// <c>Awake</c> entre GameObjects diferentes. O <c>GameManager</c> lê
-        /// <see cref="Vitalidade"/> no <b>bootstrap</b> dele para injetar no HUD; se o
-        /// <c>Awake</c> desta bridge ainda não tivesse rodado, ele recebia <c>null</c> e a
-        /// barra de Vitalidade nunca era ligada — dano acontecendo, barra parada. Foi
-        /// exatamente esse o bug de playtest de 2026-07-31. Inicializar sob demanda remove a
-        /// dependência de ordem para <b>todos</b> os consumidores, não só o HUD.</para>
         /// </summary>
         private void GarantirInicializacao()
         {
             if (_vitalidade != null) return;
 
-            // Busca equipamentos bridge primeiro (Damião). Se não tiver, usa a ficha direta (Inimigos).
-            _equipamentosBridge = GetComponent<EquipamentosBridge>();
-
-            if (_equipamentosBridge != null)
-            {
-                _atributos = _equipamentosBridge.FichaFinal;
-                _equipamentosBridge.OnAtributosMudaram += AtualizarAtributosDeEquipamento;
-            }
-            else if (ficha != null)
-            {
-                _atributos = ficha.CriarFicha();
-            }
+            if (ficha != null)
+                _atributosBase = ficha.CriarFicha();
             else
             {
-                Debug.LogError($"[VitalidadeBridge] Nenhuma ficha ou equipamento encontrado em '{name}'. " +
-                               "Usando ficha de emergência.", this);
-                _atributos = new FichaDeAtributos(vitalidadeMax: 100f, ataque: 0f, defesa: 0f);
+                Debug.LogError($"[VitalidadeBridge] Nenhuma ficha encontrada em '{name}'. Usando base.", this);
+                _atributosBase = new FichaDeAtributos(vitalidadeMax: 100f, ataque: 0f, defesa: 0f);
             }
 
-            _vitalidade = new Vitalidade(_atributos.VitalidadeMax);
+            _atributosFinais = _atributosBase;
+
+            _vitalidade = new Vitalidade(_atributosFinais.VitalidadeMax);
             _vitalidade.OnChanged += HandleVitalidadeChanged;
+        }
+
+        private void Start()
+        {
+            if (gameObject.CompareTag("Player"))
+            {
+                var efeitos = FavelaAmarela.Player.GerenciadorEfeitosPassivos.Instance;
+                if (efeitos != null)
+                {
+                    efeitos.OnBonusChanged += AtualizarAtributosDeEquipamento;
+                    AtualizarAtributosDeEquipamento(); // Força a primeira leitura
+                }
+                else
+                {
+                    Debug.LogWarning("[VitalidadeBridge] Jogador sem GerenciadorEfeitosPassivos na cena. Os status base serão mantidos.");
+                }
+
+                // Efeitos imediatos de curas
+                var invManager = FavelaAmarela.Inventario.InventoryManager.Instance;
+                if (invManager != null)
+                {
+                    invManager.OnItemConsumed += AplicarEfeitoConsumivel;
+                }
+            }
+        }
+
+        private void AplicarEfeitoConsumivel(FavelaAmarela.Inventario.ItemDef item, int indice)
+        {
+            if (item.Modificadores == null) return;
+
+            foreach (var mod in item.Modificadores)
+            {
+                // Cura a vitalidade atual
+                if (mod.Stat == FavelaAmarela.Inventario.StatType.VitMaxima && _vitalidade != null)
+                {
+                    _vitalidade.Curar(mod.Valor);
+                }
+                
+                // Cura a Resiliencia Mental
+                if (mod.Stat == FavelaAmarela.Inventario.StatType.RMMaxima)
+                {
+                    var resiliencia = FavelaAmarela.Runtime.GameLoop.GameManager.Instance?.Resiliencia;
+                    if (resiliencia != null)
+                    {
+                        resiliencia.Ancorar(mod.Valor);
+                    }
+                }
+            }
         }
 
         private void AtualizarAtributosDeEquipamento()
         {
-            _atributos = _equipamentosBridge.FichaFinal;
-            // Se o equipamento alterou a VitalidadeMax, o objeto Vitalidade precisa refletir.
-            // Por enquanto, Vitalidade não tem suporte a alterar o Max depois de criada, mas fica a ponte feita.
+            float bonusVit = 0f;
+            float bonusDefesa = 0f;
+
+            var efeitos = FavelaAmarela.Player.GerenciadorEfeitosPassivos.Instance;
+            if (efeitos != null)
+            {
+                bonusVit = efeitos.GetBonus(FavelaAmarela.Inventario.StatType.VitMaxima);
+                bonusDefesa = efeitos.GetBonus(FavelaAmarela.Inventario.StatType.DefesaFisica);
+            }
+
+            _atributosFinais = new FichaDeAtributos(
+                vitalidadeMax: _atributosBase.VitalidadeMax + bonusVit,
+                ataque: _atributosBase.Ataque, 
+                defesa: _atributosBase.Defesa + bonusDefesa
+            );
+
+            // Ajusta o max da vitalidade em tempo real mantendo a % de vida
+            if (_vitalidade != null)
+                _vitalidade.SetValorMaximo(_atributosFinais.VitalidadeMax);
         }
 
         private void OnDestroy()
@@ -119,8 +166,14 @@ namespace FavelaAmarela.Runtime.Combat
             if (_vitalidade != null)
                 _vitalidade.OnChanged -= HandleVitalidadeChanged;
 
-            if (_equipamentosBridge != null)
-                _equipamentosBridge.OnAtributosMudaram -= AtualizarAtributosDeEquipamento;
+            if (gameObject.CompareTag("Player"))
+            {
+                var efeitos = FavelaAmarela.Player.GerenciadorEfeitosPassivos.Instance;
+                if (efeitos != null) efeitos.OnBonusChanged -= AtualizarAtributosDeEquipamento;
+
+                var invManager = FavelaAmarela.Inventario.InventoryManager.Instance;
+                if (invManager != null) invManager.OnItemConsumed -= AplicarEfeitoConsumivel;
+            }
         }
 
         /// <summary>
@@ -135,7 +188,7 @@ namespace FavelaAmarela.Runtime.Combat
             GarantirInicializacao(); // dano nunca some por causa de ordem de Awake
             if (_vitalidade.EstaAbatido) return;
 
-            float danoFinal = MitigacaoDeDano.Aplicar(danoBruto, _atributos.Defesa);
+            float danoFinal = MitigacaoDeDano.Aplicar(danoBruto, _atributosFinais.Defesa);
             if (danoFinal <= 0f) return;
 
             _vitalidade.Ferir(danoFinal);

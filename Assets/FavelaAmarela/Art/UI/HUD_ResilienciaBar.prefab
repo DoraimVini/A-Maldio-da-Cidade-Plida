@@ -400,6 +400,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.UI.HUDController
   resilienciaBar: {fileID: 8777174847425014900}
+  vigorBar: {fileID: 0}
   vitalidadeBar: {fileID: 6022917652822640462}
   barraDeAcoes: {fileID: 0}
   barraDeItens: {fileID: 0}

@@ -39,7 +39,7 @@ Physics2DSettings:
     m_IslandSolverJointCostScale: 10
     m_IslandSolverBodiesPerJob: 50
     m_IslandSolverContactsPerJob: 50
-  m_SimulationMode: 0
+  m_SimulationMode: 1
   m_SimulationLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -53,5 +53,5 @@ Physics2DSettings:
   m_ReuseCollisionCallbacks: 1
   m_AutoSyncTransforms: 0
   m_GizmoOptions: 10
-  m_LayerCollisionMatrix: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+  m_LayerCollisionMatrix: ff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffbf87ffffff87ffffff87ffffff87ffffff87ffff00000000000000000000000000000000ff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffffff87ffff
   m_PhysicsLowLevelSettings: {fileID: 0}

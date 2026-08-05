@@ -8,6 +8,10 @@ namespace FavelaAmarela.Core.Combat
         [SerializeField] private float vida = 100f;
         [SerializeField] private float velocidadePatrulha = 1.5f;
         [SerializeField] private float campoDeVisao = 6f;
+        
+        [Header("Visão (Stealth)")]
+        [SerializeField] private float anguloVisao = 90f;
+        [SerializeField] private LayerMask layerObstaculos;
 
         [Header("Patrulha")]
         [SerializeField] private Transform[] pontosDePatrulha;
@@ -49,12 +53,31 @@ namespace FavelaAmarela.Core.Combat
 
         private void ProcurarJogador()
         {
-            // Substituir por detecção em cone ou OverlapCircle com LayerMask correta
             Collider2D col = Physics2D.OverlapCircle(transform.position, campoDeVisao, LayerMask.GetMask("Player"));
             if (col != null)
             {
-                jogadorDetectado = true;
-                alvo = col.transform;
+                Vector2 direcaoAoJogador = (col.transform.position - transform.position).normalized;
+                
+                // O Cortesão olha para a direção que está patrulhando
+                Vector2 direcaoOlhar = transform.right;
+                if (pontosDePatrulha != null && pontosDePatrulha.Length > 0)
+                {
+                    direcaoOlhar = (pontosDePatrulha[indexPatrulhaAtual].position - transform.position).normalized;
+                }
+                if (direcaoOlhar == Vector2.zero) direcaoOlhar = transform.right;
+
+                if (Vector2.Angle(direcaoOlhar, direcaoAoJogador) < anguloVisao / 2f)
+                {
+                    // Raycast para garantir que não tem estátuas/paredes na frente
+                    float distancia = Vector2.Distance(transform.position, col.transform.position);
+                    RaycastHit2D hit = Physics2D.Raycast(transform.position, direcaoAoJogador, distancia, layerObstaculos);
+                    
+                    if (hit.collider == null)
+                    {
+                        jogadorDetectado = true;
+                        alvo = col.transform;
+                    }
+                }
             }
         }
 

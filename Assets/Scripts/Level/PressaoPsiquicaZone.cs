@@ -1,4 +1,6 @@
 using UnityEngine;
+using FavelaAmarela.Player;
+using FavelaAmarela.Runtime.GameLoop;
 
 namespace FavelaAmarela.Level
 {
@@ -11,15 +13,11 @@ namespace FavelaAmarela.Level
 
         private bool jogadorNaZona = false;
         private Transform jogadorTransform;
-
-        void Awake() 
-        { 
-            // Inicialização se necessária
-        }
+        private PlayerMovement playerMovement;
 
         private void Update()
         {
-            if (jogadorNaZona && jogadorTransform != null && pontoDeFocoCorrompido != null)
+            if (jogadorNaZona && jogadorTransform != null && pontoDeFocoCorrompido != null && playerMovement != null)
             {
                 VerificarContatoVisual();
             }
@@ -28,9 +26,9 @@ namespace FavelaAmarela.Level
         private void VerificarContatoVisual()
         {
             Vector2 direcaoAoFoco = (pontoDeFocoCorrompido.position - jogadorTransform.position).normalized;
-            // Assumindo que o jogador tenha um método ou forma de saber para onde está olhando.
-            // Para simplificar no protótipo, usaremos a direção do movimento ou right/left
-            float angulo = Vector2.Angle(jogadorTransform.right, direcaoAoFoco); // Simplificação
+            
+            // Usa o vetor real de visão do Player, atualizado via Input System
+            float angulo = Vector2.Angle(playerMovement.LookDirection, direcaoAoFoco); 
             
             if (angulo < anguloDeDistorcaoVisao)
             {
@@ -40,9 +38,12 @@ namespace FavelaAmarela.Level
 
         private void AplicarDreno()
         {
-            // O ideal seria acessar VitalidadeBridge ou GestorDeSanidade
-            // jogadorTransform.GetComponent<VitalidadeBridge>().DrenarRM(taxaDrenoRM * Time.deltaTime);
-            Debug.Log($"Drenando {taxaDrenoRM * Time.deltaTime} de RM por contato visual com objeto corrompido!");
+            // O GameManager centraliza a posse do POCO ResilienciaMental
+            if (GameManager.Instance != null && GameManager.Instance.Resiliencia != null)
+            {
+                // Usa o termo diegético 'SofrerTrauma' para remover sanidade
+                GameManager.Instance.Resiliencia.SofrerTrauma(taxaDrenoRM * Time.deltaTime);
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -51,6 +52,7 @@ namespace FavelaAmarela.Level
             {
                 jogadorNaZona = true;
                 jogadorTransform = collision.transform;
+                playerMovement = collision.GetComponent<PlayerMovement>();
             }
         }
 
@@ -60,6 +62,7 @@ namespace FavelaAmarela.Level
             {
                 jogadorNaZona = false;
                 jogadorTransform = null;
+                playerMovement = null;
             }
         }
     }

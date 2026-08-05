@@ -6,8 +6,6 @@ namespace FavelaAmarela.Level
     {
         [Header("Configurações da Zona")]
         [SerializeField] private string nomeDaZona = "O Grande Salão";
-        [SerializeField] private bool zonaSegura = false;
-        
         [Header("Eventos Locais")]
         [SerializeField] private bool iniciaCutscene = false;
 

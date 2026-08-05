@@ -35,17 +35,37 @@ namespace FavelaAmarela.Core.Combat
         /// <summary>Mitigação anômala — subtraída do dano de conjuração recebido (defesa mágica).</summary>
         public float ResistenciaAnomala { get; }
 
+        /// <summary>Velocidade de patrulha.</summary>
+        public float VelocidadeErrante { get; }
+
+        /// <summary>Velocidade de perseguição.</summary>
+        public float VelocidadeCaca { get; }
+
+        /// <summary>Alcance do golpe corpo-a-corpo.</summary>
+        public float AlcanceDeGolpe { get; }
+
+        /// <summary>Cadência de ataque.</summary>
+        public float CadenciaDeAtaque { get; }
+
         /// <param name="vitalidadeMax">Teto da Vitalidade. Deve ser maior que zero.</param>
         /// <param name="ataque">Poder ofensivo físico (&gt;= 0).</param>
         /// <param name="defesa">Mitigação física (&gt;= 0).</param>
         /// <param name="conjuracao">Poder ofensivo anômalo (&gt;= 0). Default 0 — a maioria das unidades não conjura.</param>
         /// <param name="resistenciaAnomala">Mitigação anômala (&gt;= 0). Default 0.</param>
+        /// <param name="velocidadeErrante">Velocidade de patrulha.</param>
+        /// <param name="velocidadeCaca">Velocidade de perseguição.</param>
+        /// <param name="alcanceDeGolpe">Alcance do golpe corpo-a-corpo.</param>
+        /// <param name="cadenciaDeAtaque">Cadência de ataque.</param>
         public FichaDeAtributos(
             float vitalidadeMax,
             float ataque,
             float defesa,
             float conjuracao = 0f,
-            float resistenciaAnomala = 0f)
+            float resistenciaAnomala = 0f,
+            float velocidadeErrante = 1.5f,
+            float velocidadeCaca = 3.5f,
+            float alcanceDeGolpe = 1.2f,
+            float cadenciaDeAtaque = 1.2f)
         {
             if (vitalidadeMax <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(vitalidadeMax),
@@ -60,6 +80,10 @@ namespace FavelaAmarela.Core.Combat
             Defesa = defesa;
             Conjuracao = conjuracao;
             ResistenciaAnomala = resistenciaAnomala;
+            VelocidadeErrante = velocidadeErrante;
+            VelocidadeCaca = velocidadeCaca;
+            AlcanceDeGolpe = alcanceDeGolpe;
+            CadenciaDeAtaque = cadenciaDeAtaque;
         }
 
         private static void ExigirNaoNegativo(float valor, string nome)

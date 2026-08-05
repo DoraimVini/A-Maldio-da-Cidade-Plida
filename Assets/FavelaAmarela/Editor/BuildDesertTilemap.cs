@@ -63,7 +63,7 @@ namespace FavelaAmarela.EditorTools
             // 3. Pinta sobre cada Floor gerado + oculta o sprite placeholder.
             var rnd = new System.Random(2024);
             int painted = 0, floors = 0;
-            foreach (var tf in Object.FindObjectsByType<Transform>(FindObjectsSortMode.None))
+            foreach (var tf in Object.FindObjectsByType<Transform>())
             {
                 if (tf.name != "Floor") continue;
                 floors++;
@@ -96,3 +96,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

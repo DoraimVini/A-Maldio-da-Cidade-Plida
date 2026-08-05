@@ -17,8 +17,7 @@ namespace FavelaAmarela.Runtime.GameLoop
     /// <para>Abre por <b>interação deliberada</b> (botão E), não por encostar: é um baú,
     /// o jogador decide abrir. Implementa <see cref="IInteragivel"/>; o
     /// <c>DetectorDeInteracao</c> no Damião cuida da mira e do prompt. A regra do sorteio
-    /// vive no Core (<see cref="SorteioDeArmaDaTumba"/>); aqui só há o gatilho e o
-    /// feedback visual.</para>
+    /// de loot usa um array do Unity; aqui só há o gatilho e o feedback visual.</para>
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     [AddComponentMenu("Favela Amarela/GameLoop/Baú da Tumba")]
@@ -29,7 +28,10 @@ namespace FavelaAmarela.Runtime.GameLoop
         [SerializeField] private bool forcarArma = false;
 
         [Tooltip("Arma entregue quando 'Forçar Arma' está marcado.")]
-        [SerializeField] private ArmaDaTumba armaForcada = ArmaDaTumba.CravoDeAklo;
+        [SerializeField] private FavelaAmarela.Inventario.ItemDef armaForcada;
+
+        [Tooltip("Lista de armas (ItemDef) que podem ser sorteadas no baú.")]
+        [SerializeField] private FavelaAmarela.Inventario.ItemDef[] armasPossiveis;
 
         [Header("Visual")]
         [Tooltip("Sprite do baú fechado → trocado pelo aberto ao coletar. [ASSET pixel art]")]
@@ -42,7 +44,6 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Tooltip("Dica mostrada ao abrir o baú (reaproveita a UI do tutorial).")]
         [SerializeField] private TutorialHintUI hintUI;
 
-        private readonly SorteioDeArmaDaTumba _sorteio = new SorteioDeArmaDaTumba();
         private bool _aberto;
 
         /// <summary>Se o baú já foi aberto (um baú entrega uma arma só).</summary>
@@ -78,55 +79,67 @@ namespace FavelaAmarela.Runtime.GameLoop
                 return;
             }
 
+            if (armasPossiveis == null || armasPossiveis.Length == 0)
+            {
+                Debug.LogError("[BauDaTumba] Nenhuma arma configurada no array de sorteio.", this);
+                return;
+            }
+
             _aberto = true;
             GerenciadorDeSave.MarcarAconteceu(ChavesDeSave.BauDaTumbaAberto);
 
-            var qual = forcarArma ? armaForcada : _sorteio.Sortear();
-            var arma = SorteioDeArmaDaTumba.Criar(qual);
+            FavelaAmarela.Inventario.ItemDef armaEscolhida;
+            if (forcarArma && armaForcada != null)
+                armaEscolhida = armaForcada;
+            else
+                armaEscolhida = armasPossiveis[Random.Range(0, armasPossiveis.Length)];
 
-            // Equipa pelo identificador (não pela instância): é o que permite ao save
-            // reequipar a mesma arma depois de uma troca de cena.
-            maoFisica.EquiparArma(qual);
+            // Validação defensiva: a arma sorteada deve existir e ter ID
+            if (armaEscolhida == null || string.IsNullOrEmpty(armaEscolhida.Id))
+            {
+                Debug.LogError("[BauDaTumba] A arma sorteada ou forçada é nula/inválida. " +
+                               "Certifique-se de que os assets de ItemDef estão atribuídos no Inspector.", this);
+                return;
+            }
 
-            // Guarda também no inventário: armas são itens (decisão de 2026-08-01), e é o
-            // inventário que permite voltar a uma arma anterior num Refúgio. Se não couber,
-            // ela continua empunhada — perder a arma do baú por inventário cheio seria pior
-            // que a inconsistência.
-            GuardarNoInventario(quemInterage, qual, arma.NomeDaArma);
+            var invManager = FavelaAmarela.Inventario.InventoryManager.Instance;
+            if (invManager == null)
+            {
+                Debug.LogError("[BauDaTumba] InventoryManager.Instance está nulo. O baú não pode entregar a arma.", this);
+                return;
+            }
+
+            // 1. Guarda no inventário
+            bool coube = invManager.Main.Add(new FavelaAmarela.Inventario.ItemInstance(armaEscolhida.Id, 1));
+            if (!coube)
+            {
+                Debug.LogWarning($"[BauDaTumba] Inventário cheio — '{armaEscolhida.Nome}' não coube na mochila.", this);
+            }
+
+            // 2. Equipa no slot de equipamento do inventário
+            if (coube)
+            {
+                for (int i = 0; i < invManager.Main.Capacidade; i++)
+                {
+                    var slot = invManager.Main.GetSlot(i);
+                    if (slot != null && slot.Def != null && slot.Def.Id == armaEscolhida.Id)
+                    {
+                        invManager.Equipar(i);
+                        break;
+                    }
+                }
+            }
+
+            // O baú agora é agnóstico em relação à Mão Física e ao Combate.
+            // Apenas adiciona ao inventário e equipa no slot.
+            // A MaoFisicaBridge escuta o evento OnSlotChanged do inventário e instanciará a arma via WeaponFactory.
+            Debug.Log($"[BauDaTumba] Arma '{armaEscolhida.Nome}' foi dada e o Inventário gerenciará o equipamento.", this);
 
             MostrarComoAberto();
 
             if (hintUI != null)
-                hintUI.Mostrar($"A Tumba te entregou: {arma.NomeDaArma}. " +
-                               $"Habilidade: {arma.NomeHabilidade}.");
+                hintUI.Mostrar($"A Tumba te entregou: {armaEscolhida.Nome}.");
         }
-
-        /// <summary>
-        /// Coloca a arma sorteada no inventário, se houver um. Falha em silêncio quando não
-        /// há inventário na cena: a arma já foi empunhada, e o baú não pode travar por causa
-        /// de um sistema que talvez ainda não esteja montado naquela cena.
-        /// </summary>
-        private void GuardarNoInventario(GameObject quemInterage, ArmaDaTumba qual, string nomeDaArma)
-        {
-            var inventario = quemInterage.GetComponent<Runtime.Itens.InventarioBridge>();
-            if (inventario?.Inventario == null) return;
-
-            var definicao = new Core.Itens.DefinicaoDeItem(
-                id: $"arma_{qual}", nome: nomeDaArma, armaEquipavel: qual);
-
-            if (inventario.Inventario.Adicionar(definicao) > 0)
-                Debug.LogWarning($"[BauDaTumba] Inventário cheio — '{nomeDaArma}' foi empunhada " +
-                                 "mas não guardada.", this);
-        }
-
-        /// <summary>
-        /// Restaura um baú já aberto numa visita anterior à dungeon.
-        ///
-        /// <para><b>Não reequipa nada de propósito.</b> A arma empunhada atravessa a troca
-        /// de cena por conta própria (<c>EstadoPersistenteDoJogador</c> +
-        /// <c>ChavesDeSave.ArmaEquipada</c>); sortear ou equipar de novo aqui entregaria uma
-        /// segunda arma — possivelmente diferente da que o jogador está carregando.</para>
-        /// </summary>
         private void Start()
         {
             if (!GerenciadorDeSave.JaAconteceu(ChavesDeSave.BauDaTumbaAberto)) return;

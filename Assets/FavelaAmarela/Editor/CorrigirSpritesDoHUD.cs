@@ -36,7 +36,7 @@ namespace FavelaAmarela.EditorTools
             }
 
             var imagens = Object.FindObjectsByType<Image>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             int corrigidas = 0;
             foreach (var img in imagens)
@@ -142,3 +142,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

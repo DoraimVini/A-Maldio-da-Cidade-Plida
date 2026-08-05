@@ -69,7 +69,7 @@ namespace FavelaAmarela.EditorTools
             // Instâncias já colocadas em cena antes do marcador existir não herdam o
             // componente automaticamente se estiverem desconectadas do prefab.
             var encontrados = Object.FindObjectsByType<YugNethAI>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             int corrigidos = 0;
             foreach (var yugNeth in encontrados)
@@ -85,3 +85,4 @@ namespace FavelaAmarela.EditorTools
         }
     }
 }
+

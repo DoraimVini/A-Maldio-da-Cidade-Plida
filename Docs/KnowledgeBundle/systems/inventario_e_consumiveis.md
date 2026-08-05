@@ -1,89 +1,49 @@
 ---
 type: Game System
-title: Inventário e Consumíveis
-description: O inventário enxuto de Damião, as definições de item e como o efeito de um consumível vira mudança no mundo.
-tags: [inventario, itens, consumiveis, ancoragem, estabilizacao]
+title: Inventário e Consumíveis (Refatorado)
+description: O inventário unificado de Damião, equipamentos, consumíveis e a fundação para relíquias.
+tags: [inventario, itens, consumiveis, equipamentos, reliquias]
 ---
 
 # Inventário e Consumíveis
 
-> **Destravado em 2026-07-31** (antes era "previsto, sem data"). O item 2 do escopo do
-> edital — Sistema de Consumíveis — depende dele. Construído em 2026-08-01.
+> **Atualizado em 2026-08-03**
+> O sistema antigo (`InventarioBridge`, `DefinicaoDeItem`, `ItemConfig`) foi totalmente expurgado em favor de uma arquitetura centralizada e orientada a dados.
 
-## Forma: enxuto, de propósito
+## Forma: Enxuto, modular e orientado a eventos
 
-Restrição do `CLAUDE.md` §1: **sem grind de itens**. Poucas posições (8 por padrão), sem
-peso, sem categorias, sem ordenação automática.
+Restrição do `CLAUDE.md` §1: **sem grind de itens**. A premissa de escassez e survival horror se mantém. O inventário é deliberadamente limitado, forçando decisões difíceis (ex: Escolher entre uma relíquia importante ou um item de cura).
 
-Poucas posições não é limitação técnica — é **tensão de design**: escolher o que deixar
-para trás é parte do horror de sobrevivência. Um inventário grande transformaria decisão em
-contabilidade.
-
-## Vocabulário
-
-Segue a skill `favela-lore-enforcer`. Nada de "cura X de HP":
-
-| Efeito | Termo diegético | O que restaura |
-|---|---|---|
-| `Ancorar` | **Ancoragem** | Resiliência Mental (a sanidade) |
-| `Estabilizar` | **Estabilização** | Vitalidade corpórea (a carne) |
-| `EstancarFeridas` | — | Interrompe uma Ferida de Aklo em curso |
-| `Nenhum` | — | Item de lore, chave ou relíquia (não é gasto ao "usar") |
-
-## As peças
+## As novas peças arquiteturais
 
 | Peça | Camada | Papel |
 |---|---|---|
-| `DefinicaoDeItem` | Core | **O que um item é** — id, nome, descrição, pilha, efeito, potência. Imutável. |
-| `PilhaDeItens` | Core | Uma posição: o item + quantos. `readonly struct`. |
-| `Inventario` | Core | As posições, empilhamento, guardar/retirar/usar. **21 testes.** |
-| `EfeitoDeUso` | Core | O que sai de um uso, para o Runtime aplicar. |
-| `ItemConfig` | Runtime | Autoria em asset (um por tipo de item) → cospe a `DefinicaoDeItem`. |
-| `InventarioBridge` | Runtime | Dono do inventário e **único ponto** onde o efeito vira mudança no mundo. |
+| `ItemDef` | Data (ScriptableObject) | **O que um item é** — ID, nome, descrição, tipo (`Amuleto`, `Arma`, etc.), modificadores. |
+| `ItemInstance` | Core/Runtime | Instância de um item no inventário (referencia o `ItemDef` e guarda quantidade atual). |
+| `BaseInventory` | Core | Lógica pura de contêiner. Limites, empilhamento, adição e remoção. Testável sem Unity. |
+| `MainInventory` | Core | Herda de `BaseInventory`. É a Mochila do jogador (itens gerais e consumíveis). |
+| `EquipmentInventory` | Core | Herda de `BaseInventory`. Controla os slots restritos (Arma, Elmo, Amuleto, Anel). Valida encaixes. |
+| `InventoryManager` | Runtime (Singleton) | Dono do inventário global (`Mochila` e `Equipamentos`). Ponto central de save/load e eventos (`OnItemConsumed`). |
 
-### Por que o Core não aplica o efeito
+### Separação de Responsabilidades (Desacoplamento)
 
-O `Inventario` sabe contar, empilhar e gastar — mas **não sabe o que é Vitalidade nem
-Resiliência**. Ele devolve um `EfeitoDeUso` e o `InventarioBridge` decide onde aplicar. É o
-que mantém o inventário inteiro testável sem a Unity rodando.
+Diferente do sistema antigo, onde a UI e o loot dependiam de um Bridge rígido:
+- **UI:** A `BarraDeItens` e o `HUDController` assinam eventos do `InventoryManager` (ex: `OnSlotChanged`). Não há dependência cíclica.
+- **Consumo:** A UI chama `InventoryManager.ConsumirItem(indice)`. O `InventoryManager` consome a quantidade e dispara o evento `OnItemConsumed`.
+- **Efeito no mundo:** Quem assina `OnItemConsumed` (ex: `VitalidadeBridge`) valida se o item possui efeito (como `Ancoragem`) e aplica no jogador.
 
-## Regras que evitam bug silencioso de progresso
+## Regras que evitam bugs de progressão
 
-Cada uma existe por um motivo, e todas têm teste:
+1. **Testes isolados (POCO):** O `BaseInventory` e o `MainInventory` são exaustivamente testados sem Unity (NUnit EditMode), cobrindo falhas de empilhamento e limites estritos.
+2. **Cópia segura:** Inserir itens ou recuperar via `GetSlot` retorna clones protegidos (`ItemInstance.Clone()`), impedindo manipulação indevida do estado original da pilha.
+3. **Gerenciamento de Identidade (GUID):** O `ItemDef` armazena um ID persistente, permitindo que instâncias sejam serializadas para os saves de progresso.
 
-1. **Completa pilhas antes de ocupar posição nova.** Sem isso o inventário enche por
-   fragmentação com o jogador achando que tem espaço.
-2. **`Remover` nunca retira parcialmente.** Se não há o suficiente, não retira nada — evita
-   consumir metade de um custo que não podia ser pago.
-3. **Item sem efeito não é gasto ao ser "usado".** Uma relíquia não pode sumir porque o
-   jogador clicou nela.
-4. **`Usar` só consome se o efeito tiver onde agir.** Usar uma Ancoragem sem Resiliência
-   injetada gastaria o item à toa — o pior tipo de bug de inventário, porque o jogador perde
-   recurso e não vê nada acontecer.
-5. **Índice fora da faixa devolve pilha vazia**, não exceção.
+## Conexões Atuais
 
-## Ligação
+- **Loot:** Baús (`BauDaTumba`) e drops (`ColetavelDeItem`) agora usam `ItemDef` e injetam diretamente no `InventoryManager.Instance.Mochila`.
+- **Save/Load:** O `InventoryManager` possui `GerarSaveData()` e `CarregarSaveData()` compatíveis com a arquitetura do `GameManager`.
 
-`GameManager.InjetarDependencias` injeta a `ResilienciaMental` no `InventarioBridge` — é o
-que dá alvo aos itens de Ancoragem. A Vitalidade vem do `VitalidadeBridge` do próprio
-GameObject (`RequireComponent`).
+## Pendentes (Próximos Passos)
 
-## Pendente
-
-- **Nenhum `ItemConfig` foi autorado ainda** — o sistema funciona, mas não existe nenhum
-  item de verdade no jogo. Os nomes usados nos testes (Cinza de Âncora, Emplastro de Sal)
-  são de exemplo, não decisão de design.
-- **Nenhuma UI de inventário.** A `BarraDeAcoes` cobre arma + habilidade; falta a tela/faixa
-  que mostra as posições e permite usar.
-- **`InventarioBridge` não está em cena** em lugar nenhum.
-- **`EstancarFeridas` não tem alvo:** só inimigos sangram hoje; Damião não tem uma Ferida de
-  Aklo própria. O efeito existe no enum mas é sempre recusado.
-- **Não persiste.** O inventário não entra no save ainda — ver
-  [architecture/persistencia.md](../architecture/persistencia.md).
-
-## Nota de arquivo
-
-Todos os tipos de Core estão em `DefinicaoDeItem.cs`, não em um arquivo por tipo. Não é
-preferência: o AssetDatabase da Unity parou de indexar `.cs` novos naquela pasta e ignorava
-os arquivos em silêncio (um erro de sintaxe proposital não gerou erro nenhum). Separar
-depois de um restart do Editor — é só mover os blocos, nada no código muda.
+- **GerenciadorEfeitosPassivos:** Para resolver o processamento contínuo de relíquias e equipamentos (como Dreno de RM no escuro), o sistema demandará um intermediário (`GerenciadorEfeitosPassivos.cs`) para ler atributos do `EquipmentInventory` e injetar matemática contínua no `ResilienciaMental`.
+- **Drop em Inimigos:** `ColetavelDeItem` precisa ser configurado nos chefes (ex: Byakhee).
