@@ -19723,6 +19723,7 @@ MonoBehaviour:
   texto: {fileID: 918763199}
   playerInput: {fileID: 8736189378842754083}
   movimentoDoJogador: {fileID: 8736189378842754082}
+  detectorDeInteracao: {fileID: 8736189378842754090}
   intervaloEntreMovimentos: 0.18
 --- !u!4 &1989905789
 Transform:

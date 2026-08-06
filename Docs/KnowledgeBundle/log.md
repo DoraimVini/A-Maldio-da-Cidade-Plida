@@ -6,6 +6,35 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-05 (4ª rodada) — Recital da Cassilda travava em loop: corrida entre painel de escolha e detector de interação
+
+Reportado: quest da Cassilda presa num loop de diálogo que nunca fecha, mesmo com os 3
+fragmentos entregues. Causa raiz: `DetectorDeInteracao` e `PainelDeEscolha` liam o **mesmo
+aperto do botão E no mesmo frame**, sem nenhuma coordenação entre os dois — nem
+`ScriptExecutionOrder.asset` define a ordem entre eles.
+
+Quando `AbrirPerguntaDaEstrofeAtual` chama `painelDeEscolha.Mostrar(...)` de dentro de um
+`Interagir()` disparado pelo próprio `DetectorDeInteracao.Update()`, o painel nasce com o
+cursor no índice 0 (`NavegadorDeOpcoes` recém-criado) **no mesmo frame** em que o E foi
+apertado. Se `PainelDeEscolha.Update()` também rodar nesse frame (ordem de execução não
+garantida), ele vê o mesmo `WasPressedThisFrame() == true` e confirma a opção 0
+imediatamente — antes do jogador conseguir navegar. Para a 3ª estrofe, a opção certa é o
+índice 1: a resposta errada era confirmada sozinha, e como `CassildaNPC.PodeInteragir` é
+sempre `true` (ela continua interagível depois da quest, ao contrário do Abdul, cujo
+`PodeInteragir` vira `false` ao iniciar a luta), o próximo aperto de E reabria a mesma
+pergunta, reproduzindo a corrida — loop infinito, nunca completável.
+
+**Correção:** `DetectorDeInteracao` ganhou uma propriedade `Bloqueado`, checada no início do
+`Update()` (mesmo padrão de `PlayerMovement.MovimentoBloqueado`). `PainelDeEscolha` agora
+liga esse bloqueio em `Mostrar()` e só desliga em `Confirmar()` **depois** de invocar o
+callback e **só se nada tiver reaberto o painel durante ele** (o recital encadeia estrofe 3
+→ 4 na mesma call stack) — desbloquear antes do callback reabriria a mesma corrida um passo
+adiante. Referências ligadas nas duas cenas com `PainelDeEscolha` (Cassilda no Santuário,
+Abdul no Playtest) via referência stripped ao `DetectorDeInteracao` do prefab do Damião.
+
+**Verificação:** compilação limpa, 349/349 testes EditMode. Validação manual do recital
+completo (as 2 estrofes + Patuá) pendente do Vini.
+
 ## 2026-08-05 (3ª rodada) — Fragmento do Deserto inalcançável (mesma causa raiz da Cassilda)
 
 Confirmado em playtest: cultistas caçando, Cassilda interagível e saída do Santuário todos

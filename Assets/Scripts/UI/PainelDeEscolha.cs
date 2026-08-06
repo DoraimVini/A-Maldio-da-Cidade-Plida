@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using FavelaAmarela.Core.Dialogo;
 using FavelaAmarela.Player;
+using FavelaAmarela.Runtime.Interaction;
 
 namespace FavelaAmarela.Runtime.UI
 {
@@ -35,6 +36,12 @@ namespace FavelaAmarela.Runtime.UI
 
         [Tooltip("Movimento do Damião — travado enquanto o painel está aberto.")]
         [SerializeField] private PlayerMovement movimentoDoJogador;
+
+        [Tooltip("Detector de interação do Damião — travado enquanto o painel está aberto. " +
+                 "Sem isto, o mesmo aperto de E que confirma uma opção também reabre a " +
+                 "conversa com o NPC ainda ao alcance, resetando o painel para o índice 0 " +
+                 "e auto-confirmando a opção errada antes do jogador poder navegar.")]
+        [SerializeField] private DetectorDeInteracao detectorDeInteracao;
 
         [Header("Navegação")]
         [Tooltip("Segundos de espera entre um movimento de cursor e o próximo (evita pular 3 opções num único empurrão do stick).")]
@@ -92,6 +99,7 @@ namespace FavelaAmarela.Runtime.UI
             _timerMovimento = 0f;
 
             if (movimentoDoJogador != null) movimentoDoJogador.MovimentoBloqueado = true;
+            if (detectorDeInteracao != null) detectorDeInteracao.Bloqueado = true;
             if (raiz != null) raiz.SetActive(true);
             RenderizarOpcoes();
         }
@@ -128,11 +136,27 @@ namespace FavelaAmarela.Runtime.UI
             int id = _opcoes[_navegador.IndiceAtual].Id;
             var callback = _aoConfirmar;
 
-            Esconder();
+            // Esconde a UI e marca como fechado, mas NÃO libera movimento/interação ainda
+            // — o callback pode abrir um novo painel na mesma call stack (ex.: o recital da
+            // Cassilda encadeia estrofe 3 -> 4). Liberar cedo demais reabre, no mesmo frame,
+            // a corrida que este bloqueio existe para evitar: o aperto de E que confirmou
+            // esta escolha teria uma segunda chance de vazar para o DetectorDeInteracao
+            // antes do novo painel assumir o controle.
+            _aberto = false;
+            _opcoes = null;
+            _navegador = null;
+            _aoConfirmar = null;
+            if (raiz != null) raiz.SetActive(false);
 
-            // Chamado depois de esconder: o callback pode iniciar outra coisa (ex.: a
-            // luta) que não deveria encontrar o painel ainda marcado como aberto.
             callback?.Invoke(id);
+
+            // Só libera se nada reabriu o painel durante o callback — Mostrar() teria
+            // religado _aberto (e os dois bloqueios) de novo.
+            if (!_aberto)
+            {
+                if (movimentoDoJogador != null) movimentoDoJogador.MovimentoBloqueado = false;
+                if (detectorDeInteracao != null) detectorDeInteracao.Bloqueado = false;
+            }
         }
 
         private void RenderizarOpcoes()
@@ -156,6 +180,7 @@ namespace FavelaAmarela.Runtime.UI
             _aoConfirmar = null;
 
             if (movimentoDoJogador != null) movimentoDoJogador.MovimentoBloqueado = false;
+            if (detectorDeInteracao != null) detectorDeInteracao.Bloqueado = false;
             if (raiz != null) raiz.SetActive(false);
         }
     }

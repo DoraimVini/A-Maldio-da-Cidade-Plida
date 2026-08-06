@@ -40,6 +40,18 @@ namespace FavelaAmarela.Runtime.Interaction
         private IInteragivel _alvoAtual;
 
         /// <summary>
+        /// Enquanto <c>true</c>, ignora o botão de interação por completo. Ligado por
+        /// <see cref="FavelaAmarela.Runtime.UI.PainelDeEscolha"/> enquanto uma escolha está
+        /// aberta — sem isto, os dois componentes leem o mesmo aperto de E no mesmo frame:
+        /// o mesmo botão que confirma uma opção também reabre a conversa com o NPC (que
+        /// ainda está ao alcance), recriando o painel com o cursor de volta no índice 0 e
+        /// auto-confirmando a opção errada antes do jogador conseguir navegar. Mesmo padrão
+        /// de <c>PlayerMovement.MovimentoBloqueado</c>, aplicado à interação em vez do
+        /// movimento.
+        /// </summary>
+        public bool Bloqueado { get; set; }
+
+        /// <summary>
         /// Disparado quando o alvo sob a mira muda (inclusive para <c>null</c> ao sair de
         /// perto). A UI de prompt observa isto.
         /// </summary>
@@ -76,6 +88,8 @@ namespace FavelaAmarela.Runtime.Interaction
 
         private void Update()
         {
+            if (Bloqueado) return;
+
             AtualizarAlvo();
 
             if (_alvoAtual == null || _acaoInteragir == null) return;

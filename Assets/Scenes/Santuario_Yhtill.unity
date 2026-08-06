@@ -826,6 +826,7 @@ MonoBehaviour:
   texto: {fileID: 905980172}
   playerInput: {fileID: 811061148}
   movimentoDoJogador: {fileID: 811061147}
+  detectorDeInteracao: {fileID: 811061149}
   intervaloEntreMovimentos: 0.18
 --- !u!4 &370549645
 Transform:
@@ -11140,6 +11141,11 @@ PrefabInstance:
 --- !u!4 &811061146 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4178979482112250840, guid: 4358c838d54b30c44809872563c21742, type: 3}
+  m_PrefabInstance: {fileID: 811061145}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &811061149 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1028256812353556200, guid: 4358c838d54b30c44809872563c21742, type: 3}
   m_PrefabInstance: {fileID: 811061145}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &811061147 stripped
