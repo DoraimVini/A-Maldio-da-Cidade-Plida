@@ -177,9 +177,8 @@ MonoBehaviour:
   logarInvocacoes: 1
   prefabConeDeGelo: {fileID: 0}
   prefabPedraDePoder: {fileID: 0}
-  pontosDasPedras:
-  - {fileID: 7623025317406779963}
-  raioDasPedras: 4.5
+  pontosDasPedras: []
+  raioDasPedras: 3
   visualDoEscudo: {fileID: 0}
   corVulneravel: {r: 1, g: 1, b: 1, a: 1}
   corProtegido: {r: 1, g: 0.9067486, b: 0.54901963, a: 1}

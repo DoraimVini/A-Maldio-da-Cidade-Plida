@@ -6843,7 +6843,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a475086bab88334ebb7a65cd3df2c11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.UI.PromptDeInteracao
-  detector: {fileID: 8736189378842754085}
+  detector: {fileID: 8736189378842754090}
   raiz: {fileID: 1173791560}
   label: {fileID: 870806645}
   tecla: E
@@ -20041,16 +20041,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8736189378842754085}
-    - targetCorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8736189378842754086}
-    - targetCorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8736189378842754087}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4358c838d54b30c44809872563c21742, type: 3}
 --- !u!114 &8736189378842754082 stripped
 MonoBehaviour:
@@ -20079,51 +20070,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
   m_PrefabInstance: {fileID: 8736189378842754081}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8736189378842754085
+--- !u!114 &8736189378842754090 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 1028256812353556200, guid: 4358c838d54b30c44809872563c21742, type: 3}
+  m_PrefabInstance: {fileID: 8736189378842754081}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8736189378842754084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1edefe9c012603c49a377c63df883206, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Interaction.DetectorDeInteracao
-  alcance: 1.5
-  camadasInteragiveis:
-    serializedVersion: 2
-    m_Bits: 0
---- !u!114 &8736189378842754086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8736189378842754084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62781a545de52f5428286bcc47a566fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.CongelamentoBridge
-  limiteDeAcumulos: 3
-  duracaoDoAcumulo: 6
-  duracaoDoCongelamento: 1.5
-  spriteDoDamiao: {fileID: 1187548449}
-  corCongelado: {r: 0.55, g: 0.8, b: 1, a: 1}
---- !u!114 &8736189378842754087
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8736189378842754084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2bc657b2c8378646ac82b176dc80481, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.EstadoPersistenteDoJogador
 --- !u!1001 &8739557304498914226
 PrefabInstance:
   m_ObjectHideFlags: 0

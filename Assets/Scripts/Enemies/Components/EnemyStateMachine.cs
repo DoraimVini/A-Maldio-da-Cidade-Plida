@@ -13,6 +13,11 @@ namespace FavelaAmarela.Runtime.Enemies
         [SerializeField] private float maxChaseDistance = 20f;
         [SerializeField] private float defaultHurtDuration = 0.3f;
 
+        [Header("Diagnóstico")]
+        [Tooltip("Loga cada transição de estado deste inimigo. Serve para ver se ele está " +
+                 "perseguindo, perdendo o alvo ou oscilando. Desligue quando a IA estabilizar.")]
+        [SerializeField] private bool logarTransicoes = false;
+
         private EnemyMovement _movement;
         private EnemyCombat _combat;
         private EnemyPerception _perception;
@@ -68,6 +73,11 @@ namespace FavelaAmarela.Runtime.Enemies
             _currentState = newState;
             EnterState(_currentState);
             OnStateChanged?.Invoke(previous, newState);
+
+            if (logarTransicoes)
+                Debug.Log($"[IA:{name}] {previous} -> {newState} " +
+                          $"(suspeita={_perception.Suspeita:0.00})", this);
+
             return true;
         }
 
@@ -91,6 +101,10 @@ namespace FavelaAmarela.Runtime.Enemies
                 case EnemyState.Idle:
                 case EnemyState.Alert:
                 case EnemyState.Attack:
+                // Patrol precisa parar explicitamente: MoverPara deixa a linearVelocity
+                // cravada no Rigidbody, e sair de Chase sem zerá-la fazia o inimigo deslizar
+                // em linha reta para fora da cena (parecia estar "fugindo" do jogador).
+                case EnemyState.Patrol:
                     _movement.Parar();
                     break;
                 case EnemyState.Hurt:
@@ -131,7 +145,12 @@ namespace FavelaAmarela.Runtime.Enemies
                     }
                     break;
                 case EnemyState.Attack:
-                    if (!_combat.TentarAtacar()) TryTransition(EnemyState.Chase);
+                    // Só volta a perseguir quando o alvo de fato escapa do alcance.
+                    // Antes bastava TentarAtacar() devolver false — o que acontece durante
+                    // toda a recarga — e o inimigo era jogado de volta para Chase todo
+                    // frame, oscilando entre parar (EnterState de Attack) e avançar.
+                    if (!_combat.AlvoEstaAoAlcance()) TryTransition(EnemyState.Chase);
+                    else _combat.TentarAtacar();
                     break;
                 case EnemyState.Hurt:
                     if (_stateTimer > _hurtDuration) TryTransition(EnemyState.Chase);

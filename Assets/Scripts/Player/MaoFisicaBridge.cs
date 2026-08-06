@@ -32,6 +32,12 @@ namespace FavelaAmarela.Player
         [SerializeField] private float alcance = 1.2f;
         [SerializeField] private LayerMask camadaInimigos;
 
+        [Header("Diagnóstico")]
+        [Tooltip("Loga cada golpe: arma empunhada, dano e o que foi atingido. Serve para " +
+                 "distinguir 'estou desarmado' de 'o golpe não alcança' de 'o alvo ignorou'. " +
+                 "Desligue quando o combate estiver estável.")]
+        [SerializeField] private bool logarGolpes = true;
+
         // Golpe desarmado: POCO com dano 0 (a regra vive no Core, ver MaoVazia).
         // Instanciado uma vez — nunca por golpe (Regra de Ouro 1).
         private readonly IArma _maoVazia = new MaoVazia();
@@ -276,6 +282,8 @@ namespace FavelaAmarela.Player
             Vector2 centro = (Vector2)transform.position + direcao.normalized * (alcance * 0.5f);
             int total = Physics2D.OverlapCircle(centro, alcance * 0.5f, _filtroInimigos, _hitBuffer);
 
+            int atingidos = 0;
+
             for (int i = 0; i < total; i++)
             {
                 // Aliados (Yug-Neth e companheiros futuros) nunca são atingidos pelo golpe
@@ -286,8 +294,22 @@ namespace FavelaAmarela.Player
 
                 // Mira qualquer IDanificavel (Cultista, Aparição Primordial/boss...), não
                 // mais só o CultistaAI — é isto que permite as armas atingirem o Abdul.
-                var alvo = _hitBuffer[i].GetComponent<IDanificavel>();
-                if (alvo != null) alvo.ReceberGolpe(resultado);
+                // GetComponentInParent, e não GetComponent: o colisor pode estar num filho
+                // (sprite/hitbox separada) enquanto o script vive no objeto raiz — com
+                // GetComponent o golpe simplesmente não encontrava o alvo.
+                var alvo = _hitBuffer[i].GetComponentInParent<IDanificavel>();
+                if (alvo != null)
+                {
+                    alvo.ReceberGolpe(resultado);
+                    atingidos++;
+                }
+            }
+
+            if (logarGolpes)
+            {
+                string arma = _armaEquipada != null ? _armaEquipada.NomeDaArma : "DESARMADO (mão vazia)";
+                Debug.Log($"[Golpe] arma={arma} dano={resultado.Dano:0.##} " +
+                          $"colisores={total} alvosAtingidos={atingidos}", this);
             }
         }
 

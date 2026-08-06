@@ -471,7 +471,16 @@ namespace FavelaAmarela.Runtime.Enemies
             }
 
             // O escudo é a regra central: fora da janela de vulnerabilidade, nada entra.
-            if (!_fsm.PodeReceberDano) return;
+            if (!_fsm.PodeReceberDano)
+            {
+                // Diagnóstico: sem isto, "bati e não aconteceu nada" é indistinguível de
+                // "o golpe nem chegou". Diz qual das duas regras barrou o dano.
+                if (logarInvocacoes)
+                    Debug.Log($"[Abdul] Golpe recusado — estado={_fsm.CurrentState} " +
+                              $"escudo={( _fsm.EscudoAtivo ? "ATIVO" : "baixo")} " +
+                              $"pedras={_fsm.PedrasQuebradas}/{_fsm.TotalDePedras}", this);
+                return;
+            }
 
             // Ferida de Aklo (Estilete de Irem): acumula na janela de dano, e as feridas
             // **continuam sangrando mesmo depois do escudo voltar** — ver EscoarSangramento.

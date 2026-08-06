@@ -6,6 +6,114 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-05 (2ª rodada) — Combate jogável de ponta a ponta: IA surda, hitboxes e Cassilda inalcançável
+
+Playtest depois do commit da manhã revelou quatro bugs reais que a auditoria estática não
+pegava — todos exigiram instrumentação com log (`Debug.Log` condicional por flag de
+Inspector) em vez de leitura de código, porque eram bugs de **dado em cena**, não de lógica
+óbvia. Padrão que se repetiu 3 vezes: colisor/config muito maior ou deslocado do sprite
+visual.
+
+### IA: cultistas surdos por bug de timing na percepção sonora
+`EnemyPerception.Update()` (roda todo frame, ~0,016s) resetava `_estaOuvindo` a cada frame,
+mas o Damião só emite som a cada 0,15s (`PlayerMovement`). Saldo: 1 frame subindo suspeita
+contra ~8 descendo — a suspeita nunca alcançava nem o limiar de Alerta. Trocado por uma
+janela de memória (`MemoriaDoSom = 0.35s`) maior que o intervalo de emissão. Bug secundário
+no mesmo arquivo: o reset dos limiares exigia `_jaEntrouCaca`, então um cultista que só
+chegasse a Alerta (sem chegar a Caça) e esfriasse ficava com `_jaEntrouAlerta` travado em
+`true` para sempre — surdo pelo resto da partida. Também corrigido: `EnemyStateMachine`
+jogava o inimigo de `Attack` de volta para `Chase` a cada frame de recarga (toda vez que
+`TentarAtacar()` retornava `false`, o que é quase sempre); agora só sai de `Attack` quando o
+alvo realmente sai do alcance.
+
+### Abdul Alhazred: pedra única no pé dele, hitbox no torso, colisores desproporcionais
+`pontosDasPedras` no prefab tinha 1 elemento apontando pro próprio Transform do Abdul — só
+1 pedra nascia, em cima dele, e `DefinirTotalDePedras(1)` fazia essa pedra valer por todas.
+Array esvaziado para cair no fallback correto (4 pedras em diagonal); raio reduzido de 4,5
+para 3,0 porque a 4,5 uma pedra caía quase em cima da saída da arena. A causa real de "sem
+dano mesmo sem escudo" era a **hitbox do Abdul deslocada para o torso** (offset Y customizado
+no `CircleCollider2D`) — confirmado só depois de instrumentar `ReceberGolpe` com log do
+motivo da recusa; corrigido no Editor pelo Vini. Colisores da Pedra de Poder (0,70×0,90 pra
+um sprite de 0,22×0,29) e do Esqueleto Invocado (1,30×1,70 pra um sprite de 0,42×0,54)
+redimensionados para bater com o visual — o do esqueleto explicava "esqueletos não causam
+dano": ele ficava empurrado para fora do próprio alcance de golpe (0,9) pelo colisor sólido
+gigante. Escala visual da Pedra também aumentada (era ~40% do tamanho do Damião).
+
+### Cassilda inalcançável: `DetectorDeInteracao` nunca existiu fora do Playtest
+O componente que escuta a tecla E (`DetectorDeInteracao`) — e mais dois,
+`EstadoPersistenteDoJogador` e `CongelamentoBridge` — tinham sido adicionados como **override
+manual só na instância do Damião na cena de Playtest**, nunca no prefab. Fora dali (Santuário,
+Deserto), Damião não tinha como interagir com nada. Provavelmente também a causa real do
+"desarmado ao trocar de cena" investigado numa rodada anterior: sem
+`EstadoPersistenteDoJogador`, a arma do baú não sobrevivia a uma transição. Os três
+componentes movidos para `Player_Damiao.prefab`; overrides duplicados removidos da cena;
+uma referência pendurada (`PromptDeInteracao.detector` apontava pro componente antigo
+deletado) corrigida para o novo.
+
+### Saída do Santuário: instrumentada, não resolvida
+Reportado "não dá pra sair do templo" na mesma sessão. Auditoria do `PortalDeCena`
+(`Saida_Santuario` → `Deserto_Hali`) não achou nada errado na configuração: trigger correto,
+tamanho plausível, cena registrada em Build Settings, ponto de chegada (`VoltaDoSantuario`)
+existe do outro lado, sem gating, matriz de colisão de física sem bloqueio. Como os bugs
+anteriores desta rodada eram todos espaciais e invisíveis por grep, `OnTriggerEnter2D` ganhou
+log incondicional (antes de qualquer filtro de tag/carência) em vez de mais uma correção às
+cegas — pendente de teste em Play Mode para saber se é bloqueio físico (level design) ou algo
+depois do log.
+
+**Verificação:** compilação limpa, 349/349 testes EditMode. Luta do Abdul confirmada
+vencível pelo Vini em playtest manual.
+
+## 2026-08-05 — Destrava compilação e religa o sistema de itens (Blocos 0-2 do plano "Rumo a Carcosa")
+
+Auditoria completa do estado real do projeto antes de planejar o restante do jogo (Templo,
+Castelo, bosses finais). Corrigiu três premissas erradas do resumo da sessão anterior: o
+projeto **não compilava**, o `TutorialHintUI` nunca sumiu das cenas (o problema era outro),
+e a injeção de som na IA já tinha sido corrigida em disco — só faltava commitar. Achado mais
+grave, fora de qualquer lista: `ItemDatabase.GarantirInstancia()` era método morto (sem
+`RuntimeInitializeOnLoadMethod`), então todo item do jogo resolvia `null` em runtime.
+
+### Bloco 0 — Compilação
+- `InventoryManager.GetEfeitoDaArmaEquipada()` removido (lia `ItemDef.EfeitoDeCombate`,
+  campo que não existe mais desde a migração para `WeaponFactory`).
+- `MaoFisicaBridge`: `inv.Equipamentos` (nunca existiu) → `inv.Equipment`.
+- `MaoFisicaBridge.TryAtacar` passou a usar `_armaEquipada.Execute()` como fonte do golpe,
+  igual a `TryUsarHabilidade` — parava de depender do método morto acima.
+- `SorteioDeArmaDaTumbaTests.cs` removido (referenciava classes já deletadas).
+
+### Bloco 1 — Sistema de itens
+- `ItemDatabase.GarantirInstancia()` ganhou `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]`.
+- Os 3 `ItemDef` das armas da Tumba corrigidos: `Tipo` estava `Armadura` (1) em vez de
+  `Arma` (0); `ArmaFisica` nunca tinha sido preenchido (resolvia `MaoVazia` sempre).
+- `Item_PatuaDasLuasGemeas.asset` recriado como `ItemDef` válido — serializava a classe
+  `ItemConfig`, já deletada (Missing Script), então a quest da Cassilda não entregava nada
+  ao fim. GUID preservado (o prefab da Cassilda já apontava para ele).
+- `BauDaTumba` na cena de playtest populado com as 3 armas (array estava com 3 `fileID: 0`).
+- `MaoFisicaBridge.VerificarSlotDeArma` passou a usar a sobrecarga `EquiparArma(TipoArmaFisica)`
+  (preserva o id para o save) e a desequipar corretamente para mão vazia.
+
+### Bloco 2 — Higiene
+- Removidas duas rotinas `[InitializeOnLoad]` (`AutoFixAndTestRunner.cs`,
+  `AutoFixArchitecture.cs`) que rodavam sozinhas ao abrir o Editor e reescreviam
+  `BauDaTumba.armasPossiveis` com armas fictícias fora do lore ("Lâmina Enferrujada" etc.),
+  junto dos assets fictícios (`Assets/Resources/Itens/Armas/*`) e de duplicatas órfãs dos
+  `ItemDef` de arma no caminho antigo (`Config/Itens/`, sem `Resources`).
+- Comentário obsoleto em `GameManager.cs` corrigido (citava `CultistaAI.OnEnable()`; quem
+  recebe o som hoje é `EnemyPerception`).
+
+### Commit único preservando trabalho de sessão paralela
+O commit também incluiu sistemas que só existiam em disco, sem nenhum commit — risco real
+de perda: a refatoração da IA de inimigos por composição (`EnemyBase` + `Enemies/Components`),
+o inventário novo inteiro, Vigor/Estamina, e o Labirinto de Carcosa (árvore de progressão) +
+níveis de personagem. Decisão de 2026-08-05: Vigor fica ativo (`PlayerMovement`/`EsquivaBridge`
+já dependem dele); Labirinto e níveis ficam **congelados** — compilam, mas não são
+instanciados em nenhuma cena do Vertical Slice.
+
+**Verificação:** compilação limpa (0 erros/warnings), 349/349 testes EditMode passando.
+Falta validação manual em Play Mode (abrir o baú, entregar os 3 fragmentos à Cassilda) —
+não automatizável pela ponte MCP atual.
+
+Plano completo em `C:\Users\Vini\.claude\plans\planejamento-macro-rumo-fluttering-parrot.md`.
+
 ## 2026-08-02 (7ª rodada) — Chão do Santuário vira Tilemap isométrico de losango
 
 O que parecia "grid errado" (relatado como "voltou pra visão topdown") era, na

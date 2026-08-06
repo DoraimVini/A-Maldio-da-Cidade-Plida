@@ -27,6 +27,12 @@ namespace FavelaAmarela.Runtime.GameLoop
                  "em cima de um portal jogue o jogador de volta na hora.")]
         [SerializeField] private float carenciaAoCarregar = 0.5f;
 
+        [Tooltip("Loga todo contato de trigger, mesmo os recusados (tag errada, carência " +
+                 "ativa). Serve para distinguir 'o Player nunca chega até aqui' (problema de " +
+                 "colisão/posição) de 'chega mas é recusado' (tag/carência) de 'nada acontece " +
+                 "mesmo aceito' (cena destino/Build Settings). Desligue quando estabilizar.")]
+        [SerializeField] private bool logarContatos = true;
+
         private float _tempoDeAtivacao;
 
         private void Reset()
@@ -46,6 +52,10 @@ namespace FavelaAmarela.Runtime.GameLoop
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            if (logarContatos)
+                Debug.Log($"[Portal:{name}] contato de '{collision.name}' (tag={collision.tag}) " +
+                          $"destino={cenaDestino} carênciaRestante={Mathf.Max(0f, _tempoDeAtivacao - Time.time):0.00}s", this);
+
             if (!collision.CompareTag("Player")) return;
             if (string.IsNullOrWhiteSpace(cenaDestino)) return; // erro já logado em Awake
 

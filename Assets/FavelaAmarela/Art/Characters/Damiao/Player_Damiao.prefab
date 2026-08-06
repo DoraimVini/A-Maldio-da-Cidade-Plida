@@ -19,6 +19,9 @@ GameObject:
   - component: {fileID: 7750164519107673059}
   - component: {fileID: 4829173650284917362}
   - component: {fileID: 1028256812353556123}
+  - component: {fileID: 1028256812353556200}
+  - component: {fileID: 1028256812353556201}
+  - component: {fileID: 1028256812353556202}
   m_Layer: 8
   m_Name: Player_Damiao
   m_TagString: Player
@@ -290,5 +293,50 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44d508a6a554d224281ee8ccfcaf23f7, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.GerenciadorEfeitosPassivos
+--- !u!114 &1028256812353556200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566763281958862316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1edefe9c012603c49a377c63df883206, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Interaction.DetectorDeInteracao
+  alcance: 1.5
+  camadasInteragiveis:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &1028256812353556201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566763281958862316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62781a545de52f5428286bcc47a566fb, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.CongelamentoBridge
+  limiteDeAcumulos: 3
+  duracaoDoAcumulo: 6
+  duracaoDoCongelamento: 1.5
+  spriteDoDamiao: {fileID: 2310578032248543626}
+  corCongelado: {r: 0.55, g: 0.8, b: 1, a: 1}
+--- !u!114 &1028256812353556202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566763281958862316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2bc657b2c8378646ac82b176dc80481, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.EstadoPersistenteDoJogador

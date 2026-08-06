@@ -159,6 +159,13 @@ namespace FavelaAmarela.Player
         {
             _soundBroadcaster = broadcaster;
             _environment = env;
+
+            // Sem estes dois, Damião anda em silêncio absoluto: como a percepção dos
+            // inimigos é 100% sonora, nenhum deles jamais o caçaria — e o sintoma em
+            // playtest é "a IA está quebrada", não "faltou injeção".
+            if (_soundBroadcaster == null || _environment == null)
+                Debug.LogError("[PlayerMovement] Bind recebeu dependência nula — Damião não " +
+                               "vai emitir som e nenhum inimigo vai caçá-lo.", this);
         }
 
         private void Awake()
