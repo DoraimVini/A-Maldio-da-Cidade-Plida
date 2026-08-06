@@ -6,6 +6,29 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-05 (3ª rodada) — Fragmento do Deserto inalcançável (mesma causa raiz da Cassilda)
+
+Confirmado em playtest: cultistas caçando, Cassilda interagível e saída do Santuário todos
+funcionais depois da 2ª rodada. Bug novo relatado: quest da Cassilda não fechava, "falta uma
+parte das páginas perdidas".
+
+Os 3 fragmentos ("páginas perdidas") estão espalhados um por cena: índice 0 no
+`Deserto_Hali`, índices 1 e 2 no `Playtest_RuinasPalidas`. O Deserto tinha exatamente o
+mesmo problema corrigido para o Santuário na rodada anterior — `DetectorDeInteracao` só
+existia como override manual no Playtest, nunca ali —, só que ninguém tinha notado porque
+o fragmento 0 é opcional para *começar* a quest (só bloqueia *terminar*). Como
+`DetectorDeInteracao` já foi movido para o prefab do Damião na 2ª rodada, o Deserto herda o
+componente automaticamente agora.
+
+O que precisou de correção manual: o Deserto tinha um override próprio de
+`EstadoPersistenteDoJogador` (para persistir a arma equipada entre cenas), que agora
+duplicaria com a cópia recém-movida para o prefab. Override removido da cena
+(`m_AddedComponents` limpo + bloco `MonoBehaviour` órfão apagado) — sem referências
+externas ao fileID, confirmado por grep antes de apagar.
+
+**Verificação:** compilação limpa, 349/349 testes EditMode. Validação manual (recolher o
+fragmento 0 no Deserto e fechar a quest) pendente do Vini.
+
 ## 2026-08-05 (2ª rodada) — Combate jogável de ponta a ponta: IA surda, hitboxes e Cassilda inalcançável
 
 Playtest depois do commit da manhã revelou quatro bugs reais que a auditoria estática não

@@ -2057,10 +2057,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 686885853}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4358c838d54b30c44809872563c21742, type: 3}
 --- !u!4 &686885851 stripped
 Transform:
@@ -2072,18 +2069,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
   m_PrefabInstance: {fileID: 686885850}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &686885853
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 686885852}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2bc657b2c8378646ac82b176dc80481, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.EstadoPersistenteDoJogador
 --- !u!1 &709090737
 GameObject:
   m_ObjectHideFlags: 0
