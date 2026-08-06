@@ -6,6 +6,26 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-05 (5ª rodada) — QA dirigido: prompt de interação preso na tela sob o painel de escolha
+
+Rodada de QA pedida pelo Vini depois da correção da corrida de diálogo (4ª rodada).
+Pipeline automatizado limpo (compilação + 349/349 testes), mas a correção anterior tinha um
+efeito colateral: `DetectorDeInteracao.Bloqueado = true` faz o `Update()` retornar cedo por
+completo, inclusive a parte que dispara `OnAlvoMudou` — então o prompt "Pressione E — Falar
+com Cassilda" ficava preso na tela, sobreposto ao painel de escolha que acabou de abrir,
+porque nunca mais recebia o evento que o esconderia.
+
+`Bloqueado` virou uma propriedade com setter: ao ligar, se havia alvo, limpa e notifica
+`OnAlvoMudou(null)` antes do `Update` parar de rodar — o prompt some no mesmo instante em
+que o painel assume o controle.
+
+Varredura dirigida no resto do projeto (mesmo padrão dos bugs anteriores: dado de cena, não
+lógica) não achou mais nada: os 2 `PainelDeEscolha` do projeto têm `detectorDeInteracao`
+ligado; nenhuma cena tem override órfão de componente no prefab do Damião; catálogo de
+itens sem duplicatas.
+
+**Verificação:** compilação limpa, 349/349 testes EditMode.
+
 ## 2026-08-05 (4ª rodada) — Recital da Cassilda travava em loop: corrida entre painel de escolha e detector de interação
 
 Reportado: quest da Cassilda presa num loop de diálogo que nunca fecha, mesmo com os 3
