@@ -10,6 +10,7 @@ O projeto usa **terminologia diegética** em vez de termos genéricos de RPG. Es
 
 ## Conteúdo
 
+- [Arcos Narrativos — Guideline Mestre](arcos_narrativos.md) — **[NOVO 2026-08-10]** Estrutura dos arcos do Vertical Slice cruzada com o estado real de implementação. Ponto de partida para qualquer decisão de escrita, quest ou cutscene.
 - [Glossário Diegético](glossary.md) — Tabela de tradução de termos genéricos para vocabulário do jogo
 - [Regras do Mundo](world_rules.md) — Regras narrativas do universo de Carcosa
 - [Bestiário de Carcosa](bestiary.md) — Compilação das entidades e inimigos baseados no mito de Hastur

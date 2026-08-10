@@ -10,6 +10,7 @@ Cada tipo de problema deve ser atacado com o MCP ou Skill correto, evitando que 
 | **Termo genérico no código (ex: health)** | `favela-lore-enforcer` | Substituir ocorrências de palavras proibidas (health, damage, etc.) pelos termos diegéticos corretos (Lucidez, Anomalia, etc.). |
 | **Testes falhando** | `favela-qa-pipeline` | Corrigir a classe (POCO) responsável pela lógica testada, rodar os testes e reportar o resultado ao usuário. Commit só acontece mediante pedido explícito do usuário — NUNCA rode `git add`/`git commit` automaticamente. NUNCA prosseguir sem testes passando. |
 | **GDD desatualizado** | `notion-mcp-server` | Atualizar a página do GDD no Notion refletindo as mecânicas implementadas (ex: Resiliência Mental). |
+| **Início de sessão de trabalho** | `favela-session-briefing` | Conferir git status/log, ler as últimas entradas do devlog técnico e o roadmap do Vertical Slice, resumir o próximo passo recomendado antes de codar. |
 
 # Template Padrão de Scripts (ScriptTemplate)
 

@@ -109,7 +109,7 @@ Leia os arquivos lá antes de cometer erros arquiteturais clássicos da Unity.
 - Movimentação real do projeto usa `Rigidbody2D.linearVelocity` atribuído em `FixedUpdate` (não `MovePosition`) — siga essa convenção existente em `PlayerMovement.cs`.
 - `CollisionDetectionMode2D.Continuous` para atores que se movem.
 - A câmera fica sempre com rotação `Quaternion.identity` (sem tilt) — a "sensação" isométrica vem do Y-sorting (`sortingOrder` por `-worldCenter.y`, ver `LevelBlockoutGenerator`) e do remapeamento de input em `PlayerMovement.ConvertToIsometric`, não de uma câmera 3D inclinada. Ver skill `favela-isometric-standards`.
-- Qualquer alteração em física, câmera, prefab de sala ou Rigidbody de inimigo/player deve respeitar as constantes fixas da skill `favela-isometric-standards` (gravityScale 0, câmera sem rotação, PPU 16, Y-sorting por Custom Axis).
+- Qualquer alteração em física, câmera, prefab de sala ou Rigidbody de inimigo/player deve respeitar as constantes fixas da skill `favela-isometric-standards` (gravityScale 0, câmera sem rotação, PPU 32, Y-sorting por Custom Axis).
 
 ## 6. Terminologia diegética
 Nunca use termos genéricos de RPG (HP, Mana, Enemy, Level Up) em texto visível ao jogador, nomes de habilidade ou descrições de `ScriptableObject`. A tradução completa (Resiliência Mental, Trauma, Colapso, Ancoragem, Cultista Amarelo, Salto Dimensional etc.) está na skill `favela-lore-enforcer` — consulte-a em vez de reimplementar a tabela aqui.
@@ -118,7 +118,7 @@ Nunca use termos genéricos de RPG (HP, Mana, Enemy, Level Up) em texto visível
 Estas skills vivem em `.claude/skills/` e devem ser puxadas conforme o contexto:
 - `favela-isometric-standards` — física/câmera/grid isométrico.
 - `favela-lore-enforcer` — terminologia diegética.
-- `favela-pixelart-standards` — configurações de import de sprite (PPU 16, Point filter, sem compressão).
+- `favela-pixelart-standards` — configurações de import de sprite (PPU 32, Point filter, sem compressão).
 - `favela-qa-pipeline` — ciclo compilar → testar antes de considerar uma mudança pronta (não commita sozinho; commit só quando pedido).
 
 Essas mesmas regras também existem em `.agents/skills/` no formato usado por outra ferramenta (Antigravity) e em `.agents/AGENTS.md` (tabela de roteamento dela). Se o conteúdo de uma regra mudar, atualize os dois lados para não divergir.

@@ -3,7 +3,14 @@ import json
 import os
 import re
 
-token = '***REMOVED_NOTION_TOKEN_ROTATE_ME***'
+token = os.environ.get('NOTION_TOKEN')
+if not token:
+    raise SystemExit(
+        "NOTION_TOKEN não definido. Defina a variável de ambiente antes de rodar este "
+        "script (ex.: PowerShell: $env:NOTION_TOKEN = 'ntn_...'). O token antigo hardcoded "
+        "aqui foi removido por ter vazado em texto puro no controle de versão — rotacione-o "
+        "nas configurações da integração do Notion antes de gerar um novo."
+    )
 headers = {
     'Authorization': f'Bearer {token}',
     'Notion-Version': '2022-06-28',

@@ -6,6 +6,34 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-10 — Recuperação de desastre + reconexão do cofre Obsidian + auditoria GDD vs código
+
+A pasta de trabalho original (`projeto_amarelo/A Maldição da Cidade Pálida`) foi apagada por
+uma interação de sincronização do Google Drive (backup de Desktop ativo, conflito de
+renomeação de acentos). Recuperação em várias frentes:
+
+- **Git:** o remote real do projeto é `github.com/DoraimVini/A-Maldio-da-Cidade-Plida`
+  (não o `Peregrino_Amarelo`, que é um repo vazio/órfão). A branch `feat/fase1-deserto-hali`
+  tinha 50 commits até `fb94ae4` (2026-08-06) intactos no GitHub. Checkout dessa branch e
+  `robocopy /MIR` para o caminho canônico do Unity Hub
+  (`Desktop/Peregrino_Amarelo/Peregrino_Amarelo`) restauraram o projeto.
+- **Perda real e definitiva:** os commits locais feitos após 2026-08-06 — a montagem física
+  da cena do Templo da Serpente (12 zonas, colisão perimetral, bosses) e retoques finais do
+  sistema de menus/save (Bloco 3) — nunca foram enviados ao GitHub e não foram recuperados.
+  Precisam ser refeitos.
+- **Cofre Obsidian:** a Junction `Studio_Knowledge_Base/Projeto_Amarelo` apontava para o
+  caminho antigo (via `projeto_amarelo_unity` → pasta apagada) e por isso aparecia vazia no
+  Obsidian. Recriada apontando direto para este `Docs/KnowledgeBundle`.
+- **Auditoria GDD vs código:** GDD Unificado v3.0 (Notion) comparado contra o código real.
+  Divergências confirmadas: arma "Cravo de Ferro" do GDD é `CravoDeAklo` no código, com habilidade diferente (interrompe conjuração, não
+  mitigação); Yug-Neth usa incapacitação recuperável, não Game Over permanente por RC;
+  consumíveis e Set Lendário do GDD ainda não têm nenhum item autorado no código; Byakhee e
+  toda a Fase 2 (Castelo de Carcosa + Rei em Amarelo) têm zero código apesar de descritos no
+  GDD como conteúdo do bestiário. Detalhes em [lore/arcos_narrativos.md](lore/arcos_narrativos.md).
+
+**Verificação:** nenhuma alteração de gameplay nesta rodada — só recuperação de
+infraestrutura e documentação. Compilação/testes não re-executados ainda neste checkout.
+
 ## 2026-08-05 (5ª rodada) — QA dirigido: prompt de interação preso na tela sob o painel de escolha
 
 Rodada de QA pedida pelo Vini depois da correção da corrida de diálogo (4ª rodada).
