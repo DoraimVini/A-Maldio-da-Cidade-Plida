@@ -21,10 +21,33 @@ Toda lógica em `Core/` é testável **sem a Unity rodando**. Os testes vivem em
 | `PatrolRouteTests.cs` | `PatrolRoute` |
 | `SoundBroadcastServiceTests.cs` | `SoundBroadcastService` |
 | `GameLoopStateMachineTests.cs` | `GameLoopStateMachine` |
-| `DimensionalLeapTests.cs` | `DimensionalLeap` |
+| `VitalidadeTests.cs` | `Vitalidade` |
+| `MitigacaoDeDanoTests.cs` | `MitigacaoDeDano` |
+| `FichaDeAtributosTests.cs` | `FichaDeAtributos` |
+| `AbdulFSMTests.cs` | `AbdulFSM` |
+| `AcumuloDeCongelamentoTests.cs` | `AcumuloDeCongelamento` |
+| `SeletorDeInteracaoTests.cs` | `SeletorDeInteracao` |
+| `CultistaFSMAtaqueTests.cs` | `CultistaFSM` (estado Atacar) |
+| `FonteBuiltinTests.cs` | gotcha da fonte built-in (Unity 6) |
 | `EsquivaTests.cs` | `Esquiva` |
 | `PlayerStealthStateTests.cs` | `PlayerStealthState` |
 | `EnvironmentStateTests.cs` | `EnvironmentState` |
+| `EspectroFSMTests.cs` | `EspectroFSM` |
+| `BarraEnferrujadaTests.cs` | `BarraEnferrujada` |
+| `CoisaDoCemiterioFSMTests.cs` | `CoisaDoCemiterioFSM` |
+| `TempestadeOsciladorTests.cs` | `TempestadeOscilador` |
+| `AgendadorDeRajadaTests.cs` | `AgendadorDeRajada` |
+| `RegistroDeSaveTests.cs` | `RegistroDeSave` (chaves de persistência + degradação graciosa) |
+
+### Exceção PlayMode
+
+Todos os testes acima são EditMode. Existe uma única exceção em `Assets/Tests/PlayMode/`:
+
+| Teste | Alvo |
+|-------|------|
+| `ResilienciaBarPlayTests.cs` | `ResilienciaBar` (adapter Runtime, não POCO) |
+
+Essa exceção existe porque `ResilienciaBar` sincroniza com componentes de UI da Unity (ex.: `Slider`), o que exige uma cena rodando — não é testável via `new` como os POCOs de `Core/`.
 
 ## Padrão de Escrita (Arrange-Act-Assert)
 

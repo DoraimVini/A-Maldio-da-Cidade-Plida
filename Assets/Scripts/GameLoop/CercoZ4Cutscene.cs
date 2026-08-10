@@ -48,6 +48,10 @@ namespace FavelaAmarela.Runtime.GameLoop
         [SerializeField] private float tempoManifestacao = 0.4f;
         [SerializeField] private float duracaoAproximacao = 1.5f;
 
+        // Atores (Cultistas + Espectros) instanciados nesta cutscene, rastreados para
+        // limpeza após a queda — eram set-piece da Zona 4 e não devem persistir na Zona 5.
+        private readonly List<GameObject> _atoresInstanciados = new List<GameObject>();
+
         private void Awake()
         {
             if (cultistaPrefab == null)
@@ -80,6 +84,21 @@ namespace FavelaAmarela.Runtime.GameLoop
             yield return AproximarCultistas(cultistas, duracaoAproximacao);
         }
 
+        /// <summary>
+        /// Destrói os atores instanciados nesta cutscene. Chamado pela
+        /// <see cref="QuedaZ4Z5Trigger"/> após a queda — eles eram um set-piece da
+        /// Zona 4 e não devem persistir/perseguir na Zona 5 (senão o Espectro encalha
+        /// na barreira de anomalia).
+        /// </summary>
+        public void LimparAtores()
+        {
+            foreach (var ator in _atoresInstanciados)
+            {
+                if (ator != null) Destroy(ator);
+            }
+            _atoresInstanciados.Clear();
+        }
+
         private List<AtorEmCerco> InstanciarCultistas(Vector2 centro)
         {
             var instancias = new List<AtorEmCerco>();
@@ -91,6 +110,7 @@ namespace FavelaAmarela.Runtime.GameLoop
                 Vector2 origem = centro + slot * distanciaSpawnExtra;
 
                 var instancia = Instantiate(cultistaPrefab, origem, Quaternion.identity);
+                _atoresInstanciados.Add(instancia);
                 var ai = instancia.GetComponent<CultistaAI>();
                 if (ai != null) ai.enabled = false;
 
@@ -109,6 +129,7 @@ namespace FavelaAmarela.Runtime.GameLoop
             foreach (var slot in slotsEspectro)
             {
                 var instancia = Instantiate(espectroPrefab, centro + slot * distanciaSpawnExtra, Quaternion.identity);
+                _atoresInstanciados.Add(instancia);
                 var ai = instancia.GetComponent<EspectroAI>();
                 if (ai == null) continue;
 

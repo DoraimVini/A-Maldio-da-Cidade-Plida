@@ -32,6 +32,11 @@ namespace FavelaAmarela.Runtime.Enemies
             _rb.gravityScale = 0f;
             _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
+            // Fantasma atravessa geometria. Kinematic movido por velocidade passa por
+            // colliders estáticos (paredes, barreira de anomalia) sem resposta de colisão
+            // — mais robusto que excludeLayers, que as paredes anulam via ForceReceiveLayers.
+            _rb.bodyType = RigidbodyType2D.Kinematic;
+
             _fsm = new EspectroFSM(EspectroState.Latente);
             _fsm.OnStateChanged += HandleStateChanged;
 

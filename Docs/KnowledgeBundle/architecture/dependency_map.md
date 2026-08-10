@@ -20,7 +20,9 @@ SoundBroadcastService ──emite SomEmitido──▶ CultistaFSM
          ▼
    (Observadores do som: CultistaAI adapter)
 
-ResilienciaMental ◀──custo de RM── DimensionalLeap (IAnomalyPower)
+ResilienciaMental ◀──trauma── (dano anômalo / horror)
+Vitalidade        ◀──dano físico── MitigacaoDeDano ◀── FichaDeAtributos
+AbdulFSM          ──eventos──▶ (escudo, invocações, derrota)
          │
          │ OnChanged
          ▼
@@ -28,11 +30,20 @@ ResilienciaMental ◀──custo de RM── DimensionalLeap (IAnomalyPower)
    DynamicMusicController (Áudio)
    CameraShake (Câmera)
 
-GameLoopStateMachine ──controla──▶ Todo o fluxo (Menu → Gameplay → Pausado → Colapso → Vitória)
+GameLoopStateMachine ──controla──▶ Todo o fluxo (Menu → Gameplay → Pausado → Colapso → TransicaoDeFase)
          │
          │ observa
          ▼
    ResilienciaMental.IsColapso ──dispara──▶ GameState.Colapso
+
+EnvironmentState ──OnStormIntensityChanged──▶ TempestadeAmbiente
+         ▲                                          │
+         │ Tick()                                   ▼
+   TempestadeOscilador                        TempestadeVisualOverlay (UI)
+
+TempestadeZonaTrigger ──DefinirFaixa()──▶ EnvironmentState
+
+CoisaDoCemiterioFSM ──estímulo (Farejando→AlvoPreciso)──▶ ResilienciaMental.ForcarColapso()
 ```
 
 ## Regra de Dependência Unidirecional
@@ -61,3 +72,5 @@ GameLoopStateMachine ──controla──▶ Todo o fluxo (Menu → Gameplay →
 | `CultistaFSM` | `CultistaAI` | `OnStateChanged` → `(old, new)` |
 | `IAnomalyPower` | `PlayerMovement` | `CanActivate()` / `Execute()` → `PowerResult` |
 | `GameLoopStateMachine` | `GameManager` | `OnStateChanged` → `(anterior, atual)` |
+| `EnvironmentState` | `TempestadeAmbiente`, `TempestadeVisualOverlay` | `OnStormIntensityChanged` → `float` |
+| `CoisaDoCemiterioFSM` | `ResilienciaMental` (via adapter) | estímulo de proximidade → `ForcarColapso()` (mesmo contrato reaproveitado de `ColapsoTrigger`) |

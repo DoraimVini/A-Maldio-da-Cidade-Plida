@@ -25,8 +25,8 @@ O valor de Resiliência Mental (RM) vai de `0.0` a `100.0`.
 ## Efeitos de Status (Thresholds)
 - **>= 80 RM (Focado):** A visão fica levemente mais clara, [PlayerMovement](../scripts/runtime/player_movement_cs.md) ganha +10% de velocidade de movimento.
 - **< 30 RM (Desesperado):** Visão de túnel, sons distorcidos, probabilidade de errar interações.
-- **= 0 RM (Ruptura):** Game Over ou transição para estado de "Sombra".
+- **= 0 RM (Colapso):** Game Over ou transição para estado de "Sombra".
 
 ## Implementação Técnica
 A lógica principal está implementada em `ResilienciaMental.cs` e `ResilienciaBar.cs`.
-A interface gráfica usa eventos C# padrão (`event Action<float> OnResilienciaChanged`) para desacoplar a UI da lógica de gameplay.
+A interface gráfica usa eventos C# padrão (`event Action<ResilienciaChangedArgs> OnChanged`) para desacoplar a UI da lógica de gameplay.

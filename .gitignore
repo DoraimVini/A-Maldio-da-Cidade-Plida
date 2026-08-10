@@ -11,6 +11,11 @@
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 .utmp/
+
+# Credenciais locais (nunca commitar tokens/segredos)
+.env
+*.env
+
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/

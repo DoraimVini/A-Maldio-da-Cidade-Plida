@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>A Maldição da Cidade Pálida — Documentação Mestra</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700&family=Fira+Code&display=swap');
+
+@page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+}
+
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #1a1a1a;
+    background-color: #ffffff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 40px;
+}
+
+.cover {
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+    border-bottom: 4px solid #1a1a1a;
+    margin-bottom: 40px;
+}
+
+.cover h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 34pt;
+    margin: 0 0 15px 0;
+    letter-spacing: 2px;
+    color: #111;
+}
+
+.cover h2 {
+    font-size: 16pt;
+    font-weight: 400;
+    color: #444;
+    margin-bottom: 50px;
+}
+
+.cover .meta {
+    font-size: 11pt;
+    color: #555;
+    border-top: 2px solid #eee;
+    padding-top: 25px;
+    width: 70%;
+    line-height: 1.8;
+}
+
+.toc {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 35px;
+    margin-bottom: 50px;
+    page-break-after: always;
+}
+
+.toc h2 {
+    font-family: 'Cinzel', serif;
+    margin-top: 0;
+    border-bottom: 2px solid #111;
+    padding-bottom: 10px;
+    font-size: 18pt;
+}
+
+.toc ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.toc li {
+    margin-bottom: 12px;
+    font-size: 11pt;
+}
+
+.toc a {
+    color: #0044cc;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.doc-section {
+    page-break-after: always;
+    margin-bottom: 60px;
+}
+
+.section-header {
+    border-bottom: 3px solid #111;
+    padding-bottom: 8px;
+    margin-bottom: 25px;
+}
+
+.section-header span {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #666;
+    display: block;
+}
+
+.section-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 20pt;
+    margin: 0;
+}
+
+h1, h2, h3, h4 {
+    color: #111;
+}
+
+h3 { font-size: 14pt; margin-top: 25px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+h4 { font-size: 11pt; margin-top: 20px; }
+
+blockquote {
+    background: #f8f9fa;
+    border-left: 4px solid #111;
+    margin: 18px 0;
+    padding: 14px 20px;
+    font-style: italic;
+    color: #333;
+}
+
+table.doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 10pt;
+}
+
+table.doc-table th, table.doc-table td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+}
+
+table.doc-table th {
+    background: #f1f3f5;
+    font-weight: 700;
+}
+
+code {
+    font-family: 'Fira Code', monospace;
+    background: #f1f3f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 9.5pt;
+}
+
+pre code {
+    display: block;
+    padding: 15px;
+    background: #1a1a1a;
+    color: #f8f9fa;
+    border-radius: 6px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
+
+@media print {
+    body { padding: 0; background: #fff; }
+    .cover { height: 100vh; }
+}
+</style>
+</head>
+<body>
+
+<div class="cover">
+    <h1>A MALDIÇÃO DA CIDADE PÁLIDA</h1>
+    <h2>Documentação Mestra de Design & Game Design Document (GDD)</h2>
+    <div class="meta">
+        <p><strong>Projeto:</strong> Favela Amarela / A Maldição da Cidade Pálida</p>
+        <p><strong>Versão:</strong> 1.2 — Vertical Slice / Edital</p>
+        <p><strong>Data de Emissão:</strong> Julho de 2026</p>
+        <p><strong>Autoria:</strong> Vinícius (Vini) & Equipe de Desenvolvimento</p>
+        <p><strong>Finalidade:</strong> Apresentação Executiva para Direção e Edital</p>
+    </div>
+</div>
+
+<div class="toc">
+    <h2>ÍNDICE GERAL DE CONTEÚDO</h2>
+    <ul>
+        <li><a href="#section-1">1. Documento de Design Mestre (GDD)</a></li><li><a href="#section-2">2. GDD da Expansão e Demo do Deserto</a></li><li><a href="#section-3">3. Lore: O Povo Serpente</a></li><li><a href="#section-4">4. Lore: O Templo da Serpente (Dungeon 2)</a></li><li><a href="#section-5">5. Lore: Rainha Cassilda, Quest e Boss Byakhee</a></li><li><a href="#section-6">6. Lore & Mecânica: Yug-Neth (Mi-Go Companion)</a></li><li><a href="#section-7">7. Lore & Boss: Abdul Alhazred</a></li><li><a href="#section-8">8. Lore: Deserto de Hali e Dungeons</a></li><li><a href="#section-9">9. Lore: As Quatro Relíquias Lendárias</a></li><li><a href="#section-10">10. Lore: Glossário Diegético</a></li><li><a href="#section-11">11. Level Design: Overworld do Deserto de Hali</a></li><li><a href="#section-12">12. Level Design: Boss Abdul Alhazred</a></li>
+    </ul>
+</div>
+
+<section id="section-1" class="doc-section"><div class="section-header"><span>CAPÍTULO 1</span><h2>1. Documento de Design Mestre (GDD)</h2></div><h1>A Maldição da Cidade Pálida (Favela Amarela)</h1>
+<h2>Documento de Design Mestre (GDD) — Versão 1.1 (Vertical Slice)</h2>
+<p>* <strong>Data:</strong> 30/07/2026<br>* <strong>Autor(es):</strong> Vinícius (Vini) — Lead Designer & Developer / Claude & Antigravity (Assistentes)<br>* <strong>Status:</strong> Aprovado para Implementação (Vertical Slice / Edital)<br>* <strong>Confidencialidade:</strong> Interna (Estúdio)</p>
+<h3>Changelog</h3>
+- <strong>v1.2 (2026-07-30):</strong> Companion Yug-Neth (Mi-Go filhote) adicionado ao jogo. Encontro com Alhazred redesenhado como cena de escolha binária (Caminho A: sem luta, sem Necronomicon; Caminho B: luta, dropa Necronomicon). Sistema de Resiliência do Companheiro (RC) e mecânica de proteção adicionados. Yug-Neth é a chave dos Portões das Ruínas. Sprite de Yug-Neth gerada. Docs: <code>lore/migo_companion.md</code> (novo), <code>lore/abdul_alhazred.md</code> (atualizado).
+- <strong>v1.1 (2026-07-30):</strong> Vertical Slice fechado para edital. Quest de Cassilda expandida (5 Fragmentos de Yhtill + diálogos completos). Templo da Serpente redesenhado com 12 zonas, Boss 1 Nagaraja e Boss 2 Avatar de Set. Boss Byakhee com mecânicas detalhadas. Novo doc: <code>lore/povo_serpente.md</code>. Boss 1 do Templo renomeado de "Naga" genérico para <strong>Nagaraja, o Sacerdote do Sinal Escamado</strong>.
+<p>---</p>
+<h2>1. VISÃO GERAL DO PROJETO</h2>
+<h3>1.1 Resumo Executivo (Elevator Pitch)</h3>
+<strong>A Maldição da Cidade Pálida</strong> é um jogo de furtividade e horror cósmico em 2D isométrico onde o som é o seu maior inimigo. O jogador controla Damião, um tradutor indefeso que acorda em Carcosa — dimensão do Rei em Amarelo — e deve navegar pelo Deserto de Hali, explorar dungeons ancestrais e enfrentar cultistas cegos para encontrar um caminho de volta antes que sua mente colapse completamente sob a estática cósmica de Aldebaran. O foco do jogo é a tensão constante, a sobrevivência psicológica e a vulnerabilidade do protagonista frente ao inevitável colapso mental.
+<h3>1.2 High Concept</h3>
+É como <em>Dishonored</em> encontra <em>Silent Hill</em> em perspectiva isométrica (estilo <em>Diablo I/II</em> clássico) com a visceralidade de <em>Death Trash</em> e o gerenciamento de equipamentos de <em>Source of Madness</em>.
+<h3>1.3 Pilares de Design (Pillars)</h3>
+1. <strong>Impotência e Sobrevivência Tensa:</strong> O combate direto é um último recurso arriscado. A sobrevivência depende de evasão, do planejamento de rotas e do silêncio.
+2. <strong>Geometria Instável (Glitch Diegético):</strong> O próprio cenário reage às anomalias e ao estado mental do jogador. A distorção visual e os glitches são mecânicos e narrativos.
+3. <strong>Escuridão e Luz (Postes de Luz):</strong> A escuridão das vielas corrói ativamente a mente do jogador. A luz amarela quente dos postes funciona como um porto seguro de cura e respiro.
+4. <strong>Composição POCO (Arquitetura Limpa):</strong> A engenharia do jogo separa a lógica pura (POCO, testável) dos adaptadores visuais da Unity, garantindo um código desacoplado e robusto.
+<h3>1.4 Objetivos de Experiência (Player Experience Goals)</h3>
+* <strong>Tensão e Paranoia:</strong> O jogador deve sentir que cada passo ruidoso pode atrair a morte e que a própria realidade está colapsando ao seu redor.
+* <strong>Curva de Sentimento:</strong>
+  <em> </em>Primeiros 5 minutos:* Desorientação, impotência e pavor ao fugir de ameaças no escuro absoluto.
+  <em> </em>Após 1 hora:* Adaptação e cálculo, usando o Salto Dimensional com cautela para resolver o layout das vielas.
+  <em> </em>Ao final:* Resignação frente ao horror inevitável de Carcosa.
+<h3>1.5 Público-Alvo</h3>
+<em> <strong>Perfil:</strong> Jogadores mid-core/hardcore de jogos indie de terror atmosférico, stealth e horror cósmico (</em>Signalis<em>, </em>Silent Hill<em>, </em>Deus Ex<em>, </em>Death Trash*).
+* <strong>Plataforma Preferida:</strong> PC (Steam), utilizando preferencialmente teclado/mouse ou controle com foco tátil.
+<h3>1.6 Plataformas e Requisitos Gerais</h3>
+* <strong>Plataforma Alvo:</strong> PC (Windows).
+* <strong>Requisitos Gerais:</strong> Jogo otimizado para 60 FPS estáveis. Física 2D no plano XY.
+* <strong>Multiplayer:</strong> Não aplicável (Foco 100% Singleplayer).
+<h3>1.7 Diferenciais Competitivos (Unique Selling Points)</h3>
+* <strong>HUD Diegético e Sem Poluição:</strong> A saúde do jogador é sua própria percepção de sanidade (Resiliência Mental). O colapso mental altera a renderização da tela, os sons e a precisão do controle.
+* <strong>O Som como Vetor de Caça:</strong> A mecânica de propagação sonora substitui a visão clássica dos inimigos nas fases iniciais, exigindo que o jogador gerencie o atrito físico e o barulho dos seus poderes.
+* <strong>Slots de Ação Estilo "Source of Madness":</strong> Equipamento minimalista em 2 slots (Mão Física + Mão Anômala) em vez de inventário tradicional complexo de RPGs.
+<h3>1.8 Escopo e Metas Comerciais</h3>
+<em> <strong>Universo Multimídia:</strong> </em>A Maldição da Cidade Pálida<em> faz parte de um <strong>universo multimídia em desenvolvimento concomitante</strong>, iniciado com o curta-metragem </em>Favela Amarela* (Richard Abelha): curta (existê), animação, HQ e longa-metragem estão em desenvolvimento paralelo ao jogo. O jogo é a fatia deste universo dedicada ao encontro com o Rei em Amarelo. Os fragmentos de lore encontrados dentro das dungeons (especialmente a Tumba de Alhazred) conectam diretamente com o trabalho audiovisual.
+* <strong>Estrutura Macro (6 Fases):</strong> O jogo completo é composto por <strong>6 Fases</strong> até sua conclusão narrativa. Este GDD detalha em profundidade a <strong>Fase 1 — O Deserto de Hali</strong>: um overworld aberto (32 PPU) contendo duas dungeons (Tumba de Alhazred + Templo da Serpente), o Santuário de Yhtill e os Portões das Ruínas. <strong>As antigas "Ruínas Pálidas" (S-Path, 9 Zonas) viraram a Dungeon 1 (Tumba de Alhazred) dentro desta Fase 1</strong> (2026-07-28). As Fases 2 a 6 do jogo completo serão especificadas em documentos próprios conforme o design avançar. Este é um RPG, não um roguelike: <strong>não existe "tela de Vitória"</strong> ao fim de uma fase ou dungeon — o encerramento é uma <strong>transição</strong> para o próximo trecho. A única vitória do jogo é o desfecho da história, ao fim da Fase 6.
+  > <strong>Nota de escopo:</strong> a numeração "Fase 1/Fase 2" usada no <code>gdd_expansao_deserto_demo.md</code> (Vertical Slice/demo) é local àquele documento e não corresponde 1:1 a esta contagem de 6 fases do jogo completo — as duas ainda não foram reconciliadas.
+* <strong>Tipo de Lançamento:</strong> Premium (Steam).
+* <strong>Duração Estimada:</strong> Fase 1 (Deserto de Hali, incluindo a Tumba de Alhazred), ~2 a 3 horas de gameplay; duração total do jogo completo (6 fases) a definir.
+<p>---</p>
+<h2>2. NARRATIVA E MUNDO</h2>
+<h3>2.1 Sinopse da História</h3>
+<strong>Damião</strong> é o personagem central do universo <em>Favela Amarela</em> (criado por Richard Abelha), um tradutor obcecado por escrituras antigas. No curta-metragem original, Damião morre na Terra. O jogo começa no momento seguinte: <strong>ele acorda em Carcosa</strong> — a dimensão do Rei em Amarelo — cercado por Espectros de Hali, no meio do Deserto das Cinzas.
+<p>Sem saber como chegou ali, sem armas e com a mente já fragilizada pela morte, Damião precisa explorar o Deserto de Hali para entender onde está. Ao adentrar a <strong>Tumba de Alhazred</strong> (Dungeon 1), ele encontra fragmentos do lore de Carcosa — inscrições e registros que conectam diretamente com os eventos do universo audiovisual (<em>curta</em>, <em>animação</em>, <em>HQ</em>, <em>longa</em>). Vencer o miniboss <strong>Abdul Alhazred</strong> lhe rende o <em>Necronomicon</em>, artefato que começa a abrir o caminho para entender as regras desta dimensão.</p>
+<p>Explorando mais o deserto, ele pode encontrar o <strong>Templo da Serpente</strong> (Dungeon 2, opcional), enfrentar seus dois guardiões e obter peças de um conjunto de equipamento lendário que desbloqueiam uma sidequest dentro do <strong>Castelo de Carcosa</strong> (Fase 2). A <strong>Rainha Cassilda</strong>, no Santuário de Yhtill, oferece um puzzle narrativo cuja conclusão recompensa Damião com o <em>Patuá</em> (item de proteção mental). Para sair do Deserto, ele deve enfrentar o <strong>Byakhee</strong> nos Portões das Ruínas — guardião alado que barra a entrada no Castelo. No jogo completo, a jornada se estende pelas <strong>6 Fases</strong> até o confronto com o próprio <strong>Rei em Amarelo</strong> na fase final.</p>
+<h3>2.2 Temas e Tom</h3>
+* <strong>Temas:</strong> A inevitabilidade da loucura, a insignificância humana perante o cosmos e a busca autodestrutiva pelo conhecimento proibido.
+* <strong>Tom:</strong> Melancólico, claustrofóbico, geométrico e opressor.
+<h3>2.3 Lore e Contexto do Mundo</h3>
+Carcosa é uma dimensão onde a física obedece a uma lógica onírica e matemática. Sua arquitetura remete a uma favela corrompida por monumentos de pedra pálida e tentáculos de Hastur. O ambiente flutua na frequência natural de 7.83 Hz.
+<h3>2.4 Personagens Principais</h3>
+* <strong>Damião (Protagonista):</strong> Jovem morador da Favela do Rato Baleado (Rio de Janeiro), estudante de Direito. Para pagar a faculdade, entrou para o movimento do tráfico local com a ajuda de seu amigo Juninho. Tocados pelo sonho de Hastur, descobrem a seita por trás de uma ONG local (liderada por Natasha). Ao tentar interromper o ritual da seita na igreja para salvar seus amigos e Martha, Damião é capturado e sacrificado — seu ventre é cortado com o símbolo de Hastur. Ao morrer na Terra, acorda nas areias de Carcosa. Sua jornada em Carcosa é uma peregrinação de resgate de memórias e resistência contra a cidade-máquina.
+* <strong>O Rei em Amarelo (Antagonista):</strong> Entidade vestida de farrapos amarelos e portando a Máscara Pálida. Sua observação direta destrói a mente humana. É o antagonista final do jogo completo (Fase 6) e também o chefe final do Vertical Slice/demo (Fase 2: Castelo de Carcosa).
+* <strong>Rainha Cassilda:</strong> Figura matriarcal de Yhtill, presente no Santuário de Yhtill como NPC de quest principal. Propõe a quest "A Canção Incompleta": coletar os 5 Fragmentos de Yhtill (diários/cartas dos nobres perdidos) espalhados pelo Deserto e pelas Dungeons. Recompensa: Patuá das Luas Gêmeas. Diálogos completos em <code>lore/cassilda_e_byakhee.md</code>.
+<em> <strong>Abdul Alhazred:</strong> Autor lendário do </em>Necronomicon*. Miniboss da Tumba de Alhazred (Dungeon 1, Z9 — Tumba de Abdul). Sua essência persiste nas profundezas da dungeon que carrega seu nome. Design completo da luta em <code>lore/abdul_alhazred.md</code>.
+* <strong>Nagaraja, o Sacerdote do Sinal Escamado:</strong> Boss 1 do Templo da Serpente (Dungeon 2, Z10). Serpent Person de 2,5m, metade humanoide / metade serpente. Único de sua raça consciente do aprisionamento em Carcosa. Design completo em <code>lore/templo_da_serpente.md</code>.
+* <strong>O Avatar de Set:</strong> Boss 2 do Templo da Serpente (Dungeon 2, Z11). Fragmento da consciência divina de Set aprisionado por Hastur no Deserto de Hali. Ser colossal de 4m, não-senciente no sentido humano, pura força primordial. Dropa o Elmo de Set (garantido). Design em <code>lore/templo_da_serpente.md</code>.
+* <strong>O Byakhee:</strong> Miniboss dos Portões das Ruínas (fim da Fase 1). Guardião alado biológico de Carcosa. Luta aérea com grito infrassônico que drena RM passivamente. Dropa o Anel do Sinal Amarelo. Design em <code>lore/cassilda_e_byakhee.md</code>.
+* <strong>Yug-Neth (Mi-Go Filhote — Companion):</strong> Mi-Go filhote aprisionado por Abdul Alhazred na Zona 9 da Tumba. Libertado por Damião no encontro com Alhazred (em ambos os caminhos). Comunica-se por bioluminescência (pontos dourados no corpo). <strong>É a chave dimensional dos Portões das Ruínas</strong> — o jogador não sabe disso até a cena de chegada aos Portões. Não ataca. Design e mecânicas completas em <code>lore/migo_companion.md</code>.
+<h3>2.5 Facções, Criaturas e Raças</h3>
+* <strong>Irmandade do Sinal Amarelo:</strong> Cultistas que costuraram os próprios olhos e caçam Damião usando apenas a audição.
+* <strong>Byakhee (Arautos do Vento Negro):</strong> Sentinelas alados que patrulham de cima e ativam alarmes visuais.
+* <strong>A Coisa do Cemitério:</strong> Um ser cadavérico inchado com pele de textura úmida. Imune ao combate físico, ele caça pelo faro e mata Damião ao menor toque.
+* <strong>Habitantes de Carcosa (Corte de Yhtill):</strong> Fantasmas estáticos que choram nas esquinas, drenando a RM de quem se aproxima.
+<h3>2.6 Roteiro e Diálogos (Escopo Geral)</h3>
+* <strong>Diálogos:</strong> Poucos, focados em gravações de áudio (Logs), anotações em terminais e sussurros da Cidade Pálida.
+* <strong>Localização:</strong> Textos e legendas em Português do Brasil (idioma nativo) e Inglês.
+<h3>2.7 Progressão Narrativa</h3>
+O jogo começa com Damião acordando no <strong>Deserto de Hali</strong> — imediatamente após os eventos do curta-metragem <em>Favela Amarela</em>. Através da exploração livre do overworld e do drop de itens (incluindo o Mapa Fragmentado que revela o Templo da Serpente), o jogador vai progredindo:
+<p>1. <strong>Tumba de Alhazred (Dungeon 1)</strong> — S-Path de 9 Zonas. O ponto de virada interno ocorre na transição Z4→Z5 (queda física, desbloqueio de Arma + Salto). Clímax: derrota de Abdul Alhazred, drop do Necronomicon. A dungeon contém fragmentos de lore que conectam o jogo ao universo audiovisual.<br>2. <strong>Santuário de Yhtill</strong> — Quest narrativa com a Rainha Cassilda. Conclusão recompensa o Patuá.<br>3. <strong>Templo da Serpente (Dungeon 2, opcional)</strong> — Dois guardiões: <strong>Naga</strong> (Guardião 1) e <strong>Avatar de Set</strong> (Guardião 2, Deus Egípcio Primordial). O Avatar de Set dropa o <strong>Elmo do Set</strong> sempre garantido, mais uma segunda peça do Set Lendário de forma aleatória. O Naga também dropa uma peça RNG. O set lendário completo é composto por 4 peças: <strong>Elmo, Peço, Pernas e Arma</strong>.<br>4. <strong>Portões das Ruínas</strong> — Miniboss Byakhee. Drop: Anel do Sinal Amarelo. Abertura dos Portões → transição para a Fase 2 (Castelo de Carcosa).<br>5. <strong>Castelo de Carcosa (Fase 2)</strong> — Dentro do Castelo, Damião precisa encontrar as peças restantes do Set Lendário ainda não coletadas. Com o set completo, ele tem chance de enfrentar e matar o <strong>Avatar de Nyarlathotep</strong> (sidequest secreta). A quest principal da Fase 2 culmina no confronto com o <strong>Rei em Amarelo</strong>.</p>
+<p>---</p>
+<h2>3. MECÂNICAS DE JOGO (GAMEPLAY)</h2>
+<h3>3.1 Gameplay Loop</h3>
+<pre><code>
+[Explorar no Escuro / Dreno de RM] ──▶ [Detectar Cultistas por Som/IA]
+                │                                    │
+                ▼                                    ▼
+       [Esconder-se / Evasão] ──▶ [Usar Salto Dimensional (Custa RM)]
+                │                                    │
+                └─────────────────┬──────────────────┘
+                                  ▼
+                    [Recuperar RM sob Postes de Luz]
+</code></pre>
+<h3>3.2 Mecânicas Core</h3>
+* <strong>Movimentação Isométrica:</strong> Movimento em 8 direções no plano XY com velocidade adaptada ao estado mental (Focado ganha +10% de velocidade).
+* <strong>Furtividade baseada em Som, Faro e Luz:</strong>
+  * <strong>Agachar:</strong> Reduz a velocidade, reduz a hitbox física e diminui em 80% o ruído emitido.
+  <em> <strong>Detecção por Faro (Sseth Farejador):</strong> Inimigos farejadores detectam por proximidade em área. Podem ser neutralizados com o </em>Frasco de Incenso*.
+  * <strong>Tempestade de Memória:</strong> O vento forte no Overworld do Deserto abafa 100% o som dos passos.
+<em> <strong>Esquiva Física:</strong> Um desvio rápido que não consome RM, mas tem tempo de recarga (2.5s). </em>(Nota: O Salto Dimensional foi integralmente removido do jogo).*
+* <strong>Companheiro Yug-Neth (Mi-Go Filhote):</strong> Após ser libertado na Tumba de Alhazred, Yug-Neth segue Damião pelo jogo. Não combate, mas oferece efeitos passivos (bioluminescência ilumina 1 unidade de raio; confunde Nagas; revela posição do Byakhee). <strong>Mecânica de Proteção:</strong> Yug-Neth possui uma barra de <strong>Resiliência do Companheiro (RC)</strong>. Se a RC chegar a zero por ataques inimigos → <strong>Colapso do Companheiro = Game Over</strong>. Damião deve se posicionar entre inimigos e Yug-Neth para bloquear projéteis.
+<h3>3.3 Sistema de Combate Físico & Dupla Barra</h3>
+* <strong>Dupla Barra de Sobrevivência:</strong> Damião possui <strong>Resiliência Mental (RM - 100 max)</strong> para estabilidade psíquica e <strong>Vitalidade Corpórea (Vit - 100 max)</strong> para integridade física. Ataques de armas tiram Vitalidade Corpórea; terror/escuridão tira RM.
+* <strong>Mão Física (As 3 Armas Rituais do Baú RNG — Zona 6b):</strong> Damião começa desarmado (golpe de mão vazia com Dano 0). Na Câmara do Baú (Zona 6b), obtém por sorteio RNG 1 de 3 armas rituais:
+  1. <strong>Cravo de Ferro:</strong> Dano 40, Defesa 30 (mitigação pesada).
+  2. <strong>Estilete de Irem:</strong> Dano 25, Defesa 15 + Sangramento (15/s).
+  3. <strong>Alfanje de Alhazred:</strong> Dano 60, Defesa 40 + Habilidade <em>Golpe do Deserto</em> (Stun 2.5s).
+* <strong>Ficha de Atributos e Mitigação:</strong> Todas as unidades possuem Ficha de Atributos com 5 atributos (Vitalidade, Ataque, Defesa, Conjuração, Resistência Anômala) e mitigação por fórmula subtrativa com piso ($\max(\text{bruto} \times 0.15, \text{bruto} - \text{defesa})$).
+<h3>3.4 Consumíveis Rápidos & Relíquias (Árvore de Itens)</h3>
+* <strong>Hotbar de Consumíveis Rápidos:</strong> Chá Calmante (+40 RM), Frasco de Incenso (corta faro), Sino de Estática (distração por som 15m), Frasco de Veneno de Yig (-10 Defesa no boss), Fragmento de Yuggoth (+25 RC do companheiro).
+* <strong>Relíquias Ancestrais:</strong> O Necronomicon (tradução Aklo), Patuá de Malik Nazinga (linha de conexão ancestral), Patuá das Luas Gêmeas (-40% dreno de RM no escuro), Anel do Sinal Amarelo (-30% detecção de cultistas).
+* <strong>Set Lendário de Set (4 Peças):</strong> Elmo, Peitoral, Grevas e Arma de Set. O conjunto completo desbloqueia o confronto contra o Avatar de Nyarlathotep no Castelo.
+<h3>3.5 Economia Interna e Recursos</h3>
+* <strong>Resiliência Mental (RM):</strong> O único recurso ativo (0.0 a 100.0).
+<em> <strong>Itens Raros:</strong> Consumíveis raros de uso único (ex.: </em>Chá Calmante* que recupera 40 RM).
+<h3>3.6 Sistemas Secundários</h3>
+* <strong>Propagação Sonora:</strong> Ruídos emitidos por Damião (passos rápidos, quedas, estática de poderes) propagam ondas circulares físicas na cena que alertam os cultistas se tocarem em seu raio auditivo.
+<h3>3.7 Física e Simulação</h3>
+* <strong>Física Isométrica 2D:</strong> Todo o jogo roda em física 2D (<code>Rigidbody2D</code> com <code>gravityScale = 0</code>), simulando altura e profundidade através de remapeamento matemático de eixos e Y-Sorting dinâmico por eixo customizado.
+<h3>3.8 Modos de Jogo</h3>
+* <strong>Singleplayer:</strong> Campanha principal única.
+<p>---</p>
+<h2>4. INTERFACE E EXPERIÊNCIA DO USUÁRIO (UI/UX)</h2>
+<h3>4.1 Filosofia de Interface</h3>
+* <strong>Imersão Absoluta (HUD Diegética):</strong> Minimizar overlays digitais. A tela pisca e perde cor para sinalizar o status mental do jogador.
+* <strong>Estilo Monocromático de Terminal:</strong> Menus de pausa, logs e mensagens usam fontes monospace que emulam terminais antigos.
+<h3>4.2 Fluxo de Telas</h3>
+<pre><code>
+Menu Inicial ──▶ Gameplay (Zonas 1-4) ──▶ Queda (Z4 → Z5) ──▶ Gameplay (Zonas 5-9, Tumba de Alhazred)
+   ▲                 │                                             │
+   │            RM a 0 (Colapso)                    Drop do Necronomicon ──▶ resto do Deserto de Hali
+   └─────────────────┘
+</code></pre>
+O encerramento da Zona 5 (fuga do subterrâneo) <strong>não é fim de fase</strong> — é o meio da Tumba de Alhazred (Dungeon 1), que continua até a Zona 9 e o miniboss final da dungeon (2026-07-28: corrigido — antes este diagrama descrevia a Zona 5 como "fim da Fase 1", o que deixou de valer quando a Ruínas Pálidas virou dungeon dentro do Deserto). O fim de fase de verdade é a derrota do Byakhee nos Portões das Ruínas. O único fim de jogo mid-campanha é o <strong>Colapso</strong> (RM a 0), que retorna ao Menu Inicial.
+<h3>4.3 HUD (In-Game)</h3>
+* Um medidor circular de <strong>Resiliência Mental</strong> muito discreto no canto da tela (sinalizado como batimento de sinal).
+* Dois pequenos ícones no canto inferior esquerdo indicando o módulo ativo em cada mão.
+<h3>4.4 Menus e Painéis</h3>
+* <strong>Diário de Tradução (OKF Logs):</strong> Aba onde Damião lê documentos traduzidos e anota pistas para entender a Cidade Pálida.
+<p>---</p>
+<h2>5. CONTEÚDO E LEVEL DESIGN</h2>
+<h3>5.1 Estrutura de Progressão do Jogo (S-Path)</h3>
+As <strong>"Ruínas Pálidas"</strong> — hoje a <strong>Tumba de Alhazred, Dungeon 1 da Fase 1 (Deserto de Hali)</strong>, ver §1.8 — são construídas em formato de S. O blockout real (<code>LevelBlockoutPlanner.cs</code>) já tem <strong>9 Zonas</strong>; as 5 primeiras (documentadas abaixo) cobrem o trecho de stealth urbano até a queda para o subterrâneo:
+<pre><code>
+[Zona 1: Rua Entrada] ──▶ [Zona 2: Vila das Casas]
+                                  │
+                                  ▼
+[Zona 4: Praça Cerco] ◀── [Zona 3: Beco do Vento]
+         │ (Queda/Colapso)
+         ▼
+[Zona 5: Ruínas Subterrâneas]
+</code></pre>
+<h3>5.2 Métricas de Construção (Level Design Metrics)</h3>
+* <strong>PPU (Pixels Per Unit):</strong> 32 (2026-07-28: padrão único do projeto; ver <code>.claude/skills/favela-isometric-standards/SKILL.md</code>). Arte legada importada a 16 PPU é reimportada a 32 quando for tocada, não em massa.
+* <strong>Corredores:</strong> Largura padrão de 3.5 a 4.0 unidades para permitir movimentação livre e desvios de cultistas.
+<h3>5.3 Catálogo de Assets</h3>
+* <strong>Ambientação:</strong> Ruínas de favela com alvenaria deteriorada, pedras cinzentas e vegetação murcha bioluminescente.
+* <strong>Linguagem Visual:</strong> Postes de luz amarela atuam como faróis direcionando o caminho seguro do jogador.
+<h3>5.4 Lista de Fases / Regiões</h3>
+<h4>Dungeon 1 — Tumba de Alhazred (Zonas 1-9, S-Path)</h4>
+<blockquote>Implementado em <code>Assets/Scenes/Playtest_RuinasPalidas.unity</code>. Zonas 1-5 documentadas abaixo; Z6-9 implementadas mas pendentes de documentação textual.</blockquote>
+<p>* <strong>Zona 1 (Rua de Entrada):</strong> Trecho de subida com 2 Cultistas Errantes. Introdução aos postes de luz. <strong>[Fragmento de Yhtill nº1 não está aqui — está no Overworld: Garganta de Pedra Pálida]</strong><br>* <strong>Zona 2 (Vila das Casas):</strong> Área ampla com 3 casas modulares. <strong>Fragmento de Yhtill nº2 (Lord Morthis)</strong> escondido sob soleira.<br>* <strong>Zona 3 (Beco do Vento):</strong> Vielas estreitas com vento que abafa passos.<br>* <strong>Zona 4 (Praça do Cerco):</strong> Arena fechada, chão desaba → queda para Zona 5.<br>* <strong>Zona 5 (Subterrâneo - Ruínas de Hali):</strong> Terror puro, sem luz. Drop da Barra Enferrujada + Salto Dimensional.<br>* <strong>Zona 6b (Câmara do Baú):</strong> Sala lateral a Leste da Z6, baú sorteia uma das três armas. <strong>Fragmento de Yhtill nº3 (Lady Vaine)</strong> encontrado aqui.<br>* <strong>Zona 9 (Tumba de Abdul):</strong> Encontro com Alhazred — <strong>Cena de Escolha</strong> (concordar = sem luta + sem Necronomicon; recusar = Boss Fight + Necronomicon + mecânica de proteção de Yug-Neth). Yug-Neth libertado em ambos os caminhos e se torna companion.</p>
+<h4>Deserto Aberto (Overworld)</h4>
+* <strong>Garganta de Pedra Pálida (área inicial):</strong> <strong>Fragmento de Yhtill nº1 (Lady Seraphel)</strong> em fenda de pedra.
+* <strong>Santuário de Yhtill:</strong> Rainha Cassilda — Quest "A Canção Incompleta" (5 Fragmentos). Diálogos em visual novel style. Recompensa: Patuá das Luas Gêmeas.
+* <strong>Portões das Ruínas:</strong> Boss Byakhee. Drop: Anel do Sinal Amarelo. Abertura dos Portões = transição para Fase 2.
+<h4>Dungeon 2 — Templo da Serpente (Zonas 1-12, Semi-obrigatória)</h4>
+<blockquote>Novo conteúdo para o Vertical Slice (2026-07-30). Design completo em <code>lore/templo_da_serpente.md</code>.</blockquote>
+<p>* <strong>Z1 (Átrio das Escamas):</strong> Chão de escamas que amplifica som; introdução ao Sseth Farejador.<br>* <strong>Z2 (Corredor dos Glifos):</strong> Lore dos Serpent People em afrescos. <strong>Fragmento de Yhtill nº4 (Lord Aldaron I)</strong> atrás de painel falso.<br>* <strong>Z3 (Câmara dos Sseth):</strong> 4 Sseth Comuns + 1 Farejador. Fogueira ritual de luz maligna.<br>* <strong>Z4 (Salão dos Nagas):</strong> 2 Nagas Guerreiros (elite). Estátuas de Set como cobertura. <strong>Fragmento de Yhtill nº5 (Lord Aldaron II)</strong> no pedestal.<br>* <strong>Z5 (O Poço de Yig):</strong> Larvas de Yig. Mecânica de distração com objetos no poço.<br>* <strong>Z6 (Câmara do Veneno):</strong> Névoa tóxica + 1 Espectro Escamado. Salto Dimensional necessário.<br>* <strong>Z7 (Cripta das Larvas):</strong> Ovos de Yig sensíveis a vibração. Stealth absoluto. Drop RNG: Peitoral de Set.<br>* <strong>Z8 (Galeria das Visões de Set):</strong> Espelhos de obsidiana + 2 Sseth. Reflexos de Set.<br>* <strong>Z9 (Santuário do Olho):</strong> Cristal pulsante de Set. Ponto de Ancoragem (único do Templo).<br>* <strong>Z10 (Câmara do Trono):</strong> ★ <strong>BOSS 1: Nagaraja, o Sacerdote do Sinal Escamado</strong> ★ Drop: 1 peça RNG do Set Lendário.<br>* <strong>Z11 (A Fenda de Set):</strong> Zona de transição. ★ <strong>BOSS 2: O Avatar de Set</strong> ★ Drop: Elmo de Set (garantido) + 1 peça RNG.<br>* <strong>Z12 (Saída — O Deserto Coberto de Escamas):</strong> Retorno ao Overworld. Cena narrativa do Diário de Damião.</p>
+<p>---</p>
+<h2>6. ARTE</h2>
+<h3>6.1 Direção de Arte</h3>
+* <strong>Estilo Visual:</strong> Pixel art 2D de alta resolução (64x64px por tile) com shaders de iluminação dinâmica (mapa de normais) e efeito scanline de monitor CRT.
+* <strong>Paleta de Cores:</strong> Cinza pálido, verde ácido, ferrugem profunda e preto abissal, contrastados pela luz quente amarela dos refúgios.
+<h3>6.2 Efeitos Visuais (VFX)</h3>
+* <strong>Shaders de Glitch:</strong> Estática e distorção na tela que se intensificam quando Damião está no escuro ou perto de anomalias.
+* <strong>Partículas de Vento:</strong> Poeira e cinzas soprando lateralmente nas zonas externas.
+<p>---</p>
+<h2>7. ÁUDIO</h2>
+<h3>7.1 Direção Sonora</h3>
+* <strong>Identidade:</strong> Minimalista, industrial e ambiental. Predomínio de sons analógicos de fita magnética e sintetizadores distorcidos.
+<h3>7.2 Música Adaptativa</h3>
+* <strong>Estados Musicais:</strong>
+  <em> </em>Exploração:* Drone silencioso e tenso.
+  <em> </em>Alerta:* Batidas sutis de percussão industrial.
+  <em> </em>Caça:* Música agressiva, distorcida e opressora.
+<h3>7.3 Efeitos Sonoros (SFX)</h3>
+* Ruído físico de passos variando conforme a velocidade (agachado = silêncio, corrida = barulho alto).
+* Som de estática elétrica do Salto Dimensional.
+<p>---</p>
+<h2>8. TECNOLOGIA E ENGENHARIA</h2>
+<h3>8.1 Engine e Ferramentas</h3>
+* <strong>Engine:</strong> Unity 6000.4.4f1.
+* <strong>Controle de Versão:</strong> Git.
+<h3>8.2 Arquitetura de Software (POCO vs MonoBehaviour)</h3>
+<em> <strong>Regra de Ouro:</strong> Toda a lógica matemática, FSM de inimigos, contadores de sanidade e mecânicas de stealth rodam em C# puro (POCO) no namespace <code>FavelaAmarela.Core.</em></code>, sem herdar de MonoBehaviour.
+<em> <strong>Adaptação:</strong> Os scripts da Unity em <code>FavelaAmarela.Runtime.</em></code> servem apenas para instanciar, ler input e aplicar feedback visual/físico aos POCOs correspondentes.
+<h3>8.3 Salvamento e Persistência</h3>
+* Salvamento de progresso realizado via serialização JSON de classes POCO nos postes de luz (Refúgios).
+<h3>8.4 Performance e Otimização</h3>
+* Limitação de alocação de memória (zero Garbage Collection) no loop principal de física e updates.
+<p>---</p>
+<h2>11. TESTES E GARANTIA DE QUALIDADE (QA)</h2>
+<h3>11.1 Estratégia de Testes</h3>
+* <strong>Testes EditMode (NUnit):</strong> Toda a lógica do Core (como a resiliência mental e a máquina de estados do cultista) possui testes automáticos rodando em CLI (<code>dotnet test</code>), testando as lógicas de negócio sem abrir a Unity.
+<h3>11.2 Critérios de Aceitação</h3>
+* Uma feature só é considerada concluída se passar em 100% dos testes automáticos de qualidade (EditMode) e compilar sem avisos.
+<p>---</p>
+<h2>14. APÊNDICES</h2>
+<h3>A – Glossário Diegético</h3>
+* <strong>HP:</strong> Resiliência Mental (RM).
+* <strong>Dano de HP:</strong> Trauma.
+* <strong>Game Over:</strong> Colapso Mental.
+* <strong>Vitória / "You Win":</strong> Não se aplica (RPG, não roguelike). Fim de fase é <strong>Transição</strong>; a vitória é o desfecho da história, ao fim da Fase 6.
+* <strong>Posto de Cura:</strong> Poste de Luz / Refúgio.
+* <strong>Inimigo:</strong> Cultista Amarelo.
+* <strong>Dash:</strong> Salto Dimensional.
+<h3>B – Referências</h3>
+<em> </em>The King in Yellow* (Livro de Robert W. Chambers).
+<em> </em>Dishonored* (Furtividade vertical e habilidades de travessia).
+<em> </em>Death Trash* (Estilo visual visceral e tom maduro).</section><section id="section-2" class="doc-section"><div class="section-header"><span>CAPÍTULO 2</span><h2>2. GDD da Expansão e Demo do Deserto</h2></div><h1>A Maldição da Cidade Pálida — Vertical Slice (2 Fases) — Versão 4.0</h1>
+<p>Documento Mestre de Arquitetura Narrativa, Game Design e Isometria 2D Real (32 PPU) para a demonstração (Demo / Vertical Slice) completa de <strong><em>A Maldição da Cidade Pálida (Favela Amarela)</em></strong>.</p>
+<blockquote><strong>Nota de escopo (2026-07-28):</strong> esta numeração (Fase 1/Fase 2) é local a este Vertical Slice/demo. É diferente da ambição de "jogo completo com 6 fases" registrada no <code>GDD_Mestre.md</code> §1.8 — as duas contagens não foram reconciliadas e não devem ser lidas como a mesma coisa.</blockquote>
+>
+<blockquote><strong>Revisão v4.0:</strong> a antiga "Fase 2: As Ruínas Pálidas" (v3.0) deixou de ser uma fase própria. Seu conteúdo (S-Path, stealth urbano, queda Z4→Z5) foi absorvido como o miolo da Dungeon 1 (Tumba de Alhazred) da Fase 1 — a área já construída em <code>Assets/Scenes/Playtest_RuinasPalidas.unity</code> foi repropositada, não descartada. O que era "Fase 3" virou "Fase 2".</blockquote>
+<p>---</p>
+<h2>1. ESTRUTURA MACRO DO VERTICAL SLICE (2 FASES)</h2>
+<p>O Vertical Slice é composto por <strong>2 Fases contínuas</strong> de progressão narrativa e de gameplay:</p>
+<pre><code>
+[FASE 1: O DESERTO DE HALI] ──────────────────────▶ [FASE 2: O CASTELO DE CARCOSA]
+• Deserto Aberto, 32 PPU, 2 Dungeons + Portões       • Interior do Palácio Real
+• Dungeon 1 (Tumba de Alhazred) = S-Path repaginado   • Quest do Castelo
+  (stealth urbano, tempestades, queda Z4→Z5)          • BOSS FINAL: O REI EM AMARELO
+• NPCs Alhazred e Cassilda
+• Miniboss Byakhee nos Portões das Ruínas
+</code></pre>
+<p>---</p>
+<h2>2. DETALHAMENTO DAS 2 FASES</h2>
+<h3>🏜️ FASE 1: O DESERTO DE HALI (Área Inicial Aberta)</h3>
+* <strong>Estilo de Jogo:</strong> Navegação livre no deserto em 32 PPU, exploração de masmorras e coleta de relíquias.
+* <strong>Dungeon 1 (Tumba de Alhazred):</strong> a área já construída (S-Path, Zonas 1-9 da cena <code>Playtest_RuinasPalidas</code>), repropositada como dungeon dentro do Deserto. Furtividade urbana tensa, gestão de ruído físico, tempestades de areia, a Queda da Zona 4 para a Zona 5 (Cerco dos Cultistas, colapso do chão, travessia subterrânea) e o clímax: Miniboss <strong>Abdul Alhazred</strong> ➔ Drop: <strong>O Necronomicon</strong>.
+* <strong>Dungeon 2 (Templo da Serpente - Opcional):</strong> Chefe Guardião ➔ Drop: <strong>Coroa de Ossos do Rei em Amarelo</strong> (efeito/build a definir — aguardando fechamento do roteiro).
+* <strong>Santuário de Yhtill:</strong> Rainha Cassilda recita a Canção de Cassilda + Quest ➔ Recompensa: <strong>Patuá das Luas Gêmeas</strong>.
+* <strong>Portões das Ruínas (Fim da Fase 1):</strong> Miniboss <strong>Byakhee</strong> ➔ Drop: <strong>Anel do Sinal Amarelo</strong> ➔ Abertura dos Portões ➔ Transição para a Fase 2.
+<p>---</p>
+<h3>🏰 FASE 2: O CASTELO DE CARCOSA (Fase Final & Boss)</h3>
+* <strong>Estilo de Jogo:</strong> Terror psíquico e mistério nos salões majestosos e corrompidos do Palácio de Yhtill.
+* <strong>Quest do Castelo:</strong> Desvendando o mistério da Segunda Peça da tragédia e o destino da nobreza fossilizada.
+<em> <strong>CHEFÃO FINAL DA DEMO / DO JOGO:</strong> <strong>O REI EM AMARELO</strong> (</em>O Avatar de Hastur*).
+* <strong>Mecânica da Máscara Pálida:</strong>
+  * O Rei em Amarelo não possui barra de vida vulnerável a ataques físicos simples.
+  * O confronto é um duelo de sanidade e esquiva psíquica: quando a Máscara Pálida do Rei começar a "cair", Damião <strong>DEVE se virar de costas imediatamente</strong> (olhar direto para a verdadeira face alienígena causa Colapso Psíquico Instantâneo / Game Over).
+  * Vencer o Rei em Amarelo exige usar as 4 Relíquias acumuladas para selar o portal de Aldebaran e encerrar a demonstração com o desfecho triunfal da demo.
+<p>---</p>
+<h2>3. AS 4 RELÍQUIAS LENDÁRIAS E SUAS FUNÇÕES NAS 2 FASES</h2>
+<blockquote>Efeitos ainda não definidos para nenhuma relíquia — o roteiro está em fechamento. A tabela abaixo é só um mapa de proveniência (quem dropa o quê, onde); a coluna de função é referência histórica da v3.0 e <strong>não deve ser tratada como decisão final</strong>.</blockquote>
+<table class="doc-table">
+<tr><th>Relíquia</th><th>Obtenção</th><th>Função na Fase 1 (Deserto)</th><th>Função na Luta Final (Fase 2: O Rei)</th></tr>
+<tr><td><strong>📖 O Necronomicon</strong></td><td>Drop de Alhazred (Dungeon 1: Tumba de Alhazred)</td><td>A definir.</td><td>A definir.</td></tr>
+<tr><td><strong>👑 Coroa de Ossos do Rei em Amarelo</strong></td><td>Drop do Chefe Guardião (Dungeon 2: Templo da Serpente, Opcional)</td><td>A definir.</td><td>A definir.</td></tr>
+<tr><td><strong>🧿 Patuá das Luas Gêmeas</strong></td><td>Quest da Rainha Cassilda (Santuário de Yhtill)</td><td>A definir.</td><td>A definir.</td></tr>
+<tr><td><strong>💍 Anel do Sinal Amarelo</strong></td><td>Drop do Byakhee (Portões das Ruínas)</td><td>A definir.</td><td>A definir.</td></tr>
+</table>
+<p>---</p>
+<h2>4. PADRÃO TÉCNICO DE ISOMETRIA 2D REAL (32 PPU)</h2>
+<p>* <strong>Pixel-Per-Unit (PPU):</strong> <strong><code>32</code></strong> para todos os sprites.<br>* <strong>Tile de Chão:</strong> Losangos 2:1 de <strong><code>32 x 16 px</code></strong>.<br>* <strong>Grid CellSize:</strong> <strong><code>(1.0, 0.5, 1.0)</code></strong>.<br>* <strong>Escala dos Prefabs:</strong> <strong><code>Transform.scale = (1.0, 1.0, 1.0)</code></strong> nativo.<br>* <strong>Câmera:</strong> Ortográfica plana sem rotação (<code>Quaternion.identity</code>), offset $Z = -10$, <code>Orthographic Size = 5.5 a 6.0</code>.</p></section><section id="section-3" class="doc-section"><div class="section-header"><span>CAPÍTULO 3</span><h2>3. Lore: O Povo Serpente</h2></div><h1>O Povo Serpente</h1>
+<h2>I. Origem Mitológica (Fontes Canônicas)</h2>
+<p>Os <strong>Serpent People</strong> são uma raça pré-humana que aparece pela primeira vez nas histórias de <strong>Conan o Bárbaro</strong>, de Robert E. Howard (<em>"The Shadow Kingdom"</em>, 1929), e foi expandida pelo círculo de Lovecraft — particularmente por August Derleth e Clark Ashton Smith — como parte do Mythos.</p>
+<h3>O que sabemos da lore canônica:</h3>
+- Eram a <strong>espécie dominante da Terra</strong> durante a era Mesozoica, muito antes da ascensão dos mamíferos.
+- Habitaram <strong>Valúsia</strong> (a Antiga), no continente Thuriano — uma civilização de milhões de anos de história, com ciência, magia e arquitetura ciclópea.
+- Adoravam o deus-serpente <strong>Set</strong> — figura egípcia do Caos, das Tempestades e da Escuridão Primordial. Set não é apenas uma metáfora: é uma entidade real e ativa no Mito de Cthulhu, aliada de Nyarlathotep.
+- São mestres da <strong>magia de Aklo</strong> e da metamorfose — podem assumir a forma de humanos perfeitos, tornando-os espionadores e infiltradores naturais.
+- Sua linguagem original é o <strong>Aklo Serpentino</strong> — uma variante sibilante do Aklo que Abdul Alhazred encontrou gravado nas Ruínas da Cidade Sem Nome.
+- <strong>Não são extintos</strong>: apenas adormecidos, aguardando o retorno de Set. Pequenas colônias sobrevivem em locais de poder, especialmente em templos subterrâneos e em dimensões adjacentes.
+<p>---</p>
+<h2>II. O Povo Serpente em Carcosa</h2>
+<p>A presença do Povo Serpente no <strong>Deserto de Hali</strong> é uma anomalia — e uma revelação narrativa crucial para o lore do jogo.</p>
+<h3>A Teoria dos Dois Senhores</h3>
+<p>Carcosa é a dimensão do <strong>Rei em Amarelo (Hastur)</strong>, mas o poder de Set se estende através das <strong>Arenas do Caos Primordial</strong> — camadas dimensionais onde entidades pré-humanas reclamam territórios.</p>
+<p>O Deserto de Hali, no extremo leste, é uma dessas Arenas: uma zona onde a <strong>tempestade de Hali encontra a tempestade de Set</strong>. O Povo Serpente não chegou a Carcosa por invasão — foi <strong>invocado</strong> por um Sacerdote de Set que, ao pronunciar o nome proibido no limiar dimensional errado, atraiu o olhar de Hastur. O Rei em Amarelo os prendeu no Deserto como <strong>guardiões e ornamentos do seu domínio</strong>, forçando-os a servir sua geometria.</p>
+<p>Os Serpent People no Templo de Hali são, portanto:<br>- <strong>Prisioneiros de Carcosa</strong> que revertem ao serviço de Set por inércia milenária.<br>- <strong>Hostis a Damião</strong> porque qualquer ser humano em Carcosa é visto como um agente potencial de Hastur.<br>- <strong>Parcialmente cientes</strong> de sua prisão, o que os torna ainda mais perigosos e imprevisíveis — e o que explica a loucura do Sacerdote Nagaraja.</p>
+<p>---</p>
+<h2>III. Hierarquia do Povo Serpente no Templo</h2>
+<pre><code>
+[SET (Deus Ausente)]
+        │
+        ▼
+[Avatar de Set — Manifestação Divina]
+        │
+        ▼
+[Nagaraja, o Sacerdote do Sinal Escamado — Líder Vivo]
+        │
+        ▼
+[Nagas Guerreiros — Elite de Combate]
+        │
+        ▼
+[Sseth Comuns — Cultistas Serpentinos]
+        │
+        ▼
+[Larvas de Yig — Esporos Adormecidos]
+</code></pre>
+<h3>Tipos de Inimigos no Templo</h3>
+<table class="doc-table">
+<tr><th>Tipo</th><th>Descrição</th><th>Comportamento</th></tr>
+<tr><td><strong>Sseth Comum</strong></td><td>Serpentino bípede de ~1,5m, túnica preta com glifos de Set</td><td>Patrulha em grupo; cega-se usando quimiotaxia (fareja Damião)</td></tr>
+<tr><td><strong>Naga Guerreiro</strong></td><td>2m de altura, armado com lança de obsidiana e escudo de pele de Byakhee</td><td>Elite; visão perfeita, mas lento; quebra paredes</td></tr>
+<tr><td><strong>Larvas de Yig</strong></td><td>Massa de filhotes do deus-serpente Yig, parente de Set</td><td>Barreiras vivas que bloqueiam passagens; não atacam, mas grudam</td></tr>
+<tr><td><strong>Espectro Escamado</strong></td><td>Serpente morta-viva, invisível na escuridão</td><td>Só detectável pelo som de escamas no chão</td></tr>
+</table>
+<p>---</p>
+<h2>IV. Linguagem e Comunicação</h2>
+<p>O Aklo Serpentino usado pelo Povo Serpente é fonético e assustador ao ouvido humano. Frases canônicas que aparecem nos fragmentos escritos do Templo:</p>
+<table class="doc-table">
+<tr><th>Aklo Serpentino</th><th>Tradução (Damião no Diário)</th></tr>
+<tr><td><em>"Ssseth-kaa-yig"</em></td><td>"Set-olho-Yig" → Invocação aos dois deuses</td></tr>
+<tr><td><em>"Hali-nasseth"</em></td><td>"Hali (o lago) nos aprisiona"</td></tr>
+<tr><td><em>"Damião-keth sseth"</em></td><td>"O humano odeia a serpente"</td></tr>
+<tr><td><em>"Set-ur-haal"</em></td><td>"Set desperta / Set retorna"</td></tr>
+</table>
+<p>---</p>
+<h2>V. Conexão com o Universo Multimídia Favela Amarela</h2>
+<p>O lore do Povo Serpente conecta com o universo audiovisual de <strong>Richard Abelha</strong> de duas formas:</p>
+<p>1. <strong>Fragmento do Necronomicon</strong>: O tomo que Alhazred dropa contém uma passagem sobre o "Templo das Escamas no Deserto das Cinzas" — um aviso de Alhazred de que nunca entrou no Templo, mas ouviu os cantos vindos de lá durante a escrita do <em>Al-Azif</em>.</p>
+<p>2. <strong>A Sidequest de Nyarlathotep</strong>: O Set Lendário (4 peças) coletado no Templo é necessário para acessar o Avatar de Nyarlathotep no Castelo de Carcosa (Fase 2). Nyarlathotep e Set são aliados no Mythos — o Set Lendário funciona como um "passaporte de poder primordial" que Nyarlathotep reconhece.</p></section><section id="section-4" class="doc-section"><div class="section-header"><span>CAPÍTULO 4</span><h2>4. Lore: O Templo da Serpente (Dungeon 2)</h2></div><h1>O Templo da Serpente — Design Completo (Vertical Slice)</h1>
+<blockquote><strong>Status:</strong> Design fechado para o Vertical Slice do edital (2026-07-30).</blockquote>
+<blockquote><strong>Tipo:</strong> Dungeon semi-obrigatória. Opcional para progressão, mas o <strong>Set Lendário</strong> obtido aqui impacta o desfecho (Sidequest de Nyarlathotep no Castelo de Carcosa).</blockquote>
+<blockquote><strong>Lore completo da raça:</strong> Ver [povo_serpente.md](povo_serpente.md).</blockquote>
+<p>---</p>
+<h2>I. Introdução e Descoberta</h2>
+<p><strong>Localização:</strong> Extremo leste do Deserto de Hali, dentro da zona de tempestade máxima (~15% de visibilidade).</p>
+<p><strong>Descoberta:</strong> O <strong>Mapa Fragmentado</strong> — item raro droppado por qualquer inimigo errante do deserto — revela a localização do Templo com um símbolo de serpente enrolada. Sem o mapa, a entrada é invisível sob a areia.</p>
+<p><strong>Visual da Entrada:</strong> Uma espiral de pedras serpentinas semienterradas, alinhadas com as luas gêmeas de Carcosa. Gravuras em Aklo Serpentino na pedra de entrada alertam: <em>"Hali-nasseth"</em> (o lago nos aprisiona). A tempestade se intensifica ao cruzar o limiar.</p>
+<p><strong>Tom Narrativo:</strong> Diferente da Tumba de Alhazred (terror urbano, claustrofóbico), o Templo é <strong>grandioso e alienígena</strong> — arquitetura ciclópea de pedra negra, afrescos de batalhas pré-humanas, estátuas de Set com olhos de ônix que parecem seguir Damião. O Povo Serpente não é louco como os cultistas: é <em>antigo e deliberado</em>.</p>
+<p>---</p>
+<h2>II. Estrutura em 12 Zonas</h2>
+<pre><code>
+[ENTRADA] ──▶ [Z1: Átrio das Escamas] ──▶ [Z2: Corredor dos Glifos]
+                                                    │
+                                          [Z3: Câmara dos Sseth]
+                                                    │
+                              ┌─────────────────────┘
+                              ▼
+              [Z4: Salão dos Nagas] ──▶ [Z5: O Poço de Yig]
+                                                │
+                                      [Z6: Câmara do Veneno]
+                                                │
+              ┌─────────────────────────────────┘
+              ▼
+[Z7: Cripta das Larvas] ──▶ [Z8: Galeria das Visões de Set]
+                                       │
+                             [Z9: Santuário do Olho]
+                                       │
+                     ┌─────────────────┘
+                     ▼
+         [Z10: Câmara do Trono do Sacerdote]
+                     │
+         ══════════════════════════════════
+         ★ BOSS 1: NAGARAJA (Sacerdote) ★
+         ══════════════════════════════════
+                     │
+         [Z11: A Fenda de Set — Zona de Transição]
+                     │
+         ══════════════════════════════════════
+         ★ BOSS 2: O AVATAR DE SET (Divino) ★
+         ══════════════════════════════════════
+                     │
+         [Z12: Saída — O Deserto Coberto de Escamas]
+</code></pre>
+<p>---</p>
+<h2>III. Descrição de Cada Zona</h2>
+<h3>Z1 — Átrio das Escamas</h3>
+<strong>Tamanho:</strong> Grande (5x5 unidades)
+<strong>Atmosfera:</strong> Luz filtrada por cristais de ônix. Chão coberto por escamas secas que crocham sob os pés — emitem som. O jogador aprende imediatamente: <strong>qualquer passo aqui gera barulho dobrado</strong>.
+<strong>Inimigos:</strong> 2 Sseth Comuns em patrulha lenta.
+<strong>Segredo:</strong> Uma passagem dissimulada (atrás de uma estátua de Set) leva a um baú com o <strong>Chá Calmante</strong> (recupera 40 de Resiliência Mental).
+<strong>Mecânica introduzida:</strong> Escamas no chão como armadilha de som — Damião precisa agachar e se mover lentamente para não acordar os Sseth.
+<p>---</p>
+<h3>Z2 — Corredor dos Glifos</h3>
+<strong>Tamanho:</strong> Longo e estreito (2x8 unidades)
+<strong>Atmosfera:</strong> Afrescos imensos nas paredes narram a guerra pré-humana entre Serpentes e os ancestrais de Hastur. O Necronomicon (se obtido) permite traduzir alguns glifos — revelando fragmentos de lore.
+<strong>Inimigos:</strong> Nenhum. Zona de exploração e lore.
+<strong>Fragmento de Yhtill nº 4:</strong> Escondido atrás de um painel falso. Damião encontra uma página arrancada de um diário da nobreza de Yhtill — evidência de que nobres de Cassilda chegaram aqui antes.
+<strong>Texto do Fragmento (em jogo):</strong>
+<blockquote><em>"...o corredor não tem fim visível. As gravuras me dizem que estas bestas eram reis antes de sermos primatas. Carrego o terceiro anel de Yhtill e rezo para que Cassilda nos encontre antes que a tempestade..."</em></blockquote>
+<blockquote>— <em>[assinatura ilegível, Nobreza de Yhtill, data: círculo de luas gêmeas desconhecido]</em></blockquote>
+<p>---</p>
+<h3>Z3 — Câmara dos Sseth</h3>
+<strong>Tamanho:</strong> Médio (4x4 unidades), múltiplas saídas
+<strong>Atmosfera:</strong> Central de patrulha. Quatro Sseth Comuns distribuídos. Fogueira ritual de chamas verdes no centro — ilumina, mas drena RM (luz maligna ≠ poste de luz).
+<strong>Inimigos:</strong> 4 Sseth Comuns. Um deles <strong>Farejador</strong> (detecta Damião por cheiro, não por som).
+<strong>Mecânica nova — Farejador:</strong> O Sseth Farejador tem um cone de cheiro (invisible no mapa, mas indicado por partículas verde-podre). Damião pode neutralizá-lo usando um <strong>Frasco de Incenso</strong> (item consumível encontrado na Z1 secreta).
+<p>---</p>
+<h3>Z4 — Salão dos Nagas</h3>
+<strong>Tamanho:</strong> Grande (6x4 unidades), teto alto
+<strong>Atmosfera:</strong> Dois Nagas Guerreiros patrulham devagar com lanças. Estátuas ciclópeas de Set (~3 unidades de altura) criam ângulos cegos perfeitos para stealth.
+<strong>Inimigos:</strong> 2 Nagas Guerreiros (elites). Não detectam por som, mas têm <strong>visão de cone ampla</strong>.
+<strong>Mecânica de cobertura:</strong> Estátuas de Set bloqueiam visão dos Nagas. O jogador aprende a usar os ângulos mortos entre as estátuas.
+<strong>Fragmento de Yhtill nº 5:</strong> No pedestal de uma estátua. A quinta e última página da quest de Cassilda.
+<strong>Texto do Fragmento:</strong>
+<blockquote><em>"Esta é a última anotação que consigo fazer. Sinto que o Avatar me observa. Cassilda disse que as luas testemunhariam nosso retorno — mas as luas de Carcosa não piscam para nós. Que ela encontre estas páginas. Que ela saiba que viemos até o fim."</em></blockquote>
+<blockquote>— <em>[Lorde Aldaron de Yhtill]</em></blockquote>
+<p>---</p>
+<h3>Z5 — O Poço de Yig</h3>
+<strong>Tamanho:</strong> Pequeno e circular (3x3 unidades)
+<strong>Atmosfera:</strong> Poço central de pedra negra com serpentes vivas enroladas nas bordas — as <strong>Larvas de Yig</strong>. Não atacam, mas grudam em Damião se ele encostar, causando lentidão severa e dreno de RM.
+<strong>Mecânica do Poço:</strong> Jogar objetos no poço gera barulho que atrai as Larvas para longe por 10 segundos. Necessário para atravessar.
+<strong>Item:</strong> Frasco de Veneno de Yig (consumível, pode ser usado em combate para aplicar debuff nos bosses).
+<p>---</p>
+<h3>Z6 — Câmara do Veneno</h3>
+<strong>Tamanho:</strong> Médio (4x3 unidades)
+<strong>Atmosfera:</strong> Sala de preparação ritual. Recipientes com veneno de serpente fermentado. Gases amarelo-esverdeados no ar causam dreno passivo de RM.
+<strong>Mecânica:</strong> Damião deve se mover rapidamente (paradoxo: correr gera som, mas ficar na névoa drena RM). Solução: usar o Salto Dimensional para atravessar a sala em uma única translação.
+<strong>Inimigos:</strong> 1 Espectro Escamado (invisível na névoa, detectável pelo som de escamas).
+<p>---</p>
+<h3>Z7 — Cripta das Larvas</h3>
+<strong>Tamanho:</strong> Grande e labiríntico (5x5 unidades)
+<strong>Atmosfera:</strong> Câmaras de incubação. Ovos de Larvas de Yig em toda parte. Não eclodidos, mas sensíveis a vibração — barulho alto os quebra e libera ninhadas.
+<strong>Mecânica de stealth extremo:</strong> Qualquer som acima de um limiar quebra um ovo. Cada ovo quebrado libera 3 Larvas. Damião deve cruzar em silêncio absoluto (agachado, passo a passo).
+<strong>Recompensa:</strong> Sala de tesouro no centro com <strong>Peitoral de Set</strong> (peça RNG do Set Lendário — 50% de chance de dropar aqui; caso não drope, aparece no Avatar de Set).
+<p>---</p>
+<h3>Z8 — Galeria das Visões de Set</h3>
+<strong>Tamanho:</strong> Longo (2x10 unidades)
+<strong>Atmosfera:</strong> Corredor com espelhos de obsidiana negra. As reflexões mostram Set — não Damião. Cada espelho quebrado (por som/impacto) dispara uma visão psicodélica que causa 15 de Trauma direto.
+<strong>Mecânica:</strong> Os espelhos são obstáculos que o jogador não pode tocar ou quebrar. Exige movimentos precisos num corredor estreito enquanto 2 Sseth patrulham.
+<strong>Narrativa:</strong> Ao final do corredor, um espelho maior mostra o Avatar de Set olhando diretamente para fora do espelho — presságio do boss final.
+<p>---</p>
+<h3>Z9 — Santuário do Olho</h3>
+<strong>Tamanho:</strong> Médio-circular (4x4 unidades), altar central
+<strong>Atmosfera:</strong> Câmara sagrada com o <strong>Olho de Set</strong>: um cristal negro gigante que pulsa com luz vermelha. Não é hostil, mas Damião não pode tocar — causaria Trauma severo.
+<strong>Inimigos:</strong> 3 Sseth em adoração estacionária (em transe — não respondem a som, mas respondem a toque).
+<strong>Checkpoint narrativo:</strong> Damião pode ler inscrições ao redor do Olho (com o Necronomicon) que revelam a natureza do Avatar de Set — é um fragmento da consciência divina de Set, aprisionado em Carcosa por Hastur.
+<strong>Preparação para o boss:</strong> Damião encontra um <strong>Poste de Luz improvisado</strong> (tocha de Yhtill, criada com fragmentos dos Portões de Yhtill) — único ponto de Ancoragem dentro do Templo. Máximo de Resiliência Mental antes do Boss 1.
+<p>---</p>
+<h3>Z10 — Câmara do Trono do Sacerdote</h3>
+<strong>Tamanho:</strong> Grande (6x6 unidades), trono no centro
+<strong>Atmosfera:</strong> Salão de audiências. Nagaraja, o Sacerdote, senta no trono — um ser de 2,5 metros com coroa de espinhos ósseos e manto de pele de Byakhee. Seu corpo é metade humano (braços, tronco) e metade serpente (a partir da cintura). Ele já sabe que Damião está ali.
+<p><strong>Cena de abertura (diálogo pré-boss em caixa de texto):</strong><br><blockquote><strong>NAGARAJA</strong> <em>(em Aklo Serpentino, traduzido pelo Necronomicon se Damião o tiver)</em>:</blockquote><br><blockquote><em>"Ssseth-kaa... o tradutor. Alhazred nos mencionou em seu tomo podre. Você carrega o cheiro de Hali, viajante. Set-ur-haal... e você anda pelo nosso Templo como se a senha fosse o medo."</em></blockquote><br>><br><blockquote><em>(sem o Necronomicon, Damião ouve apenas sibilos — e o subtítulo diz apenas: [Aklo Serpentino incompreensível])</em></blockquote><br>><br><blockquote><strong>DAMIÃO</strong> <em>(pensamento interno, exibido na caixa de texto)</em>:</blockquote><br><blockquote><em>"Não entendo as palavras. Mas entendo os dentes."</em></blockquote></p>
+<p>---</p>
+<h2>IV. Boss 1 — Nagaraja, o Sacerdote do Sinal Escamado</h2>
+<p><strong>Localização:</strong> Z10 — Câmara do Trono<br><strong>Lore:</strong> Nagaraja é o único Serpent Person consciente de que está aprisionado em Carcosa. Séculos de encarceramento dimensional o enlouqueceram parcialmente — ele agora acredita que matar Damião libertará Set e lhe dará passagem de volta para Valúsia. É um fanático com lógica impecável e premissa falsa.</p>
+<p><strong>Visual:</strong> 2,5m de altura. Tronco superior humanoide com escamas douradas; cintura para baixo é serpente pura. Coroa de espinhos ósseos de Byakhee. Segura um <strong>Cajado do Olho de Set</strong> (ônix com cristal pulsante no topo).</p>
+<h3>Atributos</h3>
+- <strong>Resiliência Mental Causada por Ataque:</strong> 20 RM por golpe (veneno do cajado)
+- <strong>Vulnerabilidade:</strong> Exposto quando conjura magia (2 segundos sem escudo)
+- <strong>Imunidade:</strong> Imune a ataques físicos diretos enquanto o <strong>Escudo Escamado</strong> estiver ativo
+<h3>Estrutura da Luta (2 Fases)</h3>
+<p><strong>Fase 1 (100% → 40% de vida)</strong><br>- Nagaraja se move lentamente pelo salão, rastejando. Usa o cajado para conjurar <strong>Ondas de Veneno</strong> (cones de névoa verde que causam Trauma por segundo de contato).<br>- Escudo Escamado: Uma camada de escamas sobrepostas forma um escudo que deflecte o ataque de Damião.<br>- <strong>Mecânica de quebra do escudo:</strong> Damião deve atrair Nagaraja para pisar nas <strong>Pedras Rituais</strong> espalhadas na arena (marcadas com glifos dourados). Ao pisar, Nagaraja absorve a pedra e o escudo enfraquece. Ao pisar em 3 pedras, o escudo quebra por 4 segundos — janela de dano.<br>- <strong>Summon:</strong> Em 60% de vida, Nagaraja invoca 2 Sseth Comuns para flanquear Damião.</p>
+<p><strong>Fase 2 (Menos de 40% de vida) — Transmutação</strong><br>- Nagaraja abandona o cajado e luta com o corpo. Seus braços se transformam em serpentes adicionais — ele ataca com quatro "cabeças" (dois braços-serpente + a cabeça + a cauda).<br>- O escudo muda de mecânica: agora só é vulnerável quando Nagaraja está em animação de <strong>ataque de cauda</strong> (3 segundos de cooldown).<br>- <strong>Fúria Final:</strong> Abaixo de 20% de vida, Nagaraja recita o nome de Set em Aklo Serpentino, causando distorção na tela e dreno passivo de 5 RM/segundo enquanto o recita. Damião deve interrompê-lo com um golpe.</p>
+<h3>Morte e Drop</h3>
+- Ao morrer, Nagaraja diz: <em>"Set-ur-haal... Você não entende o que libertou..."</em>
+- Drop: <strong>1 peça aleatória do Set Lendário</strong> (Peitoral, Grevas ou Arma — exceto Elmo, que é do Avatar de Set).
+<p>---</p>
+<h3>Z11 — A Fenda de Set (Zona de Transição)</h3>
+<p><strong>Atmosfera:</strong> Após matar Nagaraja, uma fenda racha o chão do Trono, revelando uma escada descendente. Abaixo: uma sala menor, geométrica, com paredes de areia negra comprimida e um círculo de luz vermelha no centro.</p>
+<p><strong>Narrativa:</strong> Damião pode interagir com o círculo. O <strong>Necronomicon</strong> (se tiver) diz: <em>"Este é o umbigo de Set. Não um portal — uma impressão digital de divindade. Quem se ajoelha aqui convoca o Avatar."</em></p>
+<p>Ao interagir, o chão treme. O Avatar de Set materializa do círculo de luz.</p>
+<p><strong>Cena (texto):</strong><br><blockquote><em>O círculo de luz vermelha pulsa. Do chão, um braço emerge — não de serpente, não de humano. De algo que existia antes de ambos. O ar cheira a pedra quente e a presença de algo enorme que está sendo comprimido em algo menor para caber aqui.</em></blockquote><br><blockquote><em>O Avatar de Set ergueu a cabeça. Olhos de âmbar. Ele não fala.</em></blockquote></p>
+<p>---</p>
+<h2>V. Boss 2 — O Avatar de Set</h2>
+<p><strong>Localização:</strong> Z11 — A Fenda de Set<br><strong>Lore:</strong> O Avatar de Set não é Set — é um <strong>fragmento da consciência divina</strong> de Set aprisionado por Hastur no Deserto de Hali. Set usou Nagaraja como prisão intelectual e o Avatar como prisão de poder. Com Nagaraja morto, o Avatar está parcialmente liberto — mas ainda preso à dimensão. Ele não é senciente no sentido humano; é uma força da natureza com intenção primordial.</p>
+<p><strong>Visual:</strong> 4 metros de altura dentro da arena comprimida. Forma humanoide colossalinfundida com Set — cabeça de falcão-serpente (nem o falcão de Hórus nem a serpente de Apophis, mas uma fusão grotesca), corpo coberto de hieróglifos dourados luminescentes, quatro braços com garras de obsidiana. Não usa armas — <strong>é uma arma</strong>.</p>
+<p><strong>Arena:</strong> Circular, pequena (4 unidades de raio). As paredes são de areia negra que o Avatar pode manipular.</p>
+<h3>Atributos</h3>
+- <strong>Resiliência Mental Causada:</strong> 30 RM por golpe (presença divina — causa Trauma por proximidade)
+- <strong>Aura Divina:</strong> Damião perde 3 RM/segundo por estar na mesma sala (presença de divindade causa terror existencial)
+- <strong>Fase única:</strong> Sem fases distintas, mas com 3 padrões de ataque que se intercalam aleatoriamente
+<h3>Mecânica Central — Hieróglifos de Vulnerabilidade</h3>
+O Avatar é completamente imune a qualquer dano de Damião exceto durante a <strong>Janela dos Hieróglifos</strong>:
+- A cada 20 segundos, um dos hieróglifos em seu corpo pulsa <strong>branco</strong> (em vez de dourado).
+- Damião deve atingir o hieróglifo branco com a Barra Enferrujada ou a Lâmina do Sinal.
+- Acertar o hieróglifo certo causa dano direto e atordoa o Avatar por 3 segundos.
+- Errar (ou acertar um hieróglifo dourado) causa <strong>Inversão Dimensional</strong>: Damião é repelido para a parede, causando 15 de Trauma.
+<h3>Padrões de Ataque (intercalados)</h3>
+<table class="doc-table">
+<tr><th>Padrão</th><th>Descrição</th><th>Defesa</th></tr>
+<tr><td><strong>Tempestade de Set</strong></td><td>Invoca tempestade de areia que ocupa 50% da arena</td><td>Correr para o ângulo oposto + agachar</td></tr>
+<tr><td><strong>Golpe dos Quatro Braços</strong></td><td>Sequência de 4 golpes físicos em leque</td><td>Salto Dimensional para atravessar o Avatar</td></tr>
+<tr><td><strong>Olho de Set</strong></td><td>Raio de luz âmbar que atravessa a arena em linha reta</td><td>Desviar perpendicular à linha</td></tr>
+</table>
+<h3>Morte e Drop</h3>
+- Ao morrer, o Avatar fragmenta-se em hieróglifos dourados que caem como poeira.
+- <strong>Drop garantido:</strong> Elmo de Set ✅
+- <strong>Drop RNG:</strong> 1 peça adicional do Set Lendário (50% de chance)
+- <strong>Narrativa de drop:</strong> Uma voz sem corpo (Set, ausente): <em>"Fragmentos meus para fragmentos seus, tradutor. Use-os bem — ou não."</em>
+<p>---</p>
+<h2>VI. Z12 — Saída: O Deserto Coberto de Escamas</h2>
+<p><strong>Atmosfera:</strong> Escada de volta ao Deserto de Hali. A saída é marcada por escamas de Nagaraja que cobriram a areia — como se o Templo estivesse sangrando para fora.</p>
+<p><strong>Evento narrativo pós-dungeon:</strong> Damião escreve no Diário (exibido na tela durante transição):<br><blockquote><em>"Saí do Templo. O chão ainda cheira a veneno velho. Tenho peças de um deus morto no bolso. Não sei se isso é uma bênção ou uma sentença — mas sinto que Set me vê de onde quer que ele esteja. E não parece feliz."</em></blockquote></p>
+<p>---</p>
+<h2>VII. Recompensas e Conexão com o Vertical Slice</h2>
+<table class="doc-table">
+<tr><th>Recompensa</th><th>Origem</th><th>Impacto na Progressão</th></tr>
+<tr><td><strong>Elmo de Set</strong></td><td>Avatar de Set (garantido)</td><td>+30% resistência a Trauma de fontes divinas</td></tr>
+<tr><td><strong>1 peça RNG do Set</strong></td><td>Nagaraja OU Avatar (RNG)</td><td>Aproxima o jogador do Set Lendário completo</td></tr>
+<tr><td><strong>Patuá das Luas Gêmeas</strong></td><td>Quest de Cassilda (entregue separadamente)</td><td>Desacelera dreno de RM no escuro</td></tr>
+<tr><td><strong>Set Lendário 4/4</strong></td><td>Castelo de Carcosa completa</td><td>Acesso à Sidequest do Avatar de Nyarlathotep</td></tr>
+</table>
+<blockquote><strong>Nota técnica:</strong> O <code>templo_da_serpente.md</code> anterior mencionava "Naga" como Boss 1. Esse nome foi promovido de genérico para nome próprio — o Boss 1 é <strong>Nagaraja</strong> (sacerdote), e os <strong>Nagas Guerreiros</strong> são o tipo de inimigo de elite da dungeon. Decaindo o antigo nome genérico.</blockquote></section><section id="section-5" class="doc-section"><div class="section-header"><span>CAPÍTULO 5</span><h2>5. Lore: Rainha Cassilda, Quest e Boss Byakhee</h2></div><h1>Rainha Cassilda, Os Fragmentos de Yhtill e O Byakhee</h1>
+<p>---</p>
+<h2>I. Rainha Cassilda — Perfil Narrativo</h2>
+<p><strong>Nome completo:</strong> Cassilda, Rainha de Yhtill, Guardiã da Segunda Máscara<br><strong>Localização:</strong> Santuário de Yhtill — ponto fixo no setor norte do Deserto de Hali, próximo ao Lago de Hali.</p>
+<p><strong>Aparência:</strong> Mulher de meia-idade com traços de nobreza fossilizada. Cabelos prateados presos num arranjo de contas de ônix. Veste trajes anacrônicos de Yhtill (tecido amarelo-pálido bordado em preto). Os olhos têm um brilho suave, não de loucura — mas de <em>resignação profunda</em>. Ela não está corrompida pelo Sinal Amarelo; está <em>presa</em> em Carcosa assim como Damião.</p>
+<p><strong>Tom de voz:</strong> Solene, melancólico, poético. Fala em orações longas e imagens. Nunca usa termos genéricos de RPG. Não tem pressa.</p>
+<p><strong>Canção de Cassilda:</strong> Ela recita fragmentos da canção original de <em>O Rei em Amarelo</em> (Robert W. Chambers) ao longo dos diálogos. Em pt-BR adaptado:<br><blockquote><em>"Sombras longas nas luas de Carcosa / Luas gêmeas que os sóis desconhecem / O rei parte, a canção permanece / Nas tarjas negras que o vento tece."</em></blockquote></p>
+<p><strong>Lore da personagem:</strong> Cassilda é a rainha da peça maldita <em>O Rei em Amarelo</em>. Em Carcosa, ela existe em estado de vigília permanente — não dorme, não morre, aguarda. Ela perdeu os nobres de sua corte que foram explorar o Deserto e as Dungeons em busca de uma saída. Esses nobres deixaram fragmentos de seus diários espalhados pelo caminho. Cassilda sabe que estão lá; apenas não pode ir buscá-los (ela não pode deixar o Santuário — a geometria de Carcosa a prende ao ponto).</p>
+<p>---</p>
+<h2>II. A Quest: Os Fragmentos de Yhtill</h2>
+<p><strong>Nome da quest (in-game):</strong> "A Canção Incompleta"<br><strong>Tipo:</strong> Coleção e entrega (5 fragmentos)<br><strong>Iniciada:</strong> Automaticamente ao entrar no Santuário de Yhtill pela primeira vez.<br><strong>Recompensa:</strong> Patuá das Luas Gêmeas</p>
+<h3>Mapa de Localização dos 5 Fragmentos</h3>
+<table class="doc-table">
+<tr><th>#</th><th>Nome do Fragmento</th><th>Localização</th><th>Zona</th></tr>
+<tr><td>1</td><td><strong>Diário de Lady Seraphel</strong></td><td>Deserto Aberto — Garganta de Pedra Pálida</td><td>Overworld (início)</td></tr>
+<tr><td>2</td><td><strong>Anotações de Lord Morthis</strong></td><td>Tumba de Alhazred — Z2 (Vila das Casas)</td><td>Dungeon 1, Z2</td></tr>
+<tr><td>3</td><td><strong>Carta de Lady Vaine</strong></td><td>Tumba de Alhazred — Z6b (Câmara do Baú)</td><td>Dungeon 1, Z6b</td></tr>
+<tr><td>4</td><td><strong>Crônica de Lord Aldaron (I)</strong></td><td>Templo da Serpente — Z2 (Corredor dos Glifos)</td><td>Dungeon 2, Z2</td></tr>
+<tr><td>5</td><td><strong>Crônica de Lord Aldaron (II)</strong></td><td>Templo da Serpente — Z4 (Salão dos Nagas)</td><td>Dungeon 2, Z4</td></tr>
+</table>
+<blockquote><strong>Nota de design:</strong> Os fragmentos 4 e 5 estão na Dungeon 2 (Templo da Serpente, semi-obrigatória). O jogador pode completar a quest com apenas os 3 primeiros e retornar depois. Cassilda aceita entrega parcial mas só dá o Patuá com os 5.</blockquote>
+<p>---</p>
+<h3>Conteúdo Narrativo de Cada Fragmento</h3>
+<h4>Fragmento 1 — Diário de Lady Seraphel</h4>
+<em>Encontrado no Overworld, numa pedra rachada logo na Garganta de Pedra Pálida (área inicial).</em>
+<blockquote><strong>[Diário de Lady Seraphel — 3ª Lua de Carcosa]</strong></blockquote>
+>
+<blockquote><em>Acordei no deserto sem lembrar de como cheguei aqui. Cassilda disse que exploraríamos o Deserto de Hali em busca de passagem para fora. Somos quatro: eu, Morthis, Vaine e Aldaron. A rainha ficou no Santuário — diz que não pode partir.</em></blockquote>
+>
+<blockquote><em>O deserto cheira a cinzas e a algo que não consigo nomear. Escrevo isto para que alguém saiba que partimos.</em></blockquote>
+<blockquote>— <em>Lady Seraphel, nobreza de Yhtill</em></blockquote>
+<p>---</p>
+<h4>Fragmento 2 — Anotações de Lord Morthis</h4>
+<em>Encontrado na Tumba de Alhazred, Zona 2 (Vila das Casas), escondido sob uma soleira de porta.</em>
+<blockquote><strong>[Anotações de Lord Morthis — sem data]</strong></blockquote>
+>
+<blockquote><em>Perdemos Seraphel na entrada. Não estava morta — simplesmente não estava mais. Carcosa faz isso. A geometria do lugar engole quem não presta atenção.</em></blockquote>
+>
+<blockquote><em>Entramos numa tumba que cheira a giz e a estática. Os seres daqui são cegos e caçam pelo som. Aprendi a andar devagar. Vaine está bem. Aldaron não fala mais muito.</em></blockquote>
+>
+<blockquote><em>Se alguém encontrar isto: vá devagar. O silêncio é a única moeda que tem valor aqui.</em></blockquote>
+<blockquote>— <em>Lord Morthis de Yhtill</em></blockquote>
+<p>---</p>
+<h4>Fragmento 3 — Carta de Lady Vaine</h4>
+<em>Encontrado na Z6b (Câmara do Baú) da Tumba de Alhazred.</em>
+<blockquote><strong>[Carta de Lady Vaine — para Cassilda, que talvez nunca leia]</strong></blockquote>
+>
+<blockquote><em>Rainha, encontramos as câmaras mais profundas da Tumba. Há algo aqui — uma presença que sussurra em Aklo. Aldaron diz que é o autor do tomo proibido. Eu prefiro não saber o nome.</em></blockquote>
+>
+<blockquote><em>Morthis não acordou esta manhã. Sua forma simplesmente desapareceu enquanto dormia, como Seraphel. Estou sozinha com Aldaron agora.</em></blockquote>
+>
+<blockquote><em>Ele quer ir mais fundo. Achar o Templo das Escamas. Não consigo dissuadi-lo.</em></blockquote>
+>
+<blockquote><em>Se você conseguir o Patuá antes de mim, rainha — guarde. Talvez alguém precisará mais do que eu.</em></blockquote>
+<blockquote>— <em>Lady Vaine de Yhtill</em></blockquote>
+<p>---</p>
+<h4>Fragmento 4 — Crônica de Lord Aldaron (I)</h4>
+<em>Encontrado no Templo da Serpente, Z2 (Corredor dos Glifos), atrás de um painel falso.</em>
+<blockquote><strong>[Crônica de Lord Aldaron — Entrada no Templo das Escamas]</strong></blockquote>
+>
+<blockquote><em>...o corredor não tem fim visível. As gravuras me dizem que estas bestas eram reis antes de sermos primatas. Carrego o terceiro anel de Yhtill e rezo para que Cassilda nos encontre antes que a tempestade...</em></blockquote>
+>
+<blockquote><em>Vaine ficou na entrada do Templo. Disse que esperaria. Não a culpo.</em></blockquote>
+>
+<blockquote><em>As serpentes aqui têm olhos de pedra e movem-se com propósito ancestral. Não são loucas como os cultistas — são piores. São corretas.</em></blockquote>
+<blockquote>— <em>Lord Aldaron de Yhtill</em></blockquote>
+<p>---</p>
+<h4>Fragmento 5 — Crônica de Lord Aldaron (II)</h4>
+<em>Encontrado no Templo da Serpente, Z4 (Salão dos Nagas), no pedestal de uma estátua de Set.</em>
+<blockquote><strong>[Crônica de Lord Aldaron — Última Entrada]</strong></blockquote>
+>
+<blockquote><em>Esta é a última anotação que consigo fazer. Sinto que o Avatar me observa.</em></blockquote>
+>
+<blockquote><em>Cassilda disse que as luas testemunhariam nosso retorno — mas as luas de Carcosa não piscam para nós. Que ela encontre estas páginas. Que ela saiba que viemos até o fim.</em></blockquote>
+>
+<blockquote><em>O Sacerdote de Escamas me ofereceu uma escolha que não compreendi. Agora compreendo. Escolhi errado.</em></blockquote>
+>
+<blockquote><em>Não procurem Aldaron de Yhtill mais.</em></blockquote>
+<blockquote>— <em>[última linha escrita em Aklo, indecifrável mesmo com o Necronomicon]</em></blockquote>
+<p>---</p>
+<h2>III. Diálogos de Cassilda (Visual Novel Style)</h2>
+<p><em>Formato: caixa de texto na parte inferior da tela, retrato do personagem à esquerda. Música de fundo: drone suave + cordas.</em></p>
+<p>---</p>
+<h3>DIÁLOGO 1 — Primeiro Encontro (Automático ao entrar no Santuário)</h3>
+<blockquote><strong>[CASSILDA]</strong> <em>(voz melancólica, olhando para o horizonte)</em></blockquote>
+<blockquote>"Você cheira a Hali, forasteiro. E a algo mais — a morte recente. Bem-vindo ao Santuário de Yhtill. Que reste ainda um santuário para ser chamado assim."</blockquote>
+<blockquote><strong>[DAMIÃO]</strong> <em>(escolha do jogador)</em></blockquote>
+<blockquote>A) "Onde estou?"</blockquote>
+<blockquote>B) "Você está presa aqui?"</blockquote>
+<blockquote>C) <em>[Silêncio — apenas observa]</em></blockquote>
+<p><em>(Resposta A)</em><br><blockquote><strong>[CASSILDA]</strong></blockquote><br><blockquote>"No coração de Carcosa, onde os sóis gêmeos esqueceram como se pôr. Este é o Santuário de Yhtill — o que resta da corte do Rei em Amarelo antes que ele deixasse de ser apenas um personagem de peça e passasse a ser um fato."</blockquote></p>
+<p><em>(Resposta B)</em><br><blockquote><strong>[CASSILDA]</strong></blockquote><br><blockquote>"Presa. Sim. Essa palavra serve. A geometria de Carcosa tem predileção por ironias: a rainha que fundou este santuário não pode sair dele. Mas meus nobres partiram. Foram buscar fragmentos de uma saída que não existe. Ou talvez existe — simplesmente não voltaram para me contar."</blockquote></p>
+<p><em>(Resposta C)</em><br><blockquote><strong>[CASSILDA]</strong> <em>(levemente divertida)</em></blockquote><br><blockquote>"Silêncio. Isso é raro aqui. A maioria dos que chegam aqui ou gritam ou choram. Sente-se, forasteiro. Ou não. A geometria de Carcosa não se importa com sua postura."</blockquote></p>
+<p>---</p>
+<h3>DIÁLOGO 2 — Abertura da Quest</h3>
+<p><em>(Após a saudação, Cassilda propõe a quest)</em></p>
+<blockquote><strong>[CASSILDA]</strong></blockquote>
+<blockquote>"Tenho um pedido — não uma ordem, não tenho mais autoridade para ordens. Um pedido. Meus nobres partiram há... tempo não mensurável, aqui. Eles escreviam diários, anotações, cartas. Fragmentos de nossas vidas antes de Carcosa. Estão espalhados pelo deserto e pelas ruínas que eles exploraram."</blockquote>
+<blockquote><strong>[CASSILDA]</strong></blockquote>
+<blockquote>"Não peço que os traga de volta. Isso está além do possível de qualquer tradutor. Mas seus escritos... traga-os. Cinco fragmentos. Para que eu saiba o que aconteceu com cada um deles. Que eu possa cantar a canção de cada nome deles direito."</blockquote>
+<blockquote><strong>[DAMIÃO]</strong> <em>(escolha)</em></blockquote>
+<blockquote>A) "Farei isso."</blockquote>
+<blockquote>B) "Por que eu faria isso por você?"</blockquote>
+<p><em>(Resposta B)</em><br><blockquote><strong>[CASSILDA]</strong></blockquote><br><blockquote>"Porque você precisa de algo que eu tenho, e sabe disso — mesmo que ainda não saiba o que é. O Patuá das Luas Gêmeas. Uma bênção tecida na noite de Carcosa que desacelera o apagamento que o escuro causa em mentes humanas. Você vai precisar, forasteiro. O Deserto não é gentil com os não-preparados."</blockquote><br><blockquote><em>(pausa)</em></blockquote><br><blockquote>"E porque, no fundo, você é o tipo de pessoa que faz estas coisas. Eu reconheço o tipo."</blockquote></p>
+<p><em>(Aceitar quest)</em><br><blockquote><strong>[CASSILDA]</strong></blockquote><br><blockquote>"A primeira página está perto. Na Garganta de Pedra Pálida, onde o vento é alto e a pedra racha. Lady Seraphel sempre escrevia em lugares onde o vento não poderia apagar a tinta. Procure nas fendas."</blockquote></p>
+<p>---</p>
+<h3>DIÁLOGO 3 — Entrega Parcial (1-4 Fragmentos)</h3>
+<p><em>(Ao retornar com 1 a 4 fragmentos — Cassilda aceita ver mas aguarda os demais)</em></p>
+<blockquote><strong>[CASSILDA]</strong> <em>(ao receber o fragmento de Seraphel)</em></blockquote>
+<blockquote>"Seraphel... Ela sempre escrevia rápido, como se tivesse medo de esquecer. Está bem, forasteiro. Ela foi, como todos nós eventualmente vamos — só que ela foi antes. Obrigada por trazer a letra dela de volta para mim."</blockquote>
+<blockquote><em>(pausa)</em></blockquote>
+<blockquote>"Ainda faltam ${N_RESTANTES}. Quando você os tiver, volte."</blockquote>
+<p><em>(Ao receber o fragmento de Morthis)</em><br><blockquote><strong>[CASSILDA]</strong></blockquote><br><blockquote>"Morthis. Ele era prático acima de qualquer coisa. 'Andar devagar.' Sim. Era o único conselho que ele tinha. Funciona, de certa forma."</blockquote><br><blockquote>"Continua, forasteiro."</blockquote></p>
+<p><em>(Ao receber o fragmento de Vaine)</em><br><blockquote><strong>[CASSILDA]</strong> <em>(voz levemente alterada — mais sombria)</em></blockquote><br><blockquote>"Vaine. Ela não era obrigada a ir. Era a mais jovem da corte. Eu deveria tê-la impedido."</blockquote><br><blockquote><em>(olha para o horizonte)</em></blockquote><br><blockquote>"Não a culpe, se a encontrar. Ela não escolheu mal. Ela simplesmente... escolheu seguir."</blockquote></p>
+<p>---</p>
+<h3>DIÁLOGO 4 — Entrega dos Fragmentos de Aldaron (4 e 5)</h3>
+<p><em>(Cassilda percebe que os fragmentos vêm do Templo da Serpente)</em></p>
+<blockquote><strong>[CASSILDA]</strong> <em>(ao receber o fragmento 4)</em></blockquote>
+<blockquote>"O Corredor dos Glifos do Templo das Escamas. Aldaron era o único entre nós que lia Aklo. Devia ser ele a traduzir o que as serpentes escreveram nas pedras."</blockquote>
+<blockquote><em>(uma pausa longa)</em></blockquote>
+<blockquote>"Ele entrou no Templo sabendo o que encontraria. Você sobreviveu ao que ele não sobreviveu. Isso não diz nada sobre seu valor — diz apenas que você teve sorte diferente."</blockquote>
+<p><em>(Ao receber o fragmento 5 — o último)</em><br><blockquote><strong>[CASSILDA]</strong></blockquote><br><blockquote>"A última entrada. 'Escolhi errado.' Aldaron nunca errava — ele calculava. Mas o Sacerdote de Escamas fazia perguntas que não tinham respostas corretas. Apenas consequências."</blockquote><br><blockquote><em>(fecha os olhos por um momento)</em></blockquote><br><blockquote>"Cinco fragmentos. Cinco nomes. Posso cantá-los agora. Você fez algo que nenhuma geometria de Carcosa poderia fazer — devolveu a mim o direito de chorar os meus nobres com nome."</blockquote></p>
+<p>---</p>
+<h3>DIÁLOGO 5 — Conclusão e Entrega do Patuá</h3>
+<p><em>(Cassilda recita a Canção de Cassilda adaptada, depois entrega o Patuá)</em></p>
+<blockquote><strong>[CASSILDA]</strong> <em>(de olhos fechados, recitando)</em></blockquote>
+<blockquote><em>"Nas luas que não piscam, Seraphel se foi rápida.</em></blockquote>
+<blockquote><em>Morthis pisou devagar até não mais poder.</em></blockquote>
+<blockquote><em>Vaine enviou uma carta que o vento não respondeu.</em></blockquote>
+<blockquote><em>Aldaron leu o que não devia e escolheu o que não havia.</em></blockquote>
+<blockquote><em>Que as quatro sombras descansem na areia de Hali.</em></blockquote>
+<blockquote><em>Que a rainha cante seus nomes até o fim do que resta chamar de tempo."</em></blockquote>
+<blockquote><strong>[CASSILDA]</strong> <em>(abre os olhos, estende o Patuá)</em></blockquote>
+<blockquote>"Tome. O Patuá das Luas Gêmeas. Feito com fios das vestes de Yhtill e bênçãos das duas luas que iluminaram nossa corte quando ainda havia corte."</blockquote>
+<blockquote>"Ele desacelera o que o escuro faz com a sua mente. O escuro de Carcosa corrói a Resiliência Mental — com o Patuá, o processo é mais lento. Use as pausas que ele lhe dá."</blockquote>
+<blockquote><strong>[CASSILDA]</strong> <em>(enquanto Damião guarda o Patuá)</em></blockquote>
+<blockquote>"Uma última coisa, forasteiro. Os Portões das Ruínas — ao norte. Há algo lá que não deixa ninguém passar. Não é uma pessoa. É um instinto com asas."</blockquote>
+<blockquote>"Boa sorte."</blockquote>
+<p>---</p>
+<h2>IV. O Byakhee — Design Completo do Boss Fight</h2>
+<p><strong>Localização:</strong> Portões das Ruínas — extremo norte do Deserto de Hali, entrada do Castelo de Carcosa.</p>
+<p><strong>Papel narrativo:</strong> O Byakhee não é um ser individual com agenda própria — é uma <strong>força biológica de Carcosa</strong> que o Rei em Amarelo usa como selo. Os Portões das Ruínas separam o Deserto do Castelo; o Byakhee é o cadeado vivo desse limiar.</p>
+<p><strong>Visual:</strong> 3,5 metros de envergadura. Corpo híbrido: torso de gralha enorme, asas membranosas de morcego, pernas de inseto-fêmur com garras de obsidiana. Rosto que mistura bico de rapinante com mandíbulas de formiga. Olhos compostos amarelos que refletem as duas luas de Carcosa. Emite um grito infrassônico que Damião ouve no peito, não nos ouvidos.</p>
+<p>---</p>
+<h3>Cena de Abertura (Antes do Boss Fight)</h3>
+<p><em>Damião se aproxima dos Portões. As portas estão fechadas — pedra maciça de 4 metros. Acima, no topo do arco, algo se move.</em></p>
+<blockquote><em>O grito vem antes da forma. Um som que não é som — é pressão no crânio, é a frequência errada de Carcosa amplificada. O Byakhee desce dos Portões com asas que bloqueiam os dois sóis.</em></blockquote>
+<blockquote><em>Não há diálogo. Há apenas o grito e a sombra.</em></blockquote>
+<p>---</p>
+<h3>Atributos e Mecânicas do Boss Fight</h3>
+<p><strong>Arena:</strong> Espaço aberto em frente aos Portões (6x6 unidades). Sem obstáculos iniciais, mas o Byakhee cria obstáculos dinâmicos com ataques.</p>
+<p><strong>Grito Infrassônico:</strong> Passivo — Damião perde 2 RM/segundo enquanto o Byakhee estiver vivo, sem necessidade de ser atingido. Representa o terror cósmico da presença da criatura.</p>
+<p><strong>Vulnerabilidade:</strong> O Byakhee é vulnerável apenas durante os 2 segundos de <strong>pouso na arena</strong>. No ar, é imune.</p>
+<h3>Padrões de Ataque (3 fases)</h3>
+<p><strong>Fase 1 (100% → 60%)</strong><br><table class="doc-table"><br><tr><th>Ataque</th><th>Descrição</th><th>Defesa</th></tr><br><tr><td><strong>Rasante Simples</strong></td><td>Voa em linha reta de ponta a ponta da arena</td><td>Desviar lateral</td></tr><br><tr><td><strong>Mergulho de Garras</strong></td><td>Desce verticalmente sobre Damião</td><td>Esquiva (cooldown 2.5s)</td></tr><br><tr><td><strong>Pouso Agressivo</strong></td><td>Pousa, ataca 2x com garras, volta a voar</td><td>Usar os 2s de pouso para atacar</td></tr><br></table></p>
+<p><strong>Fase 2 (60% → 30%)</strong><br>- O Byakhee ganha velocidade. O Rasante agora é em zigue-zague (imprevisível).<br>- <strong>Novo ataque — Grito Direcionado:</strong> Emite um cone de pressão sonora que causa 20 de Trauma. O cone é telegrafado por 1 segundo (o Byakhee aponta o bico para Damião antes de emitir).<br>- O pouso dura apenas 1.5 segundo nesta fase.</p>
+<p><strong>Fase 3 (30% → 0%)</strong><br>- O Byakhee começa a <strong>circundar a arena voando</strong> sem pousar. Para forçar o pouso: Damião deve usar a <strong>Lâmina do Sinal</strong> (se equipada) para cortar uma das asas durante um rasante. A asa não cai, mas o Byakhee pousa de dor por 3 segundos — janela de dano ampliada.<br>- <strong>Sem a Lâmina do Sinal:</strong> O pouso ocorre espontaneamente a cada 30 segundos nesta fase (menor frequência).<br>- <strong>Frenesi final (abaixo de 10%):</strong> O Byakhee emite um grito longo que drena 5 RM/segundo. Damião deve interrompê-lo com um golpe (mesma mecânica de Nagaraja).</p>
+<p>---</p>
+<h3>Morte e Drop</h3>
+<p><em>Ao morrer, o Byakhee cai pesadamente no chão, as asas se dobram ao contrário. O grito para — o silêncio é físico.</em></p>
+<blockquote><em>Os Portões das Ruínas tremem. Depois, devagar, começam a se abrir.</em></blockquote>
+<blockquote><em>Do outro lado: o horizonte do Castelo de Carcosa.</em></blockquote>
+<blockquote><em>Damião respira. O Patuá pulsa no bolso.</em></blockquote>
+<p><strong>Drop:</strong> <strong>Anel do Sinal Amarelo</strong> — gravação sacra que reduz a taxa de detecção de sentinelas e desacelera o dreno de RM causado por entidades com o Sinal.</p>
+<p><strong>Cena final da Fase 1:</strong><br><blockquote><em>Damião avança para os Portões abertos. Lá atrás, o Deserto de Hali fica menor. Lá na frente, as torres do Castelo de Carcosa crescem.</em></blockquote><br><blockquote><em>Ele não sente que venceu. Sente que a próxima parte começou.</em></blockquote></p></section><section id="section-6" class="doc-section"><div class="section-header"><span>CAPÍTULO 6</span><h2>6. Lore & Mecânica: Yug-Neth (Mi-Go Companion)</h2></div><h1>Yug-Neth — O Mi-Go Filhote</h1>
+<blockquote><em>"Ele não tem rosto que eu possa ler. Mas quando me olha — se é que olha — sinto que é a única coisa honesta que encontrei em Carcosa."</em></blockquote>
+<blockquote>— Damião, Diário de Tradução</blockquote>
+<p>---</p>
+<h2>I. Lore</h2>
+<h3>Origem</h3>
+<p>Os <strong>Mi-Go</strong> (Fungos de Yuggoth) são uma raça extraterrestre fungóide que navega o cosmos a serviço de interesses que os humanos raramente compreendem. Alguns temem o Sinal Amarelo; outros o ignoram. Todos são inteligentes, todos possuem tecnologia inconcebível — mas <strong>filhotes de Mi-Go</strong> ainda não desenvolveram a capacidade de voar, de falar Aklo maduro, ou de resistir à magia humana de nível arcano.</p>
+<p><strong>Yug-Neth</strong> é um desses filhotes. Pequeno demais para os padrões adultos de sua espécie, foi capturado por Abdul Alhazred décadas atrás durante uma das expedições do erudito ao deserto da Arábia — muito antes de Alhazred chegar a Carcosa. Alhazred o manteve acorrentado na Tumba como <strong>fonte de conhecimento dimensional forçado</strong>: Mi-Go filhotes, ao atingirem certo patamar de amadurecimento, desenvolvem uma sensibilidade instintiva às <strong>fendas interdimensionais</strong> — e os Portões de Carcosa são exatamente esse tipo de estrutura.</p>
+<p>Alhazred descobriu que Yug-Neth pode abrir os Portões das Ruínas. Não porque os Mi-Go têm permissão de Hastur — mas porque os <strong>Mi-Go preexistem às regras de Carcosa</strong>. Eles são anteriores à dimensão; seus corpos vibram numa frequência que a geometria de Carcosa não sabe bloquear.</p>
+<h3>O Segredo</h3>
+<p>O jogador <strong>não sabe</strong> que Yug-Neth é a chave dos Portões quando o encontra. Isso só se revela:<br>- Quando Yug-Neth reage visivelmente ao se aproximar dos Portões das Ruínas (animação especial de "chamado")<br>- No momento em que toca os Portões com as garras — e eles se abrem</p>
+<p>Antes disso, Yug-Neth é apenas um ser assustado, preso, que Damião libertou. A revelação é narrativa, não mecânica.</p>
+<p>---</p>
+<h2>II. Personalidade e Comunicação</h2>
+<p>Yug-Neth não fala. Sua comunicação é <strong>cinestésica e bioluminescente</strong>: os pontos dourados no corpo pulsam em padrões que Damião aprende a interpretar progressivamente.</p>
+<table class="doc-table">
+<tr><th>Padrão de Luz</th><th>Significado</th></tr>
+<tr><td>Pulsos lentos e regulares</td><td>"Estou aqui / estou bem"</td></tr>
+<tr><td>Pulsos rápidos e irregulares</td><td>"Perigo detectado / fuga"</td></tr>
+<tr><td>Luz constante sem pulso</td><td>"Algo importante está perto"</td></tr>
+<tr><td>Apagado / sem bioluminescência</td><td>"Medo extremo / quase morto"</td></tr>
+<tr><td>Pulso em espiral dourada</td><td><em>(só ocorre nos Portões)</em> "Eu abro isso"</td></tr>
+</table>
+<p>Damião anota esses padrões no Diário de Tradução como se fossem um idioma a decifrar — consistente com sua profissão de linguista.</p>
+<p>---</p>
+<h2>III. O Encontro com Alhazred — Cena de Escolha</h2>
+<h3>Configuração da Cena</h3>
+<p>Ao entrar na Zona 9 (Tumba de Abdul), Damião encontra <strong>Alhazred em transe</strong>, flutuando, murmurando Aklo. <strong>Yug-Neth está preso por correntes anômalas no canto da arena</strong> — pequeno, assustado, bioluminescência apagada. Alhazred não percebe Damião imediatamente.</p>
+<p>Damião pode:<br>1. <strong>Interagir com as correntes de Yug-Neth</strong> → Alhazred acorda e vê<br>2. <strong>Interagir com o grimório</strong> → Alhazred entra em colapso (fluxo original de luta)</p>
+<p>Se Damião tocar as correntes primeiro, Alhazred acorda lentamente:</p>
+<p>---</p>
+<h3>Diálogo de Escolha (Visual Novel Style)</h3>
+<blockquote><strong>[ALHAZRED]</strong> <em>(descendo lentamente, voz rouca de quem não fala com humanos há séculos)</em></blockquote>
+<blockquote>"Tradutor. Eu sabia que viriam. Carcosa sempre manda alguém eventualmente."</blockquote>
+<blockquote><em>(olha para Yug-Neth)</em></blockquote>
+<blockquote>"Não toque nele. Ele é o único motivo pelo qual ainda estou... orientado. Ele me lembra que o cosmos é maior do que a loucura do Rei."</blockquote>
+<blockquote><strong>[DAMIÃO]</strong> <em>(escolha do jogador):</em></blockquote>
+<blockquote>A) <strong>"Solte-o. Você não tem o direito de escravizar uma criatura."</strong></blockquote>
+<blockquote>B) <strong>"Me diga por que ele está preso aqui."</strong></blockquote>
+<blockquote>C) <strong>"Eu o liberto, com ou sem sua permissão."</strong></blockquote>
+<p><em>(Resposta B leva a mais contexto antes da mesma bifurcação final)</em></p>
+<blockquote><strong>[ALHAZRED]</strong> <em>(se B for escolhido)</em></blockquote>
+<blockquote>"Por que? Porque ele abre portas que eu não consigo abrir sozinho. Os Portões das Ruínas — você os viu? Pedra que não é pedra. Geometria que não obedece a Hastur. Os Mi-Go são... anteriores. Anteriores a Carcosa, anteriores a Hastur, anteriores talvez ao próprio cosmos organizado."</blockquote>
+<blockquote><em>(pausa)</em></blockquote>
+<blockquote>"Com ele, posso sair. Sem ele, fico aqui rezando Aklo para paredes que não escutam."</blockquote>
+<p>---</p>
+<h3>Ponto de Bifurcação</h3>
+<blockquote><strong>[ALHAZRED]</strong></blockquote>
+<blockquote>"Então, tradutor. Tenho uma proposta. Deixe-me Yug-Neth. Em troca, levo você comigo quando eu partir — mas fico com o Al-Azif. Ou..."</blockquote>
+<blockquote><em>(sorri — e o sorriso está errado, demais dentes, ângulos incorretos)</em></blockquote>
+<blockquote>"...tente me tirar tudo."</blockquote>
+<p>---</p>
+<h4>CAMINHO A — Concordar ("Você fica com ele")</h4>
+<blockquote><strong>[DAMIÃO]</strong> <em>(escolha)</em></blockquote>
+<blockquote><strong>"Acordo. Você fica com Yug-Neth."</strong></blockquote>
+<blockquote><strong>[ALHAZRED]</strong> <em>(aliviado, quase humano por um segundo)</em></blockquote>
+<blockquote>"Sábio. Raro, mas sábio."</blockquote>
+<p><em>Alhazred libera Yug-Neth das correntes — mas para entregar a Damião, não para si mesmo. Uma última lógica retorcida: ele percebe que Yug-Neth escolheu ficar com o tradutor no momento em que foi liberado.</em></p>
+<blockquote><strong>[ALHAZRED]</strong> <em>(observando Yug-Neth se aproximar de Damião)</em></blockquote>
+<blockquote>"Hm. Trinta anos de correntes e ele prefere você. Que comentário sobre mim isso é."</blockquote>
+<blockquote><em>(ergue o Al-Azif)</em></blockquote>
+<blockquote>"Guarde o que aprender aqui, tradutor. O conhecimento que este tomo carrega não é para ser possuído — é para ser suportado."</blockquote>
+<blockquote><em>(desaparece no Aklo, levando o grimório consigo)</em></blockquote>
+<p><strong>Resultado do Caminho A:</strong><br>- ✅ Yug-Neth libertado e se torna companion<br>- ❌ Necronomicon <strong>não obtido</strong> (Alhazred some com ele)<br>- 🔓 Os Portões das Ruínas podem ser abertos via Yug-Neth<br>- ⚠️ Sem o Necronomicon, Damião <strong>não pode traduzir</strong> inscrições em Aklo nas dungeons (perde lore extra e o diálogo de Nagaraja traduzido)</p>
+<p>---</p>
+<h4>CAMINHO B — Recusar / Lutar ("Não. Ele é livre.")</h4>
+<blockquote><strong>[DAMIÃO]</strong> <em>(escolha)</em></blockquote>
+<blockquote><strong>"Não. Ele não é sua moeda de troca."</strong></blockquote>
+<blockquote><strong>[ALHAZRED]</strong> <em>(frio — o sorriso some)</em></blockquote>
+<blockquote>"Então aprenda o que significa discordar com alguém que passou 300 anos estudando como causar dor."</blockquote>
+<p><em>A luta começa. Alhazred entra em colapso mental — estática de Carcosa toma a sala. Yug-Neth se encolhe no canto da arena, bioluminescência apagada.</em></p>
+<p><strong>Durante a Luta:</strong><br>- Yug-Neth permanece no canto da arena, <strong>imóvel e vulnerável</strong>.<br>- Se Alhazred acertar Yug-Neth com qualquer ataque (Cone de Gelo, Summon de Esqueleto), Yug-Neth perde 25 RM própria.<br>- <strong>Se a RM de Yug-Neth chegar a zero: COLAPSO DE COMPANHEIRO → Game Over.</strong><br>- Damião recebe uma barra indicadora de "Resiliência do Companheiro" no HUD durante a luta.<br>- Mecânica emergente: Damião deve posicionar-se entre Alhazred e Yug-Neth para bloquear os projéteis.</p>
+<p><strong>Após a Luta:</strong><br><em>Alhazred cai. O Al-Azif flutua e pousa no chão. As correntes de Yug-Neth se dissolvem.</em></p>
+<blockquote><em>Yug-Neth se aproxima cautelosamente. Os pontos dourados pulsam — lentamente, irregulares. Damião estende a mão. Yug-Neth toca a mão com uma garra, delicadamente.</em></blockquote>
+<blockquote><em>Damião pega o Al-Azif. A bioluminescência de Yug-Neth pulsa uma vez, forte — e depois volta ao ritmo lento e regular.</em></blockquote>
+<blockquote><em>"Estou aqui / estou bem."</em></blockquote>
+<p><strong>Resultado do Caminho B:</strong><br>- ✅ Yug-Neth libertado e se torna companion<br>- ✅ Necronomicon <strong>obtido</strong> (permite traduzir Aklo, incluindo diálogo de Nagaraja)<br>- 🔓 Os Portões das Ruínas podem ser abertos via Yug-Neth<br>- ✅ Acesso completo ao lore das dungeons restantes</p>
+<p>---</p>
+<h2>IV. Mecânicas de Companion</h2>
+<h3>Comportamento no Overworld e nas Dungeons</h3>
+<p>Yug-Neth segue Damião com pathfinding simples a ~1.5 unidades de distância. Não ataca inimigos. Não emite som. <strong>Sua presença, contudo, tem efeitos passivos:</strong></p>
+<table class="doc-table">
+<tr><th>Situação</th><th>Efeito de Yug-Neth</th></tr>
+<tr><td>Próximo de cultistas amarelos</td><td>Nenhum (Cultistas são cegos e surdos a ele)</td></tr>
+<tr><td>Próximo de Nagas Guerreiros</td><td>Nagas ficam <strong>confusos</strong> por 3s (Mi-Go preexistem à hierarquia de Set)</td></tr>
+<tr><td>Próximo de Byakhee</td><td>Byakhee emite grito de reconhecimento — <strong>revela sua posição no mapa por 10s</strong></td></tr>
+<tr><td>Próximo de Portões das Ruínas</td><td>Animação especial + abre os Portões automaticamente</td></tr>
+<tr><td>No escuro</td><td>Sua bioluminescência ilumina levemente a área (~1 unidade de raio)</td></tr>
+</table>
+<h3>Sistema de Proteção — "Resiliência do Companheiro"</h3>
+<p>Yug-Neth tem sua própria barra de <strong>Resiliência do Companheiro (RC)</strong>, exibida como um segundo indicador discreto no HUD (abaixo do indicador de RM de Damião).</p>
+<table class="doc-table">
+<tr><th>RC</th><th>Estado</th><th>Consequência</th></tr>
+<tr><td>100%</td><td>Saudável</td><td>Bioluminescência plena</td></tr>
+<tr><td>50-99%</td><td>Ferido</td><td>Bioluminescência reduzida; pulsos irregulares</td></tr>
+<tr><td>1-49%</td><td>Crítico</td><td>Bioluminescência apagada; movimentos lentos</td></tr>
+<tr><td>0%</td><td><strong>Colapso do Companheiro</strong></td><td><strong>GAME OVER</strong> — <em>"Yug-Neth colapsou. Sem ele, os Portões de Carcosa permanecem fechados para sempre."</em></td></tr>
+</table>
+<p><strong>RC não regenera automaticamente.</strong> Yug-Neth recupera RC apenas:<br>- Ao descansar em postes de luz (recupera 20 RC junto com a RM de Damião)<br>- Usando o item <strong>Fragmento de Yuggoth</strong> (consumível raro, encontrado apenas no Templo da Serpente Z5)</p>
+<h3>O que causa dano à RC de Yug-Neth</h3>
+<table class="doc-table">
+<tr><th>Fonte de Dano</th><th>Dano à RC</th></tr>
+<tr><td>Ataque físico de Cultista Amarelo</td><td>30 RC</td></tr>
+<tr><td>Cone de Gelo de Alhazred (durante luta)</td><td>25 RC</td></tr>
+<tr><td>Cone de Veneno de Nagaraja</td><td>35 RC</td></tr>
+<tr><td>Presença prolongada em zona de tempestade máxima</td><td>5 RC/segundo</td></tr>
+<tr><td>Olho de Set (Templo, Z9)</td><td>20 RC por segundo de exposição</td></tr>
+</table>
+<p>---</p>
+<h2>V. Revelação dos Portões (Cena Narrativa)</h2>
+<p><em>Ao se aproximar dos Portões das Ruínas com Yug-Neth:</em></p>
+<blockquote><em>Yug-Neth para. Pela primeira vez desde que Damião o libertou, ele para completamente — não de medo, mas de reconhecimento.</em></blockquote>
+<blockquote><em>Os pontos bioluminescentes em seu corpo se acendem em espiral: da ponta das garras até os tentáculos do rosto, uma onda dourada que Damião nunca viu antes.</em></blockquote>
+<blockquote><em>"Pulso em espiral dourada. Novo padrão. Não tenho tradução."</em></blockquote>
+<blockquote><em>Yug-Neth se aproxima dos Portões. Toca a pedra com as duas garras.</em></blockquote>
+<blockquote><em>Os Portões gemem — depois se abrem.</em></blockquote>
+<blockquote><em>Damião olha para Yug-Neth. Yug-Neth olha para Damião — se é que olha.</em></blockquote>
+<blockquote><em>Agora Damião entende por que Alhazred o mantinha preso.</em></blockquote>
+<p><em>(Após essa cena, o Byakhee desce dos Portões — ele foi ativado pela abertura. A luta começa.)</em></p>
+<p>---</p>
+<h2>VI. Destino de Yug-Neth</h2>
+<p>Durante a luta com o Byakhee, Yug-Neth recua para uma posição segura na borda da arena — <strong>mas a mecânica de proteção ainda se aplica.</strong> O Byakhee tem um ataque de Mergulho que pode acertar Yug-Neth se Damião não estiver posicionado entre eles.</p>
+<p>Após a morte do Byakhee e a transição para a Fase 2, Yug-Neth entra no Castelo de Carcosa com Damião. O que acontece com ele dentro do Castelo é conteúdo da Fase 2 (ainda a ser desenhado).</p>
+<p>---</p>
+<h2>VII. Meta de Importação Unity</h2>
+<p><strong>Arquivo de sprite:</strong> <code>Assets/FavelaAmarela/Art/Characters/MiGo/yug_neth_idle.png</code><br>- <strong>Dimensões:</strong> 32 × 48 px (idêntico ao frame do Damião)<br>- <strong>PPU:</strong> 32<br>- <strong>Filter Mode:</strong> Point (no filter) — <code>filterMode: 0</code> no .meta<br>- <strong>Compression:</strong> None — <code>textureCompression: 0</code> no .meta<br>- <strong>Pivot:</strong> Bottom — <code>alignment: 7</code>, <code>spritePivot: {x: 0.5, y: 0}</code> no .meta<br>- <strong>Sprite Mode:</strong> Single<br>- <strong>Camada de sorting:</strong> acima do chão, abaixo do jogador (usar <code>DynamicYSort</code> como Damião)</p>
+<blockquote><code>.meta</code> pré-configurado criado em <code>Assets/FavelaAmarela/Art/Characters/MiGo/yug_neth_idle.png.meta</code>.</blockquote>
+<blockquote>O Unity reconhecerá as configurações automaticamente ao abrir o projeto.</blockquote></section><section id="section-7" class="doc-section"><div class="section-header"><span>CAPÍTULO 7</span><h2>7. Lore & Boss: Abdul Alhazred</h2></div><h1>Abdul Alhazred (O Árabe Louco)</h1>
+<h2>Lore</h2>
+Abdul Alhazred é o lendário poeta e erudito de Sanaa que passou anos explorando os desertos da Arábia e as ruínas de Nameless City, onde traduziu os segredos dos Antigos no tomo <em>Al-Azif</em> (<em>O Necronomicon</em>). Enlouquecido pela estática de Carcosa, ele se isolou na Tumba Mururat — onde mantém aprisionado <strong>Yug-Neth</strong>, um Mi-Go filhote, como chave dimensional para os Portões das Ruínas.
+<h2>Função no Jogo</h2>
+* <strong>Localização:</strong> Clímax da Tumba de Alhazred (Dungeon 1 do Deserto de Hali), em <code>Assets/Scenes/Playtest_RuinasPalidas.unity</code> (S-Path, Zona 9 — Tumba de Abdul).
+<em> <strong>Drop condicional:</strong> </em>O Necronomicon* — <strong>apenas no Caminho B (luta)</strong>. Ver seção abaixo.
+* <strong>Companion libertado:</strong> Yug-Neth — em ambos os caminhos.
+<p>---</p>
+<h2>O Encontro — Cena de Escolha</h2>
+<p>Ao entrar na Zona 9, Damião encontra Alhazred em transe flutuante. <strong>Yug-Neth está acorrentado no canto da arena</strong> (correntes anômalas, bioluminescência apagada). Se Damião interagir com as correntes de Yug-Neth antes do grimório, Alhazred acorda e um <strong>diálogo de escolha</strong> é iniciado.</p>
+<blockquote>Design completo da cena (diálogos, bifurcação, consequências) em <strong>[migo_companion.md](migo_companion.md)</strong>.</blockquote>
+<h3>Caminho A — Concordar com Alhazred</h3>
+- Alhazred libera Yug-Neth voluntariamente e some com o Al-Azif.
+- ❌ <strong>Necronomicon não obtido</strong> (impacto: sem tradução de Aklo, sem diálogo de Nagaraja traduzido).
+- ✅ Yug-Neth se torna companion.
+- Sem luta de boss neste caminho.
+<h3>Caminho B — Recusar / Lutar</h3>
+- Alhazred entra em colapso mental → luta começa.
+- <strong>Yug-Neth permanece vulnerável na arena durante a luta</strong> (mecânica de proteção ativa).
+- ✅ <strong>Necronomicon obtido</strong> após a vitória.
+- ✅ Yug-Neth se torna companion.
+<p>---</p>
+<h2>O Boss Fight (Caminho B)</h2>
+<h3>Fase NPC (Pre-Fight)</h3>
+Alhazred entra em colapso após a recusa de Damião. A estática de Carcosa toma conta da sala.
+<blockquote>⚠️ <strong>Mecânica de Proteção Ativa durante a luta:</strong></blockquote>
+<blockquote>Yug-Neth permanece no canto da arena com uma barra de <strong>Resiliência do Companheiro (RC)</strong>. Se a RC de Yug-Neth chegar a zero (por Cones de Gelo ou Summons de Alhazred) → <strong>GAME OVER</strong>. Damião deve se posicionar entre Alhazred e Yug-Neth para bloquear projéteis.</blockquote>
+<h3>Atributos Base</h3>
+- <strong>Mobilidade:</strong> Flutuante. Usa teleporte para se reposicionar.
+- <strong>Vulnerabilidade:</strong> Protegido por um Escudo Mágico. O escudo dita o ritmo do combate e o acesso ao dano real.
+- <strong>Tipo de Dano Causado:</strong> Dano Mágico (Frio/Gelo), Dano Físico baixo (pelos summons) e Dreno de Sanidade passivo.
+<h3>Estrutura da Luta (2 Fases)</h3>
+<p><strong>Fase 1 (100% a 35% de vida)</strong><br>- Alhazred está protegido por um Escudo Mágico impenetrável.<br>- Ele conjura <strong>pequenos esqueletos</strong> para atrapalhar e flanquear o jogador.<br>- Para causar dano, Damião precisa quebrar <strong>Pedras de Poder</strong> espalhadas pela arena.<br>- Quebrar uma Pedra desativa o escudo temporariamente. Após um tempo (ou dano recebido), ele reconjura as pedras.<br>- <strong>Atenção:</strong> Os esqueletos podem se mover na direção de Yug-Neth — Damião deve interceptá-los.</p>
+<p><strong>Fase 2 (Menos de 35% de vida)</strong><br>- O escudo mágico se torna <strong>permanente</strong> (não depende mais das pedras).<br>- Ele conjura <strong>Cones de Gelo</strong> — projéteis que podem acertar Yug-Neth se não bloqueados.<br>- <strong>Mecânica de Debuff:</strong> 3 stacks de gelo → Damião congela (Stun) por curto período.<br>- <strong>Janela de Vulnerabilidade:</strong> Após conjurar 3 magias, a "mana" de Alhazred esgota temporariamente, o escudo cai → única janela de golpe de misericórdia.</p>
+<p>---</p>
+<h2>Decisões de Conteúdo</h2>
+<p><strong>2026-07-28:</strong> O miniboss genérico "Vulto" reservado para a arena <code>Zona9_TronoDoVulto</code> <strong>não será implementado</strong>. O miniboss da arena é Abdul Alhazred.</p>
+<p><strong>2026-07-29 — Renomeação:</strong> A arena é <code>Zona9_TumbaDeAbdul</code>. A luta está implementada — ver [systems/boss_abdul.md](../systems/boss_abdul.md).</p>
+<p><strong>2026-07-29 — Layout:</strong> A dungeon ganhou a <code>Zona6b_CamaraDoBau</code>, sala lateral com baú de armas, antes das Zonas 6-8.</p>
+<p><strong>2026-07-30 — Revisão do Encontro:</strong> O encontro com Alhazred foi expandido para um <strong>sistema de escolha binária</strong> que determina:<br>- Se o Necronomicon é obtido (somente via luta)<br>- O tom da relação de Damião com Yug-Neth (libertação por respeito vs. libertação por vitória)<br>- Design completo: [migo_companion.md](migo_companion.md)</p></section><section id="section-8" class="doc-section"><div class="section-header"><span>CAPÍTULO 8</span><h2>8. Lore: Deserto de Hali e Dungeons</h2></div><h1>O Deserto de Hali e suas Dungeons</h1>
+<p>O <strong>Deserto das Cinzas de Hali</strong> é a área inicial aberta (Fase 1) de <em>A Maldição da Cidade Pálida</em>. Sob o céu tingido pelos sóis gêmeos, o deserto conecta o ponto de entrada de Damião a duas masmorras antigas, ao Santuário de Yhtill e aos Portões das Ruínas que dão saída da fase.</p>
+<p>---</p>
+<h2>1. O Deserto Aberto (Dunas de Cinza)</h2>
+* <strong>Visual:</strong> Dunas de areia amarelada e cinzas cósmicas sopradas por ventos uivantes. Sóis gêmeos esmaecidos no horizonte cor de osso.
+* <strong>Mecânicas:</strong> Área de navegação aberta com <strong>tempestades de areia</strong> que variam por setor geográfico, conectando as duas dungeons, o Santuário de Yhtill e os Portões das Ruínas. O <strong>Lago de Hali</strong> no centro divide o mapa em setor sul (entrada, Dungeon 1) e setor norte (Portões, Santuário).
+* <strong>Documento de Level Design completo:</strong> <code>systems/level_design_deserto_hali.md</code> (2026-07-28) — mapa topológico, zonas de tempestade, pontos de interesse, inimigos errantes e referências visuais.
+<p>---</p>
+<h2>2. Dungeon 1: A Tumba de Alhazred (Tumbas Mururats)</h2>
+* <strong>Localização:</strong> Fenda subterrânea nas ruínas ocidentais do deserto.
+* <strong>Inimigos:</strong> Cultistas cegos e estática anômala.
+<em> <strong>Chefe Final:</strong> <strong>Abdul Alhazred</strong> (Miniboss), autor do </em>Necronomicon*.
+* <strong>Nota de implementação (2026-07-28):</strong> esta dungeon corresponde à área já construída em <code>Assets/Scenes/Playtest_RuinasPalidas.unity</code> (Zonas 1-9 do S-Path), repropositada — não é conteúdo novo a construir do zero. O stealth urbano, as tempestades e a queda da Zona 4 para a Zona 5 (ver <code>systems/queda_z4_z5.md</code>) acontecem dentro desta dungeon, não numa fase separada.
+<p>---</p>
+<h2>3. Dungeon 2: O Templo da Serpente (Opcional)</h2>
+* <strong>Localização:</strong> A definir — achada explorando o Deserto Aberto (não faz parte do caminho obrigatório da Fase 1).
+* <strong>Guardião:</strong> O <strong>Chefe Guardião</strong> (nome próprio ainda não cunhado — ver <code>templo_da_serpente.md</code>, rascunho).
+* <strong>Progresso:</strong> A derrota do Guardião libera a <strong>Coroa de Ossos do Rei em Amarelo</strong>.
+<p>---</p>
+<h2>4. Portões das Ruínas (Fim da Fase 1)</h2>
+* <strong>Localização:</strong> Antecâmara da cidade sagrada de Carcosa, saída do Deserto de Hali.
+* <strong>Guardião:</strong> O <strong>Byakhee</strong> (Miniboss alado).
+* <strong>Progresso:</strong> A derrota do Byakhee libera o <strong>Anel do Sinal Amarelo</strong>, abre os Portões e marca a transição para a Fase 2 (O Castelo de Carcosa).</section><section id="section-9" class="doc-section"><div class="section-header"><span>CAPÍTULO 9</span><h2>9. Lore: As Quatro Relíquias Lendárias</h2></div><h1>As Quatro Relíquias Lendárias</h1>
+<h2>1. O Necronomicon (<em>Al-Azif</em>)</h2>
+* <strong>Obtenção:</strong> Recompensa de vitória contra o Miniboss Abdul Alhazred.
+* <strong>Efeito:</strong> Permite a decodificação de inscrições rúnicas anciãs e aumenta o poder anômalo, exigindo controle rígido da Resiliência Mental.
+<h2>2. O Anel do Sinal Amarelo</h2>
+* <strong>Obtenção:</strong> Drop do Miniboss Byakhee nos Portões das Ruínas.
+* <strong>Efeito:</strong> Gravação sacra que concede resguardo contra o pavor cósmico e reduz a detecção de sentinelas biológicas.
+<h2>3. O Set Lendário de Set (4 peças)</h2>
+<p>O <strong>Set Lendário de Set</strong> é o conjunto de equipamento obtido no Templo da Serpente (Dungeon 2, opcional) e dentro do Castelo de Carcosa (Fase 2). O set completo é necessário para acessar a <strong>sidequest do Avatar de Nyarlathotep</strong>.</p>
+<table class="doc-table">
+<tr><th>Peça</th><th>Slot</th><th>Obtenção</th><th>Garantido?</th></tr>
+<tr><td><strong>Elmo de Set</strong></td><td>Cabeça</td><td>Drop do Avatar de Set (Templo da Serpente)</td><td>✅ Sempre</td></tr>
+<tr><td><strong>Peitoral de Set</strong></td><td>Peito</td><td>Drop RNG do Avatar de Set, Naga (Templo), ou Castelo de Carcosa</td><td>❌ RNG</td></tr>
+<tr><td><strong>Grevas de Set</strong></td><td>Pernas</td><td>Drop RNG do Avatar de Set, Naga (Templo), ou Castelo de Carcosa</td><td>❌ RNG</td></tr>
+<tr><td><strong>Arma de Set</strong></td><td>Arma</td><td>Drop RNG do Avatar de Set, Naga (Templo), ou Castelo de Carcosa</td><td>❌ RNG</td></tr>
+</table>
+<blockquote><em>Nota: a entrada antiga "Coroa de Ossos do Rei em Amarelo" foi substituída pelo Set Lendário de Set (decisão 2026-07-28). O Elmo de Set é o item que antes se chamava "Coroa de Ossos" — renomeado para coerência com a identidade do boss Avatar de Set.</em></blockquote>
+<h2>4. O Patuá (Patuá das Luas Gêmeas)</h2>
+* <strong>Obtenção:</strong> Recompensa da conclusão da quest narrativa da <strong>Rainha Cassilda</strong> no Santuário de Yhtill. Não é um drop de combate — é a conclusão de um puzzle/diálogo com a Cassilda (decisão 2026-07-28).
+* <strong>Efeito:</strong> Proteção abençoada pela Canção de Cassilda que desacelera o dreno de sanidade no escuro e acelera a regeneração de RM nos Postes de Luz.
+* <strong>Nota de nomeação:</strong> O <code>PatuaPickup.cs</code> da Zona 5 existente em código que destrava o Salto Dimensional é um item diferente — rename pendente para "Fragmento de Hali do Salto" (Fatia 3 do roadmap de código).</section><section id="section-10" class="doc-section"><div class="section-header"><span>CAPÍTULO 10</span><h2>10. Lore: Glossário Diegético</h2></div><h1>Glossário Diegético</h1>
+<p><strong>Regra:</strong> Nunca use termos genéricos de RPG em texto visível ao jogador, nomes de habilidade, ScriptableObjects, ou nomes de variáveis/métodos públicos.</p>
+<h2>Tabela de Tradução</h2>
+<table class="doc-table">
+<tr><th>Termo Genérico</th><th>Termo Diegético</th><th>Usado em</th></tr>
+<tr><td>HP / Health</td><td><strong>Resiliência Mental</strong></td><td><code>ResilienciaMental.cs</code></td></tr>
+<tr><td>Take Damage</td><td><strong>Sofrer Trauma</strong></td><td><code>SofrerTrauma()</code></td></tr>
+<tr><td>Heal</td><td><strong>Ancorar</strong></td><td><code>Ancorar()</code></td></tr>
+<tr><td>Full Heal</td><td><strong>Estabilizar Completamente</strong></td><td><code>EstabilizarCompletamente()</code></td></tr>
+<tr><td>Death / Game Over</td><td><strong>Colapso</strong></td><td><code>IsColapso</code>, <code>ForcarColapso()</code></td></tr>
+<tr><td>Low HP State</td><td><strong>Pânico</strong></td><td><code>IsPanico</code></td></tr>
+<tr><td>Dash</td><td><strong>Salto Dimensional</strong></td><td><code>DimensionalLeap.cs</code></td></tr>
+<tr><td>Dodge</td><td><strong>Esquiva</strong></td><td><code>Esquiva.cs</code></td></tr>
+<tr><td>Enemy</td><td><strong>Cultista Amarelo</strong></td><td><code>CultistaFSM.cs</code></td></tr>
+<tr><td>Patrol</td><td><strong>Errante</strong></td><td><code>CultistaState.Errante</code></td></tr>
+<tr><td>Alert</td><td><strong>Alerta</strong></td><td><code>CultistaState.Alerta</code></td></tr>
+<tr><td>Chase</td><td><strong>Caça</strong></td><td><code>CultistaState.Caca</code></td></tr>
+<tr><td>Sound Detection</td><td><strong>Estímulo Sonoro</strong></td><td><code>ReceberEstimuloSonoro()</code></td></tr>
+<tr><td>Mana / Energy</td><td>_(não existe)_</td><td>O jogo não tem sistema de mana</td></tr>
+<tr><td>Level Up</td><td>_(não existe)_</td><td>O jogo não tem progressão de nível</td></tr>
+<tr><td>Inventory</td><td>_(não existe)_</td><td>Evite propor inventário complexo</td></tr>
+</table>
+<h2>Contexto Narrativo</h2>
+<p>O protagonista <strong>Damião</strong> está preso nas <strong>Ruínas Pálidas</strong> (Ruins of Hali) dentro da <strong>Cidade Pálida</strong> (Carcosa), sob influência de <strong>Hastur</strong> (o Rei de Amarelo). A terminologia reflete o horror cósmico lovecraftiano: a "saúde" é a capacidade mental de resistir à loucura, não pontos de vida físicos.</p></section><section id="section-11" class="doc-section"><div class="section-header"><span>CAPÍTULO 11</span><h2>11. Level Design: Overworld do Deserto de Hali</h2></div><h1>Level Design — Overworld: O Deserto de Hali</h1>
+<strong>Fase 1 — A Maldição da Cidade Pálida</strong>
+<p>---</p>
+<h2>1. CONCEITO DO ESPAÇO</h2>
+<h3>1.1 Identidade</h3>
+<p>O Deserto de Hali não é um deserto de areia dourada e calor. É um <strong>deserto de cinzas cósmicas</strong> — o resíduo sólido de sóis gêmeos que nunca terminam de morrer. O chão é mole, silencioso sob os pés, e o ar tem gosto de ferro. A paisagem não é vasta e aberta como no deserto real: ela é <strong>claustrofóbica à distância</strong>. Dunas altas criam paredes naturais. A visibilidade é sempre cortada por uma curva, por uma duna, pela própria tempestade.</p>
+<p>Hali não é um lugar para ser explorado com alegria. É um lugar para ser <strong>atravessado com cuidado</strong>.</p>
+<h3>1.2 Função no Jogo</h3>
+<p>O Deserto de Hali é o <strong>overworld conectivo da Fase 1</strong>. Não é um mapa de hub com teleportes — é um espaço com lógica de mundo coerente que o jogador precisa aprender a ler:</p>
+<p>- A <strong>Tumba de Alhazred</strong> (Dungeon 1) fica na borda ocidental, visível logo na chegada — é o objetivo principal obrigatório.<br>- O <strong>Santuário de Yhtill</strong> fica numa elevação ao noroeste, acessível por desvio natural da rota principal.<br>- O <strong>Templo da Serpente</strong> (Dungeon 2, opcional) está oculto no leste, escondido pela zona de tempestade mais intensa.<br>- Os <strong>Portões das Ruínas</strong> ficam ao norte, além do Lago de Hali — checkpoint final da Fase 1.</p>
+<h3>1.3 Tamanho e Escala</h3>
+<blockquote><strong>Escopo:</strong> Grande o suficiente para ter senso de descoberta, mas não ao ponto de tornar a navegação um ônus. Nenhuma área deve demorar mais de <strong>2 minutos de caminhada cautelosa</strong> até o próximo ponto de interesse.</blockquote>
+<p>- <strong>Dimensão aproximada:</strong> ~22 × 16 unidades de jogo (tiles de 32 PPU)<br>- <strong>Estrutura de setores:</strong> O mapa é dividido em <strong>5 setores</strong> por elementos geográficos naturais (dunas, Lago de Hali, formações de pedra pálida).<br>- <strong>Câmera:</strong> Jogador enxerga ~6 tiles ao redor em cada direção. A tempestade reduz esse alcance dinamicamente.</p>
+<p>---</p>
+<h2>2. MAPA TOPOLÓGICO</h2>
+<pre><code>
+                          ┌─────────────────┐
+                          │  PORTÕES DAS    │  ← Fim da Fase 1
+                          │  RUÍNAS [BOSS]  │    (Byakhee)
+                          └────────┬────────┘
+                                   │
+             ┌─────────────────────┤
+             │                     │
+   ┌─────────┴──────────┐    ┌─────┴────────────────────────┐
+   │  SANTUÁRIO DE      │    │     LAGO DE HALI             │
+   │  YHTILL [QUEST]    │    │  (impassável — barreira      │
+   │  ↑ elevação rochosa│    │   natural de neblina negra)  │
+   └────────────────────┘    └─────┬────────────────────────┘
+                                   │
+          ┌────────────────────────┤              ┌──────────────────┐
+          │                        │              │  TEMPLO DA       │
+   ┌──────┴─────────┐              │        ···►  │  SERPENTE [OPC.] │
+   │  TUMBA DE      │      [DESERTO CENTRAL]      │  (oculto pela    │
+   │  ALHAZRED [D1] │      tempestade moderada    │  tempestade      │
+   │  Dungeon 1     │                             │  máxima no leste)│
+   └──────┬─────────┘                             └──────────────────┘
+          │
+   ┌──────┴─────────┐
+   │    ENTRADA     │  ← Damião chega aqui (sequência de abertura TBD)
+   │  (garganta de  │
+   │   pedra pálida)│
+   └────────────────┘
+<p>LEGENDA:<br>──── Rota principal obrigatória<br>···· Rota de exploração (opcional)<br>[BOSS] Miniboss<br>[D1]   Dungeon obrigatória<br>[OPC.] Dungeon opcional<br>[QUEST] Ponto de missão secundária<br></code></pre></p>
+<p>---</p>
+<h2>3. ZONAS DE TEMPESTADE DE AREIA</h2>
+<blockquote><strong>Decisão de design (2026-07-28):</strong> A tempestade de areia é <strong>removida da Dungeon 1 (Tumba de Alhazred)</strong> e <strong>relocada para o Overworld do Deserto de Hali</strong>. Subterrâneos não têm tempestade de areia. A dungeon passa a ter StormIntensity = 0 por padrão.</blockquote>
+>
+<blockquote><strong>Impacto de código (fatia futura):</strong> Os triggers <code>TempestadeTrigger_Z1_Spawn</code>, <code>TempestadeTrigger_Z2_Rajadas</code>, <code>TempestadeTrigger_Z3Z4_Forte</code> na cena <code>Playtest_RuinasPalidas.unity</code> devem ser removidos ou desativados. O <code>TempestadeTrigger_Z5_Nula</code> permanece correto (subterrâneo = 0 de qualquer forma).</blockquote>
+<table class="doc-table">
+<tr><th>Setor</th><th>Intensidade</th><th>Visibilidade</th><th>Impacto Mecânico</th></tr>
+<tr><td><strong>Entrada</strong> (sul)</td><td>Calmaria</td><td>100%</td><td>Área de orientação. Sem penalidade.</td></tr>
+<tr><td><strong>Tumba de Alhazred</strong> (oeste)</td><td>Moderada</td><td>~70%</td><td>Passos abafados (−30% som emitido). Byakhee voa baixo, mais perigoso.</td></tr>
+<tr><td><strong>Deserto Central</strong></td><td>Forte</td><td>~45%</td><td>Passos completamente silenciosos. Cultistas errantes com rota aleatória. Byakhee cego.</td></tr>
+<tr><td><strong>Santuário de Yhtill</strong> (noroeste)</td><td>Calma sobrenatural</td><td>90%</td><td>Sem vento. RM <strong>não drena</strong> (luz espiritual de Cassilda).</td></tr>
+<tr><td><strong>Leste / Templo da Serpente</strong></td><td>Tempestade máxima</td><td>~15%</td><td>Navegação às cegas. Marco visual necessário. Drena 2 RM/s.</td></tr>
+<tr><td><strong>Portões das Ruínas</strong> (norte)</td><td>Calmaria ominosa</td><td>95%</td><td>Sem vento. Luta com o Byakhee exige visibilidade total.</td></tr>
+</table>
+<h3>A Tempestade como Stealth Invertido</h3>
+<p>Na Dungeon 1, o stealth é <strong>silêncio ativo</strong> — o jogador gerencia o som que emite.</p>
+<p>No Overworld, a tempestade cria <strong>stealth passivo</strong> na região central: o vento abafa tudo. Isso cria um espaço de alívio no meio do percurso, mas exige que o jogador aprenda a <strong>ler a tempestade</strong> como aliada e inimiga ao mesmo tempo.</p>
+<p>---</p>
+<h2>4. PONTOS DE INTERESSE</h2>
+<h3>4.1 ENTRADA — A Garganta de Pedra Pálida</h3>
+<p>- <strong>Tipo:</strong> Ponto de chegada / Tutorial implícito<br>- <strong>Visual:</strong> Passagem estreita entre dois penhascos de pedra pálida. Luz de dois sóis gêmeos esmaecidos no horizonte cor de osso.<br>- <strong>Mecânica:</strong> Sem inimigos. Poste de luz rachado que ainda funciona = primeiro Refúgio e ensino da mecânica de RM.<br>- <strong>Narrativa:</strong> Inscrições em Aklo nas pedras (log #001). Na areia, a <strong>1ª página de um diário perdido de um antigo nobre de Yhtill</strong> (item de introdução para a quest de Cassilda).<br>- <strong>Pendência:</strong> Sequência de abertura (cinemática detalhada em <code>cinematica_abertura_deserto.md</code> e storyboard).</p>
+<p>---</p>
+<h3>4.2 TUMBA DE ALHAZRED — Dungeon 1</h3>
+<p>- <strong>Tipo:</strong> Dungeon obrigatória — área implementada em <code>Playtest_RuinasPalidas.unity</code><br>- <strong>Conexão:</strong> Visível da Entrada. Depressão no solo com escadaria de pedra.<br>- <strong>Retorno ao Overworld:</strong> Damião emerge por saída diferente da entrada, mais ao norte. A dungeon funciona também como <strong>atalho geográfico</strong> do overworld.<br>- <strong>Pós-dungeon:</strong> Necronomicon <strong>reage ao ambiente</strong> — páginas vibram na direção do leste (hint para Dungeon 2).<br>- <strong>Pendência:</strong> Ponto exato de emergência no overworld (coordenada) ainda a definir.</p>
+<p>---</p>
+<h3>4.3 SANTUÁRIO DE YHTILL — Quest de Cassilda</h3>
+<p>- <strong>Tipo:</strong> Ponto de quest (obrigatória para obter o Patuá das Luas Gêmeas)<br>- <strong>Localização:</strong> Elevação acessível por rampa de pedra, fora da rota natural mas visível de longe por contraste de iluminação.<br>- <strong>Atmosfera:</strong> Única zona de calmaria sobrenatural. A tempestade <strong>para</strong> nas bordas da plataforma. RM não drena.<br>- <strong>Cassilda:</strong> Em corpo semi-translúcido. Fala com Damião independentemente de qualquer pré-requisito — <strong>as quests do overworld são independentes entre si e podem ser acessadas em qualquer ordem de exploração</strong> (decisão 2026-07-28).<br>- <strong>Poste de Luz:</strong> Refúgio e ponto de save.<br>- <strong>Pendência:</strong> Conteúdo da quest (objetivos, diálogos) — ver <code>lore/cassilda_e_byakhee.md</code>.</p>
+<p>---</p>
+<h3>4.4 TEMPLO DA SERPENTE — Dungeon 2 (Opcional)</h3>
+<p>- <strong>Tipo:</strong> Dungeon opcional encontrada por exploração<br>- <strong>Localização:</strong> Extremo leste, zona de tempestade máxima. Requer atravessar ~4 tiles de visibilidade quase zero.<br>- <strong>Entrada:</strong> Espiral de pedras serpentinas semienterradas que forma uma porta quando alinhada com as luas gêmeas.<br>- <strong>Forma de descoberta (decisão 2026-07-28):</strong> <strong>Drop de mapa</strong> — qualquer personagem inimigo no overworld tem chance de dropar um Mapa Fragmentado do Templo da Serpente. O mapa é um item consumível que revela a localização no overworld com um marcador visual discreto (rastro de luz pálida no chão, na direção leste). Essa é a <strong>única</strong> forma de descoberta oficial — as outras formas (Necronomicon reage, marco visual) foram descartadas como mecânica separada, podendo ser usadas como dressing visual e ambiental sem função de gameplay.<br>- <strong>Conteúdo interno:</strong> TBD — ver <code>lore/templo_da_serpente.md</code>.</p>
+<p>---</p>
+<h3>4.5 LAGO DE HALI — Barreira Natural</h3>
+<p>- <strong>Tipo:</strong> Elemento geográfico / barreira impassável / hazard de lore<br>- <strong>Mecânica:</strong> Impassável. Fronteira entre oeste (Tumba, Entrada) e norte (Portões, Santuário).<br>- <strong>Perigo passivo:</strong> Ficar na margem por mais de 10 segundos causa drenagem lenta de RM (−5 RM/s). Câmera distorce levemente.<br>- <strong>Visual:</strong> Superfície negra, perfeitamente imóvel. Nenhuma reflexão. Borda com brilho pálido-amarelado — como luz vindo de baixo.<br>- <strong>Função narrativa:</strong> Hastur dorme aqui. Presença como barreira reforça a cosmologia sem cutscene.</p>
+<p>---</p>
+<h3>4.6 PORTÕES DAS RUÍNAS — Fim da Fase 1</h3>
+<p>- <strong>Tipo:</strong> Arena de Miniboss / checkpoint de saída de fase<br>- <strong>Acesso:</strong> Acessível após sair da Tumba. Não requer Dungeon 2 nem quest de Cassilda (mas relíquias podem ajudar na luta).<br>- <strong>Preparação:</strong> Área sem inimigos com Poste de Luz (último Refúgio da Fase 1) e penas espalhadas como prefiguração do Byakhee.<br>- <strong>Arena do Byakhee:</strong> Área aberta. Ataques aéreos rasantes, gritos de desorientação, tentativa de agarrar e voar com Damião (dano contínuo de RM).<br>- <strong>Drop:</strong> Anel do Sinal Amarelo.<br>- <strong>Pós-Boss:</strong> Portões se abrem. <code>TransicaoDeFaseTrigger</code> → Fase 2 (Castelo de Carcosa).</p>
+<p>---</p>
+<h2>5. INIMIGOS NO OVERWORLD</h2>
+<h3>5.1 Filosofia</h3>
+<p><strong>Cada inimigo no overworld tem função de design específica.</strong> Sem presença genérica de dificuldade.</p>
+<table class="doc-table">
+<tr><th>Inimigo</th><th>Zona</th><th>Comportamento</th><th>Função de Design</th></tr>
+<tr><td><strong>Cultistas errantes (pares)</strong></td><td>Deserto Central</td><td>Patrulha diagonal, rota levemente aleatória por influência da tempestade</td><td>Tensão no cruzamento. Fáceis de desviar individualmente, mas em pares forçam separar e contornar</td></tr>
+<tr><td><strong>Byakhee (sentinelas aéreos)</strong></td><td>Zona moderada + Portões</td><td>Circulam em elipse. Visão cônica para baixo. Cegos na tempestade forte</td><td>Forçar o jogador a monitorar o céu além do chão</td></tr>
+<tr><td><strong>Coisa do Cemitério (1x)</strong></td><td>Deserto Central (meio do mapa)</td><td><strong>Patrulha errante por toda a extensão do deserto central</strong> — IA de rota aleatória lenta, guiada por faro. O encontro é imprevisível: o jogador pode cruzar o deserto inteiro sem vê-la, ou encontrá-la de frente a qualquer momento (2026-07-28)</td><td>Terror puro sem solução de combate. Tensão passiva permanente: o jogador nunca sabe onde ela está. Pode ser encontrada antes ou depois da Dungeon 1 — sem pré-requisito.</td></tr>
+<tr><td><strong>Sementes de Hastur</strong></td><td>Lago de Hali (borda)</td><td>Flutuam na margem — explodem ao toque do jogador</td><td>Reforçar que o Lago é proibido</td></tr>
+<tr><td><strong>Cultista do Templo (especial)</strong></td><td>Leste (tempestade máxima)</td><td>Caminha em direção ao Templo. Não ataca proativamente</td><td>Guia opcional. Derrota furtiva = mapa fragmentado</td></tr>
+</table>
+<h3>5.2 O Que Não Colocar</h3>
+<p>- Grupos de 3+ cultistas em campo aberto.<br>- Inimigos fixos sem função de design.<br>- Qualquer inimigo na zona de Entrada ou no Santuário de Yhtill (zonas de respiro).</p>
+<p>---</p>
+<h2>6. REFERÊNCIAS VISUAIS</h2>
+<h3>6.1 Paleta de Cores</h3>
+<table class="doc-table">
+<tr><th>Elemento</th><th>Cor</th><th>Código</th></tr>
+<tr><td>Areia / Cinza cósmico</td><td>Bege acinzentado</td><td><code>#C8B89A</code></td></tr>
+<tr><td>Rochas pálidas</td><td>Calcário frio</td><td><code>#D4CFC8</code></td></tr>
+<tr><td>Céu</td><td>Amarelo-ocre escuro</td><td><code>#7A6A3A</code></td></tr>
+<tr><td>Tempestade (partículas)</td><td>Âmbar translúcido</td><td><code>#D4883A</code></td></tr>
+<tr><td>Lago de Hali</td><td>Preto absoluto</td><td><code>#080808</code></td></tr>
+<tr><td>Borda do Lago (brilho)</td><td>Amarelo pálido</td><td><code>#E8E0A0</code></td></tr>
+<tr><td>Postes de Luz (Refúgios)</td><td>Amarelo quente</td><td><code>#F5C842</code></td></tr>
+</table>
+<h3>6.2 Referências de Jogos</h3>
+<table class="doc-table">
+<tr><th>Referência</th><th>O que emprestar</th></tr>
+<tr><td><strong>Hyper Light Drifter</strong></td><td>Navegação silenciosa em overworld vazio. Descoberta orgânica de pontos de interesse.</td></tr>
+<tr><td><strong>Death Stranding</strong></td><td>Traversal como desafio. O terreno em si é o obstáculo.</td></tr>
+<tr><td><strong>Blasphemous</strong></td><td>Pixel art com horror sacro. Luz e sombra dramáticas.</td></tr>
+<tr><td><strong>Silent Hill 2</strong></td><td>Névoa/tempestade como mecânica diegética, não UI.</td></tr>
+</table>
+<p>---</p>
+<h2>7. DECISÕES FECHADAS (2026-07-28)</h2>
+<table class="doc-table">
+<tr><th>#</th><th>Decisão</th><th>Resultado</th></tr>
+<tr><td>1</td><td>Coisa do Cemitério no overworld</td><td><strong>Patrulha errante no meio do mapa</strong>, IA aleatória. Encontro imprevisível — pode ou não acontecer dependendo de onde está na hora que o jogador passa. Sem pré-requisito de dungeon.</td></tr>
+<tr><td>2</td><td>Ordem das quests do overworld</td><td><strong>Completamente independentes entre si.</strong> Santuário, Dungeon 2 e Portões podem ser acessados em qualquer ordem de exploração.</td></tr>
+<tr><td>3</td><td>Ponto de emergência da Dungeon 1</td><td><strong>Tanto faz</strong> — a definir na hora da construção da cena, sem impacto de design.</td></tr>
+<tr><td>4</td><td>Descoberta do Templo da Serpente</td><td><strong>Drop de mapa</strong> de qualquer inimigo do overworld. Única mecânica oficial de descoberta.</td></tr>
+<tr><td>5</td><td>Sequência de abertura</td><td><strong>Cinemática</strong> — ver <code>systems/cinematica_abertura_deserto.md</code> (criado em 2026-07-28).</td></tr>
+</table>
+<h2>8. PENDÊNCIAS RESTANTES</h2>
+<p>- <strong>Remoção da tempestade da Dungeon 1</strong> — execução em fatia futura de código (remover triggers Z1, Z2, Z3Z4 da cena <code>Playtest_RuinasPalidas</code>).<br>- <strong>Conteúdo da quest de Cassilda</strong> (objetivos, diálogos) — ver <code>lore/cassilda_e_byakhee.md</code>.<br>- <strong>Conteúdo do Templo da Serpente</strong> (layout, inimigos, chefe) — ver <code>lore/templo_da_serpente.md</code>.<br>- <strong>Drop rate do Mapa Fragmentado</strong> — a definir no balanceamento.</p></section><section id="section-12" class="doc-section"><div class="section-header"><span>CAPÍTULO 12</span><h2>12. Level Design: Boss Abdul Alhazred</h2></div><h1>Luta contra Abdul Alhazred</h1>
+<p>Clímax da Tumba de Alhazred (Dungeon 1 do Deserto de Hali). Abdul é uma <em></em>Aparição<br>Primordial<strong> — logo, </strong>imune a golpe crítico de furtividade<em></em>: a furtividade serve para<br>chegar até a luta, não para resolvê-la. Lore e design narrativo em<br>[abdul_alhazred.md](../lore/abdul_alhazred.md).</p>
+<h2>O escudo é o coração da luta</h2>
+<p><strong>O dano só entra quando o Escudo Mágico está baixo.</strong> É o que impede a luta de ser "bata<br>até cair". A FSM (<code>AbdulFSM</code>) é a fonte única de verdade: o adaptador consulta<br><code>PodeReceberDano</code> antes de aplicar qualquer golpe.</p>
+<table class="doc-table">
+<tr><th>Estado</th><th>O que acontece</th><th>Vulnerável?</th></tr>
+<tr><td><strong>Transe</strong></td><td>Pré-luta: flutua murmurando Aklo. A luta começa ao interagir com o grimório.</td><td>Não</td></tr>
+<tr><td><strong>Fase 1</strong> (100%→35%)</td><td>Escudo sustentado pelas <strong>Pedras de Poder</strong>; invoca esqueletos em cadência.</td><td>Só com Pedra quebrada</td></tr>
+<tr><td><strong>Fase 2</strong> (<35%)</td><td>Escudo <strong>permanente</strong>; conjura Cones de Gelo e esqueletos gastando mana.</td><td>Não</td></tr>
+<tr><td><strong>Exausto</strong></td><td>Mana esgotada após o ciclo de magias: escudo cai.</td><td><strong>Sim</strong> — janela do golpe final</td></tr>
+<tr><td><strong>Derrotado</strong></td><td>Abatido; dropa o <strong>Necronomicon</strong>.</td><td>—</td></tr>
+</table>
+<h3>Transições</h3>
+<pre><code>
+Transe   ──(interage com o grimório)──────────▶ Fase1
+Fase1    ──(quebrar Pedra de Poder)───────────▶ escudo cai por N s, depois volta
+Fase1    ──(vida <= 35%)──────────────────────▶ Fase2  (escudo sobe, permanente)
+Fase2    ──(conjurou 3 magias)────────────────▶ Exausto (escudo cai)
+Exausto  ──(recupera mana)────────────────────▶ Fase2  (escudo volta, ciclo reinicia)
+Qualquer ──(vida <= 0)────────────────────────▶ Derrotado  → drop do Necronomicon
+</code></pre>
+<h3>Detalhes que definem a luta</h3>
+<p>- <strong>Pedras de Poder só valem na Fase 1.</strong> Na Fase 2 quebrá-las não faz nada — é o que<br>  força o jogador a mudar de plano na virada de fase (de "procurar pedras" para "sobreviver<br>  ao ciclo e punir a exaustão").<br>- <strong>A FSM não guarda a vida.</strong> Quem tem a [Vitalidade](vitalidade.md) é o adaptador<br>  (<code>AbdulAlhazredAI</code>), que informa a fração restante por <code>AtualizarFracaoDeVida</code> após cada<br>  golpe. Mesma divisão de <code>CultistaFSM</code>/<code>CultistaAI</code>.<br>- <strong>Vencível com qualquer uma das 3 armas.</strong> O baú é RNG (ver<br>  [ficha_de_atributos.md](ficha_de_atributos.md) e <code>SorteioDeArmaDaTumba</code>), então nenhuma<br>  arma pode ser obrigatória. A <code>Defesa</code> dele é baixa (5) de propósito: a fórmula de<br>  mitigação é subtrativa, então defesa alta puniria desproporcionalmente as armas de dano<br>  baixo (o Estilete).</p>
+<h2>Cones de Gelo e congelamento</h2>
+<p>Cada Cone de Gelo que acerta Damião aplica um <strong>acúmulo de frio</strong>; ao chegar a <strong>3</strong>, ele<br><strong>congela</strong> (atordoado brevemente) e o acúmulo zera. Acúmulos <strong>expiram</strong> com o tempo — a<br>mecânica é "não leve três seguidos", não uma punição inevitável. Regra em<br><code>AcumuloDeCongelamento</code> (POCO, 10 testes EditMode).</p>
+<h2>Atributos (<code>Ficha_Abdul.asset</code>)</h2>
+<table class="doc-table">
+<tr><th>Atributo</th><th>Valor</th><th>Porquê</th></tr>
+<tr><td>VitalidadeMax</td><td>300</td><td>~6 golpes de Alfanje, ~9 de Cravo — distribuídos entre janelas</td></tr>
+<tr><td>Ataque</td><td>8</td><td>dano físico baixo (o perigo real é mágico)</td></tr>
+<tr><td>Conjuração</td><td>25</td><td>dano dos Cones de Gelo</td></tr>
+<tr><td>Defesa</td><td>5</td><td>baixa de propósito (ver acima)</td></tr>
+<tr><td>ResistênciaAnômala</td><td>20</td><td>ele resiste a dano anômalo</td></tr>
+</table>
+<h2>Estado de implementação</h2>
+<p><strong>Pronto e testado:</strong> <code>AbdulFSM</code> (13 testes), <code>AcumuloDeCongelamento</code> (10 testes),<br><code>AbdulAlhazredAI</code> (adaptador), <code>PedraDePoder</code> (cenário destrutível que derruba o escudo),<br><code>Ficha_Abdul.asset</code>.</p>
+<p><strong>Pendente:</strong><br>- <strong>Sangramento não é aplicado</strong> — <code>ArmaResult</code> carrega <code>SangramentoPorSegundo</code>, mas nenhum<br>  receptor consome. A identidade do Estilete de Irem depende disso.<br>- <strong>Congelamento não está ligado ao Damião</strong> — o POCO existe, mas falta o componente no<br>  jogador, o prefab do Cone de Gelo, e um estado de "congelado" no <code>PlayerState</code> (hoje só<br>  há Livre/Saltando/Esquivando/Atacando).<br>- <strong>Arte/prefabs:</strong> esqueleto invocado, Cone de Gelo, Necronomicon, visual do escudo,<br>  sprite do Abdul. O adaptador tolera prefabs ausentes (a luta roda sem summons).<br>- <strong>Cena:</strong> o Abdul e as Pedras ainda não estão posicionados numa arena.</p></section>
+
+</body>
+</html>

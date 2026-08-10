@@ -9,9 +9,11 @@ namespace FavelaAmarela.Runtime.GameLoop
         {
             if (collision.CompareTag("Player"))
             {
-                if (GameManager.Instance != null && GameManager.Instance.Resiliencia != null)
+                if (GameManager.Instance != null && GameManager.Instance.Resiliencia != null
+                    && !GameManager.Instance.JogadorInvulneravel)
                 {
-                    // Força o colapso imediatamente (ex: cair num abismo)
+                    // Força o colapso imediatamente (ex: cair num abismo).
+                    // Respeita a invulnerabilidade de cutscene (ver GameManager.JogadorInvulneravel).
                     GameManager.Instance.Resiliencia.ForcarColapso();
                 }
             }

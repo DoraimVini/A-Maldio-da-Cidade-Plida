@@ -1,5 +1,5 @@
 ---
-type: Lore Document
+type: Lore Reference
 title: Bestiário Canônico de Carcosa
 description: Compêndio completo das abominações do Mito em Amarelo, unindo origem literária e mecânicas de gameplay.
 tags: [lore, enemies, hastur, carcosa, lovecraft, chambers]
@@ -22,9 +22,17 @@ Para compilar o bestiário completo de **Hastur** e d'**O Rei em Amarelo**, este
 * **Origem Literária:** Criado por Robert W. Chambers. Manifestação antropomórfica de Hastur vestindo farrapos amarelados pálidos de tecido orgânico. Possui a lendária "Máscara Pálida" — que na verdade é a sua pele verdadeira e sem expressões.
 * **Aplicação no Jogo:** **Antagonista Final / Eventos de Tensão.** O Rei não pode ser enfrentado fisicamente. Encontros com ele disparam a mecânica da Máscara: Se a máscara "cair" e Damião não se virar de costas a tempo, a visão do verdadeiro rosto alienígena causa *Game Over* instantâneo por fragmentação total da psique.
 
+### 2b. A Criatura Amarela (O Observador Amarelo)
+* **Origem Literária / Transmídia:** Animação *"O Peregrino Amarelo"* e Curta-Metragem *Favela Amarela*. **Não é Hastur nem o Rei em Amarelo.**
+* **Aplicação no Jogo / Lore:** É a **forma atemporal de Damião após sua transformação final na matéria amarela de Carcosa**. Ao final de sua peregrinação, Damião é envolvido pela pele/casulo amarelo da dimensão. Ao atravessar tempestades de memória entre as dimensões, essa silhueta amarela viaja no tempo e observa o Damião do passado (como nos pesadelos da favela no curta).
+
 ---
 
 ## II. A Fauna de Aldebaran e do Vácuo
+
+### 2c. Espectros Roxos / Dementadores (Espectros de Hali Ancestrais)
+* **Origem Transmídia:** Animação *"O Peregrino Amarelo"*.
+* **Aplicação no Jogo:** **Predadores Aéreos de Memória.** São **Espectros de Hali ancientes e mais fortes**, deformados por consumirem memórias humanas durante séculos nas tempestades de Carcosa. Voam em movimentos lentos e extraem almas e memórias, deixando corpos vazios.
 
 ### 3. Os Byakhee (Os Corcéis das Estrelas / Arautos do Vento Negro)
 * **Origem Literária:** Lovecraft e Derleth. Bestas gigantescas híbridas com pernas de inseto, asas membranosas de morcego e fisionomia que mistura aves de rapina com formigas. Podem voar no vácuo espacial sob o comando das flautas dos cultistas.
@@ -56,7 +64,9 @@ Para compilar o bestiário completo de **Hastur** e d'**O Rei em Amarelo**, este
 
 ### 8. Os Mi-Go (Fungos de Yuggoth)
 * **Origem Literária:** Lovecraft (*Um Sussurro nas Trevas*). Raça extraterrestre fungóide. Alguns temem o Sinal Amarelo, outros adoram. Famosos por armazenar cérebros humanos em cilindros.
-* **Aplicação no Jogo:** **Lore Oculta / Easter Eggs.** Não serão inimigos combatíveis no loop principal, mas Damião pode encontrar cadáveres dissecados com o cérebro removido ou cilindros metálicos vibrando ao som do vento, sugerindo que uma "terceira facção" está em guerra com os Cultistas de Hastur na cidade.
+* **Aplicação no Jogo:** **Companion Ativo (Yug-Neth) + Lore Ambiental.**
+  * **Yug-Neth** — Mi-Go filhote, aprisionado por Abdul Alhazred na Tumba de Alhazred. Libertado por Damião no clímax da Dungeon 1. Torna-se companion permanente. Comunica-se por bioluminescência; é a chave dimensional dos Portões das Ruínas. Design completo em `lore/migo_companion.md`.
+  * **Lore Ambiental** — Cadáveres de Mi-Go adultos dissecados com o cérebro removido e cilindros metálicos vibrando ao vento sugerem que uma terceira facção está em guerra com os Cultistas de Hastur pela cidade. Yug-Neth é jovem demais para confirmar ou negar — seus padrões bioluminescentes ficam agitados perto de qualquer cilindro Mi-Go encontrado.
 
 ### 9. Ithaqua (O Andarilho do Vento)
 * **Origem Literária:** Derleth. O gigante antropomórfico cadavérico das neves (Wendigo), aliado de Hastur no domínio do Elemento Ar.

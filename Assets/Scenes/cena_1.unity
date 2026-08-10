@@ -4144,7 +4144,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.GameManager
   maxResiliencia: 100
   fracaoPanico: 0.25
-  telaVitoria: {fileID: 0}
+  telaTransicaoDeFase: {fileID: 0}
   telaPause: {fileID: 0}
   gameplayRoot: {fileID: 0}
 --- !u!4 &1267011224
