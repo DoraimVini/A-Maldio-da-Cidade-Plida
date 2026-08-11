@@ -58,12 +58,12 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Header("Referências Opcionais")]
         [SerializeField] private GameObject telaTransicaoDeFase;
         [SerializeField] private GameObject telaPause;
-        [SerializeField] private GameObject telaMenu;
         [SerializeField] private GameObject gameplayRoot;
 
-        [Tooltip("Começa no Menu em vez de cair direto no gameplay. Desligue para playtest " +
-                 "rápido, entrando direto na cena.")]
-        [SerializeField] private bool iniciarNoMenu = true;
+        // O menu principal deixou de morar aqui: virou cena própria (`Cena_Menu`) em
+        // 2026-08-11. Com isso caíram `telaMenu`, o `iniciarNoMenu` e o congelamento do
+        // estado Menu — todos eram remendos para o mundo continuar vivo atrás de um overlay.
+        // Numa cena só de menu não há mundo atrás, então não há o que remendar.
         [Tooltip("Sequência de morte (dissolução + frase) tocada ao entrar em Colapso.")]
         [SerializeField] private SequenciaDeColapso sequenciaColapso;
 
@@ -88,7 +88,8 @@ namespace FavelaAmarela.Runtime.GameLoop
             Instance = this;
 
             // 1. Cria a Lógica Pura (Core)
-            StateMachine = new GameLoopStateMachine(iniciarNoMenu ? GameState.Menu : GameState.Gameplay);
+            // A cena de jogo sempre nasce jogando: quem mostra menu é a `Cena_Menu`.
+            StateMachine = new GameLoopStateMachine(GameState.Gameplay);
             Resiliencia = ResilienciaMental.ComThresholdFracional(maxResiliencia, fracaoPanico);
             SoundBroadcaster = new SoundBroadcastService();
             Environment = new EnvironmentState();
@@ -261,13 +262,11 @@ namespace FavelaAmarela.Runtime.GameLoop
             // continuaria rodando atrás da tela inicial — inimigos andando e a tempestade
             // drenando Resiliência —, e dava para morrer olhando o menu.
             bool mundoCongelado = atual == GameState.Pausado
-                                  || atual == GameState.TransicaoDeFase
-                                  || atual == GameState.Menu;
+                                  || atual == GameState.TransicaoDeFase;
             Time.timeScale = mundoCongelado ? 0f : 1f;
 
             // Ativa/Desativa GameObjects baseado no estado
             if (telaPause != null) telaPause.SetActive(atual == GameState.Pausado);
-            if (telaMenu != null) telaMenu.SetActive(atual == GameState.Menu);
             if (telaTransicaoDeFase != null) telaTransicaoDeFase.SetActive(atual == GameState.TransicaoDeFase);
             if (gameplayRoot != null) gameplayRoot.SetActive(atual == GameState.Gameplay || atual == GameState.Colapso);
 
@@ -278,6 +277,9 @@ namespace FavelaAmarela.Runtime.GameLoop
                 sequenciaColapso.Tocar(_tipoDeDerrota);
             }
 
+            // Vestigial desde 2026-08-11: o menu virou cena própria, e trocar de cena já
+            // recria tudo do zero. Fica porque continua correto — se algum fluxo futuro
+            // voltar ao estado Menu sem descarregar a cena, é aqui que ele se limpa.
             if (atual == GameState.Menu)
             {
                 Resiliencia?.EstabilizarCompletamente();

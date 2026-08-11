@@ -11,8 +11,12 @@ using FavelaAmarela.Runtime.UI;
 namespace FavelaAmarela.EditorTools
 {
     /// <summary>
-    /// Ferramenta de Editor. Constrói as <b>telas do fluxo de jogo</b> — Pause, Colapso e Menu
-    /// — e as liga ao <see cref="GameManager"/>.
+    /// Ferramenta de Editor. Constrói as telas de fluxo que vivem <b>dentro da cena de jogo</b>
+    /// — Pause e Colapso — e as liga ao <see cref="GameManager"/>.
+    ///
+    /// <para>O <b>menu principal não está aqui</b>: virou cena própria em 2026-08-11, montada
+    /// por <c>MontarCenaDeMenu</c>. Estas duas continuam sendo overlay porque precisam do
+    /// mundo — o pause mostra onde o jogador parou, e o Colapso dissolve o sprite do Damião.</para>
     ///
     /// <para><b>O que motivou (auditoria 2026-08-11):</b> a lógica de fluxo já existia inteira
     /// (<c>GameState</c>, a máquina de estados, Esc alternando pause, a `SequenciaDeColapso`),
@@ -34,7 +38,7 @@ namespace FavelaAmarela.EditorTools
         private static readonly Color Amarelo = new Color(0.92f, 0.86f, 0.55f, 0.92f);
         private static readonly Color AmareloFraco = new Color(0.85f, 0.82f, 0.62f, 0.5f);
 
-        [MenuItem("Tools/FavelaAmarela/Montar telas de fluxo (pause, colapso, menu)")]
+        [MenuItem("Tools/FavelaAmarela/Montar telas de fluxo (pause, colapso)")]
         public static void Executar()
         {
             var cenaAtiva = EditorSceneManager.GetActiveScene();
@@ -61,10 +65,10 @@ namespace FavelaAmarela.EditorTools
             if (!string.IsNullOrEmpty(cenaOriginal))
                 EditorSceneManager.OpenScene(cenaOriginal, OpenSceneMode.Single);
 
-            Debug.Log($"[TelasDeFluxo] Pronto — {feitas} cena(s). O jogo passa a abrir no Menu " +
-                      "('Iniciar No Menu' foi ligado no GameManager); Esc pausa; morrer leva ao " +
-                      "Colapso e volta ao Menu por qualquer tecla. Para playtest entrando direto " +
-                      "na cena, desligue 'Iniciar No Menu'.");
+            Debug.Log($"[TelasDeFluxo] Pronto — {feitas} cena(s). Esc abre o menu de pause " +
+                      "(Continuar / Sair do jogo); morrer toca o Colapso e, após 3 s, qualquer " +
+                      "tecla leva à cena de menu. O menu principal é montado à parte, por " +
+                      "'Montar cena de menu'.");
         }
 
         private static bool Montar()
@@ -87,29 +91,25 @@ namespace FavelaAmarela.EditorTools
 
             Destruir("Tela_Pause");
             Destruir("Tela_Colapso");
+
+            // O menu principal saiu daqui em 2026-08-11: virou cena própria (`Cena_Menu`).
+            // Como overlay, ele obrigava a carregar o Deserto inteiro só para cobri-lo com uma
+            // tela preta. Restos de execuções antigas são removidos.
             Destruir("Tela_Menu");
 
             var pause = MontarPause(canvas.transform);
             var (colapso, sequencia) = MontarColapso(canvas.transform);
-            var menu = MontarMenu(canvas.transform);
 
             var so = new SerializedObject(gm);
             so.FindProperty("telaPause").objectReferenceValue = pause;
-            so.FindProperty("telaMenu").objectReferenceValue = menu;
             so.FindProperty("sequenciaColapso").objectReferenceValue = sequencia;
-
-            // Escrito de forma explícita: as cenas já foram salvas antes deste campo existir,
-            // e depender do valor padrão do C# para preencher o que falta no YAML é sutil
-            // demais para confiar.
-            var inicio = so.FindProperty("iniciarNoMenu");
-            if (inicio != null) inicio.boolValue = true;
-
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(gm);
 
             // gameplayRoot fica de fora de propósito: cada cena tem uma raiz diferente
             // (Deserto_Root, Blockout_Root...) e chutar errado esconderia o jogo inteiro.
-            // O painel do Menu é opaco, então cobre a cena mesmo sem essa referência.
+            // Desde que o menu virou cena própria, ele também deixou de ser necessário —
+            // não há mais overlay precisando esconder o mundo.
 
             return true;
         }
@@ -150,13 +150,27 @@ namespace FavelaAmarela.EditorTools
 
         private static GameObject MontarPause(Transform pai)
         {
-            var tela = Overlay(pai, "Tela_Pause", new Color(0.02f, 0.02f, 0.015f, 0.75f));
+            // Semitransparente de propósito: ver o mundo congelado atrás é parte da
+            // informação do pause — o jogador enxerga onde parou.
+            var tela = Overlay(pai, "Tela_Pause", new Color(0.02f, 0.02f, 0.015f, 0.8f));
 
             Texto(tela.transform, "Titulo", "PAUSADO",
-                new Vector2(0.1f, 0.52f), new Vector2(0.9f, 0.64f), 34, TextAnchor.MiddleCenter, Amarelo);
+                new Vector2(0.1f, 0.66f), new Vector2(0.9f, 0.78f), 34, TextAnchor.MiddleCenter, Amarelo);
 
+            var continuar = Botao(tela.transform, "Botao_Continuar", "Continuar", 0.5f);
+            var sair = Botao(tela.transform, "Botao_Sair", "Sair do jogo", 0.4f);
+
+            // Previstos e NÃO construídos (decisão do Vini, 2026-08-11): Opções,
+            // Enciclopédia e "Voltar ao menu principal". Botão morto ensina o jogador a
+            // desconfiar da interface — entram quando existirem de verdade.
             Texto(tela.transform, "Dica", "Esc para continuar",
-                new Vector2(0.1f, 0.42f), new Vector2(0.9f, 0.5f), 14, TextAnchor.MiddleCenter, AmareloFraco);
+                new Vector2(0.1f, 0.3f), new Vector2(0.9f, 0.36f), 14, TextAnchor.MiddleCenter, AmareloFraco);
+
+            var comp = tela.AddComponent<MenuDePause>();
+            var so = new SerializedObject(comp);
+            so.FindProperty("botaoContinuar").objectReferenceValue = continuar;
+            so.FindProperty("botaoSair").objectReferenceValue = sair;
+            so.ApplyModifiedPropertiesWithoutUndo();
 
             tela.SetActive(false);
             return tela;
@@ -181,22 +195,36 @@ namespace FavelaAmarela.EditorTools
 
             var grupo = painel.AddComponent<CanvasGroup>();
             grupo.alpha = 0f;
-            grupo.blocksRaycasts = false;
+
+            // Precisa bloquear raycast, senão os botões da morte não recebem clique. Não há
+            // risco de o painel invisível roubar cliques do jogo: fora do Colapso ele está
+            // com o GameObject desligado (a própria SequenciaDeColapso o desliga no Awake).
+            grupo.blocksRaycasts = true;
 
             var texto = Texto(painel.transform, "Frase", "",
                 new Vector2(0.12f, 0.4f), new Vector2(0.88f, 0.6f), 22, TextAnchor.MiddleCenter, Amarelo);
 
-            // Sem isto, morrer é beco sem saída: a máquina de estados permite Colapso → Menu,
-            // mas ninguém no projeto fazia essa transição.
-            var avisoRetorno = Texto(painel.transform, "Aviso", "",
-                new Vector2(0.12f, 0.24f), new Vector2(0.88f, 0.32f), 14, TextAnchor.MiddleCenter, AmareloFraco);
-            avisoRetorno.enabled = false;
+            // As saídas da morte. Morrer NÃO devolve ao menu principal (decisão do Vini,
+            // 2026-08-11): o padrão é despertar no último Refúgio, e a tela-título é apenas
+            // uma das opções — mandar o jogador para lá a cada morte desestimula em vez de punir.
+            var opcoes = new GameObject("Opcoes", typeof(RectTransform));
+            opcoes.transform.SetParent(painel.transform, false);
+            Esticar(opcoes.GetComponent<RectTransform>());
+
+            var retomar = Botao(opcoes.transform, "Botao_Retomar", "Despertar no último refúgio", 0.28f);
+            var menu = Botao(opcoes.transform, "Botao_Menu", "Menu principal", 0.18f);
+            var rotuloRetomar = retomar.GetComponentInChildren<Text>();
+
+            opcoes.SetActive(false);
 
             // Os dois componentes ficam na RAIZ, que nunca é desligada — senão o Update do
             // retorno pararia junto com o painel e o jogador ficaria preso na tela de morte.
             var retorno = tela.AddComponent<RetornoDoColapso>();
             var soRetorno = new SerializedObject(retorno);
-            soRetorno.FindProperty("aviso").objectReferenceValue = avisoRetorno;
+            soRetorno.FindProperty("grupoDeOpcoes").objectReferenceValue = opcoes;
+            soRetorno.FindProperty("botaoRetomar").objectReferenceValue = retomar;
+            soRetorno.FindProperty("rotuloRetomar").objectReferenceValue = rotuloRetomar;
+            soRetorno.FindProperty("botaoMenu").objectReferenceValue = menu;
             soRetorno.ApplyModifiedPropertiesWithoutUndo();
 
             var sequencia = tela.AddComponent<SequenciaDeColapso>();
@@ -213,53 +241,6 @@ namespace FavelaAmarela.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
 
             return (tela, sequencia);
-        }
-
-        // ── Menu ──────────────────────────────────────────────────────────────
-
-        private static GameObject MontarMenu(Transform pai)
-        {
-            // Opaco: o Menu cobre a cena mesmo sem gameplayRoot atribuído.
-            var tela = Overlay(pai, "Tela_Menu", new Color(0.03f, 0.025f, 0.02f, 1f));
-
-            // Título oficial (decisão do Vini, 2026-08-11). O projeto tem outros nomes
-            // circulando — "A Maldição da Cidade Pálida" (repositório), "Peregrino Amarelo"
-            // (pasta), "Favela Amarela" (namespaces) —, mas o que o jogador vê é este.
-            Texto(tela.transform, "Titulo", "CAMINHO PARA CARCOSA",
-                new Vector2(0.1f, 0.72f), new Vector2(0.9f, 0.84f), 30, TextAnchor.MiddleCenter, Amarelo);
-
-            var continuar = Botao(tela.transform, "Botao_Continuar", "Continuar", 0.52f);
-            var nova = Botao(tela.transform, "Botao_NovaPartida", "Nova peregrinação", 0.42f);
-            var sair = Botao(tela.transform, "Botao_Sair", "Sair", 0.32f);
-
-            var confirmacao = MontarConfirmacao(tela.transform);
-
-            var comp = tela.AddComponent<MenuPrincipal>();
-            var so = new SerializedObject(comp);
-            so.FindProperty("botaoContinuar").objectReferenceValue = continuar;
-            so.FindProperty("botaoNovaPartida").objectReferenceValue = nova;
-            so.FindProperty("botaoSair").objectReferenceValue = sair;
-            so.FindProperty("painelDeConfirmacao").objectReferenceValue = confirmacao.painel;
-            so.FindProperty("botaoConfirmar").objectReferenceValue = confirmacao.confirmar;
-            so.FindProperty("botaoCancelar").objectReferenceValue = confirmacao.cancelar;
-            so.ApplyModifiedPropertiesWithoutUndo();
-
-            tela.SetActive(false);
-            return tela;
-        }
-
-        private static (GameObject painel, Button confirmar, Button cancelar) MontarConfirmacao(Transform pai)
-        {
-            var painel = Overlay(pai, "Confirmacao", new Color(0.05f, 0.04f, 0.03f, 0.96f));
-
-            Texto(painel.transform, "Aviso", "Isso apaga o progresso. Continuar?",
-                new Vector2(0.1f, 0.54f), new Vector2(0.9f, 0.64f), 18, TextAnchor.MiddleCenter, Amarelo);
-
-            var confirmar = Botao(painel.transform, "Botao_Confirmar", "Apagar e recomeçar", 0.44f);
-            var cancelar = Botao(painel.transform, "Botao_Cancelar", "Voltar", 0.34f);
-
-            painel.SetActive(false);
-            return (painel, confirmar, cancelar);
         }
 
         // ── Peças ─────────────────────────────────────────────────────────────

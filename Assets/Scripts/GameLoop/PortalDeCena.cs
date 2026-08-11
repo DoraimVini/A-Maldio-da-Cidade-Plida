@@ -67,11 +67,9 @@ namespace FavelaAmarela.Runtime.GameLoop
 
             PontoDeChegada.Pendente = string.IsNullOrWhiteSpace(chegarEm) ? null : chegarEm;
 
-            // Fotografa o estado antes de a cena ser destruída — sem isto, atravessar a
-            // porta faria Damião perder a arma do baú e a Vitalidade sofrida.
-            Persistencia.GerenciadorDeSave.Instancia?.CapturarTudo();
-
-            SceneManager.LoadScene(cenaDestino);
+            // A navegação fotografa o estado antes de a cena ser destruída — sem isso,
+            // atravessar a porta faria Damião perder a arma do baú e a Vitalidade sofrida.
+            NavegacaoDeCenas.IrPara(cenaDestino);
         }
 
         /// <summary>Define a cena destino por código (usado pelo gerador do deserto).</summary>

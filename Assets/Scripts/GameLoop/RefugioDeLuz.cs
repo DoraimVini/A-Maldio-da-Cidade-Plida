@@ -1,4 +1,5 @@
 using UnityEngine;
+using FavelaAmarela.Core.Persistencia;
 using FavelaAmarela.Runtime.Persistencia;
 using FavelaAmarela.Runtime.UI;
 
@@ -120,7 +121,37 @@ namespace FavelaAmarela.Runtime.GameLoop
             if (gerenciador == null) return;
 
             gerenciador.CapturarTudo();
+            MarcarComoPontoDeRenascimento();
             gerenciador.GravarEmDisco();
+        }
+
+        /// <summary>
+        /// Registra este Refúgio como o lugar para onde a morte devolve o jogador.
+        ///
+        /// <para>Guardado à parte da cena atual porque as duas respondem a perguntas
+        /// diferentes: "onde eu parei" (o Continuar do menu) e "onde é seguro voltar" (a
+        /// morte). Sem esta distinção, morrer devolveria o jogador ao corredor onde
+        /// morreu — direto para a mesma morte.</para>
+        /// </summary>
+        private void MarcarComoPontoDeRenascimento()
+        {
+            var cena = gameObject.scene;
+            if (cena.IsValid()) GerenciadorDeSave.DefinirValor(ChavesDeSave.RefugioCena, cena.name);
+
+            // O ponto de chegada irmão é o que o renascimento usa para posicionar Damião
+            // exatamente sob a luz, e não no ponto padrão da cena.
+            var ponto = GetComponent<PontoDeChegada>();
+            if (ponto != null && !string.IsNullOrWhiteSpace(ponto.Identificador))
+            {
+                GerenciadorDeSave.DefinirValor(ChavesDeSave.RefugioPonto, ponto.Identificador);
+            }
+            else
+            {
+                // Sem ponto irmão o renascimento ainda funciona — cai na posição padrão da
+                // cena. Avisar aqui evita a caça ao "por que renasci longe do poste".
+                Debug.LogWarning($"[RefugioDeLuz] '{name}' não tem PontoDeChegada irmão: o " +
+                                 "renascimento vai cair na posição padrão da cena.", this);
+            }
         }
 
         // TODO(design): pausar o dreno de RM da tempestade enquanto o jogador estiver na luz

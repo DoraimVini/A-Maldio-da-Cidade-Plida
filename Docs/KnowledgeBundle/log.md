@@ -6,6 +6,74 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (10ª rodada) — Menu vira cena, navegação centralizada e morte que não pune duas vezes
+
+Três correções de arquitetura, todas apontadas pelo Vini.
+
+### 1. O menu principal virou cena própria
+Era overlay repetido nas 3 cenas de jogo. Isso significava três cópias para manter e —
+pior — **carregar o Deserto inteiro** (tempestade, inimigos, tilemaps) só para cobrir tudo com
+uma tela preta. Também obrigava a congelar o tempo, porque o mundo ficava vivo por trás.
+
+Com `Cena_Menu` caíram três remendos que só existiam por causa disso: `iniciarNoMenu`, o
+congelamento do estado `Menu` e a necessidade do `gameplayRoot`. **Não há mundo atrás — não há
+o que congelar nem esconder.**
+
+**Pause e Colapso continuam overlay**, de propósito: o pause mostra onde o jogador parou, e o
+Colapso precisa do sprite do Damião para dissolvê-lo.
+
+De brinde, resolve o problema de build descoberto na mesma rodada: o índice 0 era a
+**SampleScene**, um blockout de protótipo abandonado — um build gerado abriria nele, numa sala
+vazia sem jogador nem HUD. Passou despercebido porque no Editor sempre se dá Play numa cena já
+aberta. Agora o índice 0 é o menu, que é o que ele deveria ser.
+
+### 2. `NavegacaoDeCenas`: um lugar só para trocar de cena
+`SceneManager.LoadScene` estava em **quatro pontos**, cada um repetindo o mesmo ritual de
+saída: capturar o save, devolver o `timeScale`, carregar. Repetir ritual é onde nascem os bugs
+— basta um caminho esquecer o `timeScale` para a partida seguinte nascer congelada, e um
+esquecer a captura para o jogador perder o trecho que acabou de jogar. Ambos já aconteceram
+nesta sessão.
+
+Junto, o `RetornoDoColapso` deixou de perguntar o estado ao `GameManager` **a cada frame** e
+passou a assinar `OnStateChanged` — o `CLAUDE.md` da camada UI proíbe polling em `Update`, e
+eu estava violando isso.
+
+### 3. Morrer não devolve mais ao menu principal
+**Decisão do Vini:** mandar o jogador à tela-título a cada morte transforma erro em burocracia
+— três cliques até voltar a jogar. Desestimula em vez de punir. A punição já é a sequência de
+Colapso e o trecho perdido.
+
+As saídas, em ordem de menor atrito: **último Refúgio de Luz** (padrão) → **entrada do
+Deserto** (para quem morreu antes de achar um) → **menu principal** (só se escolher). O rótulo
+do botão troca sozinho: prometer "último refúgio" a quem nunca achou um é mentira que só se
+descobre clicando.
+
+> **Detalhe que era fácil errar:** renascer **não captura o estado**. Se capturasse, salvaria o
+> Damião morto e os itens gastos — a morte gravaria a si mesma. Em vez disso relê o disco, que
+> guarda a foto do último Refúgio. É isso que faz a morte *desfazer* o trecho.
+
+Para isso o Refúgio registra **onde ele fica** (`RefugioCena` + `RefugioPonto`), separado da
+cena atual. As duas respondem perguntas diferentes: *"onde eu parei"* (o Continuar do menu) e
+*"onde é seguro voltar"* (a morte). Sem a distinção, morrer devolveria o jogador ao corredor
+onde morreu — direto para a mesma morte. Reusa o `PontoDeChegada` que já existia para portais.
+
+### Também nesta rodada
+- **Layer `Aliados`** (slot 7, que estava vazio). O Yug-Neth estava em `Enemy` e o
+  `EnemyCombat` só mirava `Player` — os inimigos **nunca o atacavam**, e toda a mecânica de
+  incapacitação estava morta. Layer própria, e não "põe em Player", porque virão outros
+  aliados. O `Awake` descarta máscara autorada que não enxergue aliados, senão prefabs antigos
+  continuariam cegos em silêncio.
+- **Barra de vida flutuante** sobre a cabeça, com três regras de discrição: some com vida
+  cheia, aparece ao levar dano e some sozinha, fica permanente só em estado crítico.
+- **Menu de pause** com Continuar e Sair do jogo. **Opções, Enciclopédia e "voltar ao menu"
+  ficaram registrados e não construídos** — botão morto ensina o jogador a desconfiar da
+  interface.
+
+**QA:** 413/413. Dois `using` de `ChavesDeSave` faltando foram pegos pelo próprio QA.
+
+**Wiring:** `Montar cena de menu` → `Montar telas de fluxo` → `Montar Refúgios de Luz` →
+`Montar aliados`.
+
 ## 2026-08-11 (9ª rodada) — Três defeitos do primeiro playtest do menu
 
 O menu apareceu, e o playtest expôs três coisas — duas quebradas, uma indefinida.

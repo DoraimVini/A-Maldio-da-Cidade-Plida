@@ -137,8 +137,24 @@ namespace FavelaAmarela.Runtime.Persistencia
                 _registro.Definir(p.ChaveDePersistencia, p.CapturarEstado());
             }
 
+            // Onde o jogador estava. Não vem de um IPersistente porque não pertence a objeto
+            // nenhum da cena — é fato sobre a partida, e é o que o "Continuar" do menu lê
+            // para saber para onde voltar.
+            var cena = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            if (cena.IsValid() && !string.IsNullOrEmpty(cena.name))
+                _registro.Definir(ChavesDeSave.CenaAtual, cena.name);
+
             if (gravarEmDiscoAoCapturar) GravarEmDisco();
         }
+
+        /// <summary>
+        /// Cena onde a partida salva parou, ou <c>null</c> se não houver save utilizável.
+        /// O menu principal usa isto no "Continuar".
+        /// </summary>
+        public string CenaSalva => _registro.TentarObter(ChavesDeSave.CenaAtual, out var nome) &&
+                                   !string.IsNullOrWhiteSpace(nome)
+            ? nome
+            : null;
 
         /// <summary>
         /// Reaplica a todos os inscritos o estado que existir no registro. Objeto sem chave

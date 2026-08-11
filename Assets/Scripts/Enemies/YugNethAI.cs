@@ -106,6 +106,13 @@ namespace FavelaAmarela.Runtime.Enemies
             _vitalidade = GetComponent<VitalidadeBridge>();
             _vitalidade.OnAbatido += HandleAbatido;
 
+            // Barra flutuante sobre a cabeça, se o prefab tiver uma (montada por
+            // Tools/FavelaAmarela/Montar aliados). É opcional de propósito: o companheiro
+            // funciona sem ela, e um aliado futuro pode não querer barra nenhuma.
+            var barra = GetComponentInChildren<Runtime.UI.BarraDeVidaFlutuante>(includeInactive: true);
+            if (barra != null && _vitalidade.Vitalidade != null)
+                barra.Bind(_vitalidade.Vitalidade);
+
             // Cativo = intocável. Durante a luta do Abdul ele ainda está sob controle dele
             // e não pode levar dano de fonte nenhuma (decisão do Vini, 2026-07-31): não é
             // só que os inimigos não miram nele — um Cone de Gelo perdido ou uma área de

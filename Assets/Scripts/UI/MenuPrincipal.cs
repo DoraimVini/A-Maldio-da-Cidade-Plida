@@ -1,27 +1,29 @@
 using UnityEngine;
 using UnityEngine.UI;
-using FavelaAmarela.Core.GameLoop;
 using FavelaAmarela.Runtime.GameLoop;
 using FavelaAmarela.Runtime.Persistencia;
 
 namespace FavelaAmarela.Runtime.UI
 {
     /// <summary>
-    /// Camada Runtime (MonoBehaviour). A tela inicial: <b>Continuar</b>, <b>Nova peregrinação</b>
-    /// e <b>Sair</b>.
+    /// Camada Runtime (MonoBehaviour). A tela inicial, em <b>cena própria</b>:
+    /// <b>Continuar</b>, <b>Nova peregrinação</b> e <b>Sair</b>.
     ///
-    /// <para>O <c>GameState.Menu</c> existia desde sempre na máquina de estados, mas nenhuma
-    /// tela o desenhava — o jogo entrava direto em <c>Gameplay</c>. Sem isto não havia como
-    /// começar, recomeçar nem sair.</para>
+    /// <para><b>Por que cena própria</b> (refactor de 2026-08-11, sugestão do Vini): antes o
+    /// menu era um overlay dentro de cada cena de jogo. Isso significava três cópias para
+    /// manter, e — pior — carregar o Deserto inteiro (tempestade, inimigos, tilemaps) só para
+    /// cobrir tudo com uma tela preta. Também obrigava a congelar o tempo, porque o mundo
+    /// ficava vivo por trás. Numa cena só, não há mundo atrás: nada a congelar, nada a
+    /// esconder, e o menu abre instantâneo.</para>
     ///
-    /// <para><b>"Continuar" só aparece se houver save.</b> Um botão morto que não faz nada
-    /// ensina o jogador a desconfiar da interface.</para>
+    /// <para>O <b>pause</b> continua sendo overlay dentro da cena de jogo — ali sobrepor o
+    /// mundo vivo é justamente o comportamento certo. Ver <see cref="MenuDePause"/>.</para>
     /// </summary>
     [AddComponentMenu("FavelaAmarela/UI/Menu Principal")]
     public sealed class MenuPrincipal : MonoBehaviour
     {
         [Header("Botões")]
-        [Tooltip("Retoma do último Refúgio de Luz. Escondido se não houver save. [ASSET]")]
+        [Tooltip("Retoma na cena onde a partida parou. Escondido se não houver save. [ASSET]")]
         [SerializeField] private Button botaoContinuar;
 
         [Tooltip("Começa do zero, apagando o progresso. [ASSET]")]
@@ -47,35 +49,43 @@ namespace FavelaAmarela.Runtime.UI
             if (botaoCancelar != null) botaoCancelar.onClick.AddListener(FecharConfirmacao);
 
             FecharConfirmacao();
+
+            // O menu pode ser alcançado vindo de um jogo pausado, que deixou o tempo parado.
+            // Sem isto, a partida seguinte nasceria congelada.
+            Time.timeScale = 1f;
         }
 
         private void OnEnable() => AtualizarBotoes();
 
         /// <summary>
-        /// Esconde "Continuar" quando não há nada a continuar. Um botão que não faz nada
+        /// Esconde "Continuar" quando não há para onde continuar. Um botão que não faz nada
         /// ensina o jogador a desconfiar do resto da interface.
         /// </summary>
         private void AtualizarBotoes()
         {
             if (botaoContinuar == null) return;
 
-            var gerenciador = GerenciadorDeSave.Instancia;
-            bool temSave = gerenciador != null && gerenciador.ExisteSaveEmDisco;
-
-            botaoContinuar.gameObject.SetActive(temSave);
+            botaoContinuar.gameObject.SetActive(TemPartidaSalva());
         }
 
-        private void Continuar()
+        private static bool TemPartidaSalva()
         {
-            GerenciadorDeSave.Instancia?.AplicarTudo();
-            GameManager.Instance?.StateMachine?.TryTransition(GameState.Gameplay);
+            var gerenciador = GerenciadorDeSave.Instancia;
+            return gerenciador != null
+                   && gerenciador.ExisteSaveEmDisco
+                   && !string.IsNullOrEmpty(gerenciador.CenaSalva);
         }
+
+        private void Continuar() => NavegacaoDeCenas.Continuar();
 
         private void PedirConfirmacao()
         {
-            // Apagar progresso é irreversível: confirma antes, sempre.
-            if (painelDeConfirmacao != null) painelDeConfirmacao.SetActive(true);
-            else NovaPartida();
+            // Apagar progresso é irreversível: confirma antes, sempre. Só que confirmar sem
+            // haver o que apagar é atrito à toa — quem nunca jogou vai direto.
+            if (painelDeConfirmacao != null && TemPartidaSalva())
+                painelDeConfirmacao.SetActive(true);
+            else
+                NovaPartida();
         }
 
         private void FecharConfirmacao()
@@ -86,9 +96,7 @@ namespace FavelaAmarela.Runtime.UI
         private void NovaPartida()
         {
             FecharConfirmacao();
-
-            GerenciadorDeSave.Instancia?.ApagarSave();
-            GameManager.Instance?.StateMachine?.TryTransition(GameState.Gameplay);
+            NavegacaoDeCenas.ComecarNovaPeregrinacao();
         }
 
         private void Sair()

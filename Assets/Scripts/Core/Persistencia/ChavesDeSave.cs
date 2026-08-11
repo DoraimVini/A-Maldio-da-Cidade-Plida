@@ -73,6 +73,23 @@ namespace FavelaAmarela.Core.Persistencia
         /// <summary>Os quatro slots de Artefato, como ids separados por vírgula.</summary>
         public const string ArtefatosEquipados = "Jogador.Artefatos";
 
+        /// <summary>
+        /// Em que cena o jogador estava ao salvar. É o que o "Continuar" do menu principal lê
+        /// para saber <b>para onde voltar</b> — sem isto, continuar uma partida só conseguiria
+        /// chutar uma cena fixa e mandaria de volta ao Deserto quem parou na Tumba.
+        /// </summary>
+        public const string CenaAtual = "Jogador.CenaAtual";
+
+        /// <summary>
+        /// Cena do último Refúgio de Luz onde o jogador descansou. Separada de
+        /// <see cref="CenaAtual"/> de propósito: aquela muda a cada troca de cena, e morrer
+        /// precisa voltar ao <b>último ponto seguro</b>, não ao corredor onde se morreu.
+        /// </summary>
+        public const string RefugioCena = "Jogador.Refugio.Cena";
+
+        /// <summary>Identificador do <c>PontoDeChegada</c> do último Refúgio.</summary>
+        public const string RefugioPonto = "Jogador.Refugio.Ponto";
+
         /// <summary>O Necronomicon já foi recolhido.</summary>
         public const string NecronomiconColetado = "Quest.Tumba.NecronomiconColetado";
 

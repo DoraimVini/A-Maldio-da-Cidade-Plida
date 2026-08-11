@@ -104,8 +104,36 @@ namespace FavelaAmarela.EditorTools
 
             if (go.GetComponent<RefugioDeLuz>() == null) go.AddComponent<RefugioDeLuz>();
 
+            GarantirPontoDeChegada(go, nome);
+
             EditorUtility.SetDirty(go);
             Debug.Log($"[Refúgios] {nome} em {pos} — {porque}", go);
+        }
+
+        /// <summary>
+        /// Dá ao Refúgio um <see cref="PontoDeChegada"/> irmão, com identificador igual ao
+        /// nome do objeto.
+        ///
+        /// <para><b>Por que:</b> desde 2026-08-11 morrer devolve o jogador ao último Refúgio,
+        /// e é este ponto que o posiciona <b>sob a luz</b>. Sem ele o renascimento ainda
+        /// funciona, mas cai na posição padrão da cena — o jogador desperta longe do poste
+        /// onde acha que salvou, o que parece bug de save.</para>
+        /// </summary>
+        private static void GarantirPontoDeChegada(GameObject go, string nome)
+        {
+            var ponto = go.GetComponent<PontoDeChegada>();
+            if (ponto == null) ponto = go.AddComponent<PontoDeChegada>();
+
+            var so = new SerializedObject(ponto);
+            var prop = so.FindProperty("identificador");
+
+            // Nunca sobrescreve um identificador já autorado: ele pode estar sendo usado por
+            // um PortalDeCena, e trocá-lo quebraria a chegada daquela porta em silêncio.
+            if (prop != null && string.IsNullOrWhiteSpace(prop.stringValue))
+            {
+                prop.stringValue = nome;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         private static bool TagExiste(string tag)
