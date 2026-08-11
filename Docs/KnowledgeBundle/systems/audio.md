@@ -64,11 +64,14 @@ O som precisa sair **do lugar onde o golpe aconteceu**. Num jogo em que se caça
 áudio sem posição mente para o jogador. Por isso o `MixerDeAudio` usa `spatialBlend = 1`
 (3D) com rolloff linear.
 
-## Wiring de cena pendente (manual, no Editor)
-1. Criar um GameObject com `MixerDeAudio` (e opcionalmente um asset `BancoDeSons`).
-2. Adicionar `AudioDeStealth` e `AudioDeResiliencia` na cena — o `GameManager` já os liga no
-   bootstrap e **avisa no console** se o `AudioDeStealth` estiver ausente.
-3. Adicionar `AudioDeCombate` aos prefabs de inimigo.
+## Wiring de cena
+
+**Automatizado (2026-08-11):** rodar `Tools/FavelaAmarela/Ligar sistemas novos` cria o
+`MixerDeAudio` e o `AudioDeStealth` nas 3 cenas, anexa o `AudioDeResiliencia` ao Damião e o
+`AudioDeCombate` aos prefabs de inimigo. Idempotente.
+
+O `GameManager` liga as fontes no bootstrap e **avisa no console** se o `AudioDeStealth`
+estiver ausente. Um asset `BancoDeSons` é opcional — sem ele, tudo soa por síntese.
 
 ## Pendências
 - **Nenhum clipe autorado.** É a próxima frente de áudio, e não depende de código.

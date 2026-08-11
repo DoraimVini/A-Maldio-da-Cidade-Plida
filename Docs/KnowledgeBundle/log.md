@@ -42,6 +42,21 @@ que estava no corpo.
 
 **QA:** suíte verde. **Wiring:** rodar `Tools/FavelaAmarela/Montar painel de inventário (Tab)`.
 
+### Ferramenta única de wiring
+Tudo construído em 2026-08-10/11 estava **inerte por falta de wiring de cena**: Artefatos,
+áudio, espólio ao abater e as pontes de persistência existiam no código e não rodavam no jogo.
+
+`LigarSistemasNovos` (`Tools/FavelaAmarela/Ligar sistemas novos`) faz o wiring inteiro de uma
+vez, nas 3 cenas e nos 2 prefabs de inimigo:
+
+- **No Damião:** `ArtefatosBridge`, as 3 pontes de persistência e `AudioDeResiliencia`.
+- **Na cena:** `MixerDeAudio` e `AudioDeStealth`.
+- **Nos prefabs de inimigo:** `AudioDeCombate` e `DropAoAbater` (com a `Drop_Cultista` ligada).
+
+**Idempotente:** só adiciona o que falta, nunca duplica. Existe porque o acúmulo é grande e
+anexar componente por componente à mão erra fácil — esquecer **uma** ponte de persistência
+devolve a perder progresso em silêncio, que é exatamente o bug recém-corrigido.
+
 ## 2026-08-11 (5ª rodada) — Auditoria do VS: áudio, persistência e consumíveis
 
 Auditoria dos sistemas faltando para o Vertical Slice, feita **verificando código e cenas**

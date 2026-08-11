@@ -99,12 +99,17 @@ consumidas em `PlayerMovement.Update()` pelo padrão polled do projeto (`FindAct
 **Invocar um Artefato não trava a FSM** — diferente de golpear, não é ação exclusiva. Mas, por
 entrar depois dos guardas de `Update`, herda de graça o bloqueio por diálogo (`MovimentoBloqueado`).
 
-## Wiring de cena pendente (manual, no Editor)
-1. Adicionar `ArtefatosBridge` ao prefab do Damião.
-2. Montar a `BarraDeArtefatos` no HUD (4 slots) e ligá-la ao campo `barraDeArtefatos` do
+## Wiring de cena
+
+**Automatizado (2026-08-11):** rodar `Tools/FavelaAmarela/Ligar sistemas novos` anexa a
+`ArtefatosBridge` e a ponte de persistência dos slots ao Damião, nas 3 cenas. Idempotente.
+
+**Ainda manual:**
+1. Montar a `BarraDeArtefatos` no HUD (4 slots) e ligá-la ao campo `barraDeArtefatos` do
    `HUDController` — o `MontarHUDController.cs` ainda não a linka automaticamente.
-3. Ligar os `ColetavelDeItem` dos Artefatos para chamar
-   `ArtefatosBridge.EquiparNoPrimeiroSlotLivre(id)` ao recolher.
+2. Ligar os `ColetavelDeItem` dos Artefatos para chamar
+   `ArtefatosBridge.EquiparNoPrimeiroSlotLivre(id)` ao recolher — **enquanto isso não for
+   feito, coletar um Artefato não o coloca em nenhum slot**, e ele não faz nada.
 
 ## Relacionados
 - [Habilidades de Item](habilidades_de_item.md) — `IEfeitoDeArtefato` é a primeira aplicação real daquele desenho
