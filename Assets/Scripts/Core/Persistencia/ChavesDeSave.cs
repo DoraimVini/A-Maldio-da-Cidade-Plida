@@ -59,6 +59,20 @@ namespace FavelaAmarela.Core.Persistencia
         /// </summary>
         public const string YugNethVitalidadeAtual = "Companheiro.YugNeth.Vitalidade.Atual";
 
+        /// <summary>
+        /// Mochila e equipamento de Damião, em JSON.
+        ///
+        /// <para>Chave global e não por objeto de cena: existe um inventário só, e ele
+        /// precisa atravessar toda troca de cena.</para>
+        /// </summary>
+        public const string Inventario = "Jogador.Inventario";
+
+        /// <summary>Nível de Exposição, pontos e Ecos desbloqueados, em JSON.</summary>
+        public const string Progressao = "Jogador.Progressao";
+
+        /// <summary>Os quatro slots de Artefato, como ids separados por vírgula.</summary>
+        public const string ArtefatosEquipados = "Jogador.Artefatos";
+
         /// <summary>O Necronomicon já foi recolhido.</summary>
         public const string NecronomiconColetado = "Quest.Tumba.NecronomiconColetado";
 

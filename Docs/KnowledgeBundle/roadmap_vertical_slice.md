@@ -11,6 +11,26 @@ timestamp: 2026-07-31T00:00:00Z
 Auditoria feita em **2026-07-31** contra a lista priorizada de produção (12 itens + 2 de
 polimento). Cada item foi verificado **no código e nas cenas**, não por memória.
 
+> 🔄 **Re-auditado em 2026-08-11.** Várias linhas abaixo tinham envelhecido. As correções
+> estão marcadas inline. **A mudança mais importante é a seção nova
+> [Buracos sistêmicos](#buracos-sistêmicos-fora-dos-14-itens)**: quatro sistemas que não
+> aparecem em nenhum dos 14 itens da lista, mas sem os quais o VS não se sustenta como demo —
+> e um deles (áudio) torna o pilar central do jogo imperceptível para quem joga.
+
+---
+
+## Buracos sistêmicos (fora dos 14 itens)
+
+Verificado no código em 2026-08-11. Nada disto está na lista do edital, e todos são baratos
+perto dos bosses:
+
+| Buraco | Evidência | Por que importa |
+|---|---|---|
+| **Áudio: ausente** | Zero `AudioSource`/`AudioClip` no gameplay (só em `AberturaDesertoCinematica`). Zero arquivos de som no projeto. | O pilar do jogo é **furtividade sonora** — o Cultista caça por som, a tempestade abafa o ruído, a Esquiva faz barulho de propósito. **Hoje se joga um stealth sonoro sem ouvir nada:** o jogador não percebe que fez barulho nem que foi ouvido. |
+| **Persistência incompleta** | `InventoryManager.GetSaveData()` e `ProgressionManager.GetSaveData()` **nunca são chamados** — nada os liga ao `GerenciadorDeSave`. | Mochila, equipamento, nível de Exposição, Ecos e slots de Artefato **se perdem** ao recarregar. O `RefugioDeLuz` grava em disco, mas grava um save incompleto. |
+| **Fluxo de jogo** | Zero arquivos para menu, pause ou tela de morte. | Não dá para começar, pausar nem perder. Hoje só se entra pela cena aberta no Editor, e o Colapso não tem desfecho de tela. |
+| **Animação** | Nenhum `Animator` no gameplay (só cinemática e `ResilienciaBar`). | Tudo estático. O Abdul tem spritesheet fatiado em 28 frames usando **um frame só**. |
+
 > ✅ **Escopo decidido em 2026-07-31:** o Vertical Slice são os **14 itens desta lista** —
 > a **Fase 1 completa** e a **última fase do jogo** (Castelo de Carcosa + Rei em Amarelo),
 > não só a Tumba. É um recorte **início + desfecho**, pulando as 4 fases do meio: mostra a
@@ -24,7 +44,7 @@ polimento). Cada item foi verificado **no código e nas cenas**, não por memór
 | # | Item | Estado | Observação |
 |---|---|---|---|
 | 1 | **Status Ailments** | ✅ **Pronto** | Sangramento por acúmulo (10 → estouro percentual) e Congelamento (3 acúmulos → trava o jogador). Ver [armas_da_tumba.md](systems/armas_da_tumba.md). |
-| 2 | **Sistema de Consumíveis** | ⚠️ **Fundação pronta** (2026-08-01) | Inventário completo com **21 testes** (`Inventario`, `DefinicaoDeItem`, `PilhaDeItens`), `ItemConfig` para autoria em asset e `InventarioBridge` aplicando Ancoragem/Estabilização. **Falta:** nenhum item real autorado, nenhuma UI de inventário, e o `InventarioBridge` não está em cena nenhuma. Ver [inventario_e_consumiveis.md](systems/inventario_e_consumiveis.md). |
+| 2 | **Sistema de Consumíveis** | ⚠️ **Infra pronta, zero itens** (re-auditado 2026-08-11) | O inventário amadureceu muito desde 08/01: `InventoryManager` + `ItemDatabase` + `ItemDef`, `EquipmentInventory` com 6 slots, `BarraDeItens` na HUD (teclas 1–8) e `ConsumirItem` funcionando. **O que falta é só conteúdo: `grep "Tipo: 3"` nos `ItemDef` devolve zero — nenhum consumível existe.** É o item mais barato de fechar da lista. Ver [inventario_e_consumiveis.md](systems/inventario_e_consumiveis.md). |
 | 3 | **Companheiro (RC)** | ⚠️ **Parcial** | Seguir Damião ✅; incapacitação + reanimação num Refúgio ✅ (implementado 2026-07-31). **Falta:** barra no HUD. Ver nota abaixo. |
 
 ### ⚠️ Conflito no item 1 — *Lentidão* vs. *Congelamento*
@@ -52,8 +72,8 @@ confirmar** — não é bug.
 |---|---|---|---|
 | 4 | **Blockout geográfico** | ✅ **Setores definidos** (2026-08-01) | Os marcos já estavam nas posições certas da topologia (Tumba a oeste, Santuário a noroeste, Templo a leste, Portões ao norte, chegada ao sul). O que faltava eram os **setores como entidades de jogo**: 6 volumes de `TempestadeZonaTrigger` ladrilhando o mapa sem sobrepor, com as faixas de intensidade da tabela §3 do design. Ferramenta: `Tools/FavelaAmarela/Montar setores de tempestade do Deserto`. **Terreno não foi regerado** — só acrescentei volumes. |
 | 5 | **Tempestade de Memória** | ✅ **Funcional no Deserto** (2026-08-01) | Driver + véu visual instalados na cena; o `GameManager` os liga no bootstrap. **Intensidade→detecção já funcionava**: a percepção do Cultista é 100% sonora e a tempestade abafa o ruído do Damião (`PlayerStealthState.AplicarAbafamentoTempestade`) — stealth invertido conforme decidido. **Intensidade→velocidade foi descartada** (decisão do Vini: a tempestade atrapalha só os inimigos). Falta variar a faixa por setor (`TempestadeZonaTrigger`), o que depende do item 4. |
-| 6 | **População de inimigos** | ❌ **Não no deserto** | O Deserto está **vazio**. A Tumba tem só **2 Cultistas** (verificado na cena em 2026-08-01 — a contagem de "41" que constava aqui estava errada). Ou seja, falta povoar as duas áreas, não só o Deserto. |
-| 7 | **A Coisa do Cemitério** | ⚠️ **Existe, sem instância** | `CoisaDoCemiterioAI` + `CoisaDoCemiterioFSM` implementados (caça por faro, insta-kill). A instância foi **removida** da Tumba para dar lugar ao Abdul. Precisa ser colocada no Deserto. |
+| 6 | **População de inimigos** | ❌ **Deserto segue vazio** (re-verificado 2026-08-11) | Contagem por **GUID do `Cultista.prefab`** nas cenas: `Deserto_Hali` = **0**, `Santuario_Yhtill` = **0**, `Playtest_RuinasPalidas` = 44 referências. A Tumba está povoada; o Deserto **não tem um inimigo sequer**. Apesar do nome do commit `feat(fase1): povoa o Deserto de Hali`, o que foi povoado ali foram marcos e setores de tempestade, não inimigos. Também **não existe spawner** — é posicionamento manual em cena. |
+| 7 | **A Coisa do Cemitério** | ⚠️ **Existe, zero instâncias** (re-verificado 2026-08-11) | `CoisaDoCemiterioAI` + `CoisaDoCemiterioFSM` implementados (caça por faro, insta-kill) e o `CoisaDoCemiterio.prefab` existe. Contagem por GUID: **0 instâncias em qualquer cena do projeto**. Precisa ser colocada no Deserto. |
 
 ---
 
@@ -106,6 +126,22 @@ nenhum dos 14 itens, mas está essencialmente **jogável de ponta a ponta**:
 **Pendência real da Tumba:** **arte**. Verificado — Pedra de Poder, Esqueleto, Cone de Gelo
 e Necronomicon usam o **sprite built-in do Unity** (retângulos coloridos). O Abdul tem
 spritesheet real fatiado em 28 frames, mas **sem Animator** (usa um frame estático).
+
+### Acrescentado depois desta auditoria (2026-08-10 / 08-11)
+
+Nada disto está nos 14 itens, mas passou a existir:
+
+- **Motor de loot** (`Core.Loot`): `SorteioDeDrop` testável, `TabelaDeDrop` por arquétipo,
+  `DropAoAbater`, e tiers liberados por `ProgressionManager.NivelAtual`. O `BauDaTumba` migrou
+  para tabela. Ver [systems/loot_e_drop.md](systems/loot_e_drop.md).
+- **Artefatos** (`Core.Artefatos`): inventário de 4 slots, passiva + habilidade por Artefato,
+  barra F1–F4, e os 4 autorados (Necronomicon, Patuá, Anel do Sinal Amarelo, Coroa de Ossos).
+  Ver [systems/artefatos.md](systems/artefatos.md). **Falta wiring de cena.**
+- **Catálogo de armaduras**: 3 peças Inerte + **3 peças do Set Lendário** (Elmo, Peitoral,
+  Grevas — a Arma de Set segue sem forma decidida).
+- **Progressão já existia e ninguém tinha registrado**: o `ProgressionManager` (nível de
+  Exposição, curva até 12, árvore de Ecos) está implementado desde antes, apesar de o
+  `CLAUDE.md` dizer que era "previsto, sem data". Corrigido em 2026-08-11.
 
 ---
 

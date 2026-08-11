@@ -16,7 +16,7 @@ namespace FavelaAmarela.Tests.EditMode
         private const string CaminhoCultista = "Assets/FavelaAmarela/Config/Drops/Drop_Cultista.asset";
 
         [TestCase(CaminhoBau, 3)]
-        [TestCase(CaminhoCultista, 3)]
+        [TestCase(CaminhoCultista, 5)]
         public void Tabela_ProjetaTodasAsLinhasComIdValido(string caminho, int linhasEsperadas)
         {
             var tabela = AssetDatabase.LoadAssetAtPath<TabelaDeDrop>(caminho);

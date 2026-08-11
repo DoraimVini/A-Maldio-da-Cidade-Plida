@@ -4,6 +4,7 @@ using FavelaAmarela.Core.GameLoop;
 using FavelaAmarela.Core.Stealth;
 using FavelaAmarela.Core.Environment;
 using FavelaAmarela.Player;
+using FavelaAmarela.Runtime.Audio;
 using FavelaAmarela.Runtime.Combat;
 using FavelaAmarela.Runtime.Enemies;
 using FavelaAmarela.Runtime.Environment;
@@ -124,6 +125,19 @@ namespace FavelaAmarela.Runtime.GameLoop
             var player = FindAnyObjectByType<PlayerMovement>();
             if (player != null)
                 player.Bind(SoundBroadcaster, Environment);
+
+            // Áudio: dá voz ao ruído que Damião emite (o pilar de furtividade sonora) e às
+            // viradas de estado mental. Sem isto, a mecânica central é imperceptível.
+            var audioStealth = FindAnyObjectByType<AudioDeStealth>();
+            if (audioStealth != null)
+                audioStealth.Bind(SoundBroadcaster);
+            else
+                Debug.LogWarning("[GameManager] Nenhum AudioDeStealth na cena; o jogador não vai " +
+                                 "ouvir o próprio ruído — o pilar sonoro fica invisível.", this);
+
+            var audioResiliencia = FindAnyObjectByType<AudioDeResiliencia>();
+            if (audioResiliencia != null)
+                audioResiliencia.Bind(Resiliencia);
 
             // Vitalidade corpórea de Damião: observa o abate para levar ao Colapso
             // (mesmo fim de jogo da Resiliência a zero, com frases de morte corpórea).

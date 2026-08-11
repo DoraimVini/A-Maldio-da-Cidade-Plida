@@ -6,6 +6,68 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (5ª rodada) — Auditoria do VS: áudio, persistência e consumíveis
+
+Auditoria dos sistemas faltando para o Vertical Slice, feita **verificando código e cenas**
+(o `roadmap_vertical_slice.md` era de 31/07 e envelheceu). Achados e correções abaixo.
+
+### O que a auditoria encontrou
+Quatro buracos que **não aparecem em nenhum dos 14 itens da lista do edital**, mas sem os
+quais o VS não se sustenta como demo. Registrados em `roadmap_vertical_slice.md`, seção nova
+"Buracos sistêmicos". Os dois primeiros foram fechados nesta rodada.
+
+### 1. Áudio — era ausente por completo
+**Zero `AudioSource` no gameplay** e zero arquivos de som no projeto. Não era polimento
+faltando: o pilar do jogo é furtividade sonora, e **o jogador jogava um stealth sonoro sem
+ouvir nada** — andava, era caçado, e não tinha como entender por quê.
+
+Sistema novo em `Assets/Scripts/Audio/` (doc: [systems/audio.md](systems/audio.md)):
+- `MixerDeAudio` — ponto único, **pool fixo** de `AudioSource` criado no `Awake`. Não usa
+  `PlayClipAtPoint` de propósito: com passo a cada 0,15 s, instanciar/destruir por som seria
+  lixo constante em hot path.
+- `AudioDeStealth` — **a peça que importa**: toca o passo com **volume proporcional ao raio do
+  som emitido**. O jogador aprende a mecânica jogando, ouvindo o próprio rastro sonoro
+  encolher ao agachar.
+- `AudioDeResiliencia` (só as transições de Pânico/Colapso, não a cada ponto de dreno) e
+  `AudioDeCombate` (por entidade, porque áudio sem posição mente num jogo que se caça por som).
+- `BancoDeSons` (SO) + `SinteseDeSom`: **não existe nenhum clipe no projeto**, então o sistema
+  sintetiza ruído filtrado e tons com varredura. É **andaime, não substituto** — clipe real
+  entra no banco e ganha preferência sozinho, sem tocar em código.
+
+### 2. Persistência — dois `SaveData` eram órfãos
+`InventoryManager.GetSaveData()` e `ProgressionManager.GetSaveData()` existiam desde sempre e
+**nunca eram chamados por ninguém**. Na prática, mochila, equipamento, nível de Exposição e
+Ecos **se perdiam ao recarregar, em silêncio** — e o `RefugioDeLuz` gravava em disco um save
+incompleto sem avisar. Pior desde ontem, porque o nível agora **gateia o loot**.
+
+Três pontes novas seguindo o `IPersistente` já existente: `EstadoPersistenteDoInventario`,
+`EstadoPersistenteDaProgressao` (resolve ids→`EcoDef` no load) e `EstadoPersistenteDosArtefatos`
+(guarda os 4 slots por posição — o jogador escolheu qual Artefato fica em qual tecla).
+JSON ilegível degrada graciosamente em vez de derrubar o load.
+
+### 3. Consumíveis — item 2 da lista, que tinha infra e zero conteúdo
+O pipeline já funcionava inteiro (`ConsumirItem` → `OnItemConsumed` →
+`VitalidadeBridge.AplicarEfeitoConsumivel`), lendo `Modificadores` como dado. Faltava só
+autorar. Três consumíveis no **mesmo molde das 3 armas** — catálogo pequeno, curado, e
+expansível por asset sem código novo:
+
+| Item | Efeito | Empilha |
+|---|---|---|
+| Água da Cacimba | Vitalidade +30 (corpo) | 5 |
+| Erva de Ancoragem | Ancoragem de RM +25 (mente) | 5 |
+| Raiz de Yhtill | Vit +15 **e** RM +12 | 3 |
+
+Entraram na `Drop_Cultista` para terem **presença de verdade** — senão existiriam só no
+catálogo, sem nunca aparecer em jogo.
+
+**QA:** 413/413 testes EditMode (eram 406). Os 7 novos guardam os consumíveis, incluindo um que
+recusa modificador de `StatType` que o consumo ignora — item assim seria gasto sem efeito, sem
+um erro sequer no console.
+
+**Wiring de cena pendente:** `MixerDeAudio` + `AudioDeStealth`/`AudioDeResiliencia` na cena,
+`AudioDeCombate` nos prefabs de inimigo, e as três pontes de persistência no Damião. O
+`GameManager` **avisa no console** se o `AudioDeStealth` faltar.
+
 ## 2026-08-11 (4ª rodada) — Set Lendário de Set: Elmo, Peitoral e Grevas
 
 Consequência direta da rodada anterior. Com a **Coroa de Ossos confirmada como Artefato**, a
