@@ -31,6 +31,25 @@ namespace FavelaAmarela.Inventario
         }
 
         /// <summary>
+        /// Esvazia todos os slots <b>sem trocar de instância</b>, notificando cada um.
+        ///
+        /// <para>Existe para o carregamento de save: recriar o inventário com <c>new</c>
+        /// deixaria órfãos todos os inscritos em <see cref="OnSlotChanged"/> — a
+        /// <c>MaoFisicaBridge</c>, o <c>GerenciadorEfeitosPassivos</c>, as barras de UI —
+        /// que passariam a escutar um objeto morto e nunca mais saberiam de nada.</para>
+        /// </summary>
+        public void LimparTudo()
+        {
+            for (int i = 0; i < slots.Length; i++)
+            {
+                if (slots[i] == null) continue;
+
+                slots[i] = null;
+                OnSlotChanged?.Invoke(i);
+            }
+        }
+
+        /// <summary>
         /// Validação virtual. Pode ser sobrescrita para regras específicas.
         /// </summary>
         public virtual bool CanAdd(ItemInstance item, int indice)

@@ -5,6 +5,7 @@ using FavelaAmarela.Inventario;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.Audio;
 using FavelaAmarela.Runtime.Enemies;
+using FavelaAmarela.Runtime.GameLoop;
 using FavelaAmarela.Runtime.Itens;
 using FavelaAmarela.Runtime.Persistencia;
 
@@ -34,6 +35,7 @@ namespace FavelaAmarela.EditorTools
         private const string PrefabCultista = "Assets/FavelaAmarela/Art/Enemies/Cultista.prefab";
         private const string PrefabCoisa = "Assets/FavelaAmarela/Art/Enemies/CoisaDoCemiterio.prefab";
         private const string TabelaCultista = "Assets/FavelaAmarela/Config/Drops/Drop_Cultista.asset";
+        private const string TabelaBau = "Assets/FavelaAmarela/Config/Drops/Drop_BauDaTumba.asset";
 
         [MenuItem("Tools/FavelaAmarela/Ligar sistemas novos (artefatos, áudio, save, drop)")]
         public static void Executar()
@@ -126,7 +128,7 @@ namespace FavelaAmarela.EditorTools
 
                 var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
 
-                bool mudou = LigarJogador() | LigarAudioDaCena();
+                bool mudou = LigarJogador() | LigarAudioDaCena() | LigarBauDaTumba();
 
                 if (mudou)
                 {
@@ -219,6 +221,40 @@ namespace FavelaAmarela.EditorTools
             }
 
             return mudou;
+        }
+
+        /// <summary>
+        /// Aponta o <see cref="BauDaTumba"/> da cena para a <c>Drop_BauDaTumba</c>.
+        ///
+        /// <para><b>Bug que motivou (playtest de 2026-08-11: "o baú está quebrado"):</b> quando
+        /// o baú migrou do <c>Random.Range</c> sobre <c>ItemDef[]</c> para a tabela de drop, o
+        /// campo novo ficou <b>nulo na cena</b> e o array antigo foi removido do componente.
+        /// Resultado: abrir o baú não entregava arma nenhuma. Eu registrei isto como "wiring
+        /// manual pendente" e nunca automatizei — então nunca foi feito.</para>
+        /// </summary>
+        private static bool LigarBauDaTumba()
+        {
+            var bau = Object.FindAnyObjectByType<BauDaTumba>(FindObjectsInactive.Include);
+            if (bau == null) return false; // cena sem baú é normal (só a Tumba tem)
+
+            var tabela = AssetDatabase.LoadAssetAtPath<TabelaDeDrop>(TabelaBau);
+            if (tabela == null)
+            {
+                Debug.LogError($"[LigarSistemas] Tabela do baú não encontrada em '{TabelaBau}'.");
+                return false;
+            }
+
+            var so = new SerializedObject(bau);
+            var prop = so.FindProperty("tabela");
+            if (prop == null || prop.objectReferenceValue != null) return false;
+
+            prop.objectReferenceValue = tabela;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(bau);
+
+            Debug.Log("[LigarSistemas] BauDaTumba ligado à Drop_BauDaTumba — ele voltou a " +
+                      "entregar arma.", bau);
+            return true;
         }
 
         /// <summary>Adiciona o componente se ainda não houver. Devolve se mudou algo.</summary>

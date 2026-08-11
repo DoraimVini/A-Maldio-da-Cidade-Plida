@@ -160,27 +160,80 @@ namespace FavelaAmarela.Inventario
         // ------------------ Persistência ------------------
         public InventorySaveData GetSaveData() => new InventorySaveData(Main, Equipment);
 
+        /// <summary>
+        /// Reaplica um save ao inventário <b>reaproveitando as instâncias existentes</b>.
+        ///
+        /// <para><b>Bug que motivou (playtest de 2026-08-11: "perde a arma no deserto"):</b>
+        /// esta função criava <c>new MainInventory</c> e <c>new EquipmentInventory</c>. Todo
+        /// mundo que já tinha assinado <c>OnSlotChanged</c>/<c>OnEquipmentChanged</c> —
+        /// <c>MaoFisicaBridge</c>, <c>GerenciadorEfeitosPassivos</c>, <c>BarraDeItens</c>,
+        /// <c>PainelDeInventario</c> — continuava escutando o objeto <b>antigo</b>. Na prática:
+        /// ao trocar de cena, equipar deixava de chegar à Mão Física, e Damião ficava desarmado
+        /// mesmo com a arma na mochila. Nada disso dava erro no console.</para>
+        ///
+        /// <para>Mutar no lugar preserva os inscritos. Instância nova só quando a capacidade
+        /// salva não bate com a atual — e aí o aviso deixa claro que os eventos se perderam.</para>
+        /// </summary>
         public void LoadFromSaveData(InventorySaveData data)
         {
             if (data == null) return;
 
-            Main = new MainInventory(data.mainSlotData.Length);
-            for (int i = 0; i < data.mainSlotData.Length; i++)
+            Main = RestaurarMochila(data);
+            Equipment = RestaurarEquipamento(data);
+        }
+
+        private MainInventory RestaurarMochila(InventorySaveData data)
+        {
+            var mochila = Main;
+
+            if (mochila.Capacidade != data.mainSlotData.Length)
             {
-                if (data.mainSlotData[i] != null && !string.IsNullOrEmpty(data.mainSlotData[i].itemDefId))
-                {
-                    Main.AddAt(new ItemInstance(data.mainSlotData[i].itemDefId, data.mainSlotData[i].quantity), i);
-                }
+                Debug.LogWarning($"[InventoryManager] Mochila do save tem " +
+                                 $"{data.mainSlotData.Length} slots e a atual tem {mochila.Capacidade}; " +
+                                 "recriando — quem já escutava os eventos vai parar de receber.");
+                mochila = new MainInventory(data.mainSlotData.Length);
+            }
+            else
+            {
+                mochila.LimparTudo();
             }
 
-            Equipment = new EquipmentInventory(anatomia);
+            for (int i = 0; i < data.mainSlotData.Length; i++)
+            {
+                var slot = data.mainSlotData[i];
+                if (slot == null || string.IsNullOrEmpty(slot.itemDefId)) continue;
+
+                mochila.AddAt(new ItemInstance(slot.itemDefId, slot.quantity), i);
+            }
+
+            return mochila;
+        }
+
+        private EquipmentInventory RestaurarEquipamento(InventorySaveData data)
+        {
+            var equipamento = Equipment;
+
+            if (equipamento.Capacidade != data.equipSlotData.Length)
+            {
+                Debug.LogWarning($"[InventoryManager] Anatomia do save tem " +
+                                 $"{data.equipSlotData.Length} slots e a atual tem " +
+                                 $"{equipamento.Capacidade}; recriando.");
+                equipamento = new EquipmentInventory(anatomia);
+            }
+            else
+            {
+                equipamento.LimparTudo();
+            }
+
             for (int i = 0; i < data.equipSlotData.Length; i++)
             {
-                if (data.equipSlotData[i] != null && !string.IsNullOrEmpty(data.equipSlotData[i].itemDefId))
-                {
-                    Equipment.Equip(new ItemInstance(data.equipSlotData[i].itemDefId, data.equipSlotData[i].quantity), i);
-                }
+                var slot = data.equipSlotData[i];
+                if (slot == null || string.IsNullOrEmpty(slot.itemDefId)) continue;
+
+                equipamento.Equip(new ItemInstance(slot.itemDefId, slot.quantity), i);
             }
+
+            return equipamento;
         }
     }
 }
