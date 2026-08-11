@@ -6,6 +6,42 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (7ª rodada) — Deserto povoado e a Coisa do Cemitério em cena
+
+Itens **6 e 7** da lista do edital. Ambos tinham código pronto e testado desde sempre e
+**zero instâncias em cena** — o Deserto estava literalmente vazio, e a Coisa não existia em
+nenhuma das três cenas.
+
+`PovoarODeserto` (`Tools/FavelaAmarela/Povoar o Deserto de Hali`).
+
+### A densidade acompanha a tempestade, de propósito
+A percepção do Cultista é **100% sonora** e a tempestade **abafa o ruído do Damião** — ou seja,
+quanto mais forte a tempestade, **mais furtivo o jogador fica**. A ferramenta lê o `minimo`/
+`maximo` de cada `TempestadeZonaTrigger` e escala a população entre 1 e 5 por setor.
+
+O efeito de design: setor de tempestade alta aguenta mais inimigos sem ficar injusto, e setor
+calmo fica esparso. **Isso transforma a tempestade de efeito visual em decisão** — atravessar
+no auge dela é arriscado de perto, mas é quando você passa despercebido.
+
+### Duas decisões de povoamento
+- **O setor de chegada fica vazio.** O jogador acorda no deserto sem arma e sem saber das
+  regras; emboscá-lo no primeiro minuto ensina frustração, não tensão.
+- **Uma só Coisa do Cemitério**, no Deserto Central. Ela mata no toque e caça **por faro** — a
+  tempestade, que protege contra os Cultistas, não serve de nada contra ela. Duas
+  transformariam o Deserto num corredor de morte em vez de num lugar com uma ameaça que se
+  aprende a evitar.
+
+### Chave de persistência por instância
+Cada inimigo posicionado ganha um `ObjetoPersistente` com chave própria (GUID), gerada **na
+instância e não no prefab** — em modo Prefab todas herdariam a mesma chave e uma sobrescreveria
+a outra no save. Sem isso, todo inimigo abatido ressuscitaria ao recarregar a cena.
+
+**Determinística:** semente fixa, mesmo mapa a cada execução, para playtest ser reprodutível.
+**Idempotente:** refaz o grupo `Inimigos_Deserto` do zero, então rodar duas vezes não dobra a
+população.
+
+**Pendente:** rodar o menu no Editor (não dá para posicionar em cena headless).
+
 ## 2026-08-11 (6ª rodada) — O save nunca era lido, e o inventário não tinha tela
 
 Duas perguntas do Vini ("o inventário tem botão para abrir?" e "o que é preciso para o jogo
