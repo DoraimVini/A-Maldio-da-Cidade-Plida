@@ -149,9 +149,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8628179692047720825}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 600eb9c85b30f464d8b9fc102e821a4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.NecronomiconPickup
+  m_Script: {fileID: 11500000, guid: 785f970d12137794e90ae8cc00258d40, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.ColetavelDeItem
+  item: {fileID: 11400000, guid: b7e3c1a94f2d08e4a91c65d3f807be21, type: 2}
+  quantidade: 1
+  chaveDeSave: Quest.Tumba.NecronomiconColetado
   caixaDeTexto: {fileID: 0}
   mensagem: "O Al-Azif \xE9 mais pesado do que deveria. As p\xE1ginas continuam virando
     sozinhas."

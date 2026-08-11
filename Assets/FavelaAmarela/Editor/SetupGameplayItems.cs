@@ -25,7 +25,7 @@ namespace FavelaAmarela.EditorTools
 
             SetupPickup(root, "Patua_Pickup", new Vector3(4f, -37f, 0f),
                 "Assets/FavelaAmarela/Art/Items/Patua.png",
-                "FavelaAmarela.Runtime.GameLoop.PatuaPickup", hint, obrigatorio: true);
+                "FavelaAmarela.Runtime.Itens.ColetavelDeItem", hint, obrigatorio: true);
 
             // (Arma_Pickup removido: a Barra Enferrujada foi descartada — a arma agora
             //  vem do baú da Tumba, que sorteia uma das 3 armas via RNG.)
@@ -72,7 +72,7 @@ namespace FavelaAmarela.EditorTools
             if (hint != null)
             {
                 var so = new SerializedObject(comp);
-                var p = so.FindProperty("hintUI");
+                var p = so.FindProperty("caixaDeTexto") ?? so.FindProperty("hintUI");
                 if (p != null) { p.objectReferenceValue = hint; so.ApplyModifiedPropertiesWithoutUndo(); }
             }
 

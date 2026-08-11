@@ -183,7 +183,7 @@ namespace FavelaAmarela.EditorTools
             ligados += Ligar<FragmentoDeYhtill>(caixa, "caixaDeTexto");
             ligados += Ligar<Runtime.GameLoop.RefugioDeLuz>(caixa, "caixaDeTexto");
             ligados += Ligar<Runtime.GameLoop.BauDaTumba>(caixa, "hintUI");
-            ligados += Ligar<Runtime.GameLoop.PatuaPickup>(caixa, "hintUI");
+            ligados += Ligar<Runtime.Itens.ColetavelDeItem>(caixa, "caixaDeTexto");
             return ligados;
         }
 

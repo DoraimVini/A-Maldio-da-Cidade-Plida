@@ -3,8 +3,11 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using FavelaAmarela.Core.Persistencia;
+using FavelaAmarela.Inventario;
 using FavelaAmarela.Runtime.Enemies;
 using FavelaAmarela.Runtime.GameLoop;
+using FavelaAmarela.Runtime.Itens;
 using FavelaAmarela.Runtime.UI;
 
 namespace FavelaAmarela.EditorTools
@@ -29,6 +32,8 @@ namespace FavelaAmarela.EditorTools
         private const string CaminhoEsqueleto = Pasta + "EsqueletoInvocado.prefab";
         private const string CaminhoCone = Pasta + "ConeDeGelo.prefab";
         private const string CaminhoNecronomicon = "Assets/FavelaAmarela/Art/Items/Necronomicon.prefab";
+        private const string CaminhoItemNecronomicon =
+            "Assets/FavelaAmarela/Config/Resources/Itens/Item_Necronomicon.asset";
 
         [MenuItem("Tools/FavelaAmarela/Montar Prefabs da Luta do Abdul")]
         public static void Montar()
@@ -139,7 +144,7 @@ namespace FavelaAmarela.EditorTools
             if (existente != null) return existente;
 
             var go = new GameObject("Necronomicon",
-                typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(NecronomiconPickup));
+                typeof(SpriteRenderer), typeof(BoxCollider2D), typeof(ColetavelDeItem));
 
             var col = go.GetComponent<BoxCollider2D>();
             col.isTrigger = true;
@@ -153,7 +158,16 @@ namespace FavelaAmarela.EditorTools
             // Reaproveita a caixa de texto do tutorial, como os outros pickups.
             var caixa = Object.FindAnyObjectByType<TutorialHintUI>(FindObjectsInactive.Include);
             if (caixa != null)
-                AtribuirCampo(go.GetComponent<NecronomiconPickup>(), "caixaDeTexto", caixa);
+                AtribuirCampo(go.GetComponent<ColetavelDeItem>(), "caixaDeTexto", caixa);
+
+            var coletavel = go.GetComponent<ColetavelDeItem>();
+            AtribuirCampoString(coletavel, "chaveDeSave", ChavesDeSave.NecronomiconColetado);
+            var def = AssetDatabase.LoadAssetAtPath<ItemDef>(CaminhoItemNecronomicon);
+            if (def != null)
+                AtribuirCampo(coletavel, "item", def);
+            else
+                Debug.LogError($"[Abdul] ItemDef do Necronomicon não encontrado em " +
+                               $"'{CaminhoItemNecronomicon}' — o drop não entregará nada.");
 
             AdicionarYSort(go);
 
@@ -227,6 +241,15 @@ namespace FavelaAmarela.EditorTools
             var prop = so.FindProperty(campo);
             if (prop == null) return;
             prop.objectReferenceValue = valor;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void AtribuirCampoString(Component alvo, string campo, string valor)
+        {
+            var so = new SerializedObject(alvo);
+            var prop = so.FindProperty(campo);
+            if (prop == null) return;
+            prop.stringValue = valor;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
     }

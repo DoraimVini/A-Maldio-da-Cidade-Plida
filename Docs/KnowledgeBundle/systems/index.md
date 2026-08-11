@@ -17,6 +17,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Interação com o Mundo (botão E)](interacao.md) — Camada de interação deliberada: prompt + seleção de alvo, substitui o disparo por toque
 - [Ficha de Atributos e Matemática do Combate](ficha_de_atributos.md) — Os 5 atributos de toda unidade, fórmula de mitigação e balanceamento
 - [As Três Armas da Tumba](armas_da_tumba.md) — Cravo/Estilete/Alfanje: básico + habilidade, e o sangramento por acúmulo
+- [Loot e Drop](loot_e_drop.md) — **[DESIGN, não implementado]** Tabelas de drop por arquétipo, os 4 graus de impregnação e a regra que impede explosão de build
 - [Luta contra Abdul Alhazred](boss_abdul.md) — Boss em fases: Escudo Mágico, Pedras de Poder, Cones de Gelo e a janela de exaustão
 - [IA do Cultista](cultista_ai.md) — FSM de comportamento dos inimigos
 - [Espectro](espectro.md) — Manifestação espectral roteirizada (cutscenes)

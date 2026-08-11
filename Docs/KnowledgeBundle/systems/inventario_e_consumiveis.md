@@ -46,4 +46,4 @@ Diferente do sistema antigo, onde a UI e o loot dependiam de um Bridge rígido:
 ## Pendentes (Próximos Passos)
 
 - **GerenciadorEfeitosPassivos:** Para resolver o processamento contínuo de relíquias e equipamentos (como Dreno de RM no escuro), o sistema demandará um intermediário (`GerenciadorEfeitosPassivos.cs`) para ler atributos do `EquipmentInventory` e injetar matemática contínua no `ResilienciaMental`.
-- **Drop em Inimigos:** `ColetavelDeItem` precisa ser configurado nos chefes (ex: Byakhee).
+- **Drop em Inimigos:** ~~configurar `ColetavelDeItem` chefe por chefe~~ — **substituído em 2026-08-10** por um sistema de tabela de drop para todo inimigo e baú. Design em [loot_e_drop.md](loot_e_drop.md); implementação agendada para depois do Vertical Slice.

@@ -149,11 +149,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6110000000000000001}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae6a74e18d71fb64394db7d41cce1052, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.PatuaPickup
-  hintUI: {fileID: 0}
-  mensagem: "Voc\xEA encontrou o patu\xE1 \u2014 o Salto Dimensional foi destravado."
+  m_Script: {fileID: 11500000, guid: 785f970d12137794e90ae8cc00258d40, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.ColetavelDeItem
+  item: {fileID: 11400000, guid: c8791bee981ab43468c3e891a6f5913d, type: 2}
+  quantidade: 1
+  chaveDeSave: Quest.Patua.Coletado
+  caixaDeTexto: {fileID: 0}
+  mensagem: "Voc\xEA recolheu o patu\xE1. Ele pulsa devagar, como se esperasse algo."
 --- !u!114 &6110000000000000006
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -6,6 +6,67 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-10 (2ª rodada) — Unificação do sistema de itens, Porta de Aklo e design de loot
+
+Continuação da recuperação. O bug relatado ("drop do Necronomicon quebrado") não era asset
+corrompido — as referências de prefab e os GUIDs estavam íntegros. Era uma **migração de
+sistema deixada pela metade**, provavelmente interrompida pelo próprio desastre: existiam
+**três** sistemas de item concorrentes, e o Necronomicon estava nos dois mortos.
+
+| Sistema | Estado encontrado |
+|---|---|
+| `ItemDef` + `InventoryManager` | vivo e correto (4 assets em `Config/Resources/Itens/`) |
+| `ItemData` + `ItemDropWorld` | legado; 1 asset órfão com `ItemID` **vazio** |
+| `EquipamentoConfig` | morto — zero referências em runtime |
+
+### Correções
+- **`Item_Necronomicon.asset` criado** como `ItemDef` (`Tipo: Chave`) em
+  `Config/Resources/Itens/` — único caminho que o `ItemDatabase` varre. O
+  `GerenciadorEfeitosPassivos` já tinha suporte pronto a itens Chave passivos na mochila (o
+  código cita o Necronomicon nominalmente), então a decisão "chave + relíquia passiva" caiu
+  num encaixe existente.
+- **`Necronomicon.prefab` e `Patua_Pickup.prefab` migrados** de `NecronomiconPickup`/
+  `PatuaPickup` para `ColetavelDeItem`, preservando as chaves de save (`AbdulAlhazredAI.
+  AplicarEstadoSalvo` depende de `NecronomiconColetado` para o tomo renascer).
+- **`PortaDeAklo` implementada de verdade** (era um `Configurar()` vazio com `// TODO`):
+  agora checa `InventoryManager.PossuiItemNaMochila`. O `TemploSerpenteSetup` hard-codava
+  `"3a2fdc7e8d..."` — que era o **GUID de arquivo** do asset velho, não um id semântico;
+  trocado por `"necronomicon"`.
+- **Dois sistemas mortos deletados**, incluindo `GeradorDeEquipamentosIniciais.cs` — um
+  `[InitializeOnLoad]` que **recriava os `Equip_*.asset` a cada abertura do Editor**. Mesmo
+  anti-padrão já expurgado em 2026-08-05 (Bloco 2); sem removê-lo, os assets ressuscitariam.
+  Três ferramentas de Editor que referenciavam os scripts removidos foram religadas.
+- **Texto obsoleto ao jogador:** o patuá anunciava *"o Salto Dimensional foi destravado"* —
+  habilidade removida do jogo. Corrigido.
+- **`Tools/run_qa_tests.ps1` recriado**: a versão da skill apontava para
+  `projeto_amarelo\AMALDI~1`, pasta apagada no desastre — o script de QA nunca rodaria. Agora
+  deriva a raiz do próprio `$PSScriptRoot`.
+
+### Higiene de cópias
+`Desktop\A-Maldio-da-Cidade-Plida` (clone de recuperação, 0,21 GB) e a casca vazia
+`projeto_amarelo\A Maldição da Cidade Pálida` foram apagadas após verificação: 0 commits
+exclusivos, 0 alterações não commitadas, 0 stashes, 0 arquivos de valor fora do git. O clone
+ainda continha o token do Notion no histórico — varredura pós-remoção confirma zero
+ocorrências no disco. **Causa raiz segue aberta:** a Desktop continua sincronizada pelo
+Google Drive, e o projeto canônico está nela.
+
+### Design novo: Loot e Drop
+Decisão do Vini: as 3 armas **não** são exclusivas do baú — são as primeiras entradas de um
+catálogo, e **todo inimigo e baú deve ter RNG de arma/armadura**. Isso substitui o plano
+antigo de configurar drop chefe a chefe. Design completo em
+[systems/loot_e_drop.md](systems/loot_e_drop.md); **não implementado** e fora do VS por
+decisão explícita. A regra central é que o sorteio escolhe *qual* `ItemDef` cai mas nunca
+gera atributos — preserva a invariante determinística do `ItemDef` e impede build à la PoE.
+
+**Verificação: CONCLUÍDA (2026-08-11).** `mcp-unity` seguiu indisponível na sessão (o
+`.mcp.json` do repo não recarrega sem reiniciar o processo do Claude Code); verificação feita
+pelo caminho alternativo, `Tools/run_qa_tests.ps1` em batch mode com o Editor fechado. Achado:
+`MontarPrefabsDaLutaDoAbdul.cs` não compilava — a criação do `Necronomicon` usava
+`AtribuirCampo` (que só aceita `UnityEngine.Object`) para atribuir `chaveDeSave`, um campo
+`string` de `ColetavelDeItem`. Corrigido com um helper novo, `AtribuirCampoString`
+(`prop.stringValue`), espelhando o `AtribuirCampo` já existente. Após o fix: compilação
+limpa, **349/349 testes EditMode passando**.
+
 ## 2026-08-10 — Recuperação de desastre + reconexão do cofre Obsidian + auditoria GDD vs código
 
 A pasta de trabalho original (`projeto_amarelo/A Maldição da Cidade Pálida`) foi apagada por

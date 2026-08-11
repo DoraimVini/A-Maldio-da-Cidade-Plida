@@ -119,7 +119,7 @@ namespace FavelaAmarela.EditorTools
             sr.color = new Color(0.65f, 0.50f, 0.20f); // madeira, placeholder até a arte
             go.transform.localScale = new Vector3(0.9f, 0.7f, 1f);
 
-            // Trigger: o baú abre ao Damião entrar (mesmo padrão do PatuaPickup).
+            // Trigger: o baú abre ao Damião entrar (mesmo padrão do ColetavelDeItem).
             var col = go.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
             col.size = new Vector2(1.6f, 1.6f);
