@@ -1,6 +1,8 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.GameLoop;
@@ -59,8 +61,10 @@ namespace FavelaAmarela.EditorTools
             if (!string.IsNullOrEmpty(cenaOriginal))
                 EditorSceneManager.OpenScene(cenaOriginal, OpenSceneMode.Single);
 
-            Debug.Log($"[TelasDeFluxo] Pronto — {feitas} cena(s). Esc pausa; o Menu só aparece " +
-                      "se 'Iniciar No Menu' for ligado no GameManager.");
+            Debug.Log($"[TelasDeFluxo] Pronto — {feitas} cena(s). O jogo passa a abrir no Menu " +
+                      "('Iniciar No Menu' foi ligado no GameManager); Esc pausa; morrer leva ao " +
+                      "Colapso e volta ao Menu por qualquer tecla. Para playtest entrando direto " +
+                      "na cena, desligue 'Iniciar No Menu'.");
         }
 
         private static bool Montar()
@@ -78,6 +82,8 @@ namespace FavelaAmarela.EditorTools
                 Debug.LogWarning("[TelasDeFluxo] Sem Canvas nesta cena — pulada.");
                 return false;
             }
+
+            GarantirInfraDeClique(canvas);
 
             Destruir("Tela_Pause");
             Destruir("Tela_Colapso");
@@ -114,6 +120,32 @@ namespace FavelaAmarela.EditorTools
             if (go != null) Object.DestroyImmediate(go);
         }
 
+        /// <summary>
+        /// Garante <c>EventSystem</c> e <c>GraphicRaycaster</c> — sem os dois, <b>nenhum
+        /// botão responde a clique</b>, e sem erro nenhum no console.
+        ///
+        /// <para>O projeto nunca precisou disso: todo o HUD até aqui era só exibição, e o
+        /// input é lido por polling de teclado. O Menu é a primeira UI clicável do jogo.</para>
+        ///
+        /// <para>Usa o <c>InputSystemUIInputModule</c>, e não o <c>StandaloneInputModule</c>
+        /// antigo: o projeto está no Input System novo, e o módulo velho reclama em runtime.</para>
+        /// </summary>
+        private static void GarantirInfraDeClique(Canvas canvas)
+        {
+            if (canvas.GetComponent<GraphicRaycaster>() == null)
+            {
+                canvas.gameObject.AddComponent<GraphicRaycaster>();
+                EditorUtility.SetDirty(canvas);
+                Debug.Log("[TelasDeFluxo] GraphicRaycaster acrescentado ao Canvas.");
+            }
+
+            if (Object.FindAnyObjectByType<EventSystem>(FindObjectsInactive.Include) != null) return;
+
+            var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+            Undo.RegisterCreatedObjectUndo(go, "EventSystem");
+            Debug.Log("[TelasDeFluxo] EventSystem criado — sem ele nenhum botão responderia a clique.");
+        }
+
         // ── Pause ─────────────────────────────────────────────────────────────
 
         private static GameObject MontarPause(Transform pai)
@@ -134,23 +166,34 @@ namespace FavelaAmarela.EditorTools
 
         private static (GameObject, SequenciaDeColapso) MontarColapso(Transform pai)
         {
-            // Sem véu opaco: o Colapso escurece por fade do próprio CanvasGroup, e ver o
-            // mundo através dele é parte do horror — Damião se dissolve dentro da cena.
-            var tela = Overlay(pai, "Tela_Colapso", new Color(0.03f, 0.02f, 0.02f, 1f));
+            // A raiz NÃO leva Image nem CanvasGroup, e fica sempre ativa.
+            //
+            // `SequenciaDeColapso.Awake` faz `painelColapso.gameObject.SetActive(false)`. Se o
+            // CanvasGroup morasse na mesma raiz, ela desligaria o próprio objeto onde vive — e
+            // `Tocar()` não conseguiria iniciar coroutine nenhuma ("Coroutine couldn't be
+            // started because the game object is inactive"). O script sempre esperou que o
+            // painel fosse um FILHO: é ele que a sequência reativa ao tocar.
+            var tela = new GameObject("Tela_Colapso", typeof(RectTransform));
+            tela.transform.SetParent(pai, false);
+            Esticar(tela.GetComponent<RectTransform>());
 
-            var grupo = tela.AddComponent<CanvasGroup>();
+            var painel = Overlay(tela.transform, "Painel", new Color(0.03f, 0.02f, 0.02f, 1f));
+
+            var grupo = painel.AddComponent<CanvasGroup>();
             grupo.alpha = 0f;
             grupo.blocksRaycasts = false;
 
-            var texto = Texto(tela.transform, "Frase", "",
+            var texto = Texto(painel.transform, "Frase", "",
                 new Vector2(0.12f, 0.4f), new Vector2(0.88f, 0.6f), 22, TextAnchor.MiddleCenter, Amarelo);
 
             // Sem isto, morrer é beco sem saída: a máquina de estados permite Colapso → Menu,
             // mas ninguém no projeto fazia essa transição.
-            var avisoRetorno = Texto(tela.transform, "Aviso", "",
+            var avisoRetorno = Texto(painel.transform, "Aviso", "",
                 new Vector2(0.12f, 0.24f), new Vector2(0.88f, 0.32f), 14, TextAnchor.MiddleCenter, AmareloFraco);
             avisoRetorno.enabled = false;
 
+            // Os dois componentes ficam na RAIZ, que nunca é desligada — senão o Update do
+            // retorno pararia junto com o painel e o jogador ficaria preso na tela de morte.
             var retorno = tela.AddComponent<RetornoDoColapso>();
             var soRetorno = new SerializedObject(retorno);
             soRetorno.FindProperty("aviso").objectReferenceValue = avisoRetorno;
@@ -179,8 +222,11 @@ namespace FavelaAmarela.EditorTools
             // Opaco: o Menu cobre a cena mesmo sem gameplayRoot atribuído.
             var tela = Overlay(pai, "Tela_Menu", new Color(0.03f, 0.025f, 0.02f, 1f));
 
-            Texto(tela.transform, "Titulo", "A MALDIÇÃO DA CIDADE PÁLIDA",
-                new Vector2(0.1f, 0.72f), new Vector2(0.9f, 0.84f), 28, TextAnchor.MiddleCenter, Amarelo);
+            // Título oficial (decisão do Vini, 2026-08-11). O projeto tem outros nomes
+            // circulando — "A Maldição da Cidade Pálida" (repositório), "Peregrino Amarelo"
+            // (pasta), "Favela Amarela" (namespaces) —, mas o que o jogador vê é este.
+            Texto(tela.transform, "Titulo", "CAMINHO PARA CARCOSA",
+                new Vector2(0.1f, 0.72f), new Vector2(0.9f, 0.84f), 30, TextAnchor.MiddleCenter, Amarelo);
 
             var continuar = Botao(tela.transform, "Botao_Continuar", "Continuar", 0.52f);
             var nova = Botao(tela.transform, "Botao_NovaPartida", "Nova peregrinação", 0.42f);
@@ -218,16 +264,21 @@ namespace FavelaAmarela.EditorTools
 
         // ── Peças ─────────────────────────────────────────────────────────────
 
+        /// <summary>Ancora o retângulo à tela inteira.</summary>
+        private static void Esticar(RectTransform rt)
+        {
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
         private static GameObject Overlay(Transform pai, string nome, Color cor)
         {
             var go = new GameObject(nome, typeof(Image));
             go.transform.SetParent(pai, false);
 
-            var rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
+            Esticar(go.GetComponent<RectTransform>());
 
             var img = go.GetComponent<Image>();
             img.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");

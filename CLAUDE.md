@@ -1,4 +1,11 @@
-# A Maldição da Cidade Pálida (Favela Amarela)
+# Caminho para Carcosa
+
+> **Título oficial, visível ao jogador: "Caminho para Carcosa"** (decisão do Vini, 2026-08-11).
+> O projeto carrega outros nomes por razões históricas — **A Maldição da Cidade Pálida**
+> (repositório no GitHub), **Peregrino Amarelo** (pasta local), **Favela Amarela**
+> (namespaces `FavelaAmarela.*` e nome das skills). Esses ficam como estão: renomear
+> namespace e repositório é retrabalho sem ganho. **Mas todo texto novo mostrado ao jogador
+> usa "Caminho para Carcosa".**
 
 ## 1. Contexto Geral
 - Engine: Unity 6000.4.4f1, 2D isométrico.

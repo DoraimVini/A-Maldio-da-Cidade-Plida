@@ -6,6 +6,53 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (9ª rodada) — Três defeitos do primeiro playtest do menu
+
+O menu apareceu, e o playtest expôs três coisas — duas quebradas, uma indefinida.
+
+### 1. Nenhum botão respondia a clique
+**Não existia `EventSystem` em cena nenhuma**, e só o Deserto tinha `GraphicRaycaster`. Sem os
+dois, nenhum clique de UI é registrado — e **sem erro nenhum no console**, o que torna o
+sintoma mudo.
+
+O projeto nunca precisou disso: todo o HUD até aqui era **só exibição**, e o input é lido por
+polling de teclado. O Menu é a **primeira UI clicável do jogo**. A ferramenta passa a garantir
+os dois, com `InputSystemUIInputModule` (não o `StandaloneInputModule` antigo, que reclama em
+runtime num projeto no Input System novo).
+
+### 2. A tela de Colapso não conseguia tocar
+```
+Coroutine couldn't be started because the game object 'Tela_Colapso' is inactive!
+```
+`SequenciaDeColapso.Awake()` faz `painelColapso.gameObject.SetActive(false)` — e eu tinha
+posto o `CanvasGroup` **no mesmo GameObject** que o componente. Ele desligava o próprio objeto
+onde vivia, e depois não iniciava coroutine alguma.
+
+O script **sempre esperou que o painel fosse um filho**: a própria sequência faz
+`painelColapso.gameObject.SetActive(true)` ao tocar, o que só faz sentido em outro objeto. Eu
+li os campos que ele pedia, mas não a relação entre eles. Estrutura corrigida:
+
+```
+Tela_Colapso           ← raiz, sempre ativa, sem Image
+├─ SequenciaDeColapso
+├─ RetornoDoColapso    ← o Update tem de rodar mesmo com o painel desligado
+└─ Painel              ← CanvasGroup + Image (é o "painelColapso")
+```
+
+Os dois componentes ficam na raiz de propósito: dentro do painel, o `Update` do retorno pararia
+junto e o jogador voltaria a ficar preso na tela de morte, só que por outro motivo.
+
+> **Lição:** reusar um componente exige ler as **premissas de hierarquia** dele, não só a lista
+> de campos serializados. `painelColapso` não pedia "um CanvasGroup", pedia "um CanvasGroup que
+> eu possa ligar e desligar sem me matar junto".
+
+### 3. Título oficial definido
+O jogo tinha **quatro** nomes circulando. Decisão do Vini: o que o jogador vê é **"Caminho para
+Carcosa"**. Os outros ficam onde estão por serem retrabalho sem ganho — `A Maldição da Cidade
+Pálida` (repositório), `Peregrino_Amarelo` (pasta), `FavelaAmarela.*` (namespaces e skills).
+Registrado no topo do `CLAUDE.md`, senão os quatro continuariam se contradizendo e a próxima
+tela nasceria com o nome errado.
+
 ## 2026-08-11 (8ª rodada) — Telas de fluxo, dois becos sem saída e uma armadilha da Unity
 
 ### O fluxo tinha a lógica inteira e nenhuma tela
