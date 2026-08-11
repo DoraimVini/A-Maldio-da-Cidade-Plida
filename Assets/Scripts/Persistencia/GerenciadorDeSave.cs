@@ -29,6 +29,10 @@ namespace FavelaAmarela.Runtime.Persistencia
                  "em pontos definidos (Refúgios de Luz).")]
         [SerializeField] private bool gravarEmDiscoAoCapturar = false;
 
+        [Tooltip("Lê o save do disco ao iniciar. Desligue só para depurar uma partida limpa " +
+                 "sem apagar o arquivo.")]
+        [SerializeField] private bool carregarDoDiscoAoIniciar = true;
+
         private static GerenciadorDeSave _instancia;
 
         private readonly List<IPersistente> _registrados = new List<IPersistente>();
@@ -75,6 +79,18 @@ namespace FavelaAmarela.Runtime.Persistencia
 
             _instancia = this;
             DontDestroyOnLoad(gameObject);
+
+            // Lê o save do disco AQUI, no Awake, e não sob demanda.
+            //
+            // Bug que motivou (auditoria 2026-08-11): CarregarDoDisco() existia desde o
+            // início e NUNCA era chamado por ninguém. O jogo gravava o arquivo (Refúgio de
+            // Luz, troca de cena) e nunca o lia de volta — trocar de cena funcionava só
+            // porque o registro vive em memória neste objeto DontDestroyOnLoad, mas fechar
+            // e reabrir o jogo perdia tudo, sem um aviso sequer.
+            //
+            // O Awake é o momento certo: roda antes do Start dos objetos de cena, que é
+            // onde cada IPersistente se registra e consulta o registro.
+            if (carregarDoDiscoAoIniciar) CarregarDoDisco();
         }
 
         private void OnDestroy()

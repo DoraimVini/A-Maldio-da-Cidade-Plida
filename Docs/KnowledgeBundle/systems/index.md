@@ -20,6 +20,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Loot e Drop](loot_e_drop.md) — **[MOTOR IMPLEMENTADO]** Sorteio testável, tabelas de drop por arquétipo, tiers liberados por nível de Exposição e a regra que impede explosão de build
 - [Artefatos](artefatos.md) — **[IMPLEMENTADO]** Os 4 slots, passiva + habilidade por Artefato, a barra F1–F4 e a regra de que só vale o que está equipado
 - [Áudio](audio.md) — **[IMPLEMENTADO, sem clipes]** Mixer com pool, banco autorável e síntese de andaime. Torna audível o ruído que Damião emite — o pilar que era invisível
+- [Persistência](persistencia.md) — O ciclo do save, o padrão Observer do `IPersistente`, e o bug em que o jogo gravava mas nunca lia de volta
 - [Luta contra Abdul Alhazred](boss_abdul.md) — Boss em fases: Escudo Mágico, Pedras de Poder, Cones de Gelo e a janela de exaustão
 - [IA do Cultista](cultista_ai.md) — FSM de comportamento dos inimigos
 - [Espectro](espectro.md) — Manifestação espectral roteirizada (cutscenes)

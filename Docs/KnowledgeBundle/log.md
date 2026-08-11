@@ -6,6 +6,42 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (6ª rodada) — O save nunca era lido, e o inventário não tinha tela
+
+Duas perguntas do Vini ("o inventário tem botão para abrir?" e "o que é preciso para o jogo
+salvar?") destaparam um bug sério e uma lacuna de interface.
+
+### Bug: o jogo gravava o save e nunca o lia
+`CarregarDoDisco()` existia desde o começo e **nunca era chamado por ninguém** em todo o
+projeto. O efeito era traiçoeiro porque *parecia* funcionar:
+
+- **Trocar de cena funcionava** — o registro vive em memória num objeto `DontDestroyOnLoad`.
+- **Fechar e reabrir o jogo perdia tudo** — o arquivo estava lá, escrito, e ninguém o lia.
+
+Sem erro, sem aviso. Corrigido chamando `CarregarDoDisco()` no `Awake` do `GerenciadorDeSave`,
+que roda antes do `Start` dos objetos de cena — exatamente quando cada `IPersistente` se
+registra e consulta o registro. Campo novo `carregarDoDiscoAoIniciar` (ligado por padrão)
+permite depurar partida limpa **sem apagar o arquivo**. Doc novo:
+[systems/persistencia.md](systems/persistencia.md), com o ciclo completo do save.
+
+### Lacuna: não existia tela de inventário
+O jogo só tinha a `BarraDeItens` — 8 posições sempre visíveis, teclas 1–8. Os **6 slots de
+equipamento não tinham interface nenhuma**: dava para equipar pela barra, mas não para ver o
+que estava no corpo.
+
+- `PainelDeInventario` — mochila em grade (12) + slots do corpo em coluna (6), com os rótulos
+  das partes visíveis **mesmo com o slot vazio**, senão o jogador não descobre que existe um
+  lugar para elmo até achar um.
+- Abre com **Tab** ou **I** (e `select` no gamepad). **Pausa o mundo** (`timeScale = 0`): num
+  jogo de sobrevivência, mexer na mochila com um Cultista se aproximando seria pedir para o
+  jogador morrer olhando menu. Ao fechar, restaura o valor **anterior** e não `1` — para não
+  acelerar uma cutscene em câmera lenta.
+- `MontarPainelDeInventario` (Editor) monta a tela nas 3 cenas e liga os campos, seguindo o
+  padrão do `MontarBarraDeItens` — sem isso o script seria inútil, já que UI não se monta
+  headless.
+
+**QA:** suíte verde. **Wiring:** rodar `Tools/FavelaAmarela/Montar painel de inventário (Tab)`.
+
 ## 2026-08-11 (5ª rodada) — Auditoria do VS: áudio, persistência e consumíveis
 
 Auditoria dos sistemas faltando para o Vertical Slice, feita **verificando código e cenas**

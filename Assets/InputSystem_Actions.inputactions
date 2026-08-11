@@ -78,6 +78,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Inventario",
+                    "type": "Button",
+                    "id": "e5a1c7d2-9b0f-4e13-a7c6-5d2f8b1e4a90",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "HabilidadeArtefato1",
                     "type": "Button",
                     "id": "d1f0a2b3-1111-4c4d-8e5f-a1b2c3d4e5f1",
@@ -557,6 +566,39 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "HabilidadeArma",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a9f3e1b7-2c48-4d06-9e5a-3b7c1d8f0e22",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Inventario",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c4d8b2a6-7e19-4f53-8a0c-6d9e2b5f1a37",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Inventario",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f2b6c9d1-4a37-4e80-b5c2-9d1e7a3f4b68",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Inventario",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
