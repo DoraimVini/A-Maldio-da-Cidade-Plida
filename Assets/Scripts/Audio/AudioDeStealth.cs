@@ -13,6 +13,16 @@ namespace FavelaAmarela.Runtime.Audio
     /// passo é proporcional ao raio do som emitido</b>, então andar agachado quase não soa e
     /// correr na tempestade soa alto.</para>
     ///
+    /// <para>Vai <b>no Damião</b>. Funcionalmente rodaria em qualquer objeto — a posição do
+    /// som vem da <c>Origem</c> do próprio evento, não do <c>transform</c> daqui —, mas é
+    /// sobre ele, e ficar solto na hierarquia só esconderia essa relação de quem abrisse a
+    /// cena depois.</para>
+    ///
+    /// <para><b>Premissa:</b> todo <c>SomEmitido</c> é ruído de Damião. Isso vale hoje porque
+    /// só o <c>PlayerMovement</c> chama <c>Emitir</c> — os inimigos apenas escutam. Se algum
+    /// dia um inimigo emitir pelo mesmo serviço, este componente tocaria "passo de Damião"
+    /// para o passo dele; nesse dia, o <c>SomEmitido</c> precisa dizer <b>quem</b> emitiu.</para>
+    ///
     /// Observa <c>SoundBroadcastService.OnSomEmitido</c>; nenhum polling.
     /// </summary>
     [AddComponentMenu("Favela Amarela/Audio/Áudio de Stealth")]

@@ -58,7 +58,12 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Header("Referências Opcionais")]
         [SerializeField] private GameObject telaTransicaoDeFase;
         [SerializeField] private GameObject telaPause;
+        [SerializeField] private GameObject telaMenu;
         [SerializeField] private GameObject gameplayRoot;
+
+        [Tooltip("Começa no Menu em vez de cair direto no gameplay. Desligue para playtest " +
+                 "rápido, entrando direto na cena.")]
+        [SerializeField] private bool iniciarNoMenu = true;
         [Tooltip("Sequência de morte (dissolução + frase) tocada ao entrar em Colapso.")]
         [SerializeField] private SequenciaDeColapso sequenciaColapso;
 
@@ -83,7 +88,7 @@ namespace FavelaAmarela.Runtime.GameLoop
             Instance = this;
 
             // 1. Cria a Lógica Pura (Core)
-            StateMachine = new GameLoopStateMachine(GameState.Gameplay);
+            StateMachine = new GameLoopStateMachine(iniciarNoMenu ? GameState.Menu : GameState.Gameplay);
             Resiliencia = ResilienciaMental.ComThresholdFracional(maxResiliencia, fracaoPanico);
             SoundBroadcaster = new SoundBroadcastService();
             Environment = new EnvironmentState();
@@ -94,6 +99,14 @@ namespace FavelaAmarela.Runtime.GameLoop
 
             // 3. Injeta a POCO nos sistemas de Runtime
             InjetarDependencias();
+
+            // 4. Aplica a apresentação do estado INICIAL.
+            //
+            // `OnStateChanged` só dispara em transições, e no arranque não há transição —
+            // então começar no Menu deixava o jogo num limbo: o estado era Menu, mas nenhuma
+            // tela aparecia e o mundo rodava solto por trás, porque o timeScale nunca era
+            // tocado. Aplicar aqui alinha o que a máquina de estados diz com o que se vê.
+            HandleStateChanged(StateMachine.CurrentState, StateMachine.CurrentState);
         }
 
         /// <summary>
@@ -244,11 +257,17 @@ namespace FavelaAmarela.Runtime.GameLoop
 
         private void HandleStateChanged(GameState anterior, GameState atual)
         {
-            // Lida com o timescale
-            Time.timeScale = (atual == GameState.Pausado || atual == GameState.TransicaoDeFase) ? 0f : 1f;
+            // Lida com o timescale. O Menu congela junto com Pausado: sem isso o mundo
+            // continuaria rodando atrás da tela inicial — inimigos andando e a tempestade
+            // drenando Resiliência —, e dava para morrer olhando o menu.
+            bool mundoCongelado = atual == GameState.Pausado
+                                  || atual == GameState.TransicaoDeFase
+                                  || atual == GameState.Menu;
+            Time.timeScale = mundoCongelado ? 0f : 1f;
 
             // Ativa/Desativa GameObjects baseado no estado
             if (telaPause != null) telaPause.SetActive(atual == GameState.Pausado);
+            if (telaMenu != null) telaMenu.SetActive(atual == GameState.Menu);
             if (telaTransicaoDeFase != null) telaTransicaoDeFase.SetActive(atual == GameState.TransicaoDeFase);
             if (gameplayRoot != null) gameplayRoot.SetActive(atual == GameState.Gameplay || atual == GameState.Colapso);
 

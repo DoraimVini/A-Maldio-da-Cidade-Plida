@@ -199,6 +199,35 @@ namespace FavelaAmarela.Runtime.Persistencia
         /// <summary>Esvazia o registro em memória (partida nova). Não apaga o arquivo.</summary>
         public void LimparRegistro() => _registro.Limpar();
 
+        /// <summary>
+        /// Se existe um arquivo de save em disco. O menu usa isto para decidir se mostra
+        /// "Continuar" — botão morto ensina o jogador a desconfiar da interface.
+        /// </summary>
+        public bool ExisteSaveEmDisco => File.Exists(CaminhoDoArquivo);
+
+        /// <summary>
+        /// Apaga o save do disco <b>e</b> o registro em memória — "Nova peregrinação".
+        ///
+        /// <para>Os dois juntos de propósito: limpar só o arquivo deixaria o registro em
+        /// memória vivo (o gerenciador é <c>DontDestroyOnLoad</c>), e a partida "nova"
+        /// nasceria com o progresso da anterior.</para>
+        /// </summary>
+        public void ApagarSave()
+        {
+            LimparRegistro();
+
+            try
+            {
+                if (File.Exists(CaminhoDoArquivo)) File.Delete(CaminhoDoArquivo);
+            }
+            catch (IOException e)
+            {
+                // Arquivo travado não pode impedir o jogador de começar de novo: o registro
+                // em memória já foi limpo, então a partida nova é válida de qualquer forma.
+                Debug.LogError($"[GerenciadorDeSave] Falha ao apagar o save: {e.Message}", this);
+            }
+        }
+
         // ── Flags de acontecimento (write-through) ───────────────────────────────
         //
         // Para estado que muda UMA vez e não volta atrás — baú aberto, boss resolvido,

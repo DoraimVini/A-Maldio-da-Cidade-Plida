@@ -59,6 +59,19 @@ deixaria o pilar invisível por mais tempo indeterminado. A `SinteseDeSom` gera 
 **Não é substituto de som autorado — é andaime.** Assim que um clipe real entrar no
 `BancoDeSons`, ele ganha a preferência automaticamente, sem tocar em código.
 
+### Onde cada peça mora, e por quê
+`AudioDeStealth` e `AudioDeResiliencia` vão **no Damião**: são sobre ele — o ruído que ele faz
+e o estado da mente dele. O `AudioDeStealth` rodaria em qualquer objeto (a posição do som vem
+da `Origem` do evento, não do `transform` do componente), mas deixá-lo solto na hierarquia
+esconderia essa relação de quem abrisse a cena depois. O `MixerDeAudio` fica num objeto
+próprio, porque é serviço, não característica de ninguém.
+
+> **Premissa do `AudioDeStealth`:** todo `SomEmitido` é ruído de Damião. Vale hoje porque **só
+> o `PlayerMovement` chama `Emitir`** — os inimigos apenas escutam (`EnemyPerception`,
+> `CoisaDoCemiterioAI`). Se um inimigo passar a emitir pelo mesmo serviço, este componente
+> tocaria "passo de Damião" para o passo dele; nesse dia, o `SomEmitido` precisa passar a
+> dizer **quem** emitiu.
+
 ### Por que `AudioDeCombate` é por entidade
 O som precisa sair **do lugar onde o golpe aconteceu**. Num jogo em que se caça por som,
 áudio sem posição mente para o jogador. Por isso o `MixerDeAudio` usa `spatialBlend = 1`

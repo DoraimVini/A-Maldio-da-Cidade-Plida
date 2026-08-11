@@ -95,6 +95,11 @@ namespace FavelaAmarela.Runtime.Itens
 
             var sr = coletavel.GetComponent<SpriteRenderer>();
             if (sr != null) sr.sortingOrder = Mathf.RoundToInt(-posicao.y * 10f);
+
+            // Só agora o objeto entra em cena. O Awake do ColetavelDeItem exige um ItemDef, e
+            // AddComponent o dispararia ANTES do Configurar acima — o item era entregue certo,
+            // mas cada drop cuspia um LogError de "está sem ItemDef".
+            if (!coletavel.gameObject.activeSelf) coletavel.gameObject.SetActive(true);
         }
 
         private Vector3 Deslocamento()
@@ -110,6 +115,10 @@ namespace FavelaAmarela.Runtime.Itens
         {
             var go = new GameObject($"Drop_{def.Nome}", typeof(SpriteRenderer), typeof(BoxCollider2D));
             go.transform.position = posicao;
+
+            // Nasce inativo: assim o Awake do ColetavelDeItem só roda depois do Configurar,
+            // que é quem entrega o ItemDef. Quem reativa é o Materializar.
+            go.SetActive(false);
 
             var col = go.GetComponent<BoxCollider2D>();
             col.isTrigger = true;

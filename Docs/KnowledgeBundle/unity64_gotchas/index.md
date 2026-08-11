@@ -11,6 +11,7 @@ Conhecimento técnico que um dev sênior de Unity 6.4 (6000.4) carrega na cabeç
 ## Conteúdo
 
 - [APIs Renomeadas](renamed_apis.md) — Coisas que mudaram de nome na Unity 6
+- [Domain Reload em Play Mode](domain_reload_em_play_mode.md) — Editar script com o Play rodando zera todo POCO criado em `Awake`; a cascata de NREs parece bug de código e não é
 - [Física 2D — Best Practices](physics2d_best_practices.md) — FixedUpdate, linearVelocity, gravityScale
 - [Padrões de Performance](performance_patterns.md) — Alocação zero em Update, cache, struct events
 - [Isométrico 2D](isometric2d_patterns.md) — Y-sorting, câmera identity, PPU 16

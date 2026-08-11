@@ -165,8 +165,10 @@ namespace FavelaAmarela.EditorTools
             mudou |= Garantir<EstadoPersistenteDoInventario>(go);
             mudou |= Garantir<EstadoPersistenteDaProgressao>(go);
 
-            // A Resiliência é injetada pelo GameManager; o componente precisa existir na cena.
+            // Os dois de áudio ficam no Damião: são sobre ele (o ruído que ele faz e o estado
+            // da mente dele). O GameManager os encontra por tipo e injeta a fonte.
             mudou |= Garantir<AudioDeResiliencia>(go);
+            mudou |= Garantir<AudioDeStealth>(go);
 
             if (mudou) EditorUtility.SetDirty(go);
             return mudou;
@@ -174,7 +176,7 @@ namespace FavelaAmarela.EditorTools
 
         private static bool LigarAudioDaCena()
         {
-            bool mudou = false;
+            bool mudou = LimparAudioDeStealthAvulso();
 
             if (Object.FindAnyObjectByType<MixerDeAudio>(FindObjectsInactive.Include) == null)
             {
@@ -184,14 +186,36 @@ namespace FavelaAmarela.EditorTools
                 Debug.Log("[LigarSistemas] MixerDeAudio criado.");
             }
 
-            // O AudioDeStealth é o que torna audível o ruído de Damião — o pilar do jogo.
-            // Fica num objeto próprio porque o GameManager o encontra por tipo, não por filho.
-            if (Object.FindAnyObjectByType<AudioDeStealth>(FindObjectsInactive.Include) == null)
+            return mudou;
+        }
+
+        /// <summary>
+        /// Remove o <c>AudioDeStealth</c> que versões anteriores desta ferramenta criavam
+        /// solto na cena. Ele agora mora no Damião; deixar os dois faria **dois** ouvintes do
+        /// mesmo evento, e cada passo tocaria em dobro.
+        /// </summary>
+        private static bool LimparAudioDeStealthAvulso()
+        {
+            bool mudou = false;
+
+            var todos = Object.FindObjectsByType<AudioDeStealth>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var comp in todos)
             {
-                var go = new GameObject("AudioDeStealth", typeof(AudioDeStealth));
-                Undo.RegisterCreatedObjectUndo(go, "Áudio de Stealth");
+                // Só o que está fora do jogador. O do Damião é o que fica.
+                if (comp.GetComponent<PlayerMovement>() != null) continue;
+
+                Debug.Log($"[LigarSistemas] Removendo AudioDeStealth avulso de '{comp.name}' " +
+                          "(mudou de casa: agora fica no Damião).");
+
+                // O objeto avulso existia só para hospedar este componente.
+                if (comp.gameObject.GetComponents<Component>().Length <= 2)
+                    Object.DestroyImmediate(comp.gameObject);
+                else
+                    Object.DestroyImmediate(comp);
+
                 mudou = true;
-                Debug.Log("[LigarSistemas] AudioDeStealth criado.");
             }
 
             return mudou;

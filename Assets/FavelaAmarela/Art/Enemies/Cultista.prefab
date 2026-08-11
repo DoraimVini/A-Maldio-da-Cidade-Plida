@@ -20,6 +20,8 @@ GameObject:
   - component: {fileID: 1318061846628413486}
   - component: {fileID: 9220689360430143524}
   - component: {fileID: 6360046265921058457}
+  - component: {fileID: 4695545914089126774}
+  - component: {fileID: 4727924443773620933}
   m_Layer: 6
   m_Name: Cultista
   m_TagString: Untagged
@@ -287,6 +289,7 @@ MonoBehaviour:
   alertDuration: 2
   maxChaseDistance: 20
   defaultHurtDuration: 0.3
+  logarTransicoes: 0
 --- !u!114 &6360046265921058457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,3 +304,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyStatusEffects
   mostrarNumerosDeSangramento: 1
   corDoSangramento: {r: 0.85, g: 0.15, b: 0.2, a: 1}
+--- !u!114 &4695545914089126774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03db3837762a1e440b4c8896e33f276e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Audio.AudioDeCombate
+--- !u!114 &4727924443773620933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ba4fe4047e0f3468dffc05509a987b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.DropAoAbater
+  tabela: {fileID: 11400000, guid: 6a8d57e5f1c34daeb81a8e0062bef7a1, type: 2}
+  prefabColetavel: {fileID: 0}
+  raioDeEspalhamento: 0.4

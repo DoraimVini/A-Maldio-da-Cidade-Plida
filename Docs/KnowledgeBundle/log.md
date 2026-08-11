@@ -6,6 +6,56 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (8ª rodada) — Telas de fluxo, dois becos sem saída e uma armadilha da Unity
+
+### O fluxo tinha a lógica inteira e nenhuma tela
+`GameState`, a máquina de estados, Esc alternando pause e a `SequenciaDeColapso` já existiam.
+Mas `telaPause`, `gameplayRoot` e `sequenciaColapso` estavam **nulos nas três cenas**: apertar
+Esc congelava sem nada aparecer, e morrer não mostrava tela nenhuma.
+
+`MontarTelasDeFluxo` constrói e liga as três telas — Pause, Colapso e Menu.
+
+### Dois becos sem saída, achados ao verificar as transições
+1. **Ninguém saía do Colapso.** A máquina permitia `Colapso → Menu`, mas **nenhum código no
+   projeto fazia essa transição**: morrer era definitivo, o jogo ficava parado na tela de morte
+   para sempre. Criado o `RetornoDoColapso`, que espera a sequência terminar (3 s) antes de
+   aceitar tecla — deixar pular a própria morte no primeiro frame apagaria a única punição
+   diegética do jogo.
+2. **Começar no Menu não aplicava o Menu.** `OnStateChanged` só dispara em *transições*, e no
+   arranque não há transição — então o estado era `Menu`, mas nenhuma tela aparecia e o mundo
+   rodava solto por trás, com o `timeScale` nunca tocado. O `Awake` passa a aplicar a
+   apresentação do estado inicial.
+
+Junto: o **Menu agora congela o mundo** (entrou no mesmo grupo de `Pausado`). Sem isso, com
+`gameplayRoot` sem referência, dava para morrer olhando a tela inicial.
+
+### `iniciarNoMenu` ligado
+Escrito **explicitamente** pela ferramenta, sem depender do valor padrão do C#: as cenas foram
+salvas antes do campo existir, e confiar na serialização preencher o que falta é sutil demais.
+
+### Falso alarme no drop, que era bug de verdade
+`AddComponent<ColetavelDeItem>()` dispara o `Awake` **na hora**, e ali o `item` ainda é nulo —
+o `Configurar()` só roda na linha seguinte. O item era entregue certo, mas cada morte cuspia
+`'Drop_X' está sem ItemDef` no console. Corrigido montando o objeto **inativo** e ativando só
+depois de configurado.
+
+### `AudioDeStealth` mudou de casa
+Ficava num objeto avulso; passou para o Damião. Funcionalmente dava no mesmo (a posição do som
+vem da `Origem` do evento, não do `transform`), mas era inconsistente com o `AudioDeResiliencia`
+— componentes irmãos em casas diferentes. Documentada a premissa escondida: **todo `SomEmitido`
+é ruído de Damião**, verdade hoje porque só o `PlayerMovement` chama `Emitir`.
+
+### Gotcha novo: domain reload em Play mode
+Uma cascata de ~6 `NullReferenceException` em scripts sem relação (`_fsm`, `_acumulo`,
+`_seguidor`, buffers) **não era bug de código**: era script editado com o Play rodando. A Unity
+recompila, faz domain reload, os `MonoBehaviour` sobrevivem mas **todo POCO criado em `Awake`
+vira nulo** e o `Awake` não roda de novo. Este projeto é especialmente vulnerável porque a
+arquitetura POCO+adaptador coloca um POCO em `Awake` de quase todo componente. Documentado em
+[unity64_gotchas/domain_reload_em_play_mode.md](unity64_gotchas/domain_reload_em_play_mode.md),
+com as três marcas para reconhecer o caso sem perder tempo lendo código.
+
+**QA:** 413/413. **Wiring:** rodar `Tools → FavelaAmarela → Montar telas de fluxo`.
+
 ## 2026-08-11 (7ª rodada) — Deserto povoado e a Coisa do Cemitério em cena
 
 Itens **6 e 7** da lista do edital. Ambos tinham código pronto e testado desde sempre e
