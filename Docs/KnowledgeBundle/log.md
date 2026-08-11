@@ -6,6 +6,45 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (4ª rodada) — Set Lendário de Set: Elmo, Peitoral e Grevas
+
+Consequência direta da rodada anterior. Com a **Coroa de Ossos confirmada como Artefato**, a
+nota de lore de 2026-07-28 que dizia *"o Elmo de Set é o item que antes se chamava Coroa de
+Ossos"* deixou de fazer sentido — o Elmo precisava existir por conta própria. Nenhuma peça do
+Set existia como asset até aqui, apesar de o GDD citá-las desde a v1.1.
+
+### Três peças criadas (`Config/Resources/Itens/`)
+| Peça | Id | Slot | Modificadores |
+|---|---|---|---|
+| Elmo de Set | `set_elmo` | Elmo | `DefesaFisica +5`, `VitMaxima +15` |
+| Peitoral de Set | `set_peitoral` | Peitoral | `DefesaFisica +8`, `VitMaxima +25` |
+| Grevas de Set | `set_grevas` | Grevas | `DefesaFisica +4`, `VitMaxima +10` |
+
+A escala do Elmo veio da spec que **já existia** em `reliquias_de_hali.md`; Peitoral e Grevas
+foram escalonados no mesmo idioma (só `DefesaFisica` + `VitMaxima`, sem inventar eixo novo).
+Para comparação, as armaduras **Inerte** do catálogo comum dão `DefesaFisica +1` — o Set é
+deliberadamente outra ordem de grandeza.
+
+**A Arma de Set não foi criada** — forma ainda não decidida pelo Vini.
+
+### O que deliberadamente NÃO foi feito
+- **Sem bônus de conjunto.** O "set completo" segue sendo só um **gate de quest** (acesso ao
+  Avatar de Nyarlathotep), não um bônus 2/4 peças à la ARPG — `CLAUDE.md` §1 proíbe inventar
+  mecânica de ARPG sem confirmação. O gate também **não é verificável ainda**, porque depende
+  da Arma de Set.
+- **Sem tabela de drop.** O Templo da Serpente não tem cena jogável neste checkout, então uma
+  `Drop_AvatarDeSet` não teria onde ser testada.
+
+### Correção de lore (OKF regra 4)
+A nota de 2026-07-28 em `reliquias_cosmicas.md` foi **removida**, não só anotada por cima: ela
+afirmava um fato errado (Elmo = Coroa renomeada). Ficou registrado no lugar que são **dois itens
+distintos, de naturezas distintas** — Coroa é Artefato sem slot, Elmo é armadura de cabeça.
+`reliquias_de_hali.md` também foi atualizado: o Necronomicon lá ainda constava como `Chave` e o
+Patuá com slot `Amuleto`, ambos já migrados para Artefato na rodada anterior.
+
+**QA:** 406/406 testes EditMode passando (eram 399). Os 7 novos incluem um que trava
+explicitamente `Elmo != Coroa` — se alguém tentar fundir os dois de novo, o teste cai.
+
 ## 2026-08-11 (3ª rodada) — Artefatos: 4 slots, passivas, barra F1–F4 e o Necronomicon
 
 Implementa o sistema de Artefatos desenhado em `loot_e_drop.md`. Doc completo novo:

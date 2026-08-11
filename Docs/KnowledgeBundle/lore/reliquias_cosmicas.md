@@ -27,9 +27,35 @@ O **Set Lendário de Set** é o conjunto de equipamento obtido no Templo da Serp
 | **Grevas de Set** | Pernas | Drop RNG do Avatar de Set, Naga (Templo), ou Castelo de Carcosa | ❌ RNG |
 | **Arma de Set** | Arma | Drop RNG do Avatar de Set, Naga (Templo), ou Castelo de Carcosa | ❌ RNG |
 
-> *Nota: a entrada antiga "Coroa de Ossos do Rei em Amarelo" foi substituída pelo Set Lendário de Set (decisão 2026-07-28). O Elmo de Set é o item que antes se chamava "Coroa de Ossos" — renomeado para coerência com a identidade do boss Avatar de Set.*
->
-> **Atualização 2026-08-11 — a Coroa de Ossos voltou, como outra coisa.** O Vini confirmou (em 2026-08-10 e de novo em 2026-08-11) que a **Coroa de Ossos é drop do Nagaraja**, no Templo da Serpente. Ela **não** é o Elmo de Set nem o substitui: os dois coexistem e não competem por espaço, porque são de naturezas diferentes — o **Elmo de Set** é armadura (`ItemType.Armadura`, slot Elmo, peça do Set Lendário), e a **Coroa de Ossos** é **Artefato** (`ItemType.Artefato`, sem slot de corpo, com passiva + habilidade "Sibilo de Yig"). A nota de 2026-07-28 acima vale só para a *entrada antiga* do Rei em Amarelo, que segue morta. Ver [systems/artefatos.md](../systems/artefatos.md).
+### Estado de implementação (2026-08-11)
+
+Três das quatro peças existem como `ItemDef` em `Config/Resources/Itens/`:
+
+| Peça | Id | Slot | Modificadores |
+|---|---|---|---|
+| **Elmo de Set** | `set_elmo` | Elmo | `DefesaFisica +5`, `VitMaxima +15` |
+| **Peitoral de Set** | `set_peitoral` | Peitoral | `DefesaFisica +8`, `VitMaxima +25` |
+| **Grevas de Set** | `set_grevas` | Grevas | `DefesaFisica +4`, `VitMaxima +10` |
+| **Arma de Set** | — | Arma | **não criada** — forma pendente de decisão do Vini |
+
+A escala segue a spec que já existia para o Elmo em [reliquias_de_hali.md](../systems/reliquias_de_hali.md),
+com o Peitoral acima e as Grevas abaixo dele. Para comparação, as armaduras **Inerte** do
+catálogo comum dão `DefesaFisica +1` — o Set é deliberadamente outra ordem de grandeza,
+porque é armadura de um deus primordial e é o que destranca a sidequest.
+
+**Sem bônus de conjunto por enquanto.** O "set completo" hoje é só um **gate de quest** (acesso
+ao Avatar de Nyarlathotep), não um bônus mecânico de 2/4 peças à la ARPG — e não vai virar um
+sem decisão explícita do Vini (`CLAUDE.md` §1). O gate também **não é verificável ainda**,
+porque depende da Arma de Set, que não existe.
+
+> **Correção de 2026-08-11 — a nota de 2026-07-28 estava errada e foi removida.** Ela dizia que
+> *"o Elmo de Set é o item que antes se chamava Coroa de Ossos"*. **Não é.** O Vini confirmou em
+> 2026-08-10 e 2026-08-11 que a **Coroa de Ossos é drop do Nagaraja** e é um **Artefato**
+> (`ItemType.Artefato`, sem slot de corpo, com a habilidade "Sibilo de Yig" — ver
+> [systems/artefatos.md](../systems/artefatos.md)). O **Elmo de Set** é peça de armadura do
+> conjunto, drop garantido do Avatar de Set. São **dois itens distintos**, de naturezas
+> distintas, que não competem por espaço no corpo. O que segue morto é só a entrada original
+> "Coroa de Ossos do Rei em Amarelo", que era outra coisa ainda.
 
 ## 4. O Patuá (Patuá das Luas Gêmeas)
 * **Obtenção:** Recompensa da conclusão da quest narrativa da **Rainha Cassilda** no Santuário de Yhtill. Não é um drop de combate — é a conclusão de um puzzle/diálogo com a Cassilda (decisão 2026-07-28).
