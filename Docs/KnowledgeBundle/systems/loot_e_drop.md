@@ -7,9 +7,36 @@ tags: [loot, drop, itens, raridade, rng, inventario]
 
 # Loot e Drop
 
-> **Status:** Design escrito em 2026-08-10. **Não implementado** — nenhuma linha de código
-> existe ainda. Decisão do Vini na mesma data: documentar agora, implementar **depois** do
-> Vertical Slice (ver [roadmap_vertical_slice.md](../roadmap_vertical_slice.md)).
+> **Status:** Design escrito em 2026-08-10. **Motor implementado em 2026-08-11** (fatia
+> básica): o sorteio, a tabela e o espólio ao abater existem e estão testados; o `BauDaTumba`
+> já consome tabela. Continuam **fora** desta fatia: graus Marcado/Impregnado autorados,
+> curva de chance balanceada por arquétipo, e as demais tabelas por arquétipo — ver
+> [Pendente de decisão do Vini](#pendente-de-decisão-do-vini). Escopo maior segue **depois**
+> do Vertical Slice (ver [roadmap_vertical_slice.md](../roadmap_vertical_slice.md)).
+
+## O que existe hoje (2026-08-11)
+
+| Peça | Arquivo | Camada |
+|---|---|---|
+| `GrauDeImpregnacao` | `Assets/Scripts/Core/Loot/GrauDeImpregnacao.cs` | Core |
+| `IFonteDeAleatoriedade` | `Assets/Scripts/Core/Loot/IFonteDeAleatoriedade.cs` | Core |
+| `CandidatoDeDrop` / `ItemSorteado` | `Assets/Scripts/Core/Loot/` | Core (`readonly struct`) |
+| `SorteioDeDrop` | `Assets/Scripts/Core/Loot/SorteioDeDrop.cs` | Core — a regra |
+| `EntradaDeDrop` / `TabelaDeDrop` | `Assets/Scripts/Inventario/` | Data (SO) |
+| `FonteDeAleatoriedadeUnity` | `Assets/Scripts/Itens/FonteDeAleatoriedadeUnity.cs` | Runtime |
+| `DropAoAbater` | `Assets/Scripts/Itens/DropAoAbater.cs` | Runtime |
+| `ColetavelDeItem.Configurar(...)` | `Assets/Scripts/Itens/ColetavelDeItem.cs` | Runtime |
+| `Drop_Cultista` / `Drop_BauDaTumba` | `Assets/FavelaAmarela/Config/Drops/` | Assets |
+| `SorteioDeDropTests` (16 casos) | `Assets/Tests/EditMode/SorteioDeDropTests.cs` | Testes |
+
+**Dois modos de sorteio**, porque baú e inimigo têm semânticas diferentes:
+`Sortear(...)` roda cada entrada por chance independente (inimigo pode largar nada, um ou
+vários, até o teto); `SortearUm(...)` escolhe **exatamente uma** entrada ponderada pela chance
+— é o baú, que sempre entrega uma peça.
+
+> **Falta wiring de cena/prefab:** o `DropAoAbater` ainda não está anexado a nenhum prefab de
+> inimigo, e o campo `tabela` do `BauDaTumba` na cena precisa apontar para `Drop_BauDaTumba`
+> (o array `armasPossiveis` antigo foi removido). Passo manual no Editor.
 
 ## O que muda em relação à decisão anterior
 
@@ -189,12 +216,22 @@ também carrega **de qual tier em diante** aparece. Um Cultista comum no Deserto
 rolar Impregnado no primeiro minuto de jogo; a árvore é o que impede isso, gateando por
 progresso do jogador em vez de só por peso de sorteio.
 
-**Pendente de decisão do Vini, e bloqueia implementação da árvore (não do resto do
-documento):** qual é o pré-requisito real? Candidatos, sem decisão tomada:
-- Contagem: precisa ter N itens Marcados coletados antes de Impregnados começarem a dropar.
-- Progresso de história: tier libera por dungeon completada (ex.: só depois da Tumba).
-- Nível de personagem, se a progressão por nível (`CLAUDE.md` §1) entrar em jogo — mas isso
-  também está fora do VS e sem forma definida.
+**RESOLVIDO (Vini, 2026-08-11): o gate é o nível de Exposição.** Cada `EntradaDeDrop` carrega
+um `NivelMinimo`; o `SorteioDeDrop` descarta as entradas cujo `NivelMinimo` supera o
+`ProgressionManager.NivelAtual` do jogador **antes** de rolar a chance. Graus mais impregnados
+não precisam de mecanismo próprio — basta autorá-los com `NivelMinimo` mais alto.
+
+> **Divergência doc↔código corrigida:** este documento e o `CLAUDE.md` §1 diziam que nível de
+> personagem era "previsto, sem data / sem forma definida". **Não é:** o
+> `ProgressionManager` (`Assets/Scripts/Progression/ProgressionManager.cs`) já existe e é
+> funcional — tem `NivelAtual`, curva de Exposição (cap 12) e a árvore de Ecos do Labirinto de
+> Carcosa. Foi o que permitiu fechar este gate sem inventar sistema novo.
+
+**Entradas `Garantido` furam o gate de propósito** — drop roteirizado de chefe (Necronomicon
+no Abdul) tem de cair independente do nível, senão a quest quebra para quem chegou cedo.
+
+Duas consequências de escala que ficam de graça: o balanceamento vira dado autorado (mexer em
+`NivelMinimo` no Inspector, sem tocar código), e o gate é testável com semente fixa.
 
 ### Armas e armaduras precisam fazer sentido no jogo
 

@@ -68,6 +68,27 @@ namespace FavelaAmarela.Runtime.Itens
                 Debug.LogError($"[ColetavelDeItem] '{name}' está sem ItemDef — não entrega nada.", this);
         }
 
+        /// <summary>
+        /// Preenche o coletável por código, para quem nasce em runtime (espólio de inimigo)
+        /// em vez de ser posicionado à mão no Inspector.
+        /// </summary>
+        /// <param name="itemDef">Item entregue ao recolher.</param>
+        /// <param name="quantos">Quantos exemplares.</param>
+        /// <param name="chave">
+        /// Chave de save. Vazia — o padrão para espólio de inimigo — faz o item reaparecer
+        /// a cada carga de cena, já que o abate do inimigo é quem persiste.
+        /// </param>
+        public void Configurar(FavelaAmarela.Inventario.ItemDef itemDef, int quantos = 1, string chave = "")
+        {
+            item = itemDef;
+            quantidade = quantos < 1 ? 1 : quantos;
+            chaveDeSave = chave;
+
+            var sr = GetComponent<SpriteRenderer>();
+            if (sr != null && itemDef != null && itemDef.Icone != null)
+                sr.sprite = itemDef.Icone;
+        }
+
         private void Start()
         {
             // Já recolhido numa visita anterior: some antes do primeiro frame.

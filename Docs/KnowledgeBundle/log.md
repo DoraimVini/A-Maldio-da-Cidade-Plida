@@ -6,6 +6,61 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (2ª rodada) — Motor de loot: sorteio testável, tabelas e tiers por nível
+
+Primeira implementação do sistema desenhado em `systems/loot_e_drop.md` — fatia **básica e
+escalável**, por decisão do Vini: entregar o mínimo jogável agora, com a arquitetura pronta
+para crescer depois do VS.
+
+### Core (`FavelaAmarela.Core.Loot`, POCO testável)
+- `SorteioDeDrop` com **dois modos**, porque baú e inimigo têm semânticas diferentes:
+  `Sortear` roda cada linha por chance independente (inimigo larga nada, um ou vários, até o
+  teto); `SortearUm` escolhe **exatamente uma** linha ponderada pela chance (o baú, que sempre
+  entrega uma peça). Ordem de resolução: garantidos → filtro de nível → chance → teto → dedupe.
+- `IFonteDeAleatoriedade` — **primeira abstração de aleatoriedade do projeto**. Existe porque
+  `UnityEngine.Random` é estático e global: com ele, nenhuma tabela de drop seria afirmável
+  numa suíte EditMode (Regra de Ouro 6).
+- `GrauDeImpregnacao`, `CandidatoDeDrop`, `ItemSorteado` (`readonly struct`). O Core opera
+  sobre **ids de string**, nunca sobre `ItemDef` — que é `ScriptableObject` e não pode
+  atravessar a fronteira.
+
+### Decisão de design: o gate de tier é o nível de Exposição
+Cada `EntradaDeDrop` tem `NivelMinimo`; o sorteio descarta o que supera o
+`ProgressionManager.NivelAtual` **antes** de rolar. Graus mais impregnados não precisam de
+mecanismo próprio — basta autorá-los com nível mais alto. Entradas `Garantido` furam o gate de
+propósito (drop roteirizado de chefe não pode quebrar por nível baixo).
+
+> **Divergência doc↔código corrigida (OKF regra 4).** `loot_e_drop.md` e `CLAUDE.md` §1 diziam
+> que nível de personagem era "previsto, sem data / sem forma definida". **Não é:** o
+> `ProgressionManager` já existe e é funcional (nível, curva de Exposição cap 12, árvore de
+> Ecos). Foi o que permitiu fechar o gate sem inventar sistema novo. `CLAUDE.md` atualizado.
+
+### Runtime e dados
+- `TabelaDeDrop` (SO) + `EntradaDeDrop`, com `ProjetarCandidatos()` fazendo a ponte asset→Core.
+- `DropAoAbater` — assina `EnemyBase.OnAbatido`, sorteia e materializa os coletáveis no chão
+  com espalhamento. Espólio de inimigo nasce **sem `chaveDeSave`** (quem persiste é o abate).
+- `ColetavelDeItem.Configurar(...)` — o setup por código que faltava; até aqui todo coletável
+  era posicionado à mão no Inspector.
+- **`BauDaTumba` migrado:** o `Random.Range` inline sobre `ItemDef[] armasPossiveis` (uma tabela
+  hard-coded de 3 entradas) virou `SortearUm` sobre `Drop_BauDaTumba`. `forcarArma` preservado
+  como override de teste. Bônus: o baú só se marca como aberto **depois** de ter arma válida em
+  mãos — antes, uma falha deixava o jogador sem arma e sem segunda chance.
+- Assets `Drop_Cultista` (3 armaduras Inerte, 15% cada, teto 2) e `Drop_BauDaTumba` (3 armas,
+  peso uniforme, teto 1), em `Config/Drops/` — **fora de `Resources/`**, já que são
+  referenciados direto pelo Inspector e `Resources/` vai inteiro para o build.
+
+### Testes
+`SorteioDeDropTests` (16 casos, com uma `FonteFake` de fila determinística) e
+`TabelaDeDropAssetsTests` — este último carrega os `.asset` autorados à mão e afirma que as
+referências de `ItemDef` **realmente vinculam**: uma tabela que importa mas não vincula falharia
+em silêncio (inimigo não larga nada, zero erro no console).
+
+**QA:** 368/368 testes EditMode passando (eram 349 antes desta fatia).
+
+**Wiring de cena pendente (manual, no Editor):** anexar `DropAoAbater` + `Drop_Cultista` ao
+prefab do Cultista, e apontar o campo `tabela` do `BauDaTumba` na cena para `Drop_BauDaTumba` —
+o array `armasPossiveis` antigo foi removido do componente.
+
 ## 2026-08-11 — Três armaduras básicas (grau Inerte)
 
 Resolve o item 4 pendente do desenho de loot (`systems/loot_e_drop.md`): o catálogo não

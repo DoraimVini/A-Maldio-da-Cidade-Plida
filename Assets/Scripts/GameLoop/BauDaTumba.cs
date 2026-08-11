@@ -1,8 +1,11 @@
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
+using FavelaAmarela.Core.Loot;
 using FavelaAmarela.Core.Persistencia;
 using FavelaAmarela.Player;
+using FavelaAmarela.Progression;
 using FavelaAmarela.Runtime.Interaction;
+using FavelaAmarela.Runtime.Itens;
 using FavelaAmarela.Runtime.Persistencia;
 using FavelaAmarela.Runtime.UI;
 
@@ -17,7 +20,7 @@ namespace FavelaAmarela.Runtime.GameLoop
     /// <para>Abre por <b>interação deliberada</b> (botão E), não por encostar: é um baú,
     /// o jogador decide abrir. Implementa <see cref="IInteragivel"/>; o
     /// <c>DetectorDeInteracao</c> no Damião cuida da mira e do prompt. A regra do sorteio
-    /// de loot usa um array do Unity; aqui só há o gatilho e o feedback visual.</para>
+    /// vive no POCO <see cref="SorteioDeDrop"/>; aqui só há o gatilho e o feedback visual.</para>
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     [AddComponentMenu("Favela Amarela/GameLoop/Baú da Tumba")]
@@ -30,8 +33,8 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Tooltip("Arma entregue quando 'Forçar Arma' está marcado.")]
         [SerializeField] private FavelaAmarela.Inventario.ItemDef armaForcada;
 
-        [Tooltip("Lista de armas (ItemDef) que podem ser sorteadas no baú.")]
-        [SerializeField] private FavelaAmarela.Inventario.ItemDef[] armasPossiveis;
+        [Tooltip("Tabela de drop com as armas seladas do baú. [ASSET]")]
+        [SerializeField] private FavelaAmarela.Inventario.TabelaDeDrop tabela;
 
         [Header("Visual")]
         [Tooltip("Sprite do baú fechado → trocado pelo aberto ao coletar. [ASSET pixel art]")]
@@ -45,6 +48,8 @@ namespace FavelaAmarela.Runtime.GameLoop
         [SerializeField] private TutorialHintUI hintUI;
 
         private bool _aberto;
+        private readonly SorteioDeDrop _sorteio = new SorteioDeDrop();
+        private readonly IFonteDeAleatoriedade _fonte = new FonteDeAleatoriedadeUnity();
 
         /// <summary>Se o baú já foi aberto (um baú entrega uma arma só).</summary>
         public bool Aberto => _aberto;
@@ -79,28 +84,18 @@ namespace FavelaAmarela.Runtime.GameLoop
                 return;
             }
 
-            if (armasPossiveis == null || armasPossiveis.Length == 0)
+            // Só marca o baú como aberto depois de ter uma arma válida em mãos: falhar aqui
+            // com o baú já "aberto" deixaria o jogador sem arma e sem uma segunda chance.
+            var armaEscolhida = EscolherArma();
+            if (armaEscolhida == null || string.IsNullOrEmpty(armaEscolhida.Id))
             {
-                Debug.LogError("[BauDaTumba] Nenhuma arma configurada no array de sorteio.", this);
+                Debug.LogError("[BauDaTumba] A arma sorteada ou forçada é nula/inválida. " +
+                               "Confira a Tabela de Drop e os assets de ItemDef.", this);
                 return;
             }
 
             _aberto = true;
             GerenciadorDeSave.MarcarAconteceu(ChavesDeSave.BauDaTumbaAberto);
-
-            FavelaAmarela.Inventario.ItemDef armaEscolhida;
-            if (forcarArma && armaForcada != null)
-                armaEscolhida = armaForcada;
-            else
-                armaEscolhida = armasPossiveis[Random.Range(0, armasPossiveis.Length)];
-
-            // Validação defensiva: a arma sorteada deve existir e ter ID
-            if (armaEscolhida == null || string.IsNullOrEmpty(armaEscolhida.Id))
-            {
-                Debug.LogError("[BauDaTumba] A arma sorteada ou forçada é nula/inválida. " +
-                               "Certifique-se de que os assets de ItemDef estão atribuídos no Inspector.", this);
-                return;
-            }
 
             var invManager = FavelaAmarela.Inventario.InventoryManager.Instance;
             if (invManager == null)
@@ -140,6 +135,40 @@ namespace FavelaAmarela.Runtime.GameLoop
             if (hintUI != null)
                 hintUI.Mostrar($"A Tumba te entregou: {armaEscolhida.Nome}.");
         }
+        /// <summary>
+        /// Resolve qual arma o baú entrega: o override de teste, se ligado, senão um sorteio
+        /// ponderado pela tabela. O baú entrega <b>exatamente uma</b> peça — por isso usa
+        /// <c>SortearUm</c>, e não as chances independentes do espólio de inimigo.
+        /// </summary>
+        private FavelaAmarela.Inventario.ItemDef EscolherArma()
+        {
+            if (forcarArma && armaForcada != null) return armaForcada;
+
+            if (tabela == null)
+            {
+                Debug.LogError("[BauDaTumba] Nenhuma Tabela de Drop atribuída — o baú não tem o que entregar.", this);
+                return null;
+            }
+
+            int nivel = ProgressionManager.Instance != null ? ProgressionManager.Instance.NivelAtual : 1;
+            var sorteado = _sorteio.SortearUm(tabela.ProjetarCandidatos(), nivel, _fonte);
+
+            if (sorteado == null)
+            {
+                Debug.LogError("[BauDaTumba] A tabela não produziu nenhuma arma elegível.", this);
+                return null;
+            }
+
+            var banco = FavelaAmarela.Inventario.ItemDatabase.Instance;
+            if (banco == null)
+            {
+                Debug.LogError("[BauDaTumba] ItemDatabase.Instance está nulo — a arma sorteada não pôde ser resolvida.", this);
+                return null;
+            }
+
+            return banco.Get(sorteado.Value.ItemDefId);
+        }
+
         private void Start()
         {
             if (!GerenciadorDeSave.JaAconteceu(ChavesDeSave.BauDaTumbaAberto)) return;
