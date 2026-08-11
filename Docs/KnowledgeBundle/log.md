@@ -6,6 +6,26 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 — Três armaduras básicas (grau Inerte)
+
+Resolve o item 4 pendente do desenho de loot (`systems/loot_e_drop.md`): o catálogo não
+tinha nenhuma peça de armadura fora do Set de Set (Relíquia). Criados três `ItemDef`
+(`Tipo: Armadura`) em `Config/Resources/Itens/`, um por slot já existente no `EquipmentSlot`,
+todos grau **Inerte** (`DefesaFisica +1` cada — teto propositalmente baixo, bem abaixo do
+Elmo de Set):
+
+- `Item_Armadura_CapuzDeFarrapos.asset` — slot Elmo.
+- `Item_Armadura_ColeteDeSucata.asset` — slot Peitoral.
+- `Item_Armadura_CaneleirasDeFerro.asset` — slot Grevas.
+
+Nenhum código foi tocado — `ItemType.Armadura` e os slots Elmo/Peitoral/Grevas já existiam
+e já são lidos pelo `InventoryManager`/`EquipmentInventory`. **Ainda não há `TabelaDeDrop`**:
+os itens existem no catálogo mas nada os sorteia ou instancia no mundo — isso depende da
+arquitetura de sorteio descrita em `loot_e_drop.md`, que segue não implementada e fora do VS.
+Faltam também os graus Marcado/Impregnado de armadura.
+
+QA: `Tools/run_qa_tests.ps1`, import limpo dos três assets, 349/349 testes EditMode passando.
+
 ## 2026-08-10 (2ª rodada) — Unificação do sistema de itens, Porta de Aklo e design de loot
 
 Continuação da recuperação. O bug relatado ("drop do Necronomicon quebrado") não era asset

@@ -214,9 +214,13 @@ Nada abaixo está resolvido — são as perguntas que sobraram do design:
 3. **Nível de personagem**: o `CLAUDE.md` prevê progressão por nível junto do loot. Se drop
    escalar por nível, a tabela precisa de faixa de nível por entrada — o que muda a forma da
    `TabelaDeDrop`. **Decidir antes de implementar**, não depois.
-4. **Armadura ainda não existe.** O pedido é "arma *e armadura*", mas o catálogo atual não tem
-   nenhuma peça de armadura autorada fora do Set de Set. Sem elas, metade da tabela nasce
-   vazia.
+4. ~~Armadura ainda não existe~~ — **resolvido parcialmente (2026-08-11):** três peças
+   **Inerte** autoradas, uma por slot de armadura, cada uma com `DefesaFisica +1` (teto
+   propositalmente baixo — bem abaixo do Elmo de Set, que é Relíquia): `Capuz de Farrapos`
+   (Elmo), `Colete de Sucata` (Peitoral), `Caneleiras de Ferro Enferrujado` (Grevas). Ainda
+   **sem `TabelaDeDrop`** — os assets existem em `Config/Resources/Itens/`, mas nada os
+   sorteia ou instancia no mundo ainda (isso depende da arquitetura da seção acima, que
+   segue não implementada). Faltam os graus Marcado/Impregnado de armadura.
 5. **Pré-requisito de tier da árvore** (Inerte→Marcado→Impregnado): contagem, progresso de
    história ou nível de personagem? Bloqueia a árvore, não o resto do sistema.
 6. **Slot `Amuleto` some do `EquipmentSlot`** — proposto porque o único amuleto conhecido
