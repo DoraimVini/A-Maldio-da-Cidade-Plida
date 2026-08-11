@@ -28,6 +28,8 @@ O **Set Lendário de Set** é o conjunto de equipamento obtido no Templo da Serp
 | **Arma de Set** | Arma | Drop RNG do Avatar de Set, Naga (Templo), ou Castelo de Carcosa | ❌ RNG |
 
 > *Nota: a entrada antiga "Coroa de Ossos do Rei em Amarelo" foi substituída pelo Set Lendário de Set (decisão 2026-07-28). O Elmo de Set é o item que antes se chamava "Coroa de Ossos" — renomeado para coerência com a identidade do boss Avatar de Set.*
+>
+> **Atualização 2026-08-11 — a Coroa de Ossos voltou, como outra coisa.** O Vini confirmou (em 2026-08-10 e de novo em 2026-08-11) que a **Coroa de Ossos é drop do Nagaraja**, no Templo da Serpente. Ela **não** é o Elmo de Set nem o substitui: os dois coexistem e não competem por espaço, porque são de naturezas diferentes — o **Elmo de Set** é armadura (`ItemType.Armadura`, slot Elmo, peça do Set Lendário), e a **Coroa de Ossos** é **Artefato** (`ItemType.Artefato`, sem slot de corpo, com passiva + habilidade "Sibilo de Yig"). A nota de 2026-07-28 acima vale só para a *entrada antiga* do Rei em Amarelo, que segue morta. Ver [systems/artefatos.md](../systems/artefatos.md).
 
 ## 4. O Patuá (Patuá das Luas Gêmeas)
 * **Obtenção:** Recompensa da conclusão da quest narrativa da **Rainha Cassilda** no Santuário de Yhtill. Não é um drop de combate — é a conclusão de um puzzle/diálogo com a Cassilda (decisão 2026-07-28).

@@ -6,6 +6,62 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (3ª rodada) — Artefatos: 4 slots, passivas, barra F1–F4 e o Necronomicon
+
+Implementa o sistema de Artefatos desenhado em `loot_e_drop.md`. Doc completo novo:
+[systems/artefatos.md](systems/artefatos.md).
+
+### Decisão que substitui o desenho anterior
+O doc dizia que Artefato era "sempre ativo assim que coletado". **Agora são 4 slots, e só vale
+o que está equipado** (passiva *e* habilidade) — decisão do Vini. O motivo é escala: o desenho
+prevê mais de quatro Artefatos, e com ativação automática o quinto quebraria o sistema. Com
+slots, carregar um custa deixar outro para trás. Fecha as pendências #6 e #9 do `loot_e_drop.md`.
+
+### Core (`FavelaAmarela.Core.Artefatos`)
+- `IContextoDeArtefato` — o Core **declara** o que um efeito pode fazer no mundo; o Runtime
+  executa. É essa inversão que deixa os efeitos testáveis com um contexto falso.
+- `IEfeitoDeArtefato` + 4 efeitos (`Revelacao`, `Ancoragem`, `Silencio`, `Aplacamento`) —
+  primeira aplicação real do desenho de `habilidades_de_item.md`: efeito é dado, não classe por item.
+- `ArtefatoAtivo` — custo de RM, cooldown e lista de efeitos. Exige RM **estritamente maior**
+  que o custo: colapsar por causa da própria habilidade seria punição sem aviso.
+- `InventarioDeArtefatos` — 4 slots, recusa duplicata (senão a passiva contaria duas vezes).
+
+### Costura com o que já existia
+Três dos quatro efeitos não precisaram de sistema novo: **Ancoragem** usa
+`ResilienciaMental.Ancorar`; **Aplacamento** usa `EnemyStateMachine.Atordoar`; **Silêncio** ganhou
+`PlayerMovement.SilenciarPassos`, espelhando o `MascararOdor` que já existia para o faro do
+Sseth — e gateia só o caminhar, porque **a Esquiva precisa continuar fazendo barulho**, senão
+Resguardo + Esquiva viraria apagão sonoro. Só a **Revelação** exigiu peça nova: o
+`MarcadorDeRevelacao` é um objeto filho com `SpriteRenderer` próprio em ordem 30000, e não uma
+alteração no renderer do inimigo — assim atravessa parede sem brigar com o `DynamicYSort`.
+
+### Runtime, UI e input
+- `ArtefatosBridge` (4 cooldowns independentes — por isso **não** estende a `MaoFisicaBridge`,
+  que só tem um relógio), `BarraDeArtefatos` (4 slots F1–F4 com recarga),
+  `HUDController.InjetarArtefatos` + wiring no `GameManager`.
+- `GerenciadorEfeitosPassivos.GetBonus` ganha a **4ª fonte**: passivas dos Artefatos equipados.
+- 4 ações novas (`HabilidadeArtefato1..4`, F1–F4) no `InputSystem_Actions`, consumidas pelo
+  padrão polled do projeto. Dígitos 1–8 são da `BarraDeItens` e Q é a habilidade da arma.
+
+### Assets
+`ItemType` ganhou `Artefato` **no fim do enum** (é serializado por índice; inserir no meio
+remapearia todo item já autorado). Necronomicon e Patuá migrados de `Chave`/`Amuleto`; Anel do
+Sinal Amarelo e Coroa de Ossos criados. As passivas saíram do `ItemDef` e foram para o
+`ArtefatoDef` — fonte única, sem risco de contagem dupla.
+
+### Conflito de lore resolvido (OKF regra 4)
+`reliquias_cosmicas.md` afirmava que "Coroa de Ossos" fora **renomeada para Elmo de Set**
+(2026-07-28). O Vini confirmou duas vezes que a Coroa é **drop do Nagaraja**. Resolução: os dois
+**coexistem** — Elmo de Set é armadura (slot Elmo), Coroa de Ossos é Artefato (sem slot). Doc corrigido.
+
+**QA:** 399/399 testes EditMode passando (eram 368 antes desta fatia). Os 31 novos cobrem os 4
+slots, o cooldown/custo, cada efeito, e o **binding dos 4 assets autorados à mão** — inclusive um
+teste que trava o Necronomicon como `Artefato`, porque voltar a `Chave` faria a passiva contar duas vezes.
+
+**Wiring de cena pendente (manual):** anexar `ArtefatosBridge` ao Damião, montar a
+`BarraDeArtefatos` no HUD, e ligar os coletáveis dos Artefatos ao
+`EquiparNoPrimeiroSlotLivre`. **Persistência dos slots no save** também fica pendente.
+
 ## 2026-08-11 (2ª rodada) — Motor de loot: sorteio testável, tabelas e tiers por nível
 
 Primeira implementação do sistema desenhado em `systems/loot_e_drop.md` — fatia **básica e

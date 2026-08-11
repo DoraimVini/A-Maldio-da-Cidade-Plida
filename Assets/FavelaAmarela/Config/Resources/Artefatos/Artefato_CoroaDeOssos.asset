@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe156a0836442a40b809c0997cbeb91, type: 3}
+  m_Name: Artefato_CoroaDeOssos
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ArtefatoDef
+  Id: coroa_de_ossos
+  Nome: Coroa de Ossos
+  Icone: {fileID: 0}
+  Descricao: "Tomada da cabeça de Nagaraja, o Sacerdote do Sinal Escamado. As escamas
+    ainda reconhecem quem a veste — e hesitam."
+  Item: {fileID: 11400000, guid: 3e7c928988e24160bcaeac8265ce7d5c, type: 2}
+  Passivas:
+  - Stat: 8
+    Valor: 5
+  NomeDaHabilidade: Sibilo de Yig
+  TipoDeEfeito: 3
+  CustoRM: 10
+  Cooldown: 35
+  Duracao: 4
+  Raio: 7
+  Valor: 0

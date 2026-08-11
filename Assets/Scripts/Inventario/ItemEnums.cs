@@ -7,7 +7,13 @@ namespace FavelaAmarela.Inventario
         Armadura,
         Amuleto,
         Consumivel,
-        Chave
+        Chave,
+
+        // Sempre no FIM: ItemType é serializado por índice nos .asset, e inserir um valor no
+        // meio remapearia silenciosamente todo item já autorado.
+        /// <summary>Relíquia com passiva e habilidade próprias. Não ocupa slot de corpo —
+        /// vive no inventário de Artefatos, de 4 slots.</summary>
+        Artefato
     }
 
     public enum EquipmentSlot

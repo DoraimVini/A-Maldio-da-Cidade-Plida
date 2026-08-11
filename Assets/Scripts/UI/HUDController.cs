@@ -33,6 +33,9 @@ namespace FavelaAmarela.Runtime.UI
         [Tooltip("Barra com as 8 posições do inventário (teclas 1–8). Alimentada pelo GameManager.")]
         [SerializeField] private BarraDeItens barraDeItens;
 
+        [Tooltip("Barra dos 4 Artefatos equipados (teclas F1–F4). Alimentada pelo GameManager.")]
+        [SerializeField] private BarraDeArtefatos barraDeArtefatos;
+
         [Header("Config inicial (usado se nenhuma fonte for injetada de fora)")]
         [Tooltip("Resiliência máxima inicial de Damião.")]
         [SerializeField] private float resilienciaMax = 100f;
@@ -117,6 +120,16 @@ namespace FavelaAmarela.Runtime.UI
         {
             if (fonte == null) return;
             if (vigorBar != null) vigorBar.Bind(fonte);
+        }
+
+        /// <summary>
+        /// Injeta os Artefatos de Damião na barra de artefatos, para o HUD mostrar os quatro
+        /// slots e suas recargas. Chamado pelo <c>GameManager</c> no bootstrap.
+        /// </summary>
+        public void InjetarArtefatos(FavelaAmarela.Player.ArtefatosBridge fonte)
+        {
+            if (fonte == null) return;
+            if (barraDeArtefatos != null) barraDeArtefatos.Bind(fonte);
         }
 
         // ── Atalhos de teste (removíveis) ────────────────────────────────────

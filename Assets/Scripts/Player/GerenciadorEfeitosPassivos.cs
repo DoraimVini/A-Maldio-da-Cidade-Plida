@@ -17,6 +17,23 @@ namespace FavelaAmarela.Player
 
         public event System.Action OnBonusChanged;
 
+        private ArtefatosBridge _artefatos;
+
+        /// <summary>
+        /// Liga a fonte de passivas dos Artefatos. Chamado pelo <c>GameManager</c>.
+        /// Idempotente: re-bind troca a fonte sem deixar handler pendurado.
+        /// </summary>
+        public void Bind(ArtefatosBridge artefatos)
+        {
+            if (_artefatos != null) _artefatos.OnArtefatosMudaram -= NotificarMudanca;
+
+            _artefatos = artefatos;
+
+            if (_artefatos != null) _artefatos.OnArtefatosMudaram += NotificarMudanca;
+
+            NotificarMudanca();
+        }
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -47,6 +64,8 @@ namespace FavelaAmarela.Player
 
         private void OnDestroy()
         {
+            if (_artefatos != null) _artefatos.OnArtefatosMudaram -= NotificarMudanca;
+
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.Equipment.OnEquipmentChanged -= NotificarMudanca;
@@ -122,7 +141,22 @@ namespace FavelaAmarela.Player
                 }
             }
 
-            // 3. Ecos da Memória
+            // 3. Artefatos equipados (só valem enquanto ocupam um dos 4 slots)
+            if (_artefatos != null)
+            {
+                for (int i = 0; i < FavelaAmarela.Core.Artefatos.InventarioDeArtefatos.TotalDeSlots; i++)
+                {
+                    var def = _artefatos.DefNoSlot(i);
+                    if (def?.Passivas == null) continue;
+
+                    foreach (var mod in def.Passivas)
+                    {
+                        if (mod.Stat == statType) total += mod.Valor;
+                    }
+                }
+            }
+
+            // 4. Ecos da Memória
             if (ProgressionManager.Instance != null)
             {
                 foreach (var eco in ProgressionManager.Instance.EcosDesbloqueados)

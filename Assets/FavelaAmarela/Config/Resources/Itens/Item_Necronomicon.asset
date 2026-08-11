@@ -18,10 +18,8 @@ MonoBehaviour:
   Descricao: "O Al-Azif. Mais pesado do que deveria, e as p\xE1ginas continuam virando
     sozinhas. Quem o carrega l\xEA o Aklo sem querer — e o que se l\xEA n\xE3o
     se desl\xEA."
-  Tipo: 4
+  Tipo: 5
   SlotEquipamento: 0
   EmpilhamentoMaximo: 1
   ArmaFisica: 0
-  Modificadores:
-  - Stat: 4
-    Valor: 15
+  Modificadores: []

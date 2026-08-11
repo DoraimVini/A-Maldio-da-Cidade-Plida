@@ -142,8 +142,14 @@ namespace FavelaAmarela.Player
         private MaoFisicaBridge maoFisicaBridge;
         private InputAction attackAction;
         private InputAction habilidadeArmaAction;
+
+        // --- Artefatos (F1–F4, um por slot equipado) ---
+        private ArtefatosBridge artefatosBridge;
+        private readonly InputAction[] artefatoActions =
+            new InputAction[FavelaAmarela.Core.Artefatos.InventarioDeArtefatos.TotalDeSlots];
         
         private float _odorMaskTimer = 0f;
+        private float _silencioTimer = 0f;
         private GerenciadorDeVigor _vigor;
 
         public PlayerStealthState StealthState => stealthState;
@@ -187,6 +193,7 @@ namespace FavelaAmarela.Player
 
             esquivaBridge = GetComponent<EsquivaBridge>();
             maoFisicaBridge = GetComponent<MaoFisicaBridge>();
+            artefatosBridge = GetComponent<ArtefatosBridge>();
             congelamentoBridge = GetComponent<CongelamentoBridge>();
 
             // FSM injetada nos bridges, que passam a consultá-la para exclusão mútua
@@ -221,6 +228,10 @@ namespace FavelaAmarela.Player
                 dodgeAction = playerInput.actions.FindAction("Esquiva"); // Espaço
                 attackAction = playerInput.actions.FindAction("Attack"); // botão esquerdo do mouse
                 habilidadeArmaAction = playerInput.actions.FindAction("HabilidadeArma"); // tecla Q / ombro direito
+
+                // Uma habilidade por Artefato equipado — teclas F1 a F4.
+                for (int i = 0; i < artefatoActions.Length; i++)
+                    artefatoActions[i] = playerInput.actions.FindAction($"HabilidadeArtefato{i + 1}");
 
                 if (moveAction == null)
                     Debug.LogWarning("[PlayerMovement] 'Move' action not found in Input Actions asset.", this);
@@ -282,6 +293,8 @@ namespace FavelaAmarela.Player
                 }
             }
 
+            if (_silencioTimer > 0f) _silencioTimer -= Time.deltaTime;
+
             // Avança o relógio das ações exclusivas (substitui os Invoke(EndX) do modelo antigo).
             _fsm.Tick(Time.deltaTime);
 
@@ -322,6 +335,17 @@ namespace FavelaAmarela.Player
             {
                 maoFisicaBridge.TryUsarHabilidade(inputDirection);
                 if (!_fsm.EstaLivre) return; // Habilidade pegou
+            }
+
+            // Trigger das habilidades de Artefato (F1–F4, uma por slot equipado).
+            // Não travam a FSM: invocar um Artefato não é ação exclusiva como golpear.
+            if (artefatosBridge != null)
+            {
+                for (int i = 0; i < artefatoActions.Length; i++)
+                {
+                    if (artefatoActions[i] != null && artefatoActions[i].WasPressedThisFrame())
+                        artefatosBridge.TryUsarArtefato(i);
+                }
             }
 
             // Determine stealth mode from modifier keys
@@ -381,7 +405,7 @@ namespace FavelaAmarela.Player
                 {
                     _soundTimer = 0f;
                     float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, _environment.StormIntensity);
-                    if (currentNoise > 0f)
+                    if (currentNoise > 0f && !PassosSilenciados)
                     {
                         _soundBroadcaster.Emitir(new SomEmitido(transform.position, currentNoise));
                     }
@@ -422,6 +446,23 @@ namespace FavelaAmarela.Player
                 StealthState.IsOdorMasked = true;
                 _odorMaskTimer = duracaoSegundos;
             }
+        }
+
+        /// <summary>
+        /// Se os passos de Damião estão calados neste instante — o Resguardo do Sinal.
+        /// </summary>
+        public bool PassosSilenciados => _silencioTimer > 0f;
+
+        /// <summary>
+        /// Cala os passos por um tempo: Damião continua andando, mas deixa de emitir ruído.
+        /// Vale só para o broadcast contínuo do caminhar — a Esquiva segue fazendo barulho de
+        /// propósito, senão Resguardo + Esquiva viraria um apagão sonoro completo.
+        /// </summary>
+        /// <param name="duracaoSegundos">Renova o silêncio se já houver um em curso mais curto.</param>
+        public void SilenciarPassos(float duracaoSegundos)
+        {
+            if (duracaoSegundos <= 0f) return;
+            _silencioTimer = Mathf.Max(_silencioTimer, duracaoSegundos);
         }
     }
 }

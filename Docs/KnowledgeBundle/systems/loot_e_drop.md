@@ -260,13 +260,16 @@ Nada abaixo está resolvido — são as perguntas que sobraram do design:
    segue não implementada). Faltam os graus Marcado/Impregnado de armadura.
 5. **Pré-requisito de tier da árvore** (Inerte→Marcado→Impregnado): contagem, progresso de
    história ou nível de personagem? Bloqueia a árvore, não o resto do sistema.
-6. **Slot `Amuleto` some do `EquipmentSlot`** — proposto porque o único amuleto conhecido
-   (Patuá) virou Artefato sem slot. Confirmar antes de mexer no enum: pode haver amuleto
-   equipável não-Artefato no futuro que ainda precise do slot.
+6. **Slot `Amuleto` some do `EquipmentSlot`** — **parcialmente resolvido (2026-08-11):** o Patuá
+   saiu do slot Amuleto e virou Artefato, então nenhum item usa mais esse slot. O **enum não foi
+   mexido** de propósito: `EquipmentSlot` é serializado por índice e removê-lo remapearia todo
+   asset e a `anatomia` do `InventoryManager`. Fica como fatia própria.
 7. ~~"Anel do Byakhee" × "Anel do Sinal Amarelo"~~ — **resolvido**: mesmo item.
 8. ~~Fonte da Coroa de Ossos~~ — **resolvido**: drop do Nagaraja, substitui a peça RNG do Set.
-9. **Par ativo+passivo de cada Artefato**: só a existência dos 4 foi definida, não o que cada
-   habilidade ativa faz (a passiva do Patuá já existe: -40% dreno de RM no escuro).
+9. ~~Par ativo+passivo de cada Artefato~~ — **resolvido (2026-08-11):** os 4 Artefatos estão
+   autorados com passiva e habilidade, e o sistema está implementado. Ver
+   [artefatos.md](artefatos.md). A regra de ativação mudou junto: **só vale o que está
+   equipado** num dos 4 slots, substituindo o "sempre ativo assim que coletado" da seção acima.
 
 ## Relacionados
 

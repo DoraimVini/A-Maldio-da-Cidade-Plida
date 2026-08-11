@@ -174,6 +174,16 @@ namespace FavelaAmarela.Runtime.GameLoop
                 var vigor = player.GetComponent<GerenciadorDeVigor>();
                 if (vigor != null)
                     hud.InjetarVigor(vigor);
+
+                // Artefatos: a barra F1–F4 e a fonte de passivas dependem da mesma bridge.
+                var artefatos = player.GetComponent<ArtefatosBridge>();
+                if (artefatos != null)
+                {
+                    hud.InjetarArtefatos(artefatos);
+
+                    if (GerenciadorEfeitosPassivos.Instance != null)
+                        GerenciadorEfeitosPassivos.Instance.Bind(artefatos);
+                }
             }
             else
             {
