@@ -6,6 +6,50 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (11ª rodada) — Wiring headless e a idempotência que era mentira
+
+### Todas as ferramentas rodam sem abrir a Unity
+`RodarTodoOWiring` chama as sete ferramentas de wiring na ordem certa, numa inicialização só:
+
+```
+Unity.exe -batchmode -nographics -quit -projectPath . \
+  -executeMethod FavelaAmarela.EditorTools.RodarTodoOWiring.Executar
+```
+
+Ordem importa em dois pontos: **prefabs antes das cenas** (instâncias herdam o que o prefab
+ganhou) e **telas de fluxo antes dos Refúgios** (o renascimento aponta para os pontos de
+chegada que a ferramenta dos Refúgios cria). Cada etapa fica isolada num `try` — em batch mode,
+uma exceção não tratada deixaria o projeto religado pela metade sem sinal de onde parou.
+
+Vale além da conveniência: depois de um clone limpo, é o que separa um checkout de um jogo
+jogável — exatamente o cenário do desastre de 2026-08-10.
+
+### O bug que só a verificação pegou
+As sete etapas reportaram sucesso. Mas conferir as cenas mostrou **seis `Tela_Pause` e quatro
+`Tela_Menu`** empilhadas.
+
+A causa: `Destruir` usava `GameObject.Find`, que **só enxerga objetos ativos**. Como essas
+telas nascem desativadas, cada execução não achava a anterior e criava mais uma. **A ferramenta
+se dizia idempotente e não era** — e o log não tinha como acusar, porque do ponto de vista dela
+tudo correu bem.
+
+Corrigido varrendo `GetRootGameObjects()` + `GetComponentsInChildren<Transform>(includeInactive:
+true)`. Depois da correção: 1 de cada, e o `Tela_Menu` obsoleto (resquício de antes de o menu
+virar cena) sumiu das três cenas.
+
+> **Lição:** "a ferramenta rodou sem erro" não é o mesmo que "a ferramenta fez o certo".
+> Conferir o resultado no arquivo é o que separa os dois — mesma disciplina que já tinha pego
+> a tabela de drop que importava sem vincular.
+
+Só a `MontarTelasDeFluxo` sofria disso; as outras criam objetos ativos, onde o `Find` funciona.
+
+**Estado após o wiring:** as 3 cenas com pause, colapso, painel de inventário e `EventSystem`;
+Deserto povoado; Refúgios com ponto de renascimento; Yug-Neth na layer `Aliados` com barra de
+vida; `Cena_Menu` no índice 0 do build.
+
+**Aviso esperado no log:** `'CoisaDoCemiterio' não tem EnemyBase — pulado`. Correto: ela é
+invulnerável por design (`bestiary.md`), então não recebe espólio nem áudio de combate.
+
 ## 2026-08-11 (10ª rodada) — Menu vira cena, navegação centralizada e morte que não pune duas vezes
 
 Três correções de arquitetura, todas apontadas pelo Vini.

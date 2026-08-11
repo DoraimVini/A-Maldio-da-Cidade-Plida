@@ -114,10 +114,31 @@ namespace FavelaAmarela.EditorTools
             return true;
         }
 
+        /// <summary>
+        /// Remove todos os objetos com este nome, <b>inclusive os inativos</b>.
+        ///
+        /// <para><b>Bug que motivou (2026-08-11):</b> a versão anterior usava
+        /// <c>GameObject.Find</c>, que <b>só enxerga objetos ativos</b>. Como estas telas
+        /// nascem desativadas, cada execução não achava a anterior e criava mais uma —
+        /// acumulando seis <c>Tela_Pause</c> e quatro <c>Tela_Menu</c> nas cenas. A
+        /// ferramenta se dizia idempotente e não era.</para>
+        /// </summary>
         private static void Destruir(string nome)
         {
-            var go = GameObject.Find(nome);
-            if (go != null) Object.DestroyImmediate(go);
+            var cena = EditorSceneManager.GetActiveScene();
+            if (!cena.IsValid()) return;
+
+            foreach (var raiz in cena.GetRootGameObjects())
+            {
+                // includeInactive: é justamente o que o Find não fazia.
+                var achados = raiz.GetComponentsInChildren<Transform>(includeInactive: true);
+
+                foreach (var t in achados)
+                {
+                    if (t == null || t.name != nome) continue;
+                    Object.DestroyImmediate(t.gameObject);
+                }
+            }
         }
 
         /// <summary>
