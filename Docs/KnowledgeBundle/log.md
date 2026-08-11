@@ -6,6 +6,46 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (12ª rodada) — Byakhee: o primeiro dos dois chefes que faltavam
+
+Item 9 da lista do edital, que estava com **zero código**. Decisão do Vini: os dois chefes
+primeiro, depois o Castelo.
+
+### A inversão que define a luta
+**O Byakhee é imune no ar; a única janela de dano é o pouso.** O jogador não escolhe quando
+atacar — espera, esquiva e aproveita a abertura. Toda a FSM existe para sustentar isso.
+
+Consequência de balanceamento: **a dificuldade cresce encurtando a janela** (2,0 s → 1,5 s da
+fase 1 para a 2), **não subindo o dano**. Há um teste travando essa propriedade — trocá-la por
+"mais dano" derruba `JanelaDeDano_EncurtaDaFase1ParaAFase2`.
+
+### O grito infrassônico é o relógio da luta
+Dreno passivo de 2 RM/s enquanto ele viver, **sem precisar acertar ninguém**. Quem demora
+demais colapsa sem levar um golpe — é o que impede a estratégia de esperar eternamente pela
+janela perfeita. No frenesi (<10%) sobe para 5 RM/s: o último recurso da criatura é uma
+corrida contra a sanidade, não contra a vida.
+
+### A dependência que o design tem e o jogo não
+A fase 3 prevê cortar a asa com a **Lâmina do Sinal** — arma que **não existe**. `CortarAsa()`
+ficou implementado para quando ela entrar; o caminho real é o **pouso espontâneo a cada 30 s**,
+alternativa que o próprio design documenta. Sem essa válvula, a fase 3 seria impasse para todo
+jogador.
+
+### E resolve parte do buraco de progressão
+O Vini apontou que **nenhum chefe larga item** além de artefato, e que o Deserto ficou
+punitivo. Fazer chefe direito inclui ficha e tabela: `Drop_Byakhee` entrega o **Anel do Sinal
+Amarelo garantido** (`Garantido: 1`, que fura o gate de nível de propósito).
+
+Vitalidade 420 é deliberada: com janelas de 1,5–3 s, vida baixa faria a luta acabar em dois
+pousos e o padrão nunca se revelaria.
+
+**QA:** 426/426. Um teste falhou na primeira rodada por erro meu — presumi a ordem do ciclo
+(rasante→mergulho→pouso) quando o primeiro é rasante→pouso; reescrito para avançar até pousar
+sem presumir a ordem.
+
+**Pendente:** prefab, arte, a arena dos Portões em cena, a cena de abertura e anexar o
+`DropAoAbater` com a tabela.
+
 ## 2026-08-11 (11ª rodada) — Wiring headless e a idempotência que era mentira
 
 ### Todas as ferramentas rodam sem abrir a Unity

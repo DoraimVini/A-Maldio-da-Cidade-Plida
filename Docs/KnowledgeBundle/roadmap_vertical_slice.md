@@ -82,7 +82,7 @@ confirmar** — não é bug.
 | # | Item | Estado |
 |---|---|---|
 | 8 | **Quest do Santuário de Yhtill** (Cassilda + fragmentos) | ✅ **Jogável de ponta a ponta** (2026-08-02) — `CancaoIncompleta` + `RecitalDaCancao` (Core, 13 + 9 testes), `CassildaNPC` e `FragmentoDeYhtill` implementados; Cassilda agora é prefab (`Cassilda.prefab`) com todo o conteúdo textual, instanciada e ligada em cena; os 3 fragmentos carregam as 2 primeiras estrofes da Canção de Cassilda; entregar tudo abre um **recital sem punição** das 2 estrofes finais antes do Patuá; o primeiro encontro ganhou a ramificação A/B/C do roteiro do lore (cosmética, via `PainelDeEscolha`). Progresso atravessa as duas cenas via save; o recital e a escolha do primeiro encontro não são persistidos (decisão). **Falta:** só arte — sprites placeholder em Cassilda, fragmentos e piso. Ver [quest_cassilda.md](systems/quest_cassilda.md). |
-| 9 | **Boss Byakhee** | ❌ **Não começado** — zero código. IA aérea + grito infrassônico são mecânicas novas. |
+| 9 | **Boss Byakhee** | ⚠️ **Core e Runtime prontos** (2026-08-11) — `ByakheeFSM` (3 fases, 10 testes), `ByakheeAI`, `Ficha_Byakhee` e `Drop_Byakhee` com o Anel do Sinal Amarelo garantido. **Falta:** prefab, arte, a arena dos Portões em cena e a cena de abertura. Ver [systems/boss_byakhee.md](systems/boss_byakhee.md). |
 | 10 | **Transição de Fase** | ⚠️ **Parcial** — `PortalDeCena` e `TransicaoDeFaseTrigger` existem; os Portões em si não. |
 
 ---
