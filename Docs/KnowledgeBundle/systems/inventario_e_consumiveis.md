@@ -87,6 +87,71 @@ Diferente do sistema antigo, onde a UI e o loot dependiam de um Bridge rígido:
 - **Consumo:** A UI chama `InventoryManager.ConsumirItem(indice)`. O `InventoryManager` consome a quantidade e dispara o evento `OnItemConsumed`.
 - **Efeito no mundo:** Quem assina `OnItemConsumed` (ex: `VitalidadeBridge`) valida se o item possui efeito (como `Ancoragem`) e aplica no jogador.
 
+## Modelo de consumíveis: "a luz é a válvula" (2026-08-12)
+
+**Consumíveis são finitos e encontrados no mapa.** Não caem de inimigo comum, não recarregam,
+não têm moeda. Só três existem, e cobrem os dois canais de dano:
+
+| Item | Cura | Empilha | Quantos no Deserto |
+|---|---|---|---|
+| **Água da Cacimba** | Vitalidade +30 | 5 | 4 |
+| **Erva de Ancoragem** | Resiliência Mental +25 | 5 | 3 |
+| **Raiz de Yhtill** | Vitalidade +15 **e** RM +12 | 3 | 2 |
+
+Os dois diais de escassez são **puro dado**: o `EmpilhamentoMaximo` de cada `ItemDef` e a
+quantidade de instâncias que a ferramenta espalha. Nenhum código para rebalancear.
+
+### O anti-soft-lock é o Refúgio, não recarga
+
+O `RefugioDeLuz` é o **único ponto de save do jogo**, então o jogador passa por ele por design.
+Ele devolve Resiliência cheia e, desde 2026-08-12, **40% da Vitalidade máxima** — sob o mesmo
+`intervaloDeAncoragem` que já existia, para não dar dois motivos de ficar entrando e saindo da luz.
+
+A tensão fica **espacial e momento a momento** ("consigo chegar no próximo poste?"), e o custo é
+pago em travessia por patrulhas — o verbo do próprio jogo. A cura de Vitalidade é **parcial de
+propósito**: o jogador chega no Refúgio ferido e ainda precisa decidir se gasta um consumível.
+
+> A fração de Vitalidade é **fração**, não valor absoluto como a de Resiliência. O teto de RM é
+> fixo no `GameManager`, mas `Vitalidade.Max` é dinâmico (`SetValorMaximo` reage aos bônus de
+> `StatType.VitMaxima` das armaduras) — um absoluto curaria metade da barra no começo do jogo e
+> uma lasca dela depois de algumas peças.
+
+### Por que o modelo de moeda + Santuários foi descartado
+
+Uma proposta ("Âncoras de Carcosa") queria recarga ritual em **Santuários de Carcosa** paga com
+**Fragmentos de Carcosa** (~8 no jogo). Descartada por cinco motivos verificados no repositório —
+registrados aqui para a proposta não voltar:
+
+1. **A "lacuna de cura de Vitalidade" não existia.** A Água da Cacimba já curava corpo, e
+   `VitalidadeBridge.AplicarEfeitoConsumivel` já tratava os dois canais. Um *Emplastro de Sal*
+   duplicaria a Água; um *Chá Calmante* duplicaria a Erva.
+2. **A "profecia dos Fragmentos" é leitura equivocada.** `FragmentoDeYhtill` não é item: é
+   `MonoBehaviour`/`IInteragivel` de cena, chave `Quest.Cassilda.Fragmento{indice}`, carregando
+   uma estrofe. **Não existe `ItemDef` de Fragmento.** Eles alimentam
+   [quest_cassilda.md](quest_cassilda.md), já jogável de ponta a ponta — virar moeda colidiria
+   com uma quest concluída.
+3. **"Fragmento de Carcosa" e "Santuário de Carcosa" tinham zero ocorrências** em código e em
+   `Docs/`. Não eram elementos semeados: eram novos. O que existe é o Refúgio de Luz.
+4. **A justificativa mirava a luta errada.** O argumento era "chegar no Rei em Amarelo sem
+   recursos", mas o Rei **não tem `Vitalidade` nem `IDanificavel`** — é ritual de relíquias e
+   reação, sem desgaste para curar. Ver [boss_rei_em_amarelo.md](boss_rei_em_amarelo.md).
+5. **RM já não podia soft-lockar**, porque o Refúgio devolvia 100. O único canal em risco era a
+   Vitalidade — a lacuna real, e pequena.
+
+Somado a isso, uma conversão moeda→carga em santuário é um laço de moeda + vendor, que o
+`CLAUDE.md` §1 exige confirmar antes de propor. E oito usos num jogo inteiro produzem uma decisão
+a cada poucas horas, com hoarding como estratégia dominante — o problema clássico do elixir.
+
+### Ferramenta e chave de save
+
+`Tools/FavelaAmarela/Montar consumíveis do Deserto` espalha os 9, é idempotente e usa **chave
+derivada** (`Item.Deserto.<id>.<índice>`), com os setores percorridos em ordem alfabética.
+
+> ⚠️ **Nunca use `ObjetoPersistente.GarantirChave()` aqui.** É o que o `PovoarODeserto` faz, e
+> por isso ele **não pode ser reexecutado**: a chave é GUID aleatório, então reconstruir troca
+> todas e o save perde o registro de tudo que o jogador já pegou ou matou. Verificado em
+> 2026-08-12. `ConsumiveisNoMundoTests` trava essa propriedade com regex.
+
 ## Regras que evitam bugs de progressão
 
 1. **Testes isolados (POCO):** O `BaseInventory` e o `MainInventory` são exaustivamente testados sem Unity (NUnit EditMode), cobrindo falhas de empilhamento e limites estritos.

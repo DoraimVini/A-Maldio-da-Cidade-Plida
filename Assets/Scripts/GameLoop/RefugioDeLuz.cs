@@ -34,6 +34,12 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Min(0f)]
         [SerializeField] private float resilienciaRestaurada = 100f;
 
+        [Tooltip("Fração da Vitalidade máxima que a luz devolve (0.4 = 40%). 0 = não cura o " +
+                 "corpo. Parcial de propósito: o jogador chega no próximo Refúgio ferido e " +
+                 "precisa decidir se gasta um consumível ou arrisca seguir.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float fracaoDeVitalidadeRestaurada = 0.4f;
+
         [Tooltip("Segundos até este Refúgio poder ancorar de novo. Impede farm de cura " +
                  "entrando e saindo da luz.")]
         [Min(0f)]
@@ -81,16 +87,56 @@ namespace FavelaAmarela.Runtime.GameLoop
                 caixaDeTexto.Mostrar(mensagemDeDescanso);
         }
 
-        /// <summary>Devolve Resiliência Mental, respeitando o intervalo entre descansos.</summary>
+        /// <summary>
+        /// Devolve Resiliência Mental e parte da Vitalidade, respeitando o intervalo entre
+        /// descansos. As duas curas compartilham o <b>mesmo</b> relógio de propósito: um
+        /// segundo intervalo só daria ao jogador dois motivos para ficar entrando e saindo da
+        /// luz, que é exatamente o que o anti-farm existe para evitar.
+        ///
+        /// <para>É esta cura que impede o <em>soft-lock</em> físico sem precisar de moeda nem
+        /// de recarga de consumível: o Refúgio é o único ponto de save do jogo, então o jogador
+        /// passa por ele por design. Ver
+        /// <c>Docs/KnowledgeBundle/systems/inventario_e_consumiveis.md</c>.</para>
+        /// </summary>
         private bool Ancorar()
         {
-            if (resilienciaRestaurada <= 0f || Time.time < _proximaAncoragem) return false;
+            if (Time.time < _proximaAncoragem) return false;
+
+            bool curou = AncorarMente();
+            curou |= AncorarCorpo();
+
+            if (curou) _proximaAncoragem = Time.time + intervaloDeAncoragem;
+            return curou;
+        }
+
+        private bool AncorarMente()
+        {
+            if (resilienciaRestaurada <= 0f) return false;
 
             var resiliencia = GameManager.Instance != null ? GameManager.Instance.Resiliencia : null;
             if (resiliencia == null) return false;
 
             resiliencia.Ancorar(resilienciaRestaurada);
-            _proximaAncoragem = Time.time + intervaloDeAncoragem;
+            return true;
+        }
+
+        /// <summary>
+        /// Cura uma fração da Vitalidade <b>máxima</b>, não um valor absoluto como a Resiliência.
+        ///
+        /// <para><b>A assimetria é deliberada:</b> o teto de Resiliência é fixo no
+        /// <c>GameManager</c>, mas <c>Vitalidade.Max</c> é dinâmico — <c>SetValorMaximo</c>
+        /// reage aos bônus de <c>StatType.VitMaxima</c> das armaduras. Um valor absoluto aqui
+        /// envelheceria mal: curaria metade da barra no começo do jogo e uma lasca dela depois
+        /// de algumas peças de equipamento.</para>
+        /// </summary>
+        private bool AncorarCorpo()
+        {
+            if (fracaoDeVitalidadeRestaurada <= 0f) return false;
+
+            var vitalidade = GameManager.Instance != null ? GameManager.Instance.VitalidadeDoJogador : null;
+            if (vitalidade == null) return false;
+
+            vitalidade.Curar(vitalidade.Max * fracaoDeVitalidadeRestaurada);
             return true;
         }
 

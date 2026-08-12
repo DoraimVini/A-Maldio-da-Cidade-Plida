@@ -6,6 +6,69 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-12 (20ª rodada) — Consumíveis: item 2 fechado, "a luz é a válvula"
+
+### A proposta refutada
+Chegou um documento de design ("Âncoras de Carcosa") propondo recarga de consumíveis em
+**Santuários de Carcosa** paga com **Fragmentos de Carcosa** (~8 no jogo). Refutado por cinco
+pontos verificados no repositório — todos registrados em
+[inventario_e_consumiveis.md](systems/inventario_e_consumiveis.md) para a proposta não voltar:
+
+1. A "lacuna de cura de Vitalidade" **já estava fechada** (Água da Cacimba + `VitalidadeBridge`).
+2. `FragmentoDeYhtill` **não é item** — é `MonoBehaviour` de cena com estrofe de texto, chave
+   `Quest.Cassilda.Fragmento{indice}`. **Não existe `ItemDef` de Fragmento.** Virar moeda
+   colidiria com a quest da Cassilda, já concluída.
+3. "Fragmento de Carcosa" e "Santuário de Carcosa" tinham **zero ocorrências** em código e Docs.
+4. A justificativa mirava o **Rei em Amarelo, que não tem `Vitalidade` nem `IDanificavel`** — sem
+   desgaste para curar. Mesmo erro de categoria do `TraumaAnomalia` na 16ª rodada.
+5. **RM já não podia soft-lockar** (Refúgio devolve 100). O único canal em risco era a Vitalidade.
+
+### O modelo escolhido
+Consumíveis **finitos, não farmáveis**; o anti-*soft-lock* é o `RefugioDeLuz`, que o jogador já
+atravessa por ser o único save point. Zero moeda, zero `ItemType` novo, zero cena nova.
+
+- `GameManager.VitalidadeDoJogador`: propriedade pública nova, espelhando a `Resiliencia` que já
+  era pública. O bootstrap já guardava a `VitalidadeBridge` em campo privado — só faltava expor,
+  para que ninguém precise procurá-la com `FindObjectOfType` (proibido em produção).
+- `RefugioDeLuz`: cura **40% da Vitalidade máxima** além da RM, sob o **mesmo**
+  `intervaloDeAncoragem`. Fração e não absoluto de propósito — `Vitalidade.Max` é dinâmico
+  (armaduras mexem em `StatType.VitMaxima`), então um absoluto envelheceria mal. A assimetria com
+  o campo de RM (absoluto, porque o teto de RM é fixo) está documentada no XML.
+- `MontarConsumiveisDoDeserto` (Editor): espalha **9** consumíveis (4 Água, 3 Erva, 2 Raiz),
+  idempotente, com **chave derivada** `Item.Deserto.<id>.<índice>` e setores em ordem alfabética.
+  Sprite embutido tingido por tipo, porque os `ItemDef` de consumível ainda não têm ícone —
+  preencher o campo `Icone` faz a ferramenta usar a arte real sozinha.
+
+### O que estava realmente faltando no item 2
+Não era o modelo nem os itens: era **obtenibilidade**. Havia **zero instâncias de
+`ColetavelDeItem` de consumível em qualquer cena** e nenhuma `TabelaDeDrop` os incluía. Os três
+`ItemDef` existiam desde antes e o roadmap afirmava `grep "Tipo: 3" devolve zero` — **errado**,
+e a quarta anotação desatualizada encontrada hoje.
+
+### Testes
+- `ConsumiveisNoMundoTests` (4 casos): instâncias por consumível nas quantidades da receita,
+  chaves distintas, **chaves derivadas e não GUID** (trava a lição do `PovoarODeserto`), e todo
+  coletável com chave (chave vazia = reaparece a cada carga = farm infinito).
+- `ConsumiveisAssetsTests` **não foi tocado** — já cobria o lado dos assets por inteiro.
+- Suíte EditMode: **498/498 passando**.
+
+### ⚠️ Nota de método: batch mode engana de quatro jeitos
+Esta rodada custou cinco execuções para uma tarefa de uma. Consolidando o que aprendemos:
+
+1. **`exit code 0` não prova execução.** Script de Editor **recém-criado** faz a Unity compilar,
+   recarregar o domínio e sair pelo `-quit` **antes** de chegar no `-executeMethod`. Zero erro,
+   zero trabalho. Precisa de **duas execuções**: a primeira compila, a segunda executa.
+2. **Execuções em sequência colidem.** `&`/`Start-Process` devolve o controle antes de a Unity
+   liberar o lock do projeto; a execução seguinte aborta com *"another Unity instance is running"*.
+   Use `-Wait` **mais** um laço esperando o processo desaparecer.
+3. **Arquivo idêntico não prova estabilidade.** Comparei chaves antes/depois, vi "idênticas" e
+   concluí "idempotente" — quando na verdade nada havia rodado. Conclusão certa a partir do dado
+   certo, pela razão errada.
+4. **Confirme por um efeito que só a execução produz.** Aqui foi um *rename* deliberado dos
+   objetos: `Consumivel_` → `Coletavel_`. Se o nome mudou, o método rodou. Só depois disso a
+   comparação de chaves passou a significar algo — e aí sim: **9 chaves idênticas após
+   reconstrução verificada**, com as 12 chaves dos inimigos preservadas.
+
 ## 2026-08-12 (19ª rodada) — Guarda das fichas e verificação dos itens 6 e 7
 
 Rodada de **fechamento de escopo**, sob a diretriz do Vini: deixar os sistemas prontos para

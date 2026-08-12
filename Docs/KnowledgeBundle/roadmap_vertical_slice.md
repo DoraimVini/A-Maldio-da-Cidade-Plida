@@ -44,7 +44,7 @@ perto dos bosses:
 | # | Item | Estado | Observação |
 |---|---|---|---|
 | 1 | **Status Ailments** | ✅ **Pronto** | Sangramento por acúmulo (10 → estouro percentual) e Congelamento (3 acúmulos → trava o jogador). Ver [armas_da_tumba.md](systems/armas_da_tumba.md). |
-| 2 | **Sistema de Consumíveis** | ⚠️ **Infra pronta, zero itens** (re-auditado 2026-08-11) | O inventário amadureceu muito desde 08/01: `InventoryManager` + `ItemDatabase` + `ItemDef`, `EquipmentInventory` com 6 slots, `BarraDeItens` na HUD (teclas 1–8) e `ConsumirItem` funcionando. **O que falta é só conteúdo: `grep "Tipo: 3"` nos `ItemDef` devolve zero — nenhum consumível existe.** É o item mais barato de fechar da lista. Ver [inventario_e_consumiveis.md](systems/inventario_e_consumiveis.md). |
+| 2 | **Sistema de Consumíveis** | ✅ **Fechado** (2026-08-12) | `InventoryManager` + `ItemDatabase` + `ItemDef`, `EquipmentInventory` com 7 slots, `BarraDeItens` na HUD (teclas 1–8) e `ConsumirItem` funcionando. **3 consumíveis autorados** (Água da Cacimba → corpo, Erva de Ancoragem → mente, Raiz de Yhtill → os dois) e **9 instâncias espalhadas no Deserto** via `Tools/FavelaAmarela/Montar consumíveis do Deserto`. Modelo: **finitos, não farmáveis**, com o anti-*soft-lock* no `RefugioDeLuz` (que agora cura 40% da Vitalidade além da RM cheia) em vez de moeda ou recarga. ⚠️ A anotação anterior dizia `grep "Tipo: 3" devolve zero` — era **factualmente errada**, os 3 já existiam. Ver [inventario_e_consumiveis.md](systems/inventario_e_consumiveis.md). |
 | 3 | **Companheiro (RC)** | ⚠️ **Parcial** | Seguir Damião ✅; incapacitação + reanimação num Refúgio ✅ (implementado 2026-07-31). **Falta:** barra no HUD. Ver nota abaixo. |
 
 ### ⚠️ Conflito no item 1 — *Lentidão* vs. *Congelamento*

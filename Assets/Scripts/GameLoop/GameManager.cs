@@ -31,6 +31,15 @@ namespace FavelaAmarela.Runtime.GameLoop
         public TempestadeAmbiente TempestadeAmbiente { get; private set; }
 
         /// <summary>
+        /// Vitalidade corpórea de Damião, ou <c>null</c> se a bridge não foi achada no
+        /// bootstrap. Contraparte de <see cref="Resiliencia"/> — as duas barras de derrota
+        /// passam a ser alcançáveis pelo mesmo caminho, o que evita que cada script que
+        /// precisa curar o corpo saia procurando a <c>VitalidadeBridge</c> por conta própria
+        /// (proibido em produção, ver <c>Assets/Scripts/CLAUDE.md</c>).
+        /// </summary>
+        public Vitalidade VitalidadeDoJogador => _vitalidadeDamiao?.Vitalidade;
+
+        /// <summary>
         /// Verdadeiro enquanto Damião está preso numa sequência roteirizada (ex.: a
         /// queda Z4→Z5) e não pode agir. Fontes de morte instantânea por toque/ambiente
         /// (Coisa do Cemitério, <c>ColapsoTrigger</c>) devem respeitar isto e NÃO aplicar
