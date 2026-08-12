@@ -54,7 +54,7 @@ jogador — ninguém tem a arma.
 
 | | |
 |---|---|
-| Vitalidade | 420 |
+| Vitalidade | 500 |
 | Ataque (garras) | 26 |
 | Defesa | 8 |
 | Conjuração / Resistência Anômala | 20 / 12 |
@@ -64,6 +64,40 @@ A Vitalidade alta é deliberada: com janelas de 1,5–3 s, uma vida baixa faria 
 dois pousos e o padrão nunca se revelaria. O drop é **garantido**, não sorteado — é
 progressão roteirizada, e `Garantido: 1` fura o gate de nível de propósito (ver
 [loot_e_drop.md](loot_e_drop.md)).
+
+## Balanceamento (calibrado por simulação, 2026-08-11)
+
+> **Pedido do Vini:** equilíbrio levemente puxado para o difícil — vencível, sem ser fácil.
+
+A primeira estimativa desta luta foi feita **de cabeça** e errou por completo: concluiu que a
+luta era matematicamente impossível (RM insuficiente) quando na verdade era vencível com folga.
+A causa raiz não era número nenhum — era um **bug de mecânica**: cair para a fase 3 durante um
+pouso apenas *estendia* aquela janela em vez de fazer o Byakhee decolar, então a fase 3 (a
+identidade da luta — "circunda sem pousar") nunca acontecia de verdade.
+
+**Dois problemas corrigidos, um de mecânica e um de dado:**
+1. `ByakheeFSM.AtualizarFracaoDeVida` agora força a decolagem para `Circundando` no instante em
+   que a fase 3 começa, mesmo em pleno pouso.
+2. `intervaloPousoEspontaneo` (o pouso automático da fase 3 sem a Lâmina do Sinal): 30 s → 15 s.
+   `Vitalidade`: 420 → 500 (compensa a fase 3 ficar mais rápida).
+
+**Números reais** (`ByakheeRelatorioDeBalanceamento`, jogador simulado com taxa de acerto nas
+janelas de dano):
+
+| Arma | 100% de acerto | 85% | 70% |
+|---|---|---|---|
+| Cravo de Aklo | vence, 42% RM restante | vence, 42% | vence, 26% |
+| Estilete de Irem | vence, **25%** | vence, **14%** (raspando) | **colapsa** |
+| Alfanje de Alhazred | vence, 29% | vence, 29% | **colapsa** |
+
+Jogo perfeito sempre vence com folga real, nunca trivial. Jogo mediano (85%) vence na maioria
+dos casos, com o Estilete no limite — coerente com ele já ser a arma de menor dano do baú
+(`armas_da_tumba.md`), não um acidente de balance. Jogo ruim (70%) perde com duas das três
+armas: a punição é real.
+
+`LutaContraByakheeTests` trava a intenção (vencível com as 3 armas, gasto real de RM, fase 3
+acontecendo de fato) como regressão. `ByakheeRelatorioDeBalanceamento` imprime a tabela acima a
+cada rodada de QA — nunca falha, é instrumento de leitura, não teste de regra.
 
 ## Arquitetura
 

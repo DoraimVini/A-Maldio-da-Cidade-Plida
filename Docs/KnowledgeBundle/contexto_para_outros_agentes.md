@@ -124,6 +124,18 @@ possível solução para a curva de poder, mas **decisão foi adiar** em favor d
 obrigatórios — ele compete direto com o que sustenta a tese do Vertical Slice
 ("abertura + desfecho", ver `roadmap_vertical_slice.md`).
 
+## 7.1. Regra de commit aprendida na marra (2026-08-11)
+
+**Correção de bug vai para o commit sozinha e imediatamente. Não espere o balanceamento
+fechar.**
+
+O balanceamento do Byakhee foi perdido duas vezes por ficar em working tree não commitado
+durante troca de branch. Junto foi um **bug real e independente** (garras ferindo sem checar
+alcance), que não tinha motivo nenhum para estar esperando a discussão de dificuldade
+terminar.
+
+Separe: bug → commit na hora. Ajuste de número em aberto → commit próprio, depois.
+
 ## 8. Armadilhas já pagas nesta sessão (não repetir)
 
 1. **`GameObject.Find` só enxerga objetos ativos.** Uma ferramenta de wiring que criava telas

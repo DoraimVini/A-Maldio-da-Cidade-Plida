@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29302349cc1ab564485c21050a8f45b4, type: 3}
   m_Name: Ficha_Byakhee
   m_EditorClassIdentifier:
-  vitalidadeMax: 420
+  vitalidadeMax: 500
   ataque: 26
   conjuracao: 20
   defesa: 8

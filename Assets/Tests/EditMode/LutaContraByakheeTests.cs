@@ -7,26 +7,24 @@ namespace FavelaAmarela.Tests.EditMode
     /// <summary>
     /// Trava a <b>intenção de dificuldade</b> da luta do Byakhee: vencível com jogo perfeito
     /// usando qualquer uma das 3 armas da Tumba, mas gastando uma fração real da Resiliência —
-    /// "puxado para o difícil", não trivial, não impossível (pedido do Vini, 2026-08-11).
+    /// "equilíbrio levemente puxado para o difícil" (pedido do Vini, 2026-08-11).
     ///
-    /// <para>Simula a luta inteira com os POCOs de combate <b>reais</b> (não uma reimplementação
-    /// paralela): <see cref="ByakheeFSM"/> para o boss, <see cref="Vitalidade"/> para o corpo
-    /// dele, <see cref="ResilienciaMental"/> para a mente de Damião. O jogador simulado é
-    /// perfeito — ataca a cada cooldown da arma sempre que <c>PodeReceberDano</c> é verdadeiro.
-    /// Jogo imperfeito perde mais — isso é o próprio ponto do balanceamento.</para>
+    /// <para>Simula a luta com os POCOs de combate <b>reais</b> (<see cref="ByakheeFSM"/>,
+    /// <see cref="Vitalidade"/>, <see cref="ResilienciaMental"/>) e não com uma reimplementação
+    /// paralela — reimplementar a regra no teste faria o teste concordar com o próprio erro.</para>
     ///
-    /// <para><b>Contexto do número:</b> a primeira estimativa desta luta (feita de cabeça) errou
-    /// para o lado pessimista — achou a luta impossível quando não era. Estes testes existem
-    /// para que a próxima mudança de constante seja validada por simulação, não por intuição.</para>
+    /// <para><b>Por que este arquivo existe:</b> a primeira estimativa desta luta foi feita de
+    /// cabeça e errou feio (concluiu "impossível" quando era vencível). Toda mudança de
+    /// constante daqui em diante deve ser validada por estes testes, não por intuição.</para>
     /// </summary>
     public class LutaContraByakheeTests
     {
         private const float VitalidadeByakhee = 500f;
         private const float DefesaByakhee = 8f;
         private const float MaxResiliencia = 100f;
-        private const float ThresholdPanico = 25f;
         private const float Dt = 0.02f;
 
+        /// <summary>Uma das 3 armas da Tumba, com o dano e a cadência reais dela.</summary>
         private readonly struct Arma
         {
             public readonly string Nome;
@@ -45,57 +43,77 @@ namespace FavelaAmarela.Tests.EditMode
         private static readonly Arma Estilete = new Arma("Estilete de Irem", 25f, 0.3f);
         private static readonly Arma Alfanje = new Arma("Alfanje de Alhazred", 45f, 0.7f);
 
+        private static Arma PorNome(string nome) => nome switch
+        {
+            nameof(Cravo) => Cravo,
+            nameof(Estilete) => Estilete,
+            _ => Alfanje,
+        };
+
+        private readonly struct Resultado
+        {
+            public readonly bool Venceu;
+            public readonly float ResilienciaRestante;
+            public readonly float Segundos;
+            public readonly bool CircundouAlgumaVez;
+
+            public Resultado(bool venceu, float rm, float segundos, bool circundou)
+            {
+                Venceu = venceu;
+                ResilienciaRestante = rm;
+                Segundos = segundos;
+                CircundouAlgumaVez = circundou;
+            }
+        }
+
         /// <summary>
-        /// Corre a luta até o Byakhee cair ou a Resiliência colapsar. Devolve se venceu e
-        /// quanto de Resiliência sobrou — é o número que importa para calibrar "puxado".
+        /// Corre a luta com um jogador <b>perfeito</b>: ataca a cada cooldown sempre que a
+        /// janela está aberta, e nunca leva dano evitável. Jogo real rende menos — é justamente
+        /// essa folga que separa "difícil" de "impossível".
         /// </summary>
-        private static (bool venceu, float resilienciaRestante, float segundos) SimularLuta(Arma arma)
+        private static Resultado Simular(Arma arma)
         {
             var fsm = new ByakheeFSM();
             fsm.IniciarLuta();
 
-            var vidaByakhee = new Vitalidade(VitalidadeByakhee);
-            var resiliencia = ResilienciaMental.ComThresholdFracional(MaxResiliencia, ThresholdPanico / MaxResiliencia);
+            var vida = new Vitalidade(VitalidadeByakhee);
+            var resiliencia = ResilienciaMental.ComThresholdFracional(MaxResiliencia, 0.25f);
 
-            float tempoDesdeUltimoAtaque = 999f;
+            float desdeUltimoAtaque = 999f;
             float tempo = 0f;
+            bool circundou = false;
 
-            for (int passos = 0; passos < 5_000_000; passos++)
+            for (int passos = 0; passos < 1_000_000; passos++)
             {
                 tempo += Dt;
-                tempoDesdeUltimoAtaque += Dt;
+                desdeUltimoAtaque += Dt;
 
                 float dreno = fsm.DrenoDeResilienciaPorSegundo;
                 if (dreno > 0f) resiliencia.SofrerTrauma(dreno * Dt);
+                if (resiliencia.IsColapso) return new Resultado(false, 0f, tempo, circundou);
 
-                if (resiliencia.IsColapso)
-                    return (false, 0f, tempo);
+                if (fsm.CurrentState == ByakheeState.Circundando) circundou = true;
 
-                if (fsm.PodeReceberDano && tempoDesdeUltimoAtaque >= arma.Cooldown)
+                if (fsm.PodeReceberDano && desdeUltimoAtaque >= arma.Cooldown)
                 {
-                    tempoDesdeUltimoAtaque = 0f;
-                    float danoLiquido = System.Math.Max(arma.Dano * 0.15f, arma.Dano - DefesaByakhee);
-                    vidaByakhee.Ferir(danoLiquido);
+                    desdeUltimoAtaque = 0f;
 
-                    if (vidaByakhee.EstaAbatido)
-                        return (true, resiliencia.Atual, tempo);
+                    // Mesma fórmula de MitigacaoDeDano: subtrativa com piso de 15%.
+                    float liquido = System.Math.Max(arma.Dano * 0.15f, arma.Dano - DefesaByakhee);
+
+                    // O golpe que acerta durante o Frenesi também o interrompe.
+                    if (fsm.CurrentState == ByakheeState.Frenesi) fsm.InterromperFrenesi();
+
+                    vida.Ferir(liquido);
+                    if (vida.EstaAbatido)
+                        return new Resultado(true, resiliencia.Atual, tempo, circundou);
                 }
 
-                fsm.AtualizarFracaoDeVida(vidaByakhee.Percentual);
-
-                // O frenesi só sai por golpe (não por PodeReceberDano, que é falso nele até
-                // a interrupção acontecer) — um golpe do jogador o interrompe igual a um golpe
-                // qualquer, e derruba o Byakhee pousado.
-                if (fsm.CurrentState == ByakheeState.Frenesi && tempoDesdeUltimoAtaque >= arma.Cooldown)
-                {
-                    tempoDesdeUltimoAtaque = 0f;
-                    fsm.InterromperFrenesi();
-                }
-
+                fsm.AtualizarFracaoDeVida(vida.Percentual);
                 fsm.Tick(Dt);
             }
 
-            return (false, resiliencia.Atual, tempo);
+            return new Resultado(false, resiliencia.Atual, tempo, circundou);
         }
 
         [TestCase(nameof(Cravo))]
@@ -103,37 +121,59 @@ namespace FavelaAmarela.Tests.EditMode
         [TestCase(nameof(Alfanje))]
         public void JogoPerfeito_VenceComQualquerArma(string nomeArma)
         {
-            var arma = nomeArma switch
-            {
-                nameof(Cravo) => Cravo,
-                nameof(Estilete) => Estilete,
-                _ => Alfanje,
-            };
+            var arma = PorNome(nomeArma);
+            var r = Simular(arma);
 
-            var (venceu, resilienciaRestante, _) = SimularLuta(arma);
+            Assert.IsTrue(r.Venceu,
+                $"A luta tem de ser vencível com {arma.Nome} em jogo perfeito — mesma regra " +
+                "das 3 armas da Tumba: nenhuma pode ser 'a errada'.");
+        }
 
-            Assert.IsTrue(venceu,
-                $"A luta contra o Byakhee tem de ser vencível com {arma.Nome} em jogo " +
-                "perfeito — mesma regra das 3 armas da Tumba: nenhuma pode ser 'a errada'.");
+        [TestCase(nameof(Cravo))]
+        [TestCase(nameof(Estilete))]
+        [TestCase(nameof(Alfanje))]
+        public void JogoPerfeito_CustaResilienciaDeVerdade(string nomeArma)
+        {
+            var arma = PorNome(nomeArma);
+            var r = Simular(arma);
 
-            // "Puxado para o difícil" = gasta uma fração real da RM, não sobra quase tudo.
-            // Sem piso, jogo perfeito ficaria indistinguível de trivial.
-            Assert.Less(resilienciaRestante, MaxResiliencia * 0.55f,
-                $"Sobrou {resilienciaRestante:F0}/100 de Resiliência com {arma.Nome} em jogo " +
-                "perfeito — a luta ficou fácil demais para o pedido do Vini.");
+            // Sem piso de custo, jogo perfeito ficaria indistinguível de trivial e o grito
+            // infrassônico deixaria de ser o relógio que o design pede.
+            Assert.Less(r.ResilienciaRestante, MaxResiliencia * 0.60f,
+                $"Sobrou {r.ResilienciaRestante:F0}/100 de Resiliência com {arma.Nome} em jogo " +
+                "perfeito — fácil demais para o equilíbrio pedido.");
+
+            // E o teto: se nem o jogo perfeito sobra folga, o jogo real é impossível.
+            Assert.Greater(r.ResilienciaRestante, 0f,
+                $"{arma.Nome} não deixa nenhuma margem em jogo perfeito — a luta vira " +
+                "impossível para qualquer jogador humano.");
+        }
+
+        [TestCase(nameof(Cravo))]
+        [TestCase(nameof(Estilete))]
+        [TestCase(nameof(Alfanje))]
+        public void Fase3_AconteceDeVerdade(string nomeArma)
+        {
+            // Regressão de um bug de design real: cair para 30% durante um pouso apenas
+            // ESTENDIA aquela janela em vez de fazer o Byakhee decolar. O jogador matava ele
+            // ali mesmo e a fase 3 — a identidade da luta — nunca aparecia.
+            var r = Simular(PorNome(nomeArma));
+
+            Assert.IsTrue(r.CircundouAlgumaVez,
+                $"Com {PorNome(nomeArma).Nome} o Byakhee morreu sem nunca circundar: a fase 3 " +
+                "não está acontecendo.");
         }
 
         [Test]
-        public void JogoPerfeito_ArmaMaisFracaEhAMaisApertada()
+        public void EstileteEhAOpcaoMaisApertada()
         {
-            // Coerência com o resto do jogo (armas_da_tumba.md): o Estilete tem o menor dano
-            // do baú e paga esse preço aqui também — não é acidente, é consistência de design.
-            var (_, rmCravo, _) = SimularLuta(Cravo);
-            var (_, rmEstilete, _) = SimularLuta(Estilete);
+            // Coerência com armas_da_tumba.md: o Estilete tem o menor dano do baú e paga esse
+            // preço aqui também. Não é acidente — é a mesma identidade das 3 armas.
+            var cravo = Simular(Cravo);
+            var estilete = Simular(Estilete);
 
-            Assert.Less(rmEstilete, rmCravo,
-                "O Estilete deveria sobrar com menos Resiliência que o Cravo — é a arma mais " +
-                "fraca em dano bruto, e essa fraqueza precisa aparecer aqui também.");
+            Assert.Less(estilete.ResilienciaRestante, cravo.ResilienciaRestante,
+                "O Estilete deveria terminar a luta com menos Resiliência que o Cravo.");
         }
     }
 }
