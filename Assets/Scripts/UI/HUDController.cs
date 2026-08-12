@@ -21,6 +21,21 @@ namespace FavelaAmarela.Runtime.UI
         [Header("Views de HUD")]
         [SerializeField] private ResilienciaBar resilienciaBar;
 
+        [Tooltip("Barra do Vigor (Estamina). Alimentada pelo GameManager a partir do Player.")]
+        [SerializeField] private VigorBar vigorBar;
+
+        [Tooltip("Barra da Vitalidade corpórea (a 'carne'). Alimentada pelo GameManager.")]
+        [SerializeField] private VitalidadeBar vitalidadeBar;
+
+        [Tooltip("Barra de ações da Mão Física (arma empunhada + habilidade). Alimentada pelo GameManager.")]
+        [SerializeField] private BarraDeAcoes barraDeAcoes;
+
+        [Tooltip("Barra com as 8 posições do inventário (teclas 1–8). Alimentada pelo GameManager.")]
+        [SerializeField] private BarraDeItens barraDeItens;
+
+        [Tooltip("Barra dos 4 Artefatos equipados (teclas F1–F4). Alimentada pelo GameManager.")]
+        [SerializeField] private BarraDeArtefatos barraDeArtefatos;
+
         [Header("Config inicial (usado se nenhuma fonte for injetada de fora)")]
         [Tooltip("Resiliência máxima inicial de Damião.")]
         [SerializeField] private float resilienciaMax = 100f;
@@ -30,9 +45,13 @@ namespace FavelaAmarela.Runtime.UI
         [SerializeField] private float fracaoThresholdPanico = 0.25f;
 
         private ResilienciaMental _resiliencia;
+        private Vitalidade _vitalidade;
 
         /// <summary>Instância corrente. Null antes de Awake/injeção.</summary>
         public ResilienciaMental Resiliencia => _resiliencia;
+
+        /// <summary>Vitalidade corpórea corrente. Null até o GameManager injetar.</summary>
+        public Vitalidade Vitalidade => _vitalidade;
 
         private void Awake()
         {
@@ -59,6 +78,58 @@ namespace FavelaAmarela.Runtime.UI
             _resiliencia = fonte;
             if (resilienciaBar != null)
                 resilienciaBar.Bind(_resiliencia);
+        }
+
+        /// <summary>
+        /// Injeta a <see cref="Vitalidade"/> corpórea de Damião (criada pela
+        /// <c>VitalidadeBridge</c> a partir da ficha de atributos e repassada pelo
+        /// <c>GameManager</c> no bootstrap). Diferente da Resiliência, o HUD não cria uma
+        /// local de fallback: a Vitalidade pertence ao ator na cena, não ao HUD.
+        /// </summary>
+        public void InjetarVitalidade(Vitalidade fonte)
+        {
+            if (fonte == null)
+            {
+                Debug.LogError("[HUDController] InjetarVitalidade recebeu null — a barra de " +
+                               "Vitalidade vai ficar parada. Provável ordem de Awake: a " +
+                               "VitalidadeBridge ainda não tinha criado a POCO.", this);
+                return;
+            }
+
+            _vitalidade = fonte;
+
+            if (vitalidadeBar != null)
+                vitalidadeBar.Bind(_vitalidade);
+            else
+                Debug.LogError("[HUDController] Campo 'vitalidadeBar' vazio — a Vitalidade foi " +
+                               "injetada mas não há barra ligada para mostrá-la.", this);
+        }
+
+        /// <summary>
+        /// Injeta a Mão Física de Damião na barra de ações, para o HUD mostrar a arma
+        /// empunhada e a recarga da habilidade. Chamado pelo <c>GameManager</c> no bootstrap.
+        /// </summary>
+        public void InjetarMaoFisica(FavelaAmarela.Player.MaoFisicaBridge fonte)
+        {
+            if (fonte == null) return;
+            if (barraDeAcoes != null)
+                barraDeAcoes.Bind(fonte);
+        }
+
+        public void InjetarVigor(FavelaAmarela.Player.GerenciadorDeVigor fonte)
+        {
+            if (fonte == null) return;
+            if (vigorBar != null) vigorBar.Bind(fonte);
+        }
+
+        /// <summary>
+        /// Injeta os Artefatos de Damião na barra de artefatos, para o HUD mostrar os quatro
+        /// slots e suas recargas. Chamado pelo <c>GameManager</c> no bootstrap.
+        /// </summary>
+        public void InjetarArtefatos(FavelaAmarela.Player.ArtefatosBridge fonte)
+        {
+            if (fonte == null) return;
+            if (barraDeArtefatos != null) barraDeArtefatos.Bind(fonte);
         }
 
         // ── Atalhos de teste (removíveis) ────────────────────────────────────

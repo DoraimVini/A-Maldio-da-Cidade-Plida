@@ -9,8 +9,13 @@ timestamp: 2026-07-07T11:00:00Z
 
 Este bundle OKF contém a base de conhecimento completa do projeto, organizada para ser lida tanto por desenvolvedores humanos quanto por agentes de IA. Ele funciona como a memória persistente de um **Engenheiro de Gameplay Sênior especializado em Unity 6.4**.
 
+> 🤖 **[Contexto Completo para Outros Agentes](contexto_para_outros_agentes.md)** — ponto de entrada único para qualquer IA (Antigravity, outra sessão) que não acompanhou a sessão em andamento: estado do git, o que foi construído, pendências ativas e armadilhas já pagas. Leia isto primeiro se você está chegando agora.
+>
+> 📌 **[Roadmap do Vertical Slice](roadmap_vertical_slice.md)** — estado real de cada item da lista de produção (pronto / parcial / não-começado) e os riscos de escopo. Auditado em 2026-07-31.
+
 ## Navegação do Catálogo
 
+- [Documento de Design Mestre (GDD)](GDD_Mestre.md) — Visão geral, pilares de design e HUD diegético do jogo
 - [Arquitetura](architecture/index.md) — Decisões arquiteturais, padrões e convenções estruturais
 - [Sistemas de Jogo](systems/index.md) — Regras de game design, mecânicas e fórmulas
 - [Scripts](scripts/index.md) — Documentação de implementação dos scripts C#

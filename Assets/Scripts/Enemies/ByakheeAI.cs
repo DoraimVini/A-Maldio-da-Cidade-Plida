@@ -44,9 +44,6 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Alcance do cone, em unidades.")]
         [SerializeField] private float alcanceDoGrito = 4f;
 
-        [Tooltip("Alcance das garras no pouso. Fora disso, o golpe não acerta.")]
-        [SerializeField] private float alcanceDasGarras = 1.5f;
-
         [Header("Cores de leitura (provisórias, até haver arte)")]
         [SerializeField] private Color corNoAr = new Color(0.35f, 0.30f, 0.45f);
         [SerializeField] private Color corPousado = new Color(0.85f, 0.75f, 0.25f);
@@ -219,23 +216,9 @@ namespace FavelaAmarela.Runtime.Enemies
             };
         }
 
-        /// <summary>
-        /// Golpe de garras no instante do pouso.
-        ///
-        /// <para><b>Bug corrigido em 2026-08-11:</b> esta função feria o jogador
-        /// <b>incondicionalmente</b> a cada pouso, mesmo do outro lado da arena — a cada
-        /// pouso agressivo eram 20 de dano de graça. Com 5–7 pousos numa luta, isso sozinho
-        /// podia matar o corpo de Damião mesmo com Resiliência de sobra. Agora só acerta quem
-        /// está dentro do alcance — na prática, quem está perto o bastante para revidar com
-        /// arma corpo-a-corpo também está perto o bastante para levar o golpe: é a troca de
-        /// risco que a "janela de dano" do design sempre pediu, não um chip gratuito.</para>
-        /// </summary>
         private void GolpearComGarras()
         {
             if (_jogador == null) return;
-
-            float distancia = Vector2.Distance(transform.position, _jogador.position);
-            if (distancia > alcanceDasGarras) return;
 
             var alvo = _jogador.GetComponent<IDanificavel>();
             alvo?.ReceberGolpe(new ArmaResult(true, 0f, 0f, false, 0f, danoDasGarras));

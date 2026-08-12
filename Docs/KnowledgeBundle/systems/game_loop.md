@@ -17,17 +17,17 @@ O ciclo principal do jogo é controlado por uma FSM com **5 estados** e **transi
 | **Menu** | Tela inicial. Estado padrão ao iniciar o jogo. |
 | **Gameplay** | Jogo em andamento. Todos os sistemas de stealth, IA e RM ativos. |
 | **Pausado** | Jogo pausado. Tempo congelado. |
-| **Colapso** | Game Over — [Resiliência Mental](resiliencia_mental.md) chegou a zero. |
-| **Vitória** | O jogador completou o objetivo. |
+| **Colapso** | Fim de jogo diegético — [Resiliência Mental](resiliencia_mental.md) chegou a zero; retorna ao Menu. |
+| **TransicaoDeFase** | Encerramento de uma fase/dungeon (ex.: derrota do miniboss num portão de saída). **Não é "Vitória"** — o jogo é um RPG multi-fase, não roguelike; congela o gameplay para a transição visual antes do próximo trecho. (2026-07-28: renomeado de `Vitoria`.) |
 
 ## Transições Válidas
 
 ```
-Menu     ──▶ Gameplay
-Gameplay ──▶ Pausado | Colapso | Vitória
-Pausado  ──▶ Gameplay | Menu
-Colapso  ──▶ Menu
-Vitória  ──▶ Menu
+Menu            ──▶ Gameplay
+Gameplay        ──▶ Pausado | Colapso | TransicaoDeFase
+Pausado         ──▶ Gameplay | Menu
+Colapso         ──▶ Menu
+TransicaoDeFase ──▶ Menu
 ```
 
 Qualquer outra transição é **rejeitada silenciosamente** (`TryTransition()` retorna `false`).

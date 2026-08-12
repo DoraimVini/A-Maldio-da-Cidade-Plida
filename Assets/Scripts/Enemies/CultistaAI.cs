@@ -1,178 +1,45 @@
 using UnityEngine;
-using FavelaAmarela.Core.Abilities;
-using FavelaAmarela.Core.Enemies;
-using FavelaAmarela.Core.Stealth;
-using FavelaAmarela.Runtime.GameLoop;
 
 namespace FavelaAmarela.Runtime.Enemies
 {
-    [RequireComponent(typeof(SpriteRenderer), typeof(Rigidbody2D))]
+    [RequireComponent(typeof(EnemyBase))]
+    [RequireComponent(typeof(EnemyMovement))]
+    [RequireComponent(typeof(EnemyCombat))]
+    [RequireComponent(typeof(EnemyPerception))]
+    [RequireComponent(typeof(EnemyStateMachine))]
+    [RequireComponent(typeof(EnemyStatusEffects))]
     public class CultistaAI : MonoBehaviour
     {
-        private CultistaFSM _fsm;
-        private SpriteRenderer _spriteRenderer;
-        private Rigidbody2D _rb;
-        private PatrolRoute _patrolRoute;
-
-        [Header("Patrulha")]
-        [SerializeField] private Transform[] waypoints;
-
-        [Header("Configurações")]
-        [SerializeField] private float velocidadeErrante = 1.0f;
-        [SerializeField] private float velocidadeCaca = 3.5f;
+        [Header("Cores por estado")]
         [SerializeField] private Color corErrante = Color.white;
         [SerializeField] private Color corAlerta = Color.yellow;
         [SerializeField] private Color corCaca = Color.red;
+        [SerializeField] private Color corAtacar = new Color(0.75f, 0f, 0.2f);
+        [SerializeField] private Color corHurt = Color.magenta;
+
+        private EnemyStateMachine _fsm;
+        private SpriteRenderer _sr;
 
         private void Awake()
         {
-            _spriteRenderer = GetComponent<SpriteRenderer>();
-            _rb = GetComponent<Rigidbody2D>();
-            _rb.gravityScale = 0f;
-            _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            _fsm = GetComponent<EnemyStateMachine>();
+            _sr = GetComponent<SpriteRenderer>();
+            _fsm.OnStateChanged += (prev, curr) => AtualizarCor(curr);
+            AtualizarCor(_fsm.CurrentState);
+        }
 
-            _fsm = new CultistaFSM(CultistaState.Errante);
-            _fsm.OnStateChanged += HandleStateChanged;
-
-            if (waypoints != null && waypoints.Length > 0)
+        private void AtualizarCor(EnemyState estado)
+        {
+            _sr.color = estado switch
             {
-                var poses = new Vector2[waypoints.Length];
-                for (int i = 0; i < waypoints.Length; i++)
-                {
-                    if (waypoints[i] == null)
-                    {
-                        Debug.LogError($"[CultistaAI] Waypoint {i} não está atribuído no Inspector. Usando posição atual como fallback.", this);
-                        poses[i] = transform.position;
-                        continue;
-                    }
-                    poses[i] = waypoints[i].position;
-                }
-
-                _patrolRoute = new PatrolRoute(poses, loop: true);
-            }
-            else
-            {
-                _patrolRoute = new PatrolRoute(new[] { (Vector2)transform.position });
-            }
-
-            AtualizarVisual(_fsm.CurrentState);
-        }
-
-        private void FixedUpdate()
-        {
-            _fsm.Tick(Time.fixedDeltaTime);
-
-            switch (_fsm.CurrentState)
-            {
-                case CultistaState.Errante:
-                    if (_patrolRoute != null)
-                    {
-                        MoverEmDirecaoA(_patrolRoute.AlvoAtual, velocidadeErrante);
-                        _patrolRoute.AtualizarChegada(transform.position, 0.3f);
-                    }
-                    else
-                    {
-                        _rb.linearVelocity = Vector2.zero;
-                    }
-                    break;
-                case CultistaState.Alerta:
-                    // Parado (Pausa telegrafada antes de caçar)
-                    // Poderia apenas rotacionar em direção a _fsm.UltimaOrigemConhecida se desejado
-                    _rb.linearVelocity = Vector2.zero;
-                    break;
-                case CultistaState.Caca:
-                    if (_fsm.UltimaOrigemConhecida.HasValue)
-                    {
-                        MoverEmDirecaoA(_fsm.UltimaOrigemConhecida.Value, velocidadeCaca);
-                    }
-                    else
-                    {
-                        _rb.linearVelocity = Vector2.zero;
-                    }
-                    break;
-            }
-        }
-
-        private void MoverEmDirecaoA(Vector2 alvo, float velocidade)
-        {
-            Vector2 direcao = (alvo - (Vector2)transform.position).normalized;
-            _rb.linearVelocity = direcao * velocidade;
-        }
-
-        private void OnEnable()
-        {
-            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
-            {
-                GameManager.Instance.SoundBroadcaster.OnSomEmitido += HandleSomEmitido;
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (GameManager.Instance != null && GameManager.Instance.SoundBroadcaster != null)
-            {
-                GameManager.Instance.SoundBroadcaster.OnSomEmitido -= HandleSomEmitido;
-            }
-        }
-
-        private void HandleSomEmitido(SomEmitido som)
-        {
-            float distancia = Vector2.Distance(transform.position, som.Origem);
-            _fsm.ReceberEstimuloSonoro(som.Origem, distancia, som.RaioEfetivo);
-        }
-
-        /// <summary>
-        /// Recebe o resultado de um golpe de arma física (ex.: <see cref="MaoFisicaBridge"/>
-        /// com a <see cref="BarraEnferrujada"/>). Só reage se o golpe rolou
-        /// atordoamento — a chance em si é decidida pela arma, não aqui.
-        /// </summary>
-        public void ReceberGolpeFisico(ArmaResult resultado)
-        {
-            if (resultado.Atordoou)
-            {
-                _fsm.AtordoarPor(resultado.DuracaoAtordoamento);
-            }
-        }
-
-        private void HandleStateChanged(CultistaState anterior, CultistaState atual)
-        {
-            AtualizarVisual(atual);
-        }
-
-        private void AtualizarVisual(CultistaState estado)
-        {
-            switch (estado)
-            {
-                case CultistaState.Errante:
-                    _spriteRenderer.color = corErrante;
-                    break;
-                case CultistaState.Alerta:
-                    _spriteRenderer.color = corAlerta;
-                    break;
-                case CultistaState.Caca:
-                    _spriteRenderer.color = corCaca;
-                    break;
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (_fsm != null)
-            {
-                _fsm.OnStateChanged -= HandleStateChanged;
-            }
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (_fsm == null) return;
-
-            Gizmos.color = _spriteRenderer != null ? _spriteRenderer.color : Color.white;
-            Gizmos.DrawWireSphere(transform.position, 1.5f);
-            
-            // Desenha raio de vibração
-            Gizmos.color = new Color(0.5f, 0, 0.5f, 0.2f);
-            Gizmos.DrawWireSphere(transform.position, 3f);
+                EnemyState.Idle or EnemyState.Patrol => corErrante,
+                EnemyState.Alert => corAlerta,
+                EnemyState.Chase => corCaca,
+                EnemyState.Attack => corAtacar,
+                EnemyState.Hurt => corHurt,
+                EnemyState.Dead => Color.gray,
+                _ => _sr.color
+            };
         }
     }
 }

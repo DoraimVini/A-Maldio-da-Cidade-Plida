@@ -1,11 +1,29 @@
-# A Maldição da Cidade Pálida (Favela Amarela)
+# Caminho para Carcosa
+
+> **Título oficial, visível ao jogador: "Caminho para Carcosa"** (decisão do Vini, 2026-08-11).
+> O projeto carrega outros nomes por razões históricas — **A Maldição da Cidade Pálida**
+> (repositório no GitHub), **Peregrino Amarelo** (pasta local), **Favela Amarela**
+> (namespaces `FavelaAmarela.*` e nome das skills). Esses ficam como estão: renomear
+> namespace e repositório é retrabalho sem ganho. **Mas todo texto novo mostrado ao jogador
+> usa "Caminho para Carcosa".**
 
 ## 1. Contexto Geral
 - Engine: Unity 6000.4.4f1, 2D isométrico.
 - Linguagem: C#, com separação estrita entre lógica pura (POCO) e adaptadores Unity.
-- Gênero: jogo de stealth / horror cósmico. O núcleo continua sendo furtividade e horror cósmico, não farming/loot genérico de ARPG — mas o jogo vai incorporar sistemas de progressão (inventário, barra de ações, árvore de talentos/habilidades) por decisão explícita do Vini. **Não proponha mecânicas de ARPG novas por conta própria** — essas três abaixo já foram decididas; qualquer outra (ex.: níveis de personagem, moeda, crafting) precisa ser confirmada com ele antes.
-- Inventário e barra de ações: **previstos** (decisão de 2026-07-07), para armas e armaduras coletadas via gameplay — sem data definida, não implementar por conta própria sem confirmar com o Vini antes. Quando entrar em desenvolvimento, deve ser enxuto (sem grind de itens) e seguir a terminologia diegética da skill `favela-lore-enforcer`.
-- Árvore de talentos/habilidades: **também prevista** (decisão de 2026-07-07), sem data definida — não implementar por conta própria sem confirmar com o Vini antes. Ao desenhar, seguir a terminologia diegética (nada de "Skill Tree"/"Talent Point" genérico visível ao jogador) e a filosofia de composição sobre herança da seção 4 (habilidades plugáveis via interface, ver `IAnomalyPower`) em vez de um grafo de nós genérico copiado de ARPG.
+- Gênero: jogo de stealth / horror cósmico. Furtividade e horror cósmico continuam sendo o núcleo tonal e narrativo — mas o **combate aberto já é um pilar sistêmico próprio**, não um mero fallback "quando o stealth falha": toda unidade tem uma ficha de atributos (Vitalidade/Ataque/Defesa/Conjuração/Resistência Anômala), uma fórmula de mitigação de dano por defesa, e armas com ataque básico + habilidade própria (cooldown independente) — ver `Docs/KnowledgeBundle/systems/ficha_de_atributos.md`. O jogo também vai incorporar outros sistemas de progressão (inventário, barra de ações, árvore de talentos/habilidades, loot com raridade e níveis de personagem) por decisão explícita do Vini — ver os bullets abaixo para o que já foi decidido e o que ainda precisa de confirmação. **Não proponha mecânicas de ARPG novas por conta própria** além das já decididas; qualquer outra (ex.: moeda, crafting) precisa ser confirmada com ele antes.
+- Inventário e barra de ações: **LIBERADOS para desenvolvimento** (decisão de 2026-07-31; antes eram "previstos, sem data"). Foram destravados porque o item 2 do escopo do edital (Sistema de Consumíveis) depende deles — ver §1.1. Continuam valendo as restrições de forma: enxuto (sem grind de itens) e terminologia diegética da skill `favela-lore-enforcer`. A barra de ações já existe (`BarraDeAcoes`, slot de arma + habilidade); o que falta é o inventário em si.
+- Árvore de talentos/habilidades e níveis de personagem: **JÁ EXISTEM em código** — o `ProgressionManager` (`Assets/Scripts/Progression/ProgressionManager.cs`) implementa nível de Exposição, curva de XP (cap 12), pontos e a árvore de Ecos do Labirinto de Carcosa (`EcoDef`, com pré-requisitos). Esta linha antes dizia "prevista, sem data" — divergência doc↔código corrigida em 2026-08-11. Ao mexer, seguir a terminologia diegética (nada de "Skill Tree"/"Talent Point" visível ao jogador) e a filosofia de composição sobre herança da seção 4. **Nota arquitetural:** o namespace é `FavelaAmarela.Progression`, fora do par `Core.*`/`Runtime.*` da seção 2 — não replicar esse desvio em código novo.
+- Loot e raridade: **motor implementado em 2026-08-11** (fatia básica), o resto segue **FORA do Vertical Slice**. O que existe: `Core.Loot` (`SorteioDeDrop` + `IFonteDeAleatoriedade`, testado), `TabelaDeDrop`/`EntradaDeDrop` (assets), `DropAoAbater` (Runtime) e o `BauDaTumba` já migrado — ver `systems/loot_e_drop.md`. Regras que continuam valendo: escopo **deliberadamente contido** (nada de profundidade tipo Path of Exile / Last Epoch), e a invariante central de que o sorteio escolhe *qual* `ItemDef` cai mas **nunca gera atributos**. **Tiers progridem por `NivelMinimo` por entrada, comparado ao `ProgressionManager.NivelAtual`** (decisão de 2026-08-11). Segue fora do VS e **não começar sem pedido explícito**: graus Marcado/Impregnado autorados, curva de chance por arquétipo e a contrapartida do grau alto.
+
+### 1.1 Escopo corrente: Vertical Slice
+**Redefinido em 2026-07-31.** O Vertical Slice do edital são os **14 itens da lista priorizada de produção** (GDD v3.0), não só a Tumba: **a Fase 1 completa** (Deserto de Hali povoado + tempestade ligada + Santuário de Yhtill + boss Byakhee) **e a última fase do jogo** (Castelo de Carcosa + boss Rei em Amarelo), mais os sistemas de suporte (status ailments, consumíveis, companheiro). Estado real item a item, sempre atualizado: `Docs/KnowledgeBundle/roadmap_vertical_slice.md`.
+
+**É um recorte "abertura + desfecho", não duas fases seguidas.** O jogo completo tem 6 fases; o VS pula as 4 do meio de propósito — as dungeons iniciais mostram o loop de jogo, e o Rei em Amarelo mostra onde ele desemboca. Consequência prática: **o Castelo não é candidato a corte** se o prazo apertar; cortá-lo remove metade da tese do VS. Isso substitui a definição anterior ("só a Tumba de Alhazred jogável de ponta a ponta") — a Tumba passa a ser **uma peça concluída** do VS, não o VS inteiro.
+
+Consequências práticas ao propor trabalho:
+- **Inventário/barra de ações estão liberados** (item 2 depende deles) — ver bullet acima.
+- Continuam **fora** do VS: loot/raridade/níveis de personagem, árvore de talentos, percepção graduada, fast travel.
+- O escopo é grande e o prazo é de edital: ao sugerir trabalho, prefira o que fecha um item da lista inteiro a polir algo já jogável. Quando em dúvida se algo pertence ao VS, pergunte ao Vini.
 - Ambientação: Ruínas Pálidas (Ruins of Hali) dentro da Cidade Pálida (Carcosa). Protagonista: Damião.
 - Controle de versão: Git.
 
@@ -72,6 +90,13 @@ Sempre que você for desenhar a fundação de um novo script ou lidar com import
 `C:\Users\Vini\Desktop\Studio_Knowledge_Base`
 Leia os arquivos lá antes de cometer erros arquiteturais clássicos da Unity.
 
+### 3.3 Integração com o Obsidian e Devlog
+- **Cofre Obsidian:** A pasta `Docs/KnowledgeBundle/` está conectada por link simbólico (Junction) ao cofre Obsidian em `C:\Users\Vini\Desktop\Studio_Knowledge_Base\Projeto_Amarelo`. Qualquer arquivo criado ou modificado em `Docs/KnowledgeBundle/` aparecerá instantaneamente no Obsidian do Vini.
+- **Rotina de Devlog:** Ao finalizar com sucesso qualquer tarefa de codificação ou design, você DEVE documentar as alterações no arquivo `Docs/KnowledgeBundle/log.md`. 
+  - Use a estrutura: `## AAAA-MM-DD — [Título Curto do Devlog]`
+  - Liste de forma concisa e técnica todas as modificações realizadas no Core, Runtime, Testes e Documentação.
+  - Faça isso de forma semelhante a uma mensagem de commit detalhada do GitHub.
+
 ## 4. Regras de Ouro
 1. **Nunca aloque lixo em `Update`/`FixedUpdate`/`LateUpdate`.** Sem `new`, `GetComponent` em hot path, `FindObjectOfType`, LINQ dentro de loops. Cache em `Awake`/`Start`. Prefira `readonly struct` para event args (ver `SomEmitido`, `ResilienciaChangedArgs`).
 2. **Documentação XML obrigatória em todo membro público (`/// <summary>`), em português** — é a convenção já usada em todo o código (`ResilienciaMental`, `PlayerStealthState`, `CultistaFSM`), inclusive citando o vocabulário diegético do lore-enforcer diretamente no doc.
@@ -91,7 +116,7 @@ Leia os arquivos lá antes de cometer erros arquiteturais clássicos da Unity.
 - Movimentação real do projeto usa `Rigidbody2D.linearVelocity` atribuído em `FixedUpdate` (não `MovePosition`) — siga essa convenção existente em `PlayerMovement.cs`.
 - `CollisionDetectionMode2D.Continuous` para atores que se movem.
 - A câmera fica sempre com rotação `Quaternion.identity` (sem tilt) — a "sensação" isométrica vem do Y-sorting (`sortingOrder` por `-worldCenter.y`, ver `LevelBlockoutGenerator`) e do remapeamento de input em `PlayerMovement.ConvertToIsometric`, não de uma câmera 3D inclinada. Ver skill `favela-isometric-standards`.
-- Qualquer alteração em física, câmera, prefab de sala ou Rigidbody de inimigo/player deve respeitar as constantes fixas da skill `favela-isometric-standards` (gravityScale 0, câmera sem rotação, PPU 16, Y-sorting por Custom Axis).
+- Qualquer alteração em física, câmera, prefab de sala ou Rigidbody de inimigo/player deve respeitar as constantes fixas da skill `favela-isometric-standards` (gravityScale 0, câmera sem rotação, PPU 32, Y-sorting por Custom Axis).
 
 ## 6. Terminologia diegética
 Nunca use termos genéricos de RPG (HP, Mana, Enemy, Level Up) em texto visível ao jogador, nomes de habilidade ou descrições de `ScriptableObject`. A tradução completa (Resiliência Mental, Trauma, Colapso, Ancoragem, Cultista Amarelo, Salto Dimensional etc.) está na skill `favela-lore-enforcer` — consulte-a em vez de reimplementar a tabela aqui.
@@ -100,7 +125,7 @@ Nunca use termos genéricos de RPG (HP, Mana, Enemy, Level Up) em texto visível
 Estas skills vivem em `.claude/skills/` e devem ser puxadas conforme o contexto:
 - `favela-isometric-standards` — física/câmera/grid isométrico.
 - `favela-lore-enforcer` — terminologia diegética.
-- `favela-pixelart-standards` — configurações de import de sprite (PPU 16, Point filter, sem compressão).
+- `favela-pixelart-standards` — configurações de import de sprite (PPU 32, Point filter, sem compressão).
 - `favela-qa-pipeline` — ciclo compilar → testar antes de considerar uma mudança pronta (não commita sozinho; commit só quando pedido).
 
 Essas mesmas regras também existem em `.agents/skills/` no formato usado por outra ferramenta (Antigravity) e em `.agents/AGENTS.md` (tabela de roteamento dela). Se o conteúdo de uma regra mudar, atualize os dois lados para não divergir.
