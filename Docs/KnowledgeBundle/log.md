@@ -6,6 +6,67 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-12 (19ª rodada) — Guarda das fichas e verificação dos itens 6 e 7
+
+Rodada de **fechamento de escopo**, sob a diretriz do Vini: deixar os sistemas prontos para
+integrar ao jogo completo sem aprofundar, e sem retrabalho grande lá na frente.
+
+### Guarda contra uma classe de bug, não um caso
+`FichaAtributosAssetsTests` (4 casos). O bug da 16ª rodada — campo renomeado sem
+`[FormerlySerializedAs]` fazendo a Unity descartar o valor do disco em silêncio — não foi um
+acidente isolado, é uma **categoria** que se repete a cada renomeação em qualquer
+`ScriptableObject`. O Inspector continua mostrando o número certo, porque lê o objeto, não o
+arquivo.
+
+O teste central (`TodaChaveGravadaNoAssetChegaAoObjetoCarregado`) lê o YAML de cada `.asset` e
+**refaz a mesma resolução que a Unity faz**: nome exato do campo, ou qualquer
+`FormerlySerializedAs` apontando para aquele nome antigo. Chave que não casa com nada é falha,
+com mensagem que nomeia o asset e dita a correção.
+
+A varredura é por tipo (`AssetDatabase.FindAssets("t:FichaAtributosConfig")`), então **ficha
+nova entra no teste sozinha** — ninguém precisa lembrar de editar o arquivo quando o jogo passar
+de 5 para 30 unidades.
+
+Os outros três: `ExistemFichasParaGuardar` (uma varredura vazia deixaria os demais verdes sem
+verificar nada), `NenhumaFichaEhIdenticaAosDefaultsDaClasse` (rede secundária para asset que vem
+inteiro em branco) e `Byakhee_CarregaOsNumerosDoChefeProjetado` (trava 500/12/120).
+
+**O guarda foi validado por mutação**, não só por ficar verde: removendo o
+`[FormerlySerializedAs("vitalidadeMax")]` de propósito, 2 dos 4 testes falharam com a mensagem
+certa, listando `Ficha_Abdul`, `Ficha_Byakhee` e `Ficha_Cultista` e apontando o atributo a
+acrescentar. Mutação revertida em seguida.
+
+### Itens 6 e 7 do roadmap: já estavam feitos
+`PovoarODeserto.Executar` rodado em batch mode, e a descoberta é que **não havia o que fazer**.
+Verificado contra o commit anterior à sessão (`2ee230ae`): **11 Cultistas + 1 Coisa do Cemitério
+já estavam em cena**, com **12 chaves de persistência distintas**. A anotação "Ferramenta
+pronta, falta rodar" (2026-08-11) estava **desatualizada** nos dois itens; ambos passaram para ✅
+no `roadmap_vertical_slice.md`.
+
+### ⚠️ `PovoarODeserto` não é seguro para rodar de novo
+A execução **foi revertida** (`git checkout` na cena), e a razão é o achado mais útil da rodada.
+
+A ferramenta é idempotente na *estrutura* — semente fixa `20260811`, destrói e refaz o grupo
+`Inimigos_Deserto`, e reproduziu a mesma distribuição (11 Cultistas, mesmas posições, 824 linhas
+trocadas só por renumeração de `fileID`). Mas **`ObjetoPersistente.GarantirChave()` gera um GUID
+novo para cada inimigo recriado**: as 12 chaves de persistência mudaram, todas.
+
+Consequência: todo save que registrou "inimigo X abatido" passa a apontar para uma chave que não
+existe mais na cena, e **cada inimigo já morto ressuscita**. É a mesma família de problema do
+"perde a arma no deserto" — dado de save apontando para identidade que foi recriada.
+
+**Regra prática:** rodar `PovoarODeserto` numa cena já povoada invalida o progresso de abate.
+Só rodar em cena virgem, ou aceitando reset de população. Se a ferramenta precisar ser reexecutável
+com segurança, a chave tem de ser **derivada de algo estável** (setor + índice, por exemplo) em vez
+de GUID aleatório — não foi feito agora porque a população atual já está correta e o VS não pede.
+
+### Nota de método
+Vale repetir o que apareceu duas vezes hoje: `exit code 0` de batch mode **não** prova que o
+`-executeMethod` fez algo. Nas duas ferramentas rodadas nesta sessão a confirmação real veio de
+conferir a cena (`git status`, contagem de `m_SourcePrefab` por GUID de prefab), não o código de
+saída. Na primeira leitura do log a linha `[PovoarDeserto] Pronto` ainda não tinha sido
+descarregada em disco.
+
 ## 2026-08-12 (18ª rodada) — Artefatos: posse vs porte, e o elo de aquisição que faltava
 
 Investigação pedida sobre o "acoplamento do Necronomicon" (dois assets para a mesma relíquia).
