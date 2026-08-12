@@ -92,9 +92,18 @@ existe**:
   `GameManager`, Damião, câmera isométrica e HUD completo. Cena de dev, **deliberadamente fora
   do Build Settings** — nunca vai para um build de jogador.
 
+## Prefab e sprite emprestado (2026-08-12)
+
+`ReiEmAmarelo.prefab` existe (`Tools/FavelaAmarela/Montar Prefab do Rei em Amarelo`), com
+`ReiEmAmarelo_Placeholder.png` — um frame isolado (recorte por canal alfa, sem redesenho) do
+spritesheet "Necromancer" já presente na Inbox desde a rodada anterior. Não é a arte final
+(cores erradas, sem a Máscara Pálida), mas é o mesmo arquétipo visual — figura encapuzada e
+sinistra com cajado — e tira o Rei do quadrado colorido. O `CarcosaDebuggerWindow` agora
+instancia este prefab ao invocar o Rei, com o corpo construído em runtime como fallback só se
+o prefab for removido.
+
 ## Pendente
-- **Prefab e arte.** Nenhum sprite; corpo montado em runtime pelo Debugger usa um quadrado
-  placeholder.
+- **Arte final** — cores certas (amarelo/pálido), a Máscara Pálida.
 - **O Trono de Aldebaran em cena de verdade** — o Castelo (item 11) ainda não existe.
 - **Fonte jogável para a Coroa de Ossos** — depende do Templo da Serpente/Nagaraja terem cena.
 - Trocar a lista de relíquias exigidas de `ReiEmAmareloAI` de 3 para as 4 reais assim que a

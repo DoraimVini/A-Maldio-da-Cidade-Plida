@@ -106,12 +106,33 @@ cada rodada de QA — nunca falha, é instrumento de leitura, não teste de regr
 | `ByakheeFSM`, `ByakheeState` | Core (POCO, 10 testes) |
 | `ByakheeAI` | Runtime — move o corpo, pinta o sprite, aplica dano e dreno |
 | `Ficha_Byakhee`, `Drop_Byakhee` | Assets |
+| `Byakhee.prefab`, `Byakhee_Spritesheet.png` | Assets (2026-08-12) |
 
 A imunidade em voo é aplicada pelo `ByakheeAI` ligando `EnemyBase.IgnorarDano` conforme a FSM.
 A `EnemyBase` sozinha aceitaria qualquer golpe — a regra vive no POCO, o efeito no adaptador.
 
+## Prefab e sprite real (2026-08-12)
+
+O Vini trouxe um spritesheet animado de verdade para a Inbox
+(`byakhee_v2_animated.aseprite`, 26 frames de 140×140 numa fita única, com 6 tags: Idle,
+Walk, Attack, Special, Hurt, Death). `SliceSpritesheetByakhee.cs`
+(`Tools/FavelaAmarela/Slice Spritesheet do Byakhee`) fatia isso em `Byakhee_Spritesheet.png`
+com nomes que seguem o vocabulário da `ByakheeFSM` — `byakhee_espreita_*`,
+`byakhee_rasante_*`, `byakhee_garras_*`, `byakhee_grito_*`, `byakhee_dano_*`,
+`byakhee_derrota_*` — em vez dos nomes genéricos das tags do Aseprite.
+
+As tags do arquivo original tinham o campo "to" com bug (todas terminando no frame 25); os
+"from" (0, 4, 10, 14, 20, 22) eram confiáveis e não-sobrepostos, e reconstruir os segmentos a
+partir deles bateu exato com o total de 26 frames — não foi preciso adivinhar.
+
+`MontarPrefabDoByakhee.cs` (`Tools/FavelaAmarela/Montar Prefab do Byakhee`) monta
+`Byakhee.prefab` usando o frame `byakhee_espreita_0` como visual — **ainda sem `Animator`**,
+mesma convenção do Abdul ("tudo estático" até animação entrar em escopo do VS). Números de
+combate (dano, alcance, velocidades) continuam nos defaults calibrados por simulação, intactos.
+
 ## Pendente
-- **Prefab e arte.** Não há sprite do Byakhee; as cores de estado são leitura provisória.
+- **Animação de verdade.** Os 26 frames existem e estão nomeados; falta o `Animator`/
+  `AnimatorController` que os reproduza — hoje só o frame de idle é usado.
 - **Arena em cena:** os Portões das Ruínas não existem como local jogável.
 - **Cena de abertura** (o grito antes da forma) e a abertura dos Portões ao morrer.
 - **`DropAoAbater`** precisa ser anexado ao prefab com a `Drop_Byakhee`.

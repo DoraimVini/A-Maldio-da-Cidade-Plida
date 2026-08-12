@@ -82,7 +82,7 @@ confirmar** — não é bug.
 | # | Item | Estado |
 |---|---|---|
 | 8 | **Quest do Santuário de Yhtill** (Cassilda + fragmentos) | ✅ **Jogável de ponta a ponta** (2026-08-02) — `CancaoIncompleta` + `RecitalDaCancao` (Core, 13 + 9 testes), `CassildaNPC` e `FragmentoDeYhtill` implementados; Cassilda agora é prefab (`Cassilda.prefab`) com todo o conteúdo textual, instanciada e ligada em cena; os 3 fragmentos carregam as 2 primeiras estrofes da Canção de Cassilda; entregar tudo abre um **recital sem punição** das 2 estrofes finais antes do Patuá; o primeiro encontro ganhou a ramificação A/B/C do roteiro do lore (cosmética, via `PainelDeEscolha`). Progresso atravessa as duas cenas via save; o recital e a escolha do primeiro encontro não são persistidos (decisão). **Falta:** só arte — sprites placeholder em Cassilda, fragmentos e piso. Ver [quest_cassilda.md](systems/quest_cassilda.md). |
-| 9 | **Boss Byakhee** | ⚠️ **Core e Runtime prontos** (2026-08-11) — `ByakheeFSM` (3 fases, 10 testes), `ByakheeAI`, `Ficha_Byakhee` e `Drop_Byakhee` com o Anel do Sinal Amarelo garantido. **Falta:** prefab, arte, a arena dos Portões em cena e a cena de abertura. Ver [systems/boss_byakhee.md](systems/boss_byakhee.md). |
+| 9 | **Boss Byakhee** | ⚠️ **Core, Runtime e prefab prontos** (2026-08-12) — `ByakheeFSM` (3 fases, 10 testes), `ByakheeAI`, `Ficha_Byakhee` e `Drop_Byakhee` com o Anel do Sinal Amarelo garantido. `Byakhee.prefab` com spritesheet animado real (26 frames, 6 animações nomeadas), ainda sem `Animator` (só o frame de idle é usado). **Falta:** ligar o `Animator`, a arena dos Portões em cena e a cena de abertura. Ver [systems/boss_byakhee.md](systems/boss_byakhee.md). |
 | 10 | **Transição de Fase** | ⚠️ **Parcial** — `PortalDeCena` e `TransicaoDeFaseTrigger` existem; os Portões em si não. |
 
 ---
@@ -97,7 +97,7 @@ confirmar** — não é bug.
 | # | Item | Estado |
 |---|---|---|
 | 11 | **Blockout do Castelo** | ❌ **Não começado** — cena inexistente. |
-| 12 | **Boss Rei em Amarelo** | ⚠️ **Core e Runtime prontos** (2026-08-11) — `ReiEmAmareloFSM` (ritual de relíquias + selamento em ciclos, 13 testes), `DetectorDeCostas` (geometria da Máscara Pálida, 7 testes), `ReiEmAmareloAI` e `PontoFocalDeReliquia`. A Coroa de Ossos ainda não tem fonte jogável — contornado com o `CarcosaDebuggerWindow` (concede/invoca sob demanda) e a `Cena_ArenaDeTestes` (cena de dev, fora do Build Settings), que permitem testar a luta de ponta a ponta sem depender do Castelo real. **Falta:** prefab, arte, o Trono de Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos. Ver [systems/boss_rei_em_amarelo.md](systems/boss_rei_em_amarelo.md). |
+| 12 | **Boss Rei em Amarelo** | ⚠️ **Core, Runtime e prefab prontos** (2026-08-12) — `ReiEmAmareloFSM` (ritual de relíquias + selamento em ciclos, 13 testes), `DetectorDeCostas` (geometria da Máscara Pálida, 7 testes), `ReiEmAmareloAI` e `PontoFocalDeReliquia`. `ReiEmAmarelo.prefab` com sprite emprestado (recorte do spritesheet "Necromancer" da Inbox — arquétipo certo, cores erradas). A Coroa de Ossos ainda não tem fonte jogável — contornado com o `CarcosaDebuggerWindow` (concede/invoca sob demanda, agora instanciando os prefabs reais dos dois chefes) e a `Cena_ArenaDeTestes` (cena de dev, fora do Build Settings). **Falta:** arte final (cores, Máscara Pálida), o Trono de Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos. Ver [systems/boss_rei_em_amarelo.md](systems/boss_rei_em_amarelo.md). |
 
 ---
 

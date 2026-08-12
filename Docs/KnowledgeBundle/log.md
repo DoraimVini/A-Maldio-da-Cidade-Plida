@@ -6,6 +6,46 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-12 (15ª rodada) — Prefabs reais dos dois chefes
+
+O Vini pediu para achar arte instalada que servisse para os dois bosses. Auditoria da Inbox e
+dos pacotes Kenney já instalados: achei um candidato razoável para o Rei (`Necromancer_
+creativekind-Sheet.png` — figura encapuzada com cajado, arquétipo certo, cores erradas) e
+**nada** para o Byakhee (nenhum pacote instalado tem criatura alguma, só props/prédios/UI).
+
+### Rei em Amarelo: sprite emprestado
+Isolei um frame do spritesheet Necromancer por **flood fill no canal alfa** (não por cor —
+primeira tentativa, chroma-key por branco, falhou porque o PNG já vinha com alfa real e fundo
+transparente; a tentativa seguinte, bounding-box por alfa numa região grande, juntou 6
+personagens numa bbox só; o flood fill 8-conectado isolou exatamente 1 personagem). Resultado:
+`ReiEmAmarelo_Placeholder.png` (43×56), importado com pivô BottomCenter/PPU 32/Point/sem
+compressão (`MontarPrefabDoReiEmAmarelo.cs`). `Color.white` — sem tingir por cima, mesma regra
+da Cassilda para arte real.
+
+### Byakhee: o Vini trouxe arte de verdade no meio da sessão
+Enquanto eu investigava, apareceram `byakhee_v2_raw.png` e `byakhee_v2_animated.aseprite` na
+Inbox — um gárgula/besta alada já **animado**, exatamente o arquétipo do Byakhee. Usei o
+Aseprite CLI (já instalado em `C:\aseprite\build\bin`) para exportar os dados reais do
+`.aseprite` em vez de adivinhar a grade da PNG plana: 26 frames de 140×140 numa fita única, 6
+tags (Idle/Walk/Attack/Special/Hurt/Death). As tags tinham o campo "to" com bug (todas
+terminando no frame 25); os "from" (0,4,10,14,20,22) eram confiáveis e não-sobrepostos —
+reconstruir os segmentos a partir deles bateu exato com o total (4+6+4+6+2+4=26).
+
+`SliceSpritesheetByakhee.cs` fatiou nomeando pelo vocabulário da `ByakheeFSM` (espreita/
+rasante/garras/grito/dano/derrota), não pelos nomes genéricos das tags. `MontarPrefabDoByakhee.cs`
+montou o prefab usando o frame de idle — **ainda sem `Animator`**, mesma convenção do Abdul
+("tudo estático" até animação virar item de escopo). Números de combate intactos (defaults já
+calibrados por simulação na 13ª rodada).
+
+`CarcosaDebuggerWindow` agora instancia os dois prefabs reais ao invocar os chefes, com o
+corpo construído em runtime como fallback só se o prefab for removido.
+
+**QA:** 457/457 em cada etapa (slice, prefab, slice+prefab do outro chefe) — nenhum teste novo,
+só validação de que nada quebrou.
+
+Documentação: `boss_byakhee.md` e `boss_rei_em_amarelo.md` com as seções de prefab, roadmap
+itens 9 e 12 atualizados.
+
 ## 2026-08-11/12 (14ª rodada) — Rei em Amarelo: Core, Runtime, Carcosa Debugger e Arena de Testes
 
 Segundo dos dois chefes do VS (item 12 da lista do edital, zero código antes desta rodada).
