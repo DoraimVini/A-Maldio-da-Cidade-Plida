@@ -1,5 +1,6 @@
 using UnityEngine;
 using FavelaAmarela.Inventario;
+using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.Interaction;
 using FavelaAmarela.Runtime.UI;
 
@@ -10,9 +11,14 @@ namespace FavelaAmarela.Dungeons
     /// Serpente: só cede a quem carrega o <b>Necronomicon</b> — sem o tomo, Damião vê os
     /// glifos mas não os lê.
     ///
-    /// <para>Não consome o item nem exige que ele esteja equipado: basta possuí-lo no
-    /// Bolsão Frio. O Necronomicon é item do tipo <c>Chave</c>, e a checagem é
-    /// <see cref="InventoryManager.PossuiItemNaMochila"/>.</para>
+    /// <para>Não exige que o tomo esteja <b>portado</b> num dos quatro slots: basta
+    /// <b>possuí-lo</b>. O Necronomicon é um Artefato (<c>ItemType.Artefato</c>), então a
+    /// checagem principal é <c>ArtefatosBridge.Possui</c> — trancar uma dungeon por
+    /// gerenciamento de slot seria punição sem leitura.</para>
+    ///
+    /// <para>A mochila continua sendo consultada como <b>fallback de save antigo</b>: antes de
+    /// 2026-08-12 nenhum caminho de gameplay concedia Artefatos, então o Necronomicon de
+    /// qualquer partida existente está no Bolsão Frio como <c>ItemDef</c>, e só ali.</para>
     ///
     /// <para>Abre por <b>interação deliberada</b> (botão E) como o baú, e não por encostar:
     /// a porta precisa poder recusar e explicar o porquê.</para>
@@ -84,16 +90,7 @@ namespace FavelaAmarela.Dungeons
         {
             if (_aberta) return;
 
-            var inventario = InventoryManager.Instance;
-            if (inventario == null)
-            {
-                Debug.LogError("[PortaDeAklo] InventoryManager.Instance ausente — não dá para " +
-                               "saber se o tomo está no Bolsão Frio. Selo mantido.", this);
-                Mostrar(mensagemSelada);
-                return;
-            }
-
-            if (!inventario.PossuiItemNaMochila(idItemNecessario))
+            if (!CarregaOTomo(quemInterage))
             {
                 Mostrar(mensagemSelada);
                 return;
@@ -104,6 +101,28 @@ namespace FavelaAmarela.Dungeons
 
             var alvo = folhaDaPorta != null ? folhaDaPorta : gameObject;
             alvo.SetActive(false);
+        }
+
+        /// <summary>
+        /// Se Damião carrega o tomo, em qualquer das duas formas: como Artefato possuído (o
+        /// caminho corrente) ou como item no Bolsão Frio (saves anteriores a 2026-08-12, quando
+        /// nenhum caminho de gameplay concedia Artefatos).
+        /// </summary>
+        private bool CarregaOTomo(GameObject quemInterage)
+        {
+            var artefatos = quemInterage != null ? quemInterage.GetComponent<ArtefatosBridge>() : null;
+            if (artefatos != null && artefatos.Possui(idItemNecessario)) return true;
+
+            var inventario = InventoryManager.Instance;
+            if (inventario == null)
+            {
+                Debug.LogError("[PortaDeAklo] Sem ArtefatosBridge no interagente e sem " +
+                               "InventoryManager.Instance — não dá para saber se o tomo está " +
+                               "com Damião. Selo mantido.", this);
+                return false;
+            }
+
+            return inventario.PossuiItemNaMochila(idItemNecessario);
         }
 
         private void Mostrar(string texto)

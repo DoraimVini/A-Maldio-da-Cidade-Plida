@@ -7,17 +7,56 @@ tags: [artefatos, reliquias, habilidades, inventario, hud]
 
 # Artefatos
 
-> **Status:** Implementado em 2026-08-11. Motor, UI e os 4 Artefatos autorados. Falta
-> **wiring de cena** (ver o fim deste documento) e **persistência dos slots no save**.
+> **Status:** Implementado em 2026-08-11. Motor, UI e os 4 Artefatos autorados. Persistência
+> (posse + porte) e **caminho de aquisição por gameplay** entraram em 2026-08-12. Falta
+> **wiring de cena** (ver o fim deste documento) e UI para gerenciar os dormentes.
 
 Um **Artefato** é uma relíquia que carrega **uma passiva e uma habilidade ativa própria**. Não
 é arma nem armadura: não disputa espaço de corpo, não tem `EquipmentSlot`. Vive num inventário
-separado, de **quatro slots**.
+separado.
 
-## A regra central: só vale o que está equipado
+## Posse e porte são coisas diferentes (2026-08-12)
+
+**Posse** não tem teto nem custo: um Artefato recolhido fica no inventário de Artefatos para
+sempre e **não ocupa espaço no Bolsão Frio**. **Porte** são os **quatro slots** — o resto fica
+**dormente**, guardado e sem efeito.
 
 > **Coletar não basta. Um Artefato só concede passiva e habilidade enquanto ocupa um dos
 > quatro slots.**
+
+Recolher o quinto Artefato com os quatro slots cheios **não o recusa e não o perde**: ele entra
+dormente. Um limite que causasse perda silenciosa de progresso seria a pior leitura possível.
+
+### A distinção de API que o combate depende
+
+| Método | Significado | Quem usa |
+|---|---|---|
+| `Contem(id)` | Está **portado** num slot (ativo) | `PontoFocalDeReliquia` — o rito do Rei em Amarelo exige a relíquia na mão |
+| `Possui(id)` | **Tem**, portado ou dormente | `PortaDeAklo` — carregar o tomo basta, o slot não importa |
+
+Trocar um pelo outro é bug silencioso: o rito passaria a aceitar relíquia guardada, ou a porta
+passaria a exigir gerenciamento de slot para deixar entrar numa dungeon. Há teste travando a
+distinção em `PosseDeArtefatosTests`.
+
+**Portar implica possuir:** `Equipar` registra a posse se ainda não havia. Exigir posse prévia
+no POCO só criaria uma ordem de chamada para o chamador decorar; a política de "só equipa o que
+já é seu" mora na `ArtefatosBridge`, que serve a UI.
+
+## O elo que faltava: adquirir por gameplay
+
+Até 2026-08-12 **nenhum caminho de gameplay concedia Artefatos.** O campo `ArtefatoDef.Item`
+— o vínculo entre o `ItemDef` coletável e o Artefato — estava autorado nos quatro assets e
+**não era lido por nenhuma linha de código**. `ColetavelDeItem` só fazia `Main.Add(...)`, então
+recolher o Necronomicon punha um item na mochila e mais nada.
+
+Consequência: os únicos dois lugares que colocavam Artefato no inventário eram o **Carcosa
+Debugger** e o **restore de save** (que só restaura o que nunca foi concedido). Como o rito do
+Rei em Amarelo exige 3 relíquias **portadas**, **o chefe final do Vertical Slice era
+incompletável fora do Editor** — sem erro no console, só um ponto focal que não reagia.
+
+Agora `ArtefatosBridge.ArtefatoDoItem(ItemDef)` lê o vínculo, e `ColetavelDeItem` roteia a
+relíquia para o inventário de Artefatos **sem passar pela mochila** — o `ItemDef` é veículo de
+entrega, não destino.
 
 Isso **substitui** a regra anterior do [loot_e_drop.md](loot_e_drop.md) ("sempre ativo assim que
 coletado"), por decisão do Vini em 2026-08-11. O motivo é escala: o desenho prevê **mais
@@ -83,13 +122,43 @@ Nenhum dos quatro exigiu sistema novo, fora a revelação:
 
 ## Passivas: a 4ª fonte do GerenciadorEfeitosPassivos
 `GetBonus(StatType)` agora soma **quatro** fontes: equipamento, itens `Chave` na mochila,
-**Artefatos equipados** e Ecos da Memória. A bridge é ligada por `GameManager` via
+**Artefatos portados** e Ecos da Memória. A bridge é ligada por `GameManager` via
 `GerenciadorEfeitosPassivos.Bind(artefatos)`, e a barra redesenha pelo evento `OnArtefatosMudaram`.
+
+**Só o que está portado conta.** Dormente não concede passiva nem habilidade — é o que dá
+sentido ao limite de quatro ser uma escolha.
 
 > **O Necronomicon deixou de ser `ItemType.Chave`.** Se voltar a ser, a passiva seria contada
 > **duas vezes** (uma pelo laço da mochila, outra pelo laço dos artefatos). Há um teste
-> guardando isso. A `PortaDeAklo` **não quebra** com a migração: ela checa posse por `Id`
-> (`PossuiItemNaMochila`), não por tipo.
+> guardando isso.
+>
+> **Nota de 2026-08-12:** nenhum `ItemDef` do projeto tem `ItemType.Chave` hoje, então o laço
+> da mochila em `GerenciadorEfeitosPassivos` não encontra nada — é caminho morto, mantido para
+> quando existir um item Chave com passiva.
+
+> ⚠️ **Correção de 2026-08-12.** Este documento afirmava que a `PortaDeAklo` "não quebra com a
+> migração: ela checa posse por `Id` (`PossuiItemNaMochila`), não por tipo". Isso era verdade
+> **só porque o Artefato nunca era concedido de fato** — o `ItemDef` ficava parado na mochila.
+> Agora que recolher a relíquia a consome para o inventário de Artefatos, a porta passou a
+> checar `ArtefatosBridge.Possui`, com `PossuiItemNaMochila` mantido como **fallback de save
+> antigo** (partidas anteriores a esta data têm o tomo só na mochila).
+
+## Persistência (posse + porte)
+
+Formato de `EstadoPersistenteDosArtefatos`: `"portados|possuídos"`. Antes da barra, os ids na
+ordem dos slots com vazio virando campo em branco; depois, todos os possuídos. Exemplo:
+`"necronomicon,,coroa_de_ossos,|necronomicon,coroa_de_ossos,patua_luas_gemeas"` — o Patuá está
+dormente.
+
+**Save sem a barra** é o formato anterior a 2026-08-12: lido como só a lista de portados, com a
+posse deduzida deles.
+
+O restore usa `InventarioDeArtefatos.Restaurar(possuidos, portadosPorSlot)`, e **não**
+`Adquirir`/`Equipar` — mesmo papel de `Vitalidade.Restaurar`: reconstrução de estado, não ação
+diegética. `Adquirir` porta no primeiro slot livre por conveniência, e usá-lo no load
+**embaralharia a ordem das teclas** que o jogador escolheu. Entradas inconsistentes (id portado
+que não consta como possuído, duplicata em dois slots) são descartadas em silêncio em vez de
+derrubar o load.
 
 ## Input
 Quatro ações novas (`HabilidadeArtefato1..4`, teclas **F1–F4**) no `InputSystem_Actions`,

@@ -6,6 +6,75 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-12 (18ª rodada) — Artefatos: posse vs porte, e o elo de aquisição que faltava
+
+Investigação pedida sobre o "acoplamento do Necronomicon" (dois assets para a mesma relíquia).
+O acoplamento é **intencional e correto** — `ItemDef` é o coletável do mundo, `ArtefatoDef` é o
+Artefato com passiva e habilidade, ligados por `ArtefatoDef.Item`. O problema era outro.
+
+### O bug encontrado: o chefe final era incompletável
+**`ArtefatoDef.Item` não era lido por nenhuma linha de código.** O campo estava autorado nos
+quatro assets e ninguém o consultava. `ColetavelDeItem.Interagir` só fazia `Main.Add(...)`, então
+recolher o Necronomicon punha um `ItemDef` na mochila e mais nada.
+
+Os únicos dois lugares que colocavam Artefato no inventário eram o **Carcosa Debugger** (Editor)
+e o **restore de save** (que só restaura o que nunca foi concedido). Como o rito do Rei em
+Amarelo exige 3 relíquias **portadas** (`PontoFocalDeReliquia` → `Inventario.Contem`), **o chefe
+final do Vertical Slice era inalcançável fora do Editor** — sem erro no console, só um ponto
+focal que não reagia.
+
+### Core
+- `InventarioDeArtefatos` separa **posse** de **porte**: `Possuidos` (sem teto, sem custo de
+  mochila) além dos 4 slots. `Adquirir` registra posse e auto-porta se houver slot livre; senão
+  a relíquia entra **dormente** em vez de ser recusada ou perdida. `Desequipar` nunca descarta.
+- `Possui(id)` (posse) somado a `Contem(id)` (porte), cuja semântica foi **preservada de
+  propósito** — o rito do Rei em Amarelo depende dela. Trocar um pelo outro é bug silencioso.
+- `Equipar` **registra a posse** se ainda não havia. A primeira versão exigia posse prévia e
+  quebrava 14 chamadas do `InventarioDeArtefatosTests` existente; portar implica possuir é
+  semanticamente mais defensável, e a política de "só equipa o que já é seu" ficou na camada
+  Runtime, que serve a UI.
+- `Restaurar(possuidos, portadosPorSlot)`: reconstrução de save, mesmo papel de
+  `Vitalidade.Restaurar`. Existe porque `Adquirir` porta no primeiro slot livre e usá-lo no load
+  **embaralharia a ordem das teclas** escolhida pelo jogador.
+- `SlotDe(id)` e `Dormentes()`.
+
+### Runtime
+- `ArtefatosBridge.ArtefatoDoItem(ItemDef)` — a leitura do vínculo que faltava. `Adquirir(id)` é
+  o caminho de gameplay. `EquiparNoPrimeiroSlotLivre` adquire antes de portar (é o que o Carcosa
+  Debugger usa).
+- `ColetavelDeItem` roteia relíquia para o inventário de Artefatos **sem passar pela mochila** —
+  o `ItemDef` é veículo de entrega, não destino. Nunca falha por falta de espaço.
+- `PortaDeAklo` passa a checar `ArtefatosBridge.Possui`, com `PossuiItemNaMochila` mantido como
+  **fallback de save antigo** (partidas existentes têm o tomo só na mochila, já que até hoje
+  nenhum caminho concedia Artefatos). Comentário obsoleto que dizia "o Necronomicon é item do
+  tipo `Chave`" corrigido — ele é `ItemType.Artefato`.
+- `EstadoPersistenteDosArtefatos`: formato `"portados|possuídos"`, com save sem a barra lido
+  como formato antigo e posse deduzida dos portados.
+
+### Achado colateral
+Nenhum `ItemDef` do projeto tem `ItemType.Chave`. O laço da mochila em
+`GerenciadorEfeitosPassivos` que agrega passivas de itens Chave é **caminho morto** — e o
+comentário dele cita o Necronomicon como exemplo, que é justamente quem deixou de ser Chave.
+
+### Testes
+- `PosseDeArtefatosTests` (12 casos): aquisição com e sem slot livre, dormência do quinto
+  Artefato, posse preservada ao desequipar e ao ser deslocado por troca, a distinção
+  `Contem` vs `Possui`, e quatro casos de `Restaurar` (ordem dos slots, save inconsistente,
+  substituição de estado, formato antigo).
+- Suíte EditMode completa: **490/490 passando**, 0 falhas. Os 9 casos do
+  `InventarioDeArtefatosTests` seguem verdes sem alteração.
+
+### Documentação
+- `systems/artefatos.md`: seção de posse vs porte com a tabela `Contem`/`Possui`, seção do elo
+  de aquisição, seção de persistência, e **correção explícita** da afirmação anterior de que a
+  `PortaDeAklo` "não quebra com a migração" — ela era verdadeira só porque o Artefato nunca era
+  concedido de fato.
+
+### Pendente
+- **UI para gerenciar dormentes** não existe: com 4 Artefatos e 4 slots o caso não aparece no
+  VS, mas assim que houver um quinto o jogador precisa de tela para trocar.
+- O número total de Artefatos do jogo segue indefinido (decisão adiada de propósito).
+
 ## 2026-08-12 (17ª rodada) — O 7º slot: Mão Secundária e empunhadura
 
 Segunda metade do trabalho decidido na rodada anterior. Confirmado: **acrescentar** um 7º

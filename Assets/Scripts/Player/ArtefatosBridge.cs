@@ -119,29 +119,82 @@ namespace FavelaAmarela.Player
         // ── Ações ─────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Encaixa um Artefato no primeiro slot livre. Chamado ao coletar o item
-        /// correspondente. Sem slot livre, o Artefato fica de fora — é escolha do jogador
-        /// trocar depois.
+        /// Se Damião possui este Artefato — portado ou dormente. É o que uma porta selada
+        /// pergunta; para saber se ele está <b>ativo</b>, use <c>Inventario.Contem</c>.
+        /// </summary>
+        public bool Possui(string artefatoId) => _inventario.Possui(artefatoId);
+
+        /// <summary>
+        /// O <c>ArtefatoDef</c> que este item coletável concede, ou <c>null</c> se o item não
+        /// é veículo de Artefato nenhum.
+        ///
+        /// <para>É a leitura que faltava do vínculo <c>ArtefatoDef.Item</c>: o campo estava
+        /// autorado nos quatro assets e não era consultado por nenhuma linha de código, o que
+        /// deixava as relíquias impossíveis de obter fora do Carcosa Debugger.</para>
+        /// </summary>
+        public ArtefatoDef ArtefatoDoItem(ItemDef item)
+        {
+            if (item == null) return null;
+
+            foreach (var def in _porId.Values)
+                if (def.Item == item) return def;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Registra a posse de um Artefato — o caminho de gameplay para adquirir uma relíquia.
+        /// Se houver slot livre, ele já entra portado e pronto para uso; senão fica dormente,
+        /// guardado sem custo de espaço, esperando o jogador escolher trocar.
+        /// </summary>
+        /// <returns>true se a posse era nova.</returns>
+        public bool Adquirir(string artefatoId)
+        {
+            if (string.IsNullOrEmpty(artefatoId) || !_porId.ContainsKey(artefatoId)) return false;
+
+            if (!_inventario.Adquirir(artefatoId)) return false;
+
+            int slot = _inventario.SlotDe(artefatoId);
+            if (slot >= 0) _ultimoUso[slot] = float.NegativeInfinity; // entra pronto para uso
+
+            return true;
+        }
+
+        /// <summary>
+        /// Porta um Artefato no primeiro slot livre, adquirindo-o antes se ainda não for
+        /// possuído (é o que o Carcosa Debugger usa para conceder relíquias de teste).
         /// </summary>
         /// <returns>O slot ocupado, ou -1 se não coube ou o id não existe.</returns>
         public int EquiparNoPrimeiroSlotLivre(string artefatoId)
         {
             if (!_porId.ContainsKey(artefatoId) || _inventario.Contem(artefatoId)) return -1;
 
-            int slot = _inventario.PrimeiroSlotLivre();
-            if (slot < 0) return -1;
+            // Adquirir já porta no primeiro slot livre quando há um; se o Artefato já era
+            // possuído (dormente), ele não faz nada e o encaixe fica por conta do bloco abaixo.
+            _inventario.Adquirir(artefatoId);
 
-            _inventario.Equipar(artefatoId, slot);
-            _ultimoUso[slot] = float.NegativeInfinity; // entra pronto para uso
+            if (!_inventario.Contem(artefatoId))
+            {
+                int livre = _inventario.PrimeiroSlotLivre();
+                if (livre < 0) return -1;
+                _inventario.Equipar(artefatoId, livre);
+            }
+
+            int slot = _inventario.SlotDe(artefatoId);
+            if (slot >= 0) _ultimoUso[slot] = float.NegativeInfinity; // entra pronto para uso
             return slot;
         }
 
-        /// <summary>Encaixa um Artefato num slot específico, trocando com o que estiver lá.</summary>
+        /// <summary>
+        /// Encaixa um Artefato <b>já possuído</b> num slot, trocando com o que estiver lá.
+        /// O deslocado adormece, não some.
+        /// </summary>
         public bool Equipar(string artefatoId, int slot)
         {
             if (!_porId.ContainsKey(artefatoId)) return false;
             if (slot < 0 || slot >= InventarioDeArtefatos.TotalDeSlots) return false;
             if (_inventario.Contem(artefatoId)) return false;
+            if (!_inventario.Possui(artefatoId)) return false;
 
             _inventario.Equipar(artefatoId, slot);
             _ultimoUso[slot] = float.NegativeInfinity;

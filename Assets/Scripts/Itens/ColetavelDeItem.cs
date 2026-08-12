@@ -1,4 +1,5 @@
 using UnityEngine;
+using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.Interaction;
 using FavelaAmarela.Runtime.Persistencia;
 using FavelaAmarela.Runtime.UI;
@@ -104,6 +105,18 @@ namespace FavelaAmarela.Runtime.Itens
         {
             if (_coletado || item == null) return;
 
+            // Relíquia não vai para o Bolsão Frio: ela vira Artefato, num inventário próprio
+            // que não cobra espaço de mochila. O vínculo item→Artefato é o campo
+            // ArtefatoDef.Item, lido por ArtefatosBridge.ArtefatoDoItem.
+            var artefatos = quemInterage != null ? quemInterage.GetComponent<ArtefatosBridge>() : null;
+            var comoArtefato = artefatos != null ? artefatos.ArtefatoDoItem(item) : null;
+
+            if (comoArtefato != null)
+            {
+                RecolherComoArtefato(artefatos, comoArtefato);
+                return;
+            }
+
             var invManager = FavelaAmarela.Inventario.InventoryManager.Instance;
             if (invManager == null)
             {
@@ -121,15 +134,47 @@ namespace FavelaAmarela.Runtime.Itens
                 return;
             }
 
+            Consumir(string.IsNullOrWhiteSpace(mensagem)
+                ? $"Você recolheu: {item.Nome}."
+                : mensagem);
+        }
+
+        /// <summary>
+        /// Concede o Artefato e retira o objeto do mundo. <b>Nunca falha por falta de espaço</b>
+        /// — a posse de Artefato não tem teto, e os quatro slots são só o que está portado.
+        /// Sem slot livre, a relíquia entra dormente em vez de ficar no chão.
+        /// </summary>
+        private void RecolherComoArtefato(ArtefatosBridge artefatos, FavelaAmarela.Inventario.ArtefatoDef def)
+        {
+            bool novo = artefatos.Adquirir(def.Id);
+
+            if (!novo && !artefatos.Possui(def.Id))
+            {
+                // Só acontece se o id não estiver no catálogo da bridge — vale avisar em vez
+                // de sumir com o objeto e deixar o jogador sem a relíquia nem o item.
+                Debug.LogError($"[ColetavelDeItem] '{def.Id}' não está no catálogo de Artefatos — " +
+                               "nada foi concedido.", this);
+                return;
+            }
+
+            string texto = !string.IsNullOrWhiteSpace(mensagem)
+                ? mensagem
+                : novo
+                    ? $"Você recolheu: {def.Nome}."
+                    : $"{def.Nome} já está com você.";
+
+            Consumir(texto);
+        }
+
+        /// <summary>Marca como recolhido, persiste e retira o objeto da cena.</summary>
+        private void Consumir(string texto)
+        {
             _coletado = true;
 
             if (!string.IsNullOrWhiteSpace(chaveDeSave))
                 GerenciadorDeSave.MarcarAconteceu(chaveDeSave);
 
-            Mostrar(string.IsNullOrWhiteSpace(mensagem)
-                ? $"Você recolheu: {item.Nome}."
-                : mensagem);
-
+            Mostrar(texto);
             gameObject.SetActive(false);
         }
 
