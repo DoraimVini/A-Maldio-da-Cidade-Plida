@@ -25,13 +25,16 @@ namespace FavelaAmarela.Inventario
         [SerializeField] private int capacidadeMochila = MainInventory.DefaultCapacidadeSurvivalHorror;
 
         [Header("Slots do Corpo (ordem define índices)")]
+        [Tooltip("A ordem define os índices. Arma DEVE continuar em 0: a MaoFisicaBridge " +
+                 "escuta esse índice para reconstruir a arma pela WeaponFactory.")]
         [SerializeField] private EquipmentSlot[] anatomia = {
             EquipmentSlot.Arma,
             EquipmentSlot.Elmo,
             EquipmentSlot.Peitoral,
             EquipmentSlot.Grevas,
             EquipmentSlot.Amuleto,
-            EquipmentSlot.Anel
+            EquipmentSlot.Anel,
+            EquipmentSlot.MaoSecundaria
         };
 
         private MainInventory _main;
@@ -100,7 +103,9 @@ namespace FavelaAmarela.Inventario
         public bool Equipar(int indiceMochila)
         {
             var item = Main.GetSlot(indiceMochila);
-            if (item == null) return false;
+            if (item == null || item.Def == null) return false;
+
+            if (!LiberarMaoSecundariaSePreciso(item)) return false;
 
             if (!Equipment.CanAddAny(item)) return false;
 
@@ -118,6 +123,40 @@ namespace FavelaAmarela.Inventario
             {
                 Debug.LogWarning("Mochila cheia! Item antigo dropado no chão.");
                 // TODO: instanciar loot no mundo
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Empunhar uma arma de duas mãos exige a Mão Secundária vazia — o
+        /// <c>EquipmentInventory</c> recusa o contrário. Aqui a secundária é esvaziada para
+        /// a mochila antes da troca.
+        ///
+        /// <para><b>Rollback deliberado:</b> se a mochila não tiver espaço para o item da
+        /// off-hand, ele volta para a mão de onde saiu e a troca inteira é cancelada. Sem
+        /// isso, o jogador ficaria sem o escudo <em>e</em> sem o espadão, com o item
+        /// evaporando entre os dois contêineres.</para>
+        /// </summary>
+        /// <returns>true se a troca pode prosseguir.</returns>
+        private bool LiberarMaoSecundariaSePreciso(ItemInstance aEquipar)
+        {
+            if (aEquipar.Def.Tipo != ItemType.Arma) return true;
+            if (aEquipar.Def.Empunhadura != Empunhadura.DuasMaos) return true;
+            if (!Equipment.MaoSecundariaOcupada) return true;
+
+            int indiceOffHand = Equipment.IndiceDoSlot(EquipmentSlot.MaoSecundaria);
+            if (indiceOffHand < 0) return true;
+
+            ItemInstance liberado = Equipment.Unequip(indiceOffHand);
+            if (liberado == null) return true;
+
+            if (!Main.Add(liberado))
+            {
+                Equipment.Equip(liberado, indiceOffHand);
+                Debug.LogWarning("[InventoryManager] Mochila cheia: sem espaço para guardar o " +
+                                 "item da Mão Secundária, a arma de duas mãos não pode ser empunhada.");
+                return false;
             }
 
             return true;
@@ -209,31 +248,72 @@ namespace FavelaAmarela.Inventario
             return mochila;
         }
 
+        /// <summary>
+        /// Reaplica o equipamento salvo <b>sempre na instância existente</b>, inclusive quando
+        /// a anatomia mudou de tamanho.
+        ///
+        /// <para><b>Por que nunca há <c>new</c> aqui:</b> a versão anterior recriava o
+        /// contêiner quando a capacidade do save divergia da atual. Isso é exatamente o bug
+        /// documentado em <see cref="LoadFromSaveData"/> — todo inscrito em
+        /// <c>OnSlotChanged</c>/<c>OnEquipmentChanged</c> (<c>MaoFisicaBridge</c>,
+        /// <c>GerenciadorEfeitosPassivos</c>, <c>BarraDeItens</c>, <c>PainelDeInventario</c>)
+        /// continuava escutando o objeto morto, e equipar deixava de chegar à Mão Física.
+        /// O ramo era inalcançável enquanto a anatomia nunca mudava; ao adicionar a Mão
+        /// Secundária (6 → 7 slots), <b>todo save antigo passaria por ele</b>.</para>
+        ///
+        /// <para>Itens que não couberem (anatomia encolheu, ou o tipo não bate com o índice
+        /// salvo) vão para a mochila em vez de sumir.</para>
+        /// </summary>
         private EquipmentInventory RestaurarEquipamento(InventorySaveData data)
         {
             var equipamento = Equipment;
+            equipamento.LimparTudo();
 
-            if (equipamento.Capacidade != data.equipSlotData.Length)
+            int salvos = data.equipSlotData.Length;
+            if (salvos != equipamento.Capacidade)
             {
-                Debug.LogWarning($"[InventoryManager] Anatomia do save tem " +
-                                 $"{data.equipSlotData.Length} slots e a atual tem " +
-                                 $"{equipamento.Capacidade}; recriando.");
-                equipamento = new EquipmentInventory(anatomia);
-            }
-            else
-            {
-                equipamento.LimparTudo();
+                Debug.Log($"[InventoryManager] Anatomia do save tem {salvos} slots e a atual " +
+                          $"tem {equipamento.Capacidade}. Migrando na mesma instância — os " +
+                          "inscritos nos eventos são preservados.");
             }
 
-            for (int i = 0; i < data.equipSlotData.Length; i++)
+            for (int i = 0; i < salvos; i++)
             {
                 var slot = data.equipSlotData[i];
                 if (slot == null || string.IsNullOrEmpty(slot.itemDefId)) continue;
 
-                equipamento.Equip(new ItemInstance(slot.itemDefId, slot.quantity), i);
+                RestaurarUmEquipamento(equipamento, new ItemInstance(slot.itemDefId, slot.quantity), i);
             }
 
             return equipamento;
+        }
+
+        /// <summary>
+        /// Recoloca um item salvo: primeiro no índice original, depois em qualquer slot do
+        /// tipo dele (cobre reordenação da anatomia), e em último caso na mochila.
+        /// </summary>
+        private void RestaurarUmEquipamento(EquipmentInventory equipamento, ItemInstance item, int indiceSalvo)
+        {
+            // Atenção: Equip devolve o item ANTIGO do slot — null quando o slot estava vazio,
+            // que é sempre o caso logo após LimparTudo. Ele não serve como sinal de sucesso.
+            // O sinal real é o AddAt ter zerado a quantidade da instância de origem.
+            if (indiceSalvo < equipamento.Capacidade && equipamento.CanAdd(item, indiceSalvo))
+            {
+                equipamento.Equip(item, indiceSalvo);
+                if (item.Quantidade == 0) return;
+            }
+
+            if (equipamento.CanAddAny(item))
+            {
+                equipamento.Equip(item);
+                if (item.Quantidade == 0) return;
+            }
+
+            if (!Main.Add(item))
+            {
+                Debug.LogWarning($"[InventoryManager] Item '{item.ItemDefId}' do save não coube " +
+                                 "no corpo nem na mochila e foi perdido.");
+            }
         }
     }
 }

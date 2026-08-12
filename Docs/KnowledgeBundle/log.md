@@ -6,6 +6,62 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-12 (17ª rodada) — O 7º slot: Mão Secundária e empunhadura
+
+Segunda metade do trabalho decidido na rodada anterior. Confirmado: **acrescentar** um 7º
+slot, não reaproveitar o `Anel` (que tem item autorado, `Item_AnelDoSinalAmarelo`).
+
+### Inventário
+- `EquipmentSlot.MaoSecundaria` — **no fim do enum**, pelo mesmo motivo já documentado no
+  `ItemType`: é serializado por índice, e inserir no meio remapearia os 16 `ItemDef` autorados.
+- Enum novo `Empunhadura` (`UmaMao`/`DuasMaos`) + campo `ItemDef.Empunhadura`.
+- `EquipmentInventory`: `IndiceDoSlot(tipo)`, `ArmaDeDuasMaosEquipada`, `MaoSecundariaOcupada`,
+  e as duas regras de bloqueio no `CanAdd`. As regras consultam a anatomia por tipo, não por
+  índice mágico — a ordem é autorada no Inspector e pode mudar.
+- `InventoryManager.anatomia`: 6 → 7 slots. **Arma continua em 0** (a `MaoFisicaBridge` escuta
+  esse índice para reconstruir a arma pela `WeaponFactory`).
+- `InventoryManager.LiberarMaoSecundariaSePreciso`: esvazia a off-hand para a mochila antes de
+  empunhar uma arma de duas mãos, **com rollback** se a mochila estiver cheia — sem isso o
+  jogador ficaria sem o escudo e sem o espadão, com o item evaporando entre os contêineres.
+
+### Migração de save — o risco real da mudança
+`RestaurarEquipamento` **não chama mais `new EquipmentInventory(...)` em nenhum caminho**. O
+ramo de capacidade divergente era inalcançável enquanto a anatomia nunca mudava; ao entrar a
+Mão Secundária, **todo save antigo passaria por ele** e reintroduziria o bug de 2026-08-11
+("perde a arma no deserto"), em que recriar a instância deixa órfãos `MaoFisicaBridge`,
+`GerenciadorEfeitosPassivos`, `BarraDeItens` e `PainelDeInventario` — silenciosamente.
+Agora a instância é sempre preservada; item que não couber tenta o slot do tipo dele e, em
+último caso, vai para a mochila, nunca some.
+
+- `InventorySaveData.saveVersion` (`VersaoAtual = 1`): 0 = save anterior ao campo (6 slots).
+
+### Bug corrigido durante a implementação
+`Equip()` devolve o item **antigo** do slot — `null` quando o slot está vazio, que é sempre o
+caso logo após `LimparTudo`. Eu o usei como sinal de sucesso na primeira versão do
+`RestaurarUmEquipamento`; o sinal correto é a quantidade da instância de origem ter zerado
+(o `AddAt` clona e zera).
+
+### UI
+- `MontarPainelDeInventario.SlotsDoCorpo`: 6 → 7. O `PainelDeInventario` já iterava por
+  `Equipment.Capacidade` com guarda, então nada quebra antes de reconstruir o prefab — o 7º
+  slot só fica invisível até o builder rodar (`Tools/FavelaAmarela/Montar painel de inventário`).
+
+### Testes
+- `MaoSecundariaTests` (11 casos): anatomia e posição dos índices, as quatro combinações de
+  empunhadura, encaixe por tipo, e três casos de migração 6 → 7 — incluindo
+  `SaveDeSeisSlots_NaoRecriaOEquipamento` (`Assert.AreSame`) e
+  `SaveDeSeisSlots_InscritosContinuamRecebendo`, que travam o bug dos órfãos.
+- Suíte EditMode completa: **478/478 passando**, 0 falhas.
+
+### Documentação
+- `systems/inventario_e_consumiveis.md`: tabela da anatomia de 7 slots, seção de empunhadura
+  com o porquê da recusa estrita, e a seção de migração de save.
+
+### Pendente
+- Nenhum `ItemDef` com `Empunhadura.DuasMaos` foi autorado ainda — a regra está implementada e
+  testada, mas só ganha vida quando existir uma arma colossal de verdade no jogo.
+- Item de off-hand (escudo/foco) também ainda não existe como asset.
+
 ## 2026-08-12 (16ª rodada) — Canal de dano anômalo + bug de serialização das fichas
 
 Sessão pedida como "implementar `ItemDataSO`, `EquipmentInventory` e `ArmaFactory`" a partir

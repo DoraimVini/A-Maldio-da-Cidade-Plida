@@ -27,7 +27,7 @@ namespace FavelaAmarela.EditorTools
         };
 
         private const int SlotsDaMochila = MainInventory.DefaultCapacidadeSurvivalHorror; // 12
-        private const int SlotsDoCorpo = 6;                                               // anatomia
+        private const int SlotsDoCorpo = 7;                                               // anatomia (com Mão Secundária)
         private const int ColunasDaMochila = 4;
 
         [MenuItem("Tools/FavelaAmarela/Montar painel de inventário (Tab)")]

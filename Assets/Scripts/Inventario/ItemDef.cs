@@ -34,6 +34,10 @@ namespace FavelaAmarela.Inventario
         [Tooltip("A fábrica de C# usará este ID para gerar o dano verdadeiro da arma.")]
         public TipoArmaFisica ArmaFisica = TipoArmaFisica.MaoVazia;
 
+        [Tooltip("Quantas mãos a arma toma. DuasMaos bloqueia o slot de Mão Secundária " +
+                 "enquanto estiver equipada. Ignorado em itens que não são armas.")]
+        public Empunhadura Empunhadura = Empunhadura.UmaMao;
+
         [Header("Atributos Fixos")]
         [Tooltip("Lista de modificadores que este item concede (quando equipado).")]
         public List<ModificadorFixo> Modificadores = new List<ModificadorFixo>();

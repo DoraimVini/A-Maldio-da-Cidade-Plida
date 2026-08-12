@@ -22,8 +22,63 @@ Restrição do `CLAUDE.md` §1: **sem grind de itens**. A premissa de escassez e
 | `ItemInstance` | Core/Runtime | Instância de um item no inventário (referencia o `ItemDef` e guarda quantidade atual). |
 | `BaseInventory` | Core | Lógica pura de contêiner. Limites, empilhamento, adição e remoção. Testável sem Unity. |
 | `MainInventory` | Core | Herda de `BaseInventory`. É a Mochila do jogador (itens gerais e consumíveis). |
-| `EquipmentInventory` | Core | Herda de `BaseInventory`. Controla os slots restritos (Arma, Elmo, Amuleto, Anel). Valida encaixes. |
+| `EquipmentInventory` | Core | Herda de `BaseInventory`. Controla os 7 slots do corpo. Valida encaixes e as **regras de empunhadura**. |
 | `InventoryManager` | Runtime (Singleton) | Dono do inventário global (`Mochila` e `Equipamentos`). Ponto central de save/load e eventos (`OnItemConsumed`). |
+
+## Anatomia: os 7 slots do corpo (2026-08-12)
+
+A ordem do array `anatomia` no `InventoryManager` **define os índices** e é autorada no
+Inspector:
+
+| Índice | Slot |
+|---|---|
+| 0 | `Arma` (mão principal) |
+| 1 | `Elmo` |
+| 2 | `Peitoral` |
+| 3 | `Grevas` |
+| 4 | `Amuleto` |
+| 5 | `Anel` |
+| 6 | `MaoSecundaria` |
+
+> **A Arma tem de continuar no índice 0.** A `MaoFisicaBridge` escuta especificamente esse
+> índice (`VerificarSlotDeArma`) para reconstruir o POCO da arma pela `WeaponFactory`.
+> Reordenar a anatomia sem ajustar essa bridge desarma Damião silenciosamente.
+
+### Empunhadura: uma mão ou duas
+
+`ItemDef.Empunhadura` (`UmaMao` / `DuasMaos`) é a escolha tática central do combate: arma
+leve **+ foco/escudo** na secundária, ou uma lâmina colossal que toma as duas mãos e não
+deixa espaço para defesa.
+
+O `EquipmentInventory` recusa nos dois sentidos — nada entra na secundária com uma arma de
+duas mãos empunhada, e uma arma de duas mãos não entra com a secundária ocupada.
+
+**A recusa é estrita, não desalojamento automático, e isso é deliberado:** liberar a
+off-hand exige devolver aquele item à mochila, e a mochila pode estar cheia. O POCO não tem
+como saber disso. Quem orquestra os dois contêineres é o `InventoryManager.Equipar`, que
+esvazia a secundária para a mochila **com rollback** — se não houver espaço, o item volta
+para a mão de onde saiu e a troca inteira é cancelada, em vez de deixar o jogador sem o
+escudo *e* sem o espadão.
+
+> **`EquipmentSlot` e `ItemType` são serializados por índice.** Valores novos entram
+> **sempre no fim** do enum. Inserir no meio remapearia silenciosamente todo item já
+> autorado — um elmo viraria grevas sem erro no console.
+
+### Migração de save (anatomia 6 → 7)
+
+`InventorySaveData.saveVersion` versiona o formato (**0** = save anterior ao campo, anatomia
+de 6 slots; **1** = 7 slots com Mão Secundária).
+
+`InventoryManager.RestaurarEquipamento` **nunca** recria o contêiner com `new`, nem quando a
+capacidade do save diverge da atual. O ramo que fazia isso existia desde sempre mas era
+inalcançável enquanto a anatomia nunca mudava; ao entrar a Mão Secundária, **todo save
+antigo passaria por ele** e cairia no bug de 2026-08-11 ("perde a arma no deserto"), em que
+recriar a instância deixava órfãos `MaoFisicaBridge`, `GerenciadorEfeitosPassivos`,
+`BarraDeItens` e `PainelDeInventario` — sem nenhum erro no console.
+
+Item que não couber (anatomia encolheu, ou o tipo não bate com o índice salvo) tenta o slot
+do tipo dele e, em último caso, vai para a mochila — nunca some. Coberto por
+`MaoSecundariaTests`.
 
 ### Separação de Responsabilidades (Desacoplamento)
 

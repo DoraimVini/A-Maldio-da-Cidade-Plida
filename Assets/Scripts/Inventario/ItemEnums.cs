@@ -24,7 +24,29 @@ namespace FavelaAmarela.Inventario
         Peitoral,
         Grevas,
         Amuleto,
-        Anel
+        Anel,
+
+        // Sempre no FIM, pelo mesmo motivo do ItemType: EquipmentSlot é serializado por
+        // índice nos .asset, e inserir um valor no meio remapearia silenciosamente todo
+        // item já autorado (um elmo viraria grevas sem ninguém notar).
+        /// <summary>Mão secundária — escudos, focos arcanos e a segunda lâmina.
+        /// Fica bloqueada enquanto a Mão principal empunha uma arma de
+        /// <see cref="Empunhadura.DuasMaos"/>.</summary>
+        MaoSecundaria
+    }
+
+    /// <summary>
+    /// Como uma arma ocupa as mãos de Damião. É a escolha tática central do combate:
+    /// arma leve + foco/escudo na off-hand, ou uma lâmina colossal que toma as duas mãos
+    /// e não deixa espaço para defesa.
+    /// </summary>
+    public enum Empunhadura
+    {
+        /// <summary>Ocupa só a mão principal — deixa a secundária livre. Default.</summary>
+        UmaMao,
+
+        /// <summary>Toma as duas mãos: bloqueia o slot de Mão Secundária enquanto equipada.</summary>
+        DuasMaos
     }
 
     public enum StatType
