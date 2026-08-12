@@ -6,6 +6,53 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11/12 (14ª rodada) — Rei em Amarelo: Core, Runtime, Carcosa Debugger e Arena de Testes
+
+Segundo dos dois chefes do VS (item 12 da lista do edital, zero código antes desta rodada).
+Decisão do Vini: bosses primeiro, Castelo depois.
+
+### Sem barra de vida, de propósito
+`ReiEmAmareloAI` não tem `EnemyBase`/`Vitalidade`/`IDanificavel` — o design é explícito ("não
+há barra de vida"). É mais perto de `ColapsoTrigger` que de `CultistaAI`: duas metades, ritual
+de relíquias sem pressão (`AtivarReliquia`, via `PontoFocalDeReliquia` — `IInteragivel`, checa
+posse real via `ArtefatosBridge.Inventario.Contem`) e selamento em ciclos de reação pura
+(`Tick(dt, jogadorEstaDeCostas)`, janela de 1,5 s do design doc, `Colapso` instantâneo se não
+reagir a tempo).
+
+### DetectorDeCostas: geometria pura para a Máscara Pálida
+Produto escalar entre `PlayerMovement.LookDirection` e o vetor jogador→Rei, limiar padrão
+-0,5 (~60° de folga da direção oposta perfeita). "De costas" salva assim que acontece, não
+precisa se manter até o fim da janela.
+
+### O gap da Coroa de Ossos, resolvido arquiteturalmente + com tooling
+A Coroa de Ossos não tem fonte jogável (Nagaraja/Templo da Serpente sem cena).
+`ReiEmAmareloFSM` recebe a lista de relíquias exigidas no construtor (dado, não constante) —
+mesma filosofia do `TabelaDeDrop`. Para destravar teste de ponta a ponta sem fabricar um drop
+que não existe, dois pedidos do Vini viraram ferramenta:
+
+- **`CarcosaDebuggerWindow`** (`Tools/FavelaAmarela/Carcosa Debugger`) — primeira
+  `EditorWindow` do projeto (61 ferramentas `[MenuItem]` já existiam, mas nenhuma com UI
+  própria). Play-Mode-only: concede os 4 artefatos, concede+equipa as 3 armas da Tumba, invoca
+  Byakhee/Rei em Amarelo sob demanda (corpo montado em runtime — nenhum tem prefab ainda,
+  `EnemyBase.ficha` setado via `SerializedObject` com o GameObject ainda inativo, para não
+  disparar `Awake` cedo demais), e mostra o estado ao vivo da FSM de qualquer chefe presente.
+- **`MontarArenaDeTestes`** (`Tools/FavelaAmarela/Montar Arena de Testes`) — cria
+  `Cena_ArenaDeTestes.unity`: chão neutro, `GameManager`, Damião, câmera isométrica,
+  EventSystem e HUD completo (reaproveita `BuildHUDCompleto` + barra de artefatos mínima).
+  Deliberadamente **fora do Build Settings** — ferramenta de dev, nunca vai para build de
+  jogador.
+
+Achado ao reusar `BuildHUDCompleto`: 3 avisos preexistentes de campos desalinhados em
+`BarraDeAcoes` (`nomeDaHabilidade`/`preenchimentoRecarga`/`grupoHabilidade`) — não é regressão
+desta rodada, ficou visível por reusar a ferramenta aqui; registrado, não corrigido (fora de
+escopo).
+
+**QA:** 457/457 (444 + 13 de `ReiEmAmareloFSMTests` + 7 de `DetectorDeCostasTests`, mais os
+20 já somados da rodada do Byakhee).
+
+Documentação: [boss_rei_em_amarelo.md](systems/boss_rei_em_amarelo.md) (novo),
+`roadmap_vertical_slice.md` item 12 atualizado.
+
 ## 2026-08-11 (13ª rodada) — Byakhee: o bug de mecânica por trás do balanceamento
 
 O Vini pediu para acertar a luta inteira: "equilíbrio levemente puxado para o difícil". A

@@ -97,7 +97,7 @@ confirmar** — não é bug.
 | # | Item | Estado |
 |---|---|---|
 | 11 | **Blockout do Castelo** | ❌ **Não começado** — cena inexistente. |
-| 12 | **Boss Rei em Amarelo** | ❌ **Não começado** — zero código. A mecânica de "virar as costas" não existe em nenhuma forma. |
+| 12 | **Boss Rei em Amarelo** | ⚠️ **Core e Runtime prontos** (2026-08-11) — `ReiEmAmareloFSM` (ritual de relíquias + selamento em ciclos, 13 testes), `DetectorDeCostas` (geometria da Máscara Pálida, 7 testes), `ReiEmAmareloAI` e `PontoFocalDeReliquia`. A Coroa de Ossos ainda não tem fonte jogável — contornado com o `CarcosaDebuggerWindow` (concede/invoca sob demanda) e a `Cena_ArenaDeTestes` (cena de dev, fora do Build Settings), que permitem testar a luta de ponta a ponta sem depender do Castelo real. **Falta:** prefab, arte, o Trono de Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos. Ver [systems/boss_rei_em_amarelo.md](systems/boss_rei_em_amarelo.md). |
 
 ---
 
