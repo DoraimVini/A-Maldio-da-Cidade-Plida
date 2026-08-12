@@ -6,6 +6,33 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-11 (13ª rodada) — Byakhee: o bug de mecânica por trás do balanceamento
+
+O Vini pediu para acertar a luta inteira: "equilíbrio levemente puxado para o difícil". A
+primeira estimativa (feita de cabeça, rodada anterior) tinha concluído que a luta era
+**impossível** — errada. Uma simulação fiel ao `Tick()` real mostrou que já era vencível.
+
+### O bug real: a fase 3 quase não acontecia
+Cair para 30% de vida **durante um pouso** apenas estendia aquela janela (1,5 s → 3 s) em vez
+de fazer o Byakhee decolar. O jogador matava ele ali mesmo, sem nunca ver a fase 3 — que é a
+identidade da luta ("circunda sem pousar"). `AtualizarFracaoDeVida` agora força a decolagem
+no instante em que a fase 3 começa, mesmo em pleno pouso.
+
+### Dois números recalibrados por simulação, não à mão
+`intervaloPousoEspontaneo` 30s→15s, `Vitalidade` 420→500. Números reais
+(`ByakheeRelatorioDeBalanceamento`, ver [boss_byakhee.md](systems/boss_byakhee.md)
+§Balanceamento): jogo perfeito vence com qualquer arma sobrando 25–42% de Resiliência; jogo
+mediano (85% de acerto) vence a maioria, com o Estilete raspando; jogo ruim (70%) perde com
+duas das três armas. Puxado para o difícil, nunca trivial, nunca impossível.
+
+### Nota de processo: um bug se perdeu duas vezes
+O fix real (garras ferindo sem checar alcance, achado na rodada anterior) tinha sido escrito
+e se perdeu numa troca de branch porque ficou **junto** do balanceamento, não commitado, ainda
+em iteração. Desta vez foi commitado sozinho e na hora (`968e494d`), antes de mexer em
+qualquer número — registrado em `contexto_para_outros_agentes.md` §7.1 para não repetir.
+
+**QA:** 437/437 (426 + 10 de `LutaContraByakheeTests` + 1 relatório).
+
 ## 2026-08-11 (12ª rodada) — Byakhee: o primeiro dos dois chefes que faltavam
 
 Item 9 da lista do edital, que estava com **zero código**. Decisão do Vini: os dois chefes

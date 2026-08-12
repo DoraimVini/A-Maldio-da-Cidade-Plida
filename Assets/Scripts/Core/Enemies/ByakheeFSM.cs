@@ -107,7 +107,7 @@ namespace FavelaAmarela.Core.Enemies
             float duracaoRasante = 2f,
             float duracaoMergulho = 1.2f,
             float telegrafoDoGrito = 1f,
-            float intervaloPousoEspontaneo = 30f,
+            float intervaloPousoEspontaneo = 15f,
             float drenoPassivo = 2f,
             float drenoFrenesi = 5f)
         {
@@ -137,6 +137,7 @@ namespace FavelaAmarela.Core.Enemies
         /// </summary>
         public void AtualizarFracaoDeVida(float fracao)
         {
+            int faseAnterior = Fase;
             _fracaoDeVida = fracao < 0f ? 0f : (fracao > 1f ? 1f : fracao);
 
             if (_fracaoDeVida <= 0f)
@@ -155,6 +156,20 @@ namespace FavelaAmarela.Core.Enemies
                 && CurrentState != ByakheeState.Espreita)
             {
                 Transicionar(ByakheeState.Frenesi);
+                return;
+            }
+
+            // Entrar na fase 3 DECOLA na hora, mesmo no meio de um pouso.
+            //
+            // Sem isto a fase 3 quase não existia: cair para 30% durante uma janela apenas
+            // ESTENDIA aquela janela (de 1,5 s para 3 s, via DuracaoDoPousoAtual), e o jogador
+            // matava o Byakhee ali mesmo sem nunca vê-lo circundar. O design pede o oposto —
+            // "começa a circundar a arena voando sem pousar" é a fase inteira, não um bônus
+            // de tempo no pouso anterior.
+            if (faseAnterior < 3 && Fase >= 3 && CurrentState == ByakheeState.Pousado)
+            {
+                OnLevantouVoo?.Invoke();
+                Transicionar(ByakheeState.Circundando);
             }
         }
 
