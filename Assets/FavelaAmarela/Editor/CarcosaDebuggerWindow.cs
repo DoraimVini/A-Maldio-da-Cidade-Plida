@@ -198,8 +198,24 @@ namespace FavelaAmarela.EditorTools
                 EditorGUILayout.HelpBox("Nenhum objeto com a tag Player na cena.", MessageType.Warning);
         }
 
+        private const string PrefabByakheePath = "Assets/FavelaAmarela/Art/Enemies/Byakhee.prefab";
+
         private static void InvocarByakhee(GameObject jogador)
         {
+            var posicao = jogador.transform.position + new Vector3(3f, 2f, 0f);
+
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabByakheePath);
+            if (prefab != null)
+            {
+                var instancia = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                instancia.name = "Byakhee (Debug)";
+                instancia.transform.position = posicao;
+                Debug.Log("[CarcosaDebugger] Byakhee invocado (prefab).");
+                return;
+            }
+
+            // Sem o prefab (rode 'Tools/FavelaAmarela/Montar Prefab do Byakhee'): cai no
+            // corpo mínimo construído em runtime, quadrado colorido no lugar da arte.
             var ficha = AssetDatabase.LoadAssetAtPath<FichaAtributosConfig>(FichaByakheePath);
             if (ficha == null)
             {
@@ -207,7 +223,7 @@ namespace FavelaAmarela.EditorTools
                 return;
             }
 
-            var go = CriarCorpoDoChefe("Byakhee (Debug)", jogador.transform.position + new Vector3(3f, 2f, 0f));
+            var go = CriarCorpoDoChefe("Byakhee (Debug)", posicao);
 
             // EnemyBase.Awake lê o campo privado `ficha` — precisa ser preenchido com o
             // objeto ainda inativo, senão Awake já rodou com ficha nula.
@@ -219,19 +235,33 @@ namespace FavelaAmarela.EditorTools
             go.AddComponent<ByakheeAI>();
 
             go.SetActive(true);
-            Debug.Log("[CarcosaDebugger] Byakhee invocado.");
+            Debug.Log("[CarcosaDebugger] Byakhee invocado (placeholder — sem prefab).");
         }
+
+        private const string PrefabReiEmAmareloPath = "Assets/FavelaAmarela/Art/Enemies/ReiEmAmarelo.prefab";
 
         private static void InvocarReiEmAmarelo(GameObject jogador)
         {
-            var go = CriarCorpoDoChefe("Rei em Amarelo (Debug)", jogador.transform.position + new Vector3(-3f, 2f, 0f));
+            var posicao = jogador.transform.position + new Vector3(-3f, 2f, 0f);
 
-            // Sem EnemyBase/Vitalidade de propósito — o design não prevê barra de vida
-            // para este confronto (ver ReiEmAmareloAI).
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabReiEmAmareloPath);
+            if (prefab != null)
+            {
+                var instancia = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                instancia.name = "Rei em Amarelo (Debug)";
+                instancia.transform.position = posicao;
+                Debug.Log("[CarcosaDebugger] Rei em Amarelo invocado (prefab). Use 'iniciar ritual' para começar.");
+                return;
+            }
+
+            // Sem o prefab (rode 'Tools/FavelaAmarela/Montar Prefab do Rei em Amarelo'):
+            // cai no corpo mínimo construído em runtime, sem EnemyBase/Vitalidade de
+            // propósito — o design não prevê barra de vida para este confronto.
+            var go = CriarCorpoDoChefe("Rei em Amarelo (Debug)", posicao);
             go.AddComponent<ReiEmAmareloAI>();
-
             go.SetActive(true);
-            Debug.Log("[CarcosaDebugger] Rei em Amarelo invocado. Use 'iniciar ritual' para começar.");
+            Debug.Log("[CarcosaDebugger] Rei em Amarelo invocado (placeholder — sem prefab). " +
+                      "Use 'iniciar ritual' para começar.");
         }
 
         /// <summary>
