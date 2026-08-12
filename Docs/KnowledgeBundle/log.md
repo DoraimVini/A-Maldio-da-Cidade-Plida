@@ -6,6 +6,48 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-12 (21ª rodada) — Auditoria de balanceamento do Byakhee com os números reais
+
+O `ByakheeRelatorioDeBalanceamento` **hardcodava** `Vitalidade 500, defesa 8` — os valores
+*autorados*. Foi por isso que o bug de serialização passou meses sem ser notado: o relatório
+simulava a luta pretendida enquanto o jogo rodava a luta real (100 de Vitalidade). Agora ele
+**lê `Ficha_Byakhee.asset`**, então os dois não podem mais divergir. Rodar depois da mudança deu
+números idênticos, o que confirma que a ficha finalmente carrega.
+
+Também ganhou uma coluna de **Erva de Ancoragem**, que até a 20ª rodada era teoria — não havia
+como obter consumível nenhum no mundo.
+
+### A tabela (500 vitalidade, defesa 8)
+
+| Arma | 100% | 85% | 70% | 70% + 1 Erva |
+|---|---|---|---|---|
+| **Cravo de Aklo** | vence 28,3s (42 RM) | vence 28,3s (42 RM) | vence 36,4s (26 RM) | vence (51 RM) |
+| **Estilete de Irem** | vence 35,9s (25 RM) | vence 41,6s (14 RM) | **colapsa** | vence (22 RM) |
+| **Alfanje de Alhazred** | vence 34,6s (29 RM) | vence 34,6s (29 RM) | **colapsa** | vence (14 RM) |
+
+### Três achados que importam mais que o veredito
+
+1. **O Cravo domina.** Vence nas três taxas, é o mais rápido e sobra mais RM. As outras duas
+   colapsam a 70%. O baú da Tumba sorteia entre as três, então hoje isso é uma arma correta e
+   duas armadilhas, não uma escolha de build.
+2. **100% e 85% de acerto dão resultado idêntico** para Cravo e Alfanje. A luta **não é limitada
+   pelo DPS do jogador** — é limitada pelas janelas de vulnerabilidade da FSM. Errar 15% não
+   custa nada porque sobra capacidade de golpe dentro de cada janela; a 70% começam a se perder
+   janelas inteiras. É um **penhasco, não uma curva**: quem está pouco abaixo do limiar não
+   perde por pouco, perde inteiro.
+3. **A luta é corrida de sanidade, não de vida.** Em nenhum cenário Damião morre de dano físico —
+   sempre Colapso, pelo grito passivo (2/s) e frenesi (5/s). A Erva de Ancoragem não é
+   conveniência: é *a* rede, e converte os dois colapsos em vitória. Valida a decisão da 20ª
+   rodada de tornar os consumíveis obteníveis.
+
+### Limites conhecidos da simulação
+- **Não modela o ataque físico do Byakhee** (`ataque 26` na ficha). Só o dreno de RM. Lutas reais
+  podem ser mais duras que a tabela.
+- **Não modela o canal anômalo** (mente 120, resistência 12) — inerte por ora, porque nenhuma
+  arma preenche `TraumaAnomalia` ainda.
+- **Não mede sensação.** Ritmo, legibilidade dos telegrafos e justiça do frenesi exigem alguém no
+  controle; nenhuma simulação substitui isso.
+
 ## 2026-08-12 (20ª rodada) — Consumíveis: item 2 fechado, "a luz é a válvula"
 
 ### A proposta refutada
