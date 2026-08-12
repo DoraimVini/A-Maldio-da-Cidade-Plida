@@ -10,37 +10,67 @@ namespace FavelaAmarela.Tests.EditMode
     /// reais da luta do Byakhee no console do test runner, para o Vini calibrar sem precisar
     /// entrar em Play Mode nem confiar em conta de cabeça.
     ///
-    /// <para>Nasceu porque a primeira estimativa desta luta, feita à mão, errou por completo.
-    /// Enquanto o <c>CarcosaDebuggerWindow</c> não existir (ver relatório da branch
-    /// <c>develop_items</c>), este é o jeito mais barato de auditar os números.</para>
+    /// <para>Nasceu porque a primeira estimativa desta luta, feita à mão, errou por completo.</para>
+    ///
+    /// <para><b>Lê a ficha do disco</b> em vez de hardcodar. Os valores estavam fixos aqui, e foi
+    /// exatamente por isso que o bug de serialização de 2026-08-12 passou meses sem ser notado:
+    /// o relatório mostrava a luta PRETENDIDA (500 de Vitalidade) enquanto o jogo rodava a REAL
+    /// (100, porque a ficha não carregava). Lendo o asset, relatório e jogo não divergem.</para>
+    ///
+    /// <para><b>Modela os dois canais</b> desde 2026-08-12: o grito drena Resiliência e as garras
+    /// ferem a Vitalidade. Em combate <b>não há Refúgio</b> — poste de luz é recuperação entre
+    /// encontros, nunca durante. Dentro da luta só existem <b>consumível e esquiva</b>.</para>
     ///
     /// <para>Roda junto com a suíte e nunca falha: quem julga se o número está bom é o
     /// <see cref="LutaContraByakheeTests"/>.</para>
     /// </summary>
     public class ByakheeRelatorioDeBalanceamento
     {
-        private const string CaminhoDaFicha = "Assets/FavelaAmarela/Config/Ficha_Byakhee.asset";
+        private const string FichaDoByakhee = "Assets/FavelaAmarela/Config/Ficha_Byakhee.asset";
+        private const string FichaDoDamiao = "Assets/FavelaAmarela/Config/Ficha_Damiao.asset";
         private const float Dt = 0.02f;
 
-        /// <summary>Quanta RM a Erva de Ancoragem devolve (ver o <c>ItemDef</c>).</summary>
-        private const float RmPorErva = 25f;
+        // Valores do ByakheeAI (conferidos no Byakhee.prefab).
+        private const float DanoDasGarras = 26f;
+        private const float TraumaDoGrito = 20f;
 
-        /// <summary>Abaixo disto o jogador simulado bebe uma Erva, se ainda tiver.</summary>
-        private const float LimiarDeUso = 30f;
+        // Consumíveis, dos ItemDef.
+        private const float RmPorErva = 25f;
+        private const float VitalidadePorAgua = 30f;
+        private const float LimiarDeRm = 30f;
+        private const float LimiarDeVitalidade = 35f;
+
+        // GerenciadorDeVigor.
+        private const float VigorMaximo = 100f;
+        private const float CustoDaEsquiva = 25f;
+        private const float RegeneracaoDeVigor = 25f;
 
         [Test]
         public void ImprimirTabelaDaLuta()
         {
-            // Lê a ficha do disco em vez de hardcodar. Os valores estavam fixos aqui, e foi
-            // exatamente por isso que o bug de serialização de 2026-08-12 passou meses sem ser
-            // notado: o relatório mostrava a luta PRETENDIDA (500 de Vitalidade) enquanto o jogo
-            // rodava a luta REAL (100, porque a ficha não carregava). Lendo o asset, relatório e
-            // jogo não podem mais divergir.
-            var ficha = AssetDatabase.LoadAssetAtPath<FichaAtributosConfig>(CaminhoDaFicha);
-            Assert.IsNotNull(ficha, $"Ficha não encontrada: {CaminhoDaFicha}");
+            var byakhee = AssetDatabase.LoadAssetAtPath<FichaAtributosConfig>(FichaDoByakhee);
+            var damiao = AssetDatabase.LoadAssetAtPath<FichaAtributosConfig>(FichaDoDamiao);
 
-            float vitalidade = ficha.VitalidadeMax;
-            float defesa = ficha.Defesa;
+            Assert.IsNotNull(byakhee, $"Ficha não encontrada: {FichaDoByakhee}");
+            Assert.IsNotNull(damiao, $"Ficha não encontrada: {FichaDoDamiao}");
+
+            float golpeDasGarras = MitigacaoDeDano.Aplicar(DanoDasGarras, damiao.Defesa);
+
+            TestContext.WriteLine("=== LUTA CONTRA O BYAKHEE — fichas lidas do disco ===");
+            TestContext.WriteLine($"Byakhee: vitalidade {byakhee.VitalidadeMax:F0} | defesa {byakhee.Defesa:F0}");
+            TestContext.WriteLine($"Damião:  vitalidade {damiao.VitalidadeMax:F0} | defesa {damiao.Defesa:F0} | vigor {VigorMaximo:F0}");
+            TestContext.WriteLine("");
+            TestContext.WriteLine($"Garras {DanoDasGarras:F0} − defesa {damiao.Defesa:F0} = " +
+                                  $"{golpeDasGarras:F0} por acerto → " +
+                                  $"{damiao.VitalidadeMax / golpeDasGarras:F0} golpes matam.");
+            TestContext.WriteLine($"Grito direcionado: {TraumaDoGrito:F0} de RM (fase 2+). " +
+                                  "Grito passivo: 2/s, frenesi 5/s.");
+            TestContext.WriteLine("");
+            TestContext.WriteLine("SEM REFÚGIO em combate: só consumível e esquiva. Esquiva custa " +
+                                  $"{CustoDaEsquiva:F0} de vigor (regen {RegeneracaoDeVigor:F0}/s).");
+            TestContext.WriteLine("Bolsa = 2 Ervas (25 RM) + 2 Águas (30 vitalidade), usadas ao " +
+                                  $"cair abaixo de {LimiarDeRm:F0} RM / {LimiarDeVitalidade:F0} vitalidade.");
+            TestContext.WriteLine("");
 
             var armas = new (string nome, float dano, float cd)[]
             {
@@ -49,89 +79,111 @@ namespace FavelaAmarela.Tests.EditMode
                 ("Alfanje de Alhazred", 45f, 0.7f),
             };
 
-            // Taxa de acerto simula jogo imperfeito: 1,0 = perfeito; 0,7 = erra ~1 em cada 3
-            // oportunidades de golpe dentro da janela.
-            var taxas = new[] { 1.0f, 0.85f, 0.7f };
-
-            TestContext.WriteLine($"=== LUTA CONTRA O BYAKHEE — lido de {CaminhoDaFicha} ===");
-            TestContext.WriteLine($"Vitalidade {vitalidade:F0} | defesa {defesa:F0} | " +
-                                  $"resistência anômala {ficha.ResistenciaAnomala:F0} | " +
-                                  $"mente {ficha.ResilienciaMax:F0}");
-            TestContext.WriteLine("(Damião: RM inicial 100; grito passivo 2/s; frenesi 5/s)");
-            TestContext.WriteLine("");
-            TestContext.WriteLine("'ervas' = quantas Ervas de Ancoragem (25 RM) o jogador bebe " +
-                                  "ao cair abaixo de 30 de RM.");
-            TestContext.WriteLine("");
-
             foreach (var (nome, dano, cd) in armas)
             {
-                foreach (var taxa in taxas)
-                {
-                    Linha(nome, dano, cd, taxa, vitalidade, defesa, ervas: 0);
-                }
-
-                // O mesmo cenário com uma Erva no bolso: até 2026-08-12 não havia como obter
-                // consumível nenhum no mundo, então a coluna de baixo era teoria. Agora há 3
-                // Ervas espalhadas no Deserto.
-                Linha(nome, dano, cd, 0.7f, vitalidade, defesa, ervas: 1);
+                // acerto = golpes que conectam na janela; esquiva = mergulhos evitados.
+                Linha(nome, dano, cd, acerto: 1.00f, esquiva: 0.90f, bolsa: false, byakhee, damiao);
+                Linha(nome, dano, cd, acerto: 0.85f, esquiva: 0.75f, bolsa: false, byakhee, damiao);
+                Linha(nome, dano, cd, acerto: 0.70f, esquiva: 0.60f, bolsa: false, byakhee, damiao);
+                Linha(nome, dano, cd, acerto: 0.70f, esquiva: 0.60f, bolsa: true, byakhee, damiao);
                 TestContext.WriteLine("");
             }
 
             Assert.Pass("Relatório impresso — ver saída acima.");
         }
 
-        private static void Linha(string nome, float dano, float cd, float taxa,
-            float vitalidade, float defesa, int ervas)
+        private static void Linha(string nome, float dano, float cd, float acerto, float esquiva,
+            bool bolsa, FichaAtributosConfig byakhee, FichaAtributosConfig damiao)
         {
-            var r = Simular(vitalidade, defesa, dano, cd, taxa, ervas, semente: 12345);
+            var r = Simular(byakhee, damiao, dano, cd, acerto, esquiva,
+                ervas: bolsa ? 2 : 0, aguas: bolsa ? 2 : 0, semente: 12345);
 
-            string veredito = r.venceu ? "VENCEU" : "COLAPSOU";
             TestContext.WriteLine(
-                $"{nome,-22} acerto={taxa,4:P0} ervas={ervas}  {veredito,-9} " +
-                $"tempo={r.segundos,5:F1}s  RM restante={r.rm,5:F0}/100  " +
-                $"pousos={r.pousos}  circundou={(r.circundou ? "sim" : "NAO")}");
+                $"{nome,-22} acerto={acerto,4:P0} esquiva={esquiva,4:P0} bolsa={(bolsa ? "sim" : "nao"),-3}  " +
+                $"{r.desfecho,-16} tempo={r.segundos,5:F1}s  " +
+                $"RM={r.rm,3:F0}/100  vida={r.vida,3:F0}/{damiao.VitalidadeMax:F0}  " +
+                $"garradas={r.garradas}  pousos={r.pousos}");
         }
 
-        private static (bool venceu, float rm, float segundos, int pousos, bool circundou)
-            Simular(float vitalidadeMax, float defesa, float dano, float cooldown,
-                float taxaDeAcerto, int ervas, int semente)
+        private static (string desfecho, float rm, float vida, float segundos, int pousos, int garradas)
+            Simular(FichaAtributosConfig fichaByakhee, FichaAtributosConfig fichaDamiao,
+                float dano, float cooldown, float taxaDeAcerto, float taxaDeEsquiva,
+                int ervas, int aguas, int semente)
         {
             var rng = new System.Random(semente);
             var fsm = new ByakheeFSM();
             fsm.IniciarLuta();
 
-            var vida = new Vitalidade(vitalidadeMax);
+            var vidaDoByakhee = new Vitalidade(fichaByakhee.VitalidadeMax);
+            var vidaDoDamiao = new Vitalidade(fichaDamiao.VitalidadeMax);
             var rm = ResilienciaMental.ComThresholdFracional(100f, 0.25f);
+
+            float golpeDasGarras = MitigacaoDeDano.Aplicar(DanoDasGarras, fichaDamiao.Defesa);
+            float vigor = VigorMaximo;
 
             float desdeAtaque = 999f;
             float tempo = 0f;
             int pousos = 0;
-            bool circundou = false;
+            int garradas = 0;
             var estadoAnterior = fsm.CurrentState;
 
             for (int i = 0; i < 1_000_000; i++)
             {
                 tempo += Dt;
                 desdeAtaque += Dt;
+                vigor = System.Math.Min(VigorMaximo, vigor + RegeneracaoDeVigor * Dt);
 
+                // ── O que o Byakhee faz com Damião ──────────────────────────
                 float dreno = fsm.DrenoDeResilienciaPorSegundo;
                 if (dreno > 0f) rm.SofrerTrauma(dreno * Dt);
 
-                // Bebe uma Erva ao cruzar o limiar, enquanto tiver. Modela o jogador atento,
-                // não o ótimo: quem espera o Colapso não teria tempo de reagir mesmo.
-                if (ervas > 0 && rm.Atual > 0f && rm.Atual < LimiarDeUso)
+                bool entrouEm(ByakheeState e) =>
+                    fsm.CurrentState == e && estadoAnterior != e;
+
+                // Mergulho de garras: o único golpe que fere o CORPO. Esquivar sai de graça em
+                // vida mas custa vigor — sem vigor, o golpe entra.
+                if (entrouEm(ByakheeState.MergulhoDeGarras))
+                {
+                    bool esquivou = vigor >= CustoDaEsquiva && rng.NextDouble() < taxaDeEsquiva;
+                    if (esquivou)
+                    {
+                        vigor -= CustoDaEsquiva;
+                    }
+                    else
+                    {
+                        vidaDoDamiao.Ferir(golpeDasGarras);
+                        garradas++;
+                    }
+                }
+
+                // Cone de pressão sonora: fere a MENTE, não o corpo. Aproxima o
+                // OnGritoEmitido, que dispara depois do telegrama.
+                if (entrouEm(ByakheeState.GritoDirecionado)) rm.SofrerTrauma(TraumaDoGrito);
+
+                // ── Consumíveis: a única cura em combate ────────────────────
+                if (ervas > 0 && rm.Atual > 0f && rm.Atual < LimiarDeRm)
                 {
                     rm.Ancorar(RmPorErva);
                     ervas--;
                 }
 
-                if (rm.IsColapso) return (false, 0f, tempo, pousos, circundou);
+                if (aguas > 0 && !vidaDoDamiao.EstaAbatido && vidaDoDamiao.Atual < LimiarDeVitalidade)
+                {
+                    vidaDoDamiao.Curar(VitalidadePorAgua);
+                    aguas--;
+                }
 
-                if (fsm.CurrentState == ByakheeState.Circundando) circundou = true;
+                if (rm.IsColapso)
+                    return ("COLAPSO MENTAL", 0f, vidaDoDamiao.Atual, tempo, pousos, garradas);
+
+                if (vidaDoDamiao.EstaAbatido)
+                    return ("MORTE FISICA", rm.Atual, 0f, tempo, pousos, garradas);
+
                 if (fsm.CurrentState == ByakheeState.Pousado && estadoAnterior != ByakheeState.Pousado)
                     pousos++;
                 estadoAnterior = fsm.CurrentState;
 
+                // ── O que Damião faz com o Byakhee ──────────────────────────
                 if (fsm.PodeReceberDano && desdeAtaque >= cooldown)
                 {
                     desdeAtaque = 0f;
@@ -140,16 +192,17 @@ namespace FavelaAmarela.Tests.EditMode
                     {
                         if (fsm.CurrentState == ByakheeState.Frenesi) fsm.InterromperFrenesi();
 
-                        vida.Ferir(System.Math.Max(dano * 0.15f, dano - defesa));
-                        if (vida.EstaAbatido) return (true, rm.Atual, tempo, pousos, circundou);
+                        vidaDoByakhee.Ferir(MitigacaoDeDano.Aplicar(dano, fichaByakhee.Defesa));
+                        if (vidaDoByakhee.EstaAbatido)
+                            return ("VENCEU", rm.Atual, vidaDoDamiao.Atual, tempo, pousos, garradas);
                     }
                 }
 
-                fsm.AtualizarFracaoDeVida(vida.Percentual);
+                fsm.AtualizarFracaoDeVida(vidaDoByakhee.Percentual);
                 fsm.Tick(Dt);
             }
 
-            return (false, rm.Atual, tempo, pousos, circundou);
+            return ("TEMPO ESGOTADO", rm.Atual, vidaDoDamiao.Atual, tempo, pousos, garradas);
         }
     }
 }
