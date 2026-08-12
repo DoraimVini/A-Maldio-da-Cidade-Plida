@@ -228,13 +228,9 @@ namespace FavelaAmarela.Player
             // não há por que reler o inventário a cada ataque.
             if (_armaEquipada != null)
             {
-                var baseResult = _armaEquipada.Execute();
-                float bonusDano = GerenciadorEfeitosPassivos.Instance?.GetBonus(StatType.TraumaFisico) ?? 0f;
-                float danoFinal = baseResult.Dano + bonusDano;
-
-                resultado = new ArmaResult(baseResult.Success, baseResult.DurationSeconds, baseResult.CooldownSeconds,
-                    baseResult.Atordoou, baseResult.DuracaoAtordoamento, danoFinal, baseResult.InterrompeConjuracao,
-                    baseResult.SangramentoPorSegundo, baseResult.DuracaoSangramento, baseResult.ForcaRepulsao, baseResult.AcumulosDeSangramento);
+                resultado = _armaEquipada.Execute().ComBonus(
+                    BonusPassivo(StatType.TraumaFisico),
+                    BonusPassivo(StatType.TraumaAnomalia));
             }
             else
             {
@@ -261,13 +257,9 @@ namespace FavelaAmarela.Player
             if (_fsm == null || !_fsm.EstaLivre) return;
             if (!_armaEquipada.CanActivateHabilidade(Time.time - _lastAbilityUseTime)) return;
 
-            var baseResult = _armaEquipada.ExecuteHabilidade();
-            float bonusDano = FavelaAmarela.Player.GerenciadorEfeitosPassivos.Instance?.GetBonus(FavelaAmarela.Inventario.StatType.TraumaFisico) ?? 0f;
-            float danoFinal = baseResult.Dano + bonusDano;
-
-            var resultado = new ArmaResult(baseResult.Success, baseResult.DurationSeconds, baseResult.CooldownSeconds, 
-                baseResult.Atordoou, baseResult.DuracaoAtordoamento, danoFinal, baseResult.InterrompeConjuracao, 
-                baseResult.SangramentoPorSegundo, baseResult.DuracaoSangramento, baseResult.ForcaRepulsao, baseResult.AcumulosDeSangramento);
+            var resultado = _armaEquipada.ExecuteHabilidade().ComBonus(
+                BonusPassivo(StatType.TraumaFisico),
+                BonusPassivo(StatType.TraumaAnomalia));
 
             if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
 
@@ -276,6 +268,14 @@ namespace FavelaAmarela.Player
             ResolverGolpe(direcao, resultado);
             OnHabilidadeExecutada?.Invoke(direcao, resultado.DurationSeconds);
         }
+
+        /// <summary>
+        /// Bônus passivo agregado (equipamentos + relíquias + Ecos) para um atributo, ou 0
+        /// se o gerenciador ainda não existe na cena. Existe para que os dois canais de dano
+        /// sejam consultados do mesmo jeito, num lugar só.
+        /// </summary>
+        private static float BonusPassivo(StatType atributo)
+            => GerenciadorEfeitosPassivos.Instance?.GetBonus(atributo) ?? 0f;
 
         private void ResolverGolpe(Vector2 direcao, ArmaResult resultado)
         {
@@ -309,6 +309,7 @@ namespace FavelaAmarela.Player
             {
                 string arma = _armaEquipada != null ? _armaEquipada.NomeDaArma : "DESARMADO (mão vazia)";
                 Debug.Log($"[Golpe] arma={arma} dano={resultado.Dano:0.##} " +
+                          $"trauma={resultado.TraumaAnomalia:0.##} " +
                           $"colisores={total} alvosAtingidos={atingidos}", this);
             }
         }

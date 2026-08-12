@@ -44,11 +44,24 @@ namespace FavelaAmarela.Core.Abilities
         /// <summary>Força de repulsão (empurrão) aplicada ao alvo, em unidades (habilidade do Alfanje de Alhazred).</summary>
         public readonly float ForcaRepulsao;
 
+        /// <summary>
+        /// Trauma anômalo (estática/cósmico) aplicado ao alvo — o <b>segundo canal</b> de
+        /// dano descrito em <c>FichaDeAtributos</c>: mitigado pela Resistência Anômala do
+        /// defensor e descontado da <c>ResilienciaMental</c>, não da Vitalidade. É o que
+        /// separa uma adaga profana de um facão: ferir a mente em vez da carne.
+        ///
+        /// <para>Zero na esmagadora maioria das armas — só relíquias e lâminas de Carcosa
+        /// (Tier 2 em diante) preenchem isto. Alvos sem Resiliência Mental na ficha
+        /// (<c>ResilienciaMax</c> = 0) simplesmente ignoram este canal.</para>
+        /// </summary>
+        public readonly float TraumaAnomalia;
+
         public ArmaResult(bool success, float durationSeconds, float cooldownSeconds,
             bool atordoou = false, float duracaoAtordoamento = 0f,
             float dano = 0f, bool interrompeConjuracao = false,
             float sangramentoPorSegundo = 0f, float duracaoSangramento = 0f,
-            float forcaRepulsao = 0f, int acumulosDeSangramento = 0)
+            float forcaRepulsao = 0f, int acumulosDeSangramento = 0,
+            float traumaAnomalia = 0f)
         {
             AcumulosDeSangramento = acumulosDeSangramento;
             Success = success;
@@ -61,7 +74,30 @@ namespace FavelaAmarela.Core.Abilities
             SangramentoPorSegundo = sangramentoPorSegundo;
             DuracaoSangramento = duracaoSangramento;
             ForcaRepulsao = forcaRepulsao;
+            TraumaAnomalia = traumaAnomalia;
         }
+
+        /// <summary>
+        /// Devolve uma cópia deste resultado com os bônus passivos do atacante somados aos
+        /// dois canais de dano. Todo o resto do golpe (atordoamento, sangramento, repulsão,
+        /// cooldown) é preservado intacto.
+        ///
+        /// <para><b>Por que existe:</b> a <c>MaoFisicaBridge</c> reconstruía o struct à mão,
+        /// em dois lugares, com um construtor posicional de onze argumentos. Todo campo novo
+        /// adicionado aqui era <b>silenciosamente descartado</b> por esquecimento em uma das
+        /// duas cópias — sem erro de compilação, porque os parâmetros têm default. Centralizar
+        /// a cópia num único método torna esse tipo de perda impossível.</para>
+        /// </summary>
+        /// <param name="bonusFisico">Bônus de <c>StatType.TraumaFisico</c> agregado dos equipamentos.</param>
+        /// <param name="bonusAnomalia">Bônus de <c>StatType.TraumaAnomalia</c> agregado dos equipamentos.</param>
+        public ArmaResult ComBonus(float bonusFisico, float bonusAnomalia = 0f)
+            => new ArmaResult(
+                Success, DurationSeconds, CooldownSeconds,
+                Atordoou, DuracaoAtordoamento,
+                Dano + bonusFisico, InterrompeConjuracao,
+                SangramentoPorSegundo, DuracaoSangramento,
+                ForcaRepulsao, AcumulosDeSangramento,
+                TraumaAnomalia + bonusAnomalia);
     }
 
     /// <summary>

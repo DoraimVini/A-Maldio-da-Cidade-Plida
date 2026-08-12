@@ -47,6 +47,16 @@ namespace FavelaAmarela.Core.Combat
         /// <summary>Cadência de ataque.</summary>
         public float CadenciaDeAtaque { get; }
 
+        /// <summary>
+        /// Teto da Resiliência Mental (a "mente") desta unidade — o alvo do canal anômalo.
+        /// <b>Zero significa que a unidade não tem mente a ferir</b>: ela ignora
+        /// silenciosamente todo Trauma de Anomalia, sem que ninguém precise de um
+        /// <c>if</c> por tipo de inimigo. É o default justamente porque a carne é a regra
+        /// e a mente é a exceção — um Cultista comum cai por dano físico; uma criatura de
+        /// Carcosa pode ser desfeita pelos dois vetores.
+        /// </summary>
+        public float ResilienciaMax { get; }
+
         /// <param name="vitalidadeMax">Teto da Vitalidade. Deve ser maior que zero.</param>
         /// <param name="ataque">Poder ofensivo físico (&gt;= 0).</param>
         /// <param name="defesa">Mitigação física (&gt;= 0).</param>
@@ -56,6 +66,10 @@ namespace FavelaAmarela.Core.Combat
         /// <param name="velocidadeCaca">Velocidade de perseguição.</param>
         /// <param name="alcanceDeGolpe">Alcance do golpe corpo-a-corpo.</param>
         /// <param name="cadenciaDeAtaque">Cadência de ataque.</param>
+        /// <param name="resilienciaMax">
+        /// Teto da Resiliência Mental (&gt;= 0). Default 0 — a unidade não tem mente a ferir
+        /// e é imune ao canal anômalo.
+        /// </param>
         public FichaDeAtributos(
             float vitalidadeMax,
             float ataque,
@@ -65,7 +79,8 @@ namespace FavelaAmarela.Core.Combat
             float velocidadeErrante = 1.5f,
             float velocidadeCaca = 3.5f,
             float alcanceDeGolpe = 1.2f,
-            float cadenciaDeAtaque = 1.2f)
+            float cadenciaDeAtaque = 1.2f,
+            float resilienciaMax = 0f)
         {
             if (vitalidadeMax <= 0f)
                 throw new ArgumentOutOfRangeException(nameof(vitalidadeMax),
@@ -74,7 +89,9 @@ namespace FavelaAmarela.Core.Combat
             ExigirNaoNegativo(defesa, nameof(defesa));
             ExigirNaoNegativo(conjuracao, nameof(conjuracao));
             ExigirNaoNegativo(resistenciaAnomala, nameof(resistenciaAnomala));
+            ExigirNaoNegativo(resilienciaMax, nameof(resilienciaMax));
 
+            ResilienciaMax = resilienciaMax;
             VitalidadeMax = vitalidadeMax;
             Ataque = ataque;
             Defesa = defesa;

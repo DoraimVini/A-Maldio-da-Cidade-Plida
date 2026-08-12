@@ -6,6 +6,78 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-12 (16ª rodada) — Canal de dano anômalo + bug de serialização das fichas
+
+Sessão pedida como "implementar `ItemDataSO`, `EquipmentInventory` e `ArmaFactory`" a partir
+de um Pacto de escopo negociado fora do repositório. **A auditoria do código derrubou quatro
+premissas do Pacto antes de escrever qualquer linha** — registrado aqui porque o documento de
+handoff continua circulando e vai induzir ao erro de novo.
+
+### Premissas do Pacto que o código contradiz
+- **"Refatorar `EquipmentInventory` de 5 para 6 slots":** já são **6**
+  (`InventoryManager.anatomia`: Arma, Elmo, Peitoral, Grevas, Amuleto, Anel). O que não existe
+  é um slot *off-hand* — `MaoSecundaria`/`OffHand`/`DuasMaos` têm **zero** ocorrências no
+  código e no Knowledge Bundle. O pedido real é um **7º** slot, que não foi orçado.
+- **"Quebra o `InventorySaveData`, ~1h de refatoração":** custa **zero** — o save dimensiona
+  os arrays por `equip.Capacidade` em runtime. O custo real, não mencionado, é que mudar a
+  anatomia faz `RestaurarEquipamento` cair no ramo de capacidade divergente e chamar
+  `new EquipmentInventory(...)`, **reintroduzindo o bug dos inscritos órfãos** já documentado
+  em `InventoryManager.cs` (playtest "perde a arma no deserto", 2026-08-11).
+- **"`TraumaAnomalia` é inegociável para validar a luta contra o Rei em Amarelo":**
+  impossível. O Rei **não tem `IDanificavel`** — nenhum `ArmaResult` chega até ele, por design
+  explícito em código e em `boss_rei_em_amarelo.md`. O canal anômalo foi redirecionado para o
+  **Byakhee**, o único boss do VS que é `EnemyBase`/`IDanificavel`.
+- **"Implementar a `ArmaFactory`":** já existe (`Core/Factories/WeaponFactory.cs`), e
+  `ItemDataSO` já existe como `ItemDef`. Criar os dois teria produzido sistemas paralelos
+  concorrentes. Também: os "10 itens" do Pacto ignoram os **16 `ItemDef` já autorados**.
+
+### Core
+- `ArmaResult` (`Core/Abilities/IArma.cs`): campo `TraumaAnomalia` — o segundo canal de dano
+  que a `FichaDeAtributos` documentava mas nenhuma arma conseguia entregar.
+- `ArmaResult.ComBonus(bonusFisico, bonusAnomalia)`: cópia centralizada com os bônus passivos
+  somados. Substitui as **duas** reconstruções manuais do struct na `MaoFisicaBridge`, que
+  usavam um construtor posicional de 11 argumentos e descartavam silenciosamente qualquer
+  campo novo (todos os parâmetros têm default, então não havia erro de compilação).
+- `FichaDeAtributos`: atributo `ResilienciaMax` (default **0** = a unidade não tem mente a
+  ferir e ignora o canal anômalo, sem `if` por tipo de inimigo).
+
+### Runtime
+- `EnemyBase`: resolve os dois canais no mesmo golpe. Instancia `ResilienciaMental` só quando
+  `ResilienciaMax > 0`; trauma mitigado por `ResistenciaAnomala`; **Colapso mental abate**, o
+  segundo vetor de derrota. Trava `_jaAbatido` para o golpe que zera carne e mente não chamar
+  `Abater()` duas vezes. Número flutuante em cor própria para o trauma.
+- `MaoFisicaBridge`: usa `ComBonus`; helper `BonusPassivo(StatType)`; log de golpe mostra os
+  dois canais.
+
+### Correção crítica — fichas nunca carregavam do disco
+`FichaAtributosConfig` tinha os campos em `PascalCase` enquanto **todos** os `.asset` gravam
+em `camelCase`, sem nenhum `[FormerlySerializedAs]`. A Unity casa por nome exato: toda ficha
+do projeto vinha ignorando os valores autorados e caindo nos defaults da classe. O
+`Ficha_Byakhee` rodava com **100 de vitalidade em vez de 500** e **0 de resistência anômala em
+vez de 12** — um quinto do boss projetado, silenciosamente. Corrigido com
+`[FormerlySerializedAs]` em cada campo. **Todo balanceamento por playtest anterior a hoje foi
+feito contra números que não eram os das fichas.**
+
+### Assets
+- `Ficha_Byakhee.asset`: `resilienciaMax: 120` — a criatura de Carcosa passa a ter mente a
+  ferir (com resistência 12, um golpe anômalo de 20 entrega 8; 15 golpes desfazem a mente).
+
+### Testes
+- `TraumaAnomaloTests` (10 casos): transporte do campo, mitigação pelo canal certo (e não pela
+  Defesa), acúmulo até o Colapso, arma mundana não arranhando a mente, e um **guarda de
+  regressão** que dá valor distinto a cada campo do `ArmaResult` e exige que `ComBonus`
+  devolva todos — é o que impede o bug do campo perdido de voltar.
+- Suíte EditMode completa: **467/467 passando**, 0 falhas.
+
+### Documentação
+- `systems/ficha_de_atributos.md`: tabela de 5 → 6 atributos, seção do canal anômalo por golpe
+  corpo-a-corpo, aviso de que o Rei em Amarelo está fora dele de propósito, e a seção nova
+  sobre o bug de serialização com a tabela do que o Byakhee realmente rodava.
+
+### Pendente (não feito nesta rodada)
+- `VitalidadeBridge` (Damião) ainda **não** consome `TraumaAnomalia` — só `EnemyBase` consome.
+  Inimigos com golpe anômalo não existem no VS, mas o caminho está aberto.
+
 ## 2026-08-12 (15ª rodada) — Prefabs reais dos dois chefes
 
 O Vini pediu para achar arte instalada que servisse para os dois bosses. Auditoria da Inbox e

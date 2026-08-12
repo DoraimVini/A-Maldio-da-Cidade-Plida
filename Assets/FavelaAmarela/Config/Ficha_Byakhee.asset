@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ficha_Byakhee
   m_EditorClassIdentifier:
   vitalidadeMax: 500
+  resilienciaMax: 120
   ataque: 26
   conjuracao: 20
   defesa: 8
