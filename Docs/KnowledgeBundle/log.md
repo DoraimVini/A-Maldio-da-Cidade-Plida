@@ -6,6 +6,66 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-13 (22ª rodada) — Playtest real: três bugs da Arena e a reviravolta do Estilete
+
+Primeiro playtest de verdade da Arena, feito pelo Vini. Rendeu três bugs e desmentiu uma
+conclusão minha da rodada anterior.
+
+### O Estilete nunca foi uma armadilha — a simulação é que estava errada
+A 21ª rodada concluiu que o Estilete "perde em 3 dos 4 cenários" e que o baú entregava "uma arma
+correta e duas armadilhas". **Estava errado.** A simulação aplicava só `resultado.Dano` e
+**ignorava o `Sangramento` inteiro** — que é a identidade da arma, e cuja própria documentação
+diz existir porque "o Estilete tem o menor dano do baú e perderia feio a disputa por
+dano-por-janela".
+
+Com as feridas modeladas (acúmulos, dano contínuo escalando, estouro de `min(500×0,10; 60)` = 50
+contra Aparição Primordial, escoando **mesmo com o Byakhee no ar**), ele passa a ser o **melhor**:
+
+| Arma | 100% | 85% | 70% | 70% + bolsa |
+|---|---|---|---|---|
+| **Estilete de Irem** | vence **26,0s** (25 RM) | vence **26,0s** (25 RM) | vence **28,1s** (**42 RM**) | vence 28,1s (42 RM) |
+| **Cravo de Aklo** | vence 28,3s (42 RM) | vence 28,3s (42 RM) | vence 31,3s (36 RM) | vence 31,3s (36 RM) |
+| **Alfanje de Alhazred** | vence 34,6s (9 RM) | vence 34,6s (9 RM) | vence 40,2s (17 RM) | vence 40,2s (42 RM) |
+
+Ele é o mais rápido em todos os cenários e o que sobra mais RM a 70%. **O pedido de subir o dano
+do Estilete foi suspenso** — buffar a arma já mais forte a tornaria dominante. A decisão volta
+para o Vini com os números na mão.
+
+Detalhe: a 100% e 85% o estouro nem chega a acontecer (`estouros=0`) — o dano contínuo sozinho
+resolve. O estouro só aparece a 70%, quando a luta dura mais.
+
+### Três bugs do playtest
+
+1. **Boss não levava dano nem se movia — é um bug só.** `ByakheeAI.IniciarLuta()` é público e
+   documentado como "chamado pelo gatilho da arena", mas **ninguém chamava** (só Abdul, Avatar de
+   Set e Nagaraja têm chamador). A FSM ficava em `Espreita`: os estados dirigem o voo, então
+   parado; e `PodeReceberDano` só vale em `Pousado`/`Frenesi`, então intocável. Corrigido no
+   `CarcosaDebuggerWindow`, que agora chama ao instanciar.
+2. **Artefatos não equipáveis.** A Arena tinha **zero `ArtefatosBridge`** — o Debugger concede no
+   bridge do jogador e não havia nenhum. Deserto, Playtest e Santuário têm; só a cena de teste
+   ficou de fora, justamente onde os chefes são testados. O prefab do Damião também não traz
+   `GerenciadorDeVigor`, sem o qual a Esquiva não tem recurso para cobrar. `MontarArenaDeTestes`
+   agora garante os dois.
+3. **Arena sem colisores e sem losango.** O chão era um único `SpriteRenderer` escalado 24×24,
+   sem `Grid` nenhum. Agora é a receita canônica do `BuildSantuarioIsoFloor`: `cellSize
+   (1, 0.5, 1)`, `cellLayout Isometric`, tile de losango 32×16 gerado por código (PPU 32, Point),
+   mais um anel de colisão invisível na borda. Importa além do visual: no losango 2:1 **uma
+   unidade em Y vale metade de uma em X**, então alcance testado em chão quadrado não corresponde
+   ao do jogo.
+
+### Sprite do Byakhee sem fundo
+`Byakhee_Spritesheet.png` era a única sprite de inimigo com cantos opacos (fundo cinza-claro em
+degradê até branco). Chroma-key comeria os brancos da criatura, então usei **flood fill a partir
+da borda de cada um dos 26 quadros**. 61% da folha removida, 39% restante, sombra elíptica
+preservada. **Ainda não aplicado ao asset** — aguardando aprovação.
+
+### Nota de método (a lista continua crescendo)
+`2>&1` em executável nativo no PowerShell 5.1 embrulha cada linha de stderr num
+`NativeCommandError`. A Unity emitiu um aviso benigno (`debugger-agent: Unable to listen on
+3672`) e, com `$ErrorActionPreference = "Stop"` dentro do `run_qa_tests.ps1`, isso **derrubou a
+cadeia inteira** depois de os testes já terem passado. Perdemos uma rodada por encanamento, não
+por código. Redirecionar para arquivo em vez de pipe resolve.
+
 ## 2026-08-12 (21ª rodada) — Auditoria de balanceamento do Byakhee com os números reais
 
 O `ByakheeRelatorioDeBalanceamento` **hardcodava** `Vitalidade 500, defesa 8` — os valores

@@ -72,47 +72,82 @@ namespace FavelaAmarela.Tests.EditMode
                                   $"cair abaixo de {LimiarDeRm:F0} RM / {LimiarDeVitalidade:F0} vitalidade.");
             TestContext.WriteLine("");
 
-            var armas = new (string nome, float dano, float cd)[]
+            // Sangramento por golpe: só o Estilete abre feridas. É a identidade dele — o
+            // Sangramento existe justamente porque ele tem o menor dano do baú e perderia a
+            // disputa por dano-por-janela. Ignorá-lo aqui subestimava a arma inteira.
+            var armas = new Arma[]
             {
-                ("Cravo de Aklo", 40f, 0.5f),
-                ("Estilete de Irem", 25f, 0.3f),
-                ("Alfanje de Alhazred", 45f, 0.7f),
+                new Arma("Cravo de Aklo", 40f, 0.5f),
+                new Arma("Estilete de Irem", 25f, 0.3f, sangraPorSeg: 4f, duracaoSangra: 5f, acumulos: 1),
+                new Arma("Alfanje de Alhazred", 45f, 0.7f),
             };
 
-            foreach (var (nome, dano, cd) in armas)
+            foreach (var arma in armas)
             {
                 // acerto = golpes que conectam na janela; esquiva = mergulhos evitados.
-                Linha(nome, dano, cd, acerto: 1.00f, esquiva: 0.90f, bolsa: false, byakhee, damiao);
-                Linha(nome, dano, cd, acerto: 0.85f, esquiva: 0.75f, bolsa: false, byakhee, damiao);
-                Linha(nome, dano, cd, acerto: 0.70f, esquiva: 0.60f, bolsa: false, byakhee, damiao);
-                Linha(nome, dano, cd, acerto: 0.70f, esquiva: 0.60f, bolsa: true, byakhee, damiao);
+                Linha(arma, acerto: 1.00f, esquiva: 0.90f, bolsa: false, byakhee, damiao);
+                Linha(arma, acerto: 0.85f, esquiva: 0.75f, bolsa: false, byakhee, damiao);
+                Linha(arma, acerto: 0.70f, esquiva: 0.60f, bolsa: false, byakhee, damiao);
+                Linha(arma, acerto: 0.70f, esquiva: 0.60f, bolsa: true, byakhee, damiao);
                 TestContext.WriteLine("");
             }
 
             Assert.Pass("Relatório impresso — ver saída acima.");
         }
 
-        private static void Linha(string nome, float dano, float cd, float acerto, float esquiva,
-            bool bolsa, FichaAtributosConfig byakhee, FichaAtributosConfig damiao)
+        /// <summary>Uma arma do baú da Tumba, com o sangramento que ela abre (0 se não sangra).</summary>
+        private readonly struct Arma
         {
-            var r = Simular(byakhee, damiao, dano, cd, acerto, esquiva,
-                ervas: bolsa ? 2 : 0, aguas: bolsa ? 2 : 0, semente: 12345);
+            public readonly string Nome;
+            public readonly float Dano;
+            public readonly float Cooldown;
+            public readonly float SangraPorSeg;
+            public readonly float DuracaoSangra;
+            public readonly int Acumulos;
 
-            TestContext.WriteLine(
-                $"{nome,-22} acerto={acerto,4:P0} esquiva={esquiva,4:P0} bolsa={(bolsa ? "sim" : "nao"),-3}  " +
-                $"{r.desfecho,-16} tempo={r.segundos,5:F1}s  " +
-                $"RM={r.rm,3:F0}/100  vida={r.vida,3:F0}/{damiao.VitalidadeMax:F0}  " +
-                $"garradas={r.garradas}  pousos={r.pousos}");
+            public Arma(string nome, float dano, float cooldown,
+                float sangraPorSeg = 0f, float duracaoSangra = 0f, int acumulos = 0)
+            {
+                Nome = nome; Dano = dano; Cooldown = cooldown;
+                SangraPorSeg = sangraPorSeg; DuracaoSangra = duracaoSangra; Acumulos = acumulos;
+            }
+
+            public bool Sangra => Acumulos > 0 && SangraPorSeg > 0f;
         }
 
-        private static (string desfecho, float rm, float vida, float segundos, int pousos, int garradas)
+        private static void Linha(Arma arma, float acerto, float esquiva,
+            bool bolsa, FichaAtributosConfig byakhee, FichaAtributosConfig damiao)
+        {
+            var r = Simular(byakhee, damiao, arma, acerto, esquiva,
+                ervas: bolsa ? 2 : 0, aguas: bolsa ? 2 : 0, semente: 12345);
+
+            string estouros = arma.Sangra ? $" estouros={r.estouros}" : "";
+
+            TestContext.WriteLine(
+                $"{arma.Nome,-22} acerto={acerto,4:P0} esquiva={esquiva,4:P0} bolsa={(bolsa ? "sim" : "nao"),-3}  " +
+                $"{r.desfecho,-16} tempo={r.segundos,5:F1}s  " +
+                $"RM={r.rm,3:F0}/100  vida={r.vida,3:F0}/{damiao.VitalidadeMax:F0}  " +
+                $"garradas={r.garradas}  pousos={r.pousos}{estouros}");
+        }
+
+        private static (string desfecho, float rm, float vida, float segundos, int pousos, int garradas, int estouros)
             Simular(FichaAtributosConfig fichaByakhee, FichaAtributosConfig fichaDamiao,
-                float dano, float cooldown, float taxaDeAcerto, float taxaDeEsquiva,
+                Arma arma, float taxaDeAcerto, float taxaDeEsquiva,
                 int ervas, int aguas, int semente)
         {
+            float dano = arma.Dano;
+            float cooldown = arma.Cooldown;
+
             var rng = new System.Random(semente);
             var fsm = new ByakheeFSM();
             fsm.IniciarLuta();
+
+            // O Byakhee é Aparição Primordial: o estouro usa dano percentual (10% da vida
+            // máxima, com teto 60), e não o valor fixo dos inimigos comuns.
+            var sangramento = new Sangramento();
+            float danoDoEstouro = ExplosaoDeSangramento.Calcular(
+                fichaByakhee.VitalidadeMax, ehAparicaoPrimordial: true);
+            int estouros = 0;
 
             var vidaDoByakhee = new Vitalidade(fichaByakhee.VitalidadeMax);
             var vidaDoDamiao = new Vitalidade(fichaDamiao.VitalidadeMax);
@@ -174,10 +209,24 @@ namespace FavelaAmarela.Tests.EditMode
                 }
 
                 if (rm.IsColapso)
-                    return ("COLAPSO MENTAL", 0f, vidaDoDamiao.Atual, tempo, pousos, garradas);
+                    return ("COLAPSO MENTAL", 0f, vidaDoDamiao.Atual, tempo, pousos, garradas, estouros);
 
                 if (vidaDoDamiao.EstaAbatido)
-                    return ("MORTE FISICA", rm.Atual, 0f, tempo, pousos, garradas);
+                    return ("MORTE FISICA", rm.Atual, 0f, tempo, pousos, garradas, estouros);
+
+                // ── Sangramento: escoa mesmo com o Byakhee no ar ────────────
+                // Diferente do golpe, a ferida não espera a janela de pouso — é isso que
+                // converte permanência em dano no Estilete.
+                var tick = sangramento.Tick(Dt);
+                if (tick.DanoContinuo > 0f) vidaDoByakhee.Ferir(tick.DanoContinuo);
+                if (tick.Explodiu)
+                {
+                    vidaDoByakhee.Ferir(danoDoEstouro);
+                    estouros++;
+                }
+
+                if (vidaDoByakhee.EstaAbatido)
+                    return ("VENCEU", rm.Atual, vidaDoDamiao.Atual, tempo, pousos, garradas, estouros);
 
                 if (fsm.CurrentState == ByakheeState.Pousado && estadoAnterior != ByakheeState.Pousado)
                     pousos++;
@@ -193,8 +242,14 @@ namespace FavelaAmarela.Tests.EditMode
                         if (fsm.CurrentState == ByakheeState.Frenesi) fsm.InterromperFrenesi();
 
                         vidaDoByakhee.Ferir(MitigacaoDeDano.Aplicar(dano, fichaByakhee.Defesa));
+
+                        // Cada golpe abre mais uma ferida e renova a duração: parar de bater
+                        // deixa estancar, então acumular exige manter a pressão.
+                        if (arma.Sangra)
+                            sangramento.Aplicar(arma.Acumulos, arma.SangraPorSeg, arma.DuracaoSangra);
+
                         if (vidaDoByakhee.EstaAbatido)
-                            return ("VENCEU", rm.Atual, vidaDoDamiao.Atual, tempo, pousos, garradas);
+                            return ("VENCEU", rm.Atual, vidaDoDamiao.Atual, tempo, pousos, garradas, estouros);
                     }
                 }
 
@@ -202,7 +257,7 @@ namespace FavelaAmarela.Tests.EditMode
                 fsm.Tick(Dt);
             }
 
-            return ("TEMPO ESGOTADO", rm.Atual, vidaDoDamiao.Atual, tempo, pousos, garradas);
+            return ("TEMPO ESGOTADO", rm.Atual, vidaDoDamiao.Atual, tempo, pousos, garradas, estouros);
         }
     }
 }

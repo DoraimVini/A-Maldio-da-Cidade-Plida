@@ -210,7 +210,16 @@ namespace FavelaAmarela.EditorTools
                 var instancia = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
                 instancia.name = "Byakhee (Debug)";
                 instancia.transform.position = posicao;
-                Debug.Log("[CarcosaDebugger] Byakhee invocado (prefab).");
+
+                // Sem isto a FSM fica em Espreita para sempre: o Byakhee não se move (os
+                // estados é que dirigem o voo) e é INTOCÁVEL, porque PodeReceberDano só vale
+                // em Pousado/Frenesi. O playtest de 2026-08-12 leu isso como dois bugs
+                // separados ("não leva dano" e "não se move"); é um só. O método existe e está
+                // documentado como "chamado pelo gatilho da arena" — mas a arena não tem
+                // gatilho, e no jogo real quem chamaria são os Portões, que ainda não existem.
+                instancia.GetComponent<ByakheeAI>()?.IniciarLuta();
+
+                Debug.Log("[CarcosaDebugger] Byakhee invocado (prefab) e luta iniciada.");
                 return;
             }
 

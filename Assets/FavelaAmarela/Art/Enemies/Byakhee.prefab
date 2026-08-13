@@ -199,6 +199,7 @@ MonoBehaviour:
   ehAparicaoPrimordial: 0
   mostrarNumerosDeDano: 1
   corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}
+  corDoTraumaAnomalo: {r: 0.9, g: 0.85, b: 0.4, a: 1}
 --- !u!114 &5639470958258438907
 MonoBehaviour:
   m_ObjectHideFlags: 0
