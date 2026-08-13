@@ -23,6 +23,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Boss Byakhee](boss_byakhee.md) — **[CORE+RUNTIME]** O cadeado dos Portões: imune no ar, vulnerável só no pouso; fecha a Fase 1
 - [Boss Rei em Amarelo](boss_rei_em_amarelo.md) — **[CORE+RUNTIME]** O confronto final: sem barra de vida, ritual de relíquias + selamento por reação (Máscara Pálida). Ver também o Carcosa Debugger e a Arena de Testes
 - [Persistência](persistencia.md) — O ciclo do save, o padrão Observer do `IPersistente`, e o bug em que o jogo gravava mas nunca lia de volta
+- [HUD](hud.md) — As 6 views, o `HUDController` como injetor, e `BuildHUDCompleto` como ponto único de montagem — nenhuma cena tinha HUD completo antes de 2026-08-13
 - [Luta contra Abdul Alhazred](boss_abdul.md) — Boss em fases: Escudo Mágico, Pedras de Poder, Cones de Gelo e a janela de exaustão
 - [IA do Cultista](cultista_ai.md) — FSM de comportamento dos inimigos
 - [Espectro](espectro.md) — Manifestação espectral roteirizada (cutscenes)

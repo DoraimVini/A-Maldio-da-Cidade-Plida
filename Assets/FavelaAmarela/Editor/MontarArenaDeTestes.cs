@@ -5,11 +5,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 using FavelaAmarela.CameraSystem;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.GameLoop;
-using FavelaAmarela.Runtime.UI;
 
 namespace FavelaAmarela.EditorTools
 {
@@ -79,13 +77,11 @@ namespace FavelaAmarela.EditorTools
 
             new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
 
-            // HUD completo: cada peça vem de uma ferramenta diferente, e chamar só o
-            // BuildHUDCompleto deixava a Arena com metade dele — sem barra de itens (teclas
-            // 1–8) e sem painel de inventário (Tab). Foi o que sumiu no playtest de 2026-08-13.
+            // HUD completo: BuildHUDCompleto é o único ponto de montagem desde 2026-08-13 — ele
+            // já monta as seis views (inclusive Vigor e Artefatos, que só a Arena tinha antes)
+            // mais a barra de itens e o painel de inventário. Nada de HUD "da Arena" separado
+            // do HUD do jogo.
             BuildHUDCompleto.Build();
-            MontarBarraDeItens.MontarNaCenaAberta();
-            MontarPainelDeInventario.MontarNaCenaAberta();
-            MontarBarraDeArtefatos();
         }
 
         // ── Chão ─────────────────────────────────────────────────────────────
@@ -295,89 +291,5 @@ namespace FavelaAmarela.EditorTools
                 camGo.GetComponent<IsometricCameraController>().SetTarget(damiao.transform);
         }
 
-        // ── Barra de Artefatos ───────────────────────────────────────────────
-
-        /// <summary>
-        /// Versão mínima de 4 slots (só texto, sem ícone/recarga visual) — o suficiente para
-        /// o HUDController ter algo para injetar via <c>InjetarArtefatos</c> e o jogador ver
-        /// que artefato está em qual tecla durante o teste. Sub-campos de ícone e recarga
-        /// ficam nulos de propósito: <c>BarraDeArtefatos.Redesenhar/Update</c> já checam null
-        /// em cada um.
-        /// </summary>
-        private static void MontarBarraDeArtefatos()
-        {
-            var hud = Object.FindAnyObjectByType<HUDController>();
-            if (hud == null)
-            {
-                Debug.LogWarning("[ArenaDeTestes] Sem HUDController — barra de artefatos não montada.");
-                return;
-            }
-
-            if (hud.GetComponentInChildren<BarraDeArtefatos>(true) != null) return;
-
-            var raiz = new GameObject("Barra_Artefatos", typeof(RectTransform));
-            raiz.transform.SetParent(hud.transform, false);
-
-            var rt = raiz.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0f, 0f);
-            rt.anchorMax = new Vector2(0f, 0f);
-            rt.pivot = new Vector2(0f, 0f);
-            rt.anchoredPosition = new Vector2(16f, 16f);
-            rt.sizeDelta = new Vector2(220f, 44f);
-
-            var fonte = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            var slots = new BarraDeArtefatos.SlotDeArtefato[4];
-
-            for (int i = 0; i < slots.Length; i++)
-            {
-                var slotGo = new GameObject($"Slot_F{i + 1}", typeof(RectTransform), typeof(CanvasGroup));
-                slotGo.transform.SetParent(raiz.transform, false);
-
-                var slotRt = slotGo.GetComponent<RectTransform>();
-                slotRt.anchorMin = slotRt.anchorMax = new Vector2(0f, 0f);
-                slotRt.pivot = new Vector2(0f, 0f);
-                slotRt.anchoredPosition = new Vector2(i * 56f, 0f);
-                slotRt.sizeDelta = new Vector2(52f, 44f);
-
-                var texto = new GameObject("Texto", typeof(RectTransform)).AddComponent<Text>();
-                texto.transform.SetParent(slotGo.transform, false);
-                texto.font = fonte;
-                texto.fontSize = 11;
-                texto.alignment = TextAnchor.MiddleCenter;
-                texto.color = new Color(0.93f, 0.90f, 0.75f);
-                texto.horizontalOverflow = HorizontalWrapMode.Wrap;
-                texto.text = "—";
-                var textoRt = texto.GetComponent<RectTransform>();
-                textoRt.anchorMin = Vector2.zero;
-                textoRt.anchorMax = Vector2.one;
-                textoRt.offsetMin = Vector2.zero;
-                textoRt.offsetMax = Vector2.zero;
-
-                slots[i] = new BarraDeArtefatos.SlotDeArtefato
-                {
-                    grupo = slotGo.GetComponent<CanvasGroup>(),
-                    nomeDaHabilidade = texto,
-                    rotuloTecla = null,
-                    icone = null,
-                    preenchimentoRecarga = null,
-                };
-            }
-
-            var barra = raiz.AddComponent<BarraDeArtefatos>();
-            var so = new SerializedObject(barra);
-            var slotsProp = so.FindProperty("slots");
-            slotsProp.arraySize = slots.Length;
-            for (int i = 0; i < slots.Length; i++)
-            {
-                var elemento = slotsProp.GetArrayElementAtIndex(i);
-                elemento.FindPropertyRelative("grupo").objectReferenceValue = slots[i].grupo;
-                elemento.FindPropertyRelative("nomeDaHabilidade").objectReferenceValue = slots[i].nomeDaHabilidade;
-            }
-            so.ApplyModifiedPropertiesWithoutUndo();
-
-            var hudSo = new SerializedObject(hud);
-            hudSo.FindProperty("barraDeArtefatos").objectReferenceValue = barra;
-            hudSo.ApplyModifiedPropertiesWithoutUndo();
-        }
     }
 }

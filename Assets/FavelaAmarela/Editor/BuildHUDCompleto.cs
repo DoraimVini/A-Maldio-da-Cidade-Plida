@@ -1,3 +1,4 @@
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -7,20 +8,33 @@ using FavelaAmarela.Runtime.UI;
 namespace FavelaAmarela.EditorTools
 {
     /// <summary>
-    /// Utilitário de Editor: monta o HUD de gameplay completo na cena aberta —
-    /// barra de <b>Resiliência Mental</b> (sanidade), barra de <b>Vitalidade</b> (a carne)
-    /// e a <b>Barra de Ações</b> da Mão Física (arma empunhada + habilidade e sua recarga).
+    /// Utilitário de Editor: <b>o único ponto de montagem do HUD de gameplay</b> — as seis
+    /// views (<see cref="ResilienciaBar"/>, <see cref="VitalidadeBar"/>, <see cref="VigorBar"/>,
+    /// <see cref="BarraDeAcoes"/>, <see cref="BarraDeItens"/>, <see cref="BarraDeArtefatos"/>)
+    /// mais o <see cref="PainelDeInventario"/>, todas ligadas no <see cref="HUDController"/>.
     ///
-    /// Existe porque as cenas de playtest não tinham HUD nenhum: o prefab
-    /// <c>HUD_ResilienciaBar</c> nunca foi instanciado, então nem a Resiliência aparecia.
-    /// Construir a hierarquia por código (e não por YAML na mão) deixa a Unity resolver
-    /// anchors, fonte e sprites — o mesmo padrão dos outros builders desta pasta.
+    /// <para><b>Por que existe centralizado (2026-08-13):</b> até aqui cada peça vinha de uma
+    /// ferramenta com lista de cenas própria — <c>MontarBarraDeItens</c>,
+    /// <c>MontarPainelDeInventario</c>, e uma <c>MontarBarraDeArtefatos</c> que só existia
+    /// dentro de <c>MontarArenaDeTestes</c>. O resultado: <b>nenhuma cena tinha HUD
+    /// completo</b>. O Deserto e o Santuário não mostravam a arma empunhada nem os artefatos
+    /// F1–F4; a <c>VigorBar</c> nunca foi instanciada em cena ou prefab nenhum, então a
+    /// Esquiva não tinha indicador de recurso em lugar algum.</para>
     ///
-    /// Idempotente: se o HUD já existir na cena, reaproveita e só completa o que falta.
+    /// <para>Idempotente: acha o <see cref="HUDController"/> existente (inclusive dentro do
+    /// prefab <c>HUD_ResilienciaBar</c>, que só liga duas das seis views) e só completa o que
+    /// falta — não recria views já presentes.</para>
     /// </summary>
     public static class BuildHUDCompleto
     {
         private const string NomeRaiz = "HUD_Gameplay";
+
+        private static readonly string[] CenasDeJogo =
+        {
+            "Assets/Scenes/Deserto_Hali.unity",
+            "Assets/Scenes/Playtest_RuinasPalidas.unity",
+            "Assets/Scenes/Santuario_Yhtill.unity",
+        };
 
         [MenuItem("Tools/FavelaAmarela/Build HUD Completo (cena aberta)")]
         public static void Build()
@@ -28,44 +42,78 @@ namespace FavelaAmarela.EditorTools
             var canvasGO = ObterOuCriarCanvas(out var hud);
 
             // ── Resiliência Mental (sanidade) ────────────────────────────────
-            var resiliencia = canvasGO.GetComponentInChildren<ResilienciaBar>(true);
-            if (resiliencia == null)
-            {
-                resiliencia = CriarBarra<ResilienciaBar>(
-                    canvasGO.transform, "Barra_ResilienciaMental",
-                    ancoraY: -24f, corFill: new Color(0.85f, 0.78f, 0.30f));
-            }
+            var resiliencia = ObterOuCriarBarra<ResilienciaBar>(canvasGO, "Barra_ResilienciaMental",
+                ancoraY: -24f, corFill: new Color(0.85f, 0.78f, 0.30f));
 
             // ── Vitalidade corpórea (a carne) ────────────────────────────────
-            var vitalidade = canvasGO.GetComponentInChildren<VitalidadeBar>(true);
-            if (vitalidade == null)
-            {
-                vitalidade = CriarBarra<VitalidadeBar>(
-                    canvasGO.transform, "Barra_Vitalidade",
-                    ancoraY: -48f, corFill: new Color(0.72f, 0.18f, 0.18f));
-            }
+            var vitalidade = ObterOuCriarBarra<VitalidadeBar>(canvasGO, "Barra_Vitalidade",
+                ancoraY: -48f, corFill: new Color(0.72f, 0.18f, 0.18f));
+
+            // ── Vigor (estamina da Esquiva) ───────────────────────────────────
+            var vigor = ObterOuCriarBarra<VigorBar>(canvasGO, "Barra_Vigor",
+                ancoraY: -72f, corFill: new Color(0.35f, 0.70f, 0.25f));
 
             // ── Barra de Ações da Mão Física ─────────────────────────────────
-            var acoes = canvasGO.GetComponentInChildren<BarraDeAcoes>(true);
-            if (acoes == null)
-                acoes = CriarBarraDeAcoes(canvasGO.transform);
+            var acoes = canvasGO.GetComponentInChildren<BarraDeAcoes>(true)
+                        ?? CriarBarraDeAcoes(canvasGO.transform);
 
-            // ── Liga as views no HUDController ──────────────────────────────
-            LigarViews(hud, resiliencia, vitalidade, acoes);
+            // ── Barra de Artefatos (4 slots, F1–F4) ──────────────────────────
+            var artefatos = canvasGO.GetComponentInChildren<BarraDeArtefatos>(true)
+                            ?? CriarBarraDeArtefatos(canvasGO.transform);
+
+            LigarViews(hud, resiliencia, vitalidade, vigor, acoes, artefatos);
+
+            // Barra de itens (teclas 1–8) e painel de inventário (Tab): ferramentas próprias
+            // que já se auto-ligam no HUDController — ver MontarBarraDeItens.MontarNaCenaAberta.
+            // Idempotentes, então chamar de novo numa cena que já as tem não duplica nada.
+            MontarBarraDeItens.MontarNaCenaAberta();
+            MontarPainelDeInventario.MontarNaCenaAberta();
 
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
             Selection.activeGameObject = canvasGO;
 
-            Debug.Log($"[BuildHUDCompleto] HUD montado em '{EditorSceneManager.GetActiveScene().name}': " +
-                      "Resiliência Mental, Vitalidade e Barra de Ações. " +
+            Debug.Log($"[BuildHUDCompleto] HUD completo em '{EditorSceneManager.GetActiveScene().name}': " +
+                      "Resiliência, Vitalidade, Vigor, Ações, Artefatos, Itens e Painel de Inventário. " +
                       "O GameManager injeta as fontes no bootstrap (Play para ver).");
+        }
+
+        /// <summary>
+        /// Aplica <see cref="Build"/> nas três cenas de jogo do Vertical Slice em sequência.
+        /// Existe porque rodar <c>Build</c> só na cena aberta exige lembrar de repetir para
+        /// cada fase — e foi exatamente por não repetir que o Deserto e o Santuário ficaram
+        /// para trás.
+        /// </summary>
+        [MenuItem("Tools/FavelaAmarela/Build HUD Completo em todas as cenas de jogo")]
+        public static void BuildEmTodasAsCenas()
+        {
+            var cenaAtiva = EditorSceneManager.GetActiveScene();
+            if (cenaAtiva.isDirty && !string.IsNullOrEmpty(cenaAtiva.path))
+                EditorSceneManager.SaveScene(cenaAtiva);
+            string cenaOriginal = cenaAtiva.path;
+
+            int feitas = 0;
+            foreach (var caminho in CenasDeJogo)
+            {
+                if (!File.Exists(caminho)) continue;
+
+                var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
+                Build();
+                EditorSceneManager.MarkSceneDirty(cena);
+                EditorSceneManager.SaveScene(cena);
+                feitas++;
+            }
+
+            if (!string.IsNullOrEmpty(cenaOriginal) && System.Array.IndexOf(CenasDeJogo, cenaOriginal) < 0)
+                EditorSceneManager.OpenScene(cenaOriginal, OpenSceneMode.Single);
+
+            Debug.Log($"[BuildHUDCompleto] HUD completo aplicado em {feitas} cena(s) de jogo.");
         }
 
         // ── Canvas raiz ──────────────────────────────────────────────────────
 
         private static GameObject ObterOuCriarCanvas(out HUDController hud)
         {
-            hud = Object.FindAnyObjectByType<HUDController>();
+            hud = Object.FindAnyObjectByType<HUDController>(FindObjectsInactive.Include);
             if (hud != null) return hud.gameObject;
 
             var go = new GameObject(NomeRaiz,
@@ -85,6 +133,13 @@ namespace FavelaAmarela.EditorTools
         }
 
         // ── Barras de recurso (trilho + preenchimento) ───────────────────────
+
+        private static T ObterOuCriarBarra<T>(GameObject canvasGO, string nome, float ancoraY, Color corFill)
+            where T : Component
+        {
+            var existente = canvasGO.GetComponentInChildren<T>(true);
+            return existente != null ? existente : CriarBarra<T>(canvasGO.transform, nome, ancoraY, corFill);
+        }
 
         private static T CriarBarra<T>(Transform pai, string nome, float ancoraY, Color corFill)
             where T : Component
@@ -151,6 +206,81 @@ namespace FavelaAmarela.EditorTools
             AtribuirCampo(barra, "nomeDaHabilidade", textoHab);
             AtribuirCampo(barra, "preenchimentoRecarga", imgRecarga);
             AtribuirCampo(barra, "grupoHabilidade", grupo);
+            return barra;
+        }
+
+        // ── Barra de Artefatos (4 slots, F1–F4) ──────────────────────────────
+        // Movida de MontarArenaDeTestes.MontarBarraDeArtefatos (2026-08-13): a Arena era a
+        // única cena que a montava, então nenhuma cena de jogo mostrava os artefatos F1–F4.
+
+        /// <summary>
+        /// Versão mínima de 4 slots (só texto, sem ícone/recarga visual) — o suficiente para o
+        /// jogador ver que artefato está em qual tecla. Sub-campos de ícone e recarga ficam
+        /// nulos de propósito: <c>BarraDeArtefatos.Redesenhar/Update</c> já checam null em cada
+        /// um.
+        /// </summary>
+        private static BarraDeArtefatos CriarBarraDeArtefatos(Transform pai)
+        {
+            var raiz = new GameObject("Barra_Artefatos", typeof(RectTransform));
+            raiz.transform.SetParent(pai, false);
+
+            var rt = raiz.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0f, 0f);
+            rt.anchorMax = new Vector2(0f, 0f);
+            rt.pivot = new Vector2(0f, 0f);
+            rt.anchoredPosition = new Vector2(16f, 16f);
+            rt.sizeDelta = new Vector2(220f, 44f);
+
+            var fonte = ObterFontePadrao();
+            var slots = new BarraDeArtefatos.SlotDeArtefato[4];
+
+            for (int i = 0; i < slots.Length; i++)
+            {
+                var slotGo = new GameObject($"Slot_F{i + 1}", typeof(RectTransform), typeof(CanvasGroup));
+                slotGo.transform.SetParent(raiz.transform, false);
+
+                var slotRt = slotGo.GetComponent<RectTransform>();
+                slotRt.anchorMin = slotRt.anchorMax = new Vector2(0f, 0f);
+                slotRt.pivot = new Vector2(0f, 0f);
+                slotRt.anchoredPosition = new Vector2(i * 56f, 0f);
+                slotRt.sizeDelta = new Vector2(52f, 44f);
+
+                var texto = new GameObject("Texto", typeof(RectTransform)).AddComponent<Text>();
+                texto.transform.SetParent(slotGo.transform, false);
+                texto.font = fonte;
+                texto.fontSize = 11;
+                texto.alignment = TextAnchor.MiddleCenter;
+                texto.color = new Color(0.93f, 0.90f, 0.75f);
+                texto.horizontalOverflow = HorizontalWrapMode.Wrap;
+                texto.text = "—";
+                var textoRt = texto.GetComponent<RectTransform>();
+                textoRt.anchorMin = Vector2.zero;
+                textoRt.anchorMax = Vector2.one;
+                textoRt.offsetMin = Vector2.zero;
+                textoRt.offsetMax = Vector2.zero;
+
+                slots[i] = new BarraDeArtefatos.SlotDeArtefato
+                {
+                    grupo = slotGo.GetComponent<CanvasGroup>(),
+                    nomeDaHabilidade = texto,
+                    rotuloTecla = null,
+                    icone = null,
+                    preenchimentoRecarga = null,
+                };
+            }
+
+            var barra = raiz.AddComponent<BarraDeArtefatos>();
+            var so = new SerializedObject(barra);
+            var slotsProp = so.FindProperty("slots");
+            slotsProp.arraySize = slots.Length;
+            for (int i = 0; i < slots.Length; i++)
+            {
+                var elemento = slotsProp.GetArrayElementAtIndex(i);
+                elemento.FindPropertyRelative("grupo").objectReferenceValue = slots[i].grupo;
+                elemento.FindPropertyRelative("nomeDaHabilidade").objectReferenceValue = slots[i].nomeDaHabilidade;
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+
             return barra;
         }
 
@@ -244,12 +374,14 @@ namespace FavelaAmarela.EditorTools
         }
 
         private static void LigarViews(HUDController hud, ResilienciaBar resiliencia,
-            VitalidadeBar vitalidade, BarraDeAcoes acoes)
+            VitalidadeBar vitalidade, VigorBar vigor, BarraDeAcoes acoes, BarraDeArtefatos artefatos)
         {
             if (hud == null) return;
             AtribuirCampo(hud, "resilienciaBar", resiliencia);
             AtribuirCampo(hud, "vitalidadeBar", vitalidade);
+            AtribuirCampo(hud, "vigorBar", vigor);
             AtribuirCampo(hud, "barraDeAcoes", acoes);
+            AtribuirCampo(hud, "barraDeArtefatos", artefatos);
         }
     }
 }

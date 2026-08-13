@@ -116,10 +116,26 @@ namespace FavelaAmarela.Runtime.UI
                 barraDeAcoes.Bind(fonte);
         }
 
+        /// <summary>
+        /// Injeta o Vigor de Damião na barra correspondente. Chamado pelo <c>GameManager</c>
+        /// no bootstrap.
+        /// </summary>
         public void InjetarVigor(FavelaAmarela.Player.GerenciadorDeVigor fonte)
         {
             if (fonte == null) return;
-            if (vigorBar != null) vigorBar.Bind(fonte);
+
+            if (vigorBar != null)
+            {
+                vigorBar.Bind(fonte);
+            }
+            else
+            {
+                // Era o único Injetar* que falhava em silêncio — a VigorBar ficou órfã (0
+                // cenas, 0 prefabs) sem que nada no console apontasse a causa. Ver
+                // Docs/KnowledgeBundle/systems para o histórico (2026-08-13).
+                Debug.LogError("[HUDController] Campo 'vigorBar' vazio — o Vigor foi injetado " +
+                               "mas não há barra ligada para mostrá-lo.", this);
+            }
         }
 
         /// <summary>

@@ -6,6 +6,66 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-13 (24ª rodada) — HUD: refutação de roadmap e o ponto único de montagem
+
+### O documento refutado
+Chegou uma proposta de roadmap de HUD (~6,5h) priorizando Barra de Chefe e ícones de status
+ailment como 🔴 bloqueantes, e extração de uma classe base como Etapa 0. Verificado contra o
+repositório, tinha cinco erros:
+
+1. **Barra de Chefe "bloqueante para o Rei em Amarelo"** — impossível: o Rei não tem
+   `Vitalidade` nem `IDanificavel` por design. Terceiro documento da sessão a tratá-lo como
+   chefe de HP convencional (depois do `TraumaAnomalia` e do modelo de consumíveis).
+2. **"Rei ou Byakhee podem aplicar Sangramento/Congelamento"** — não aplicam. Sangramento é
+   100% jogador→inimigo (só o Estilete); Congelamento é 100% Abdul→jogador (`ConeDeGelo.cs`).
+3. **"RM regenera +10/s sob o Poste de Luz"** — falso. `RefugioDeLuz` cura 100 de Resiliência
+   de uma vez + 40% da Vitalidade, com 30s de cooldown. Evento único, não regeneração contínua.
+4. **"~80% de código duplicado entre as 3 barras"** — o núcleo comum é ~35-40 linhas (40-50%);
+   a política de cor, o miolo, é estruturalmente diferente nas três.
+5. **`VigorBar` listada como componente existente** — está órfã: 0 cenas, 0 prefabs.
+   `HUDController.InjetarVigor` ligava em null sem `Debug.LogError`, o único `Injetar*` assim.
+
+**A omissão real:** nenhuma cena tinha HUD completo. Deserto e Santuário sem `BarraDeAcoes` nem
+`BarraDeArtefatos`; `VigorBar` ausente em todas as seis cenas do projeto. Causa: cada view vinha
+de uma ferramenta com lista de cenas própria, e `BuildHUDCompleto` só montava 3 das 6.
+
+### A abordagem: ligar antes de escrever mais
+Decidido com o Vini: Etapa 0 é wiring + guarda, não features novas.
+
+- `BuildHUDCompleto` (`Assets/FavelaAmarela/Editor/BuildHUDCompleto.cs`) vira o **ponto único de
+  montagem** das 6 views + barra de itens + painel de inventário. Ganhou `BuildEmTodasAsCenas()`
+  para aplicar nas 3 cenas de jogo em sequência. `CriarBarraDeArtefatos` foi movida para cá,
+  saindo de dentro de `MontarArenaDeTestes` — era a única ferramenta que a montava.
+- `MontarArenaDeTestes` não monta mais HUD por conta própria: chama só `BuildHUDCompleto.Build()`.
+  Não existe mais "HUD da Arena" separado do HUD do jogo.
+- `HUDController.InjetarVigor` ganhou o `Debug.LogError` que faltava.
+- Aplicado nas 4 cenas (`BuildEmTodasAsCenas` + rebuild da Arena): Deserto e Santuário ganharam
+  `BarraDeAcoes`+`BarraDeArtefatos`+`VigorBar`; Playtest ganhou `BarraDeArtefatos`+`VigorBar`;
+  Arena ganhou `VigorBar`.
+
+### O guarda, e uma descoberta sobre serialização de prefab
+`HudCompletoTests` (`Assets/Tests/EditMode/`) trava duas coisas: os 6 campos do `HUDController`
+não-vazios em toda cena de HUD, e nenhum script de `Assets/Scripts/UI/` órfão sem exceção
+documentada (`ScreenFader`, dormente — os consumidores dele também não estão em cena nenhuma).
+
+**Achado escrevendo o teste:** um `HUDController` vindo de instância de prefab **sem override**
+não tem bloco de componente na cena — só existe no `.prefab`. Campo sobrescrito vira entrada em
+`m_Modifications`, referenciando o componente pelo `fileID` **dentro do prefab**, não pelo guid
+do script. Um grep simples pelo guid não achava nada em 3 das 4 cenas — não por bug no jogo, por
+formato de override da Unity. O guarda resolve os dois casos: bloco direto na cena, ou baseline
+do prefab com overrides da cena aplicados por cima. Documentado em detalhe em
+[systems/hud.md](systems/hud.md).
+
+Validado por mutação: zerar o override de `vigorBar` em `Deserto_Hali.unity` de propósito fez o
+teste falhar citando exatamente a cena e o campo. Revertido em seguida.
+
+Suíte completa: **503/503** (498 + 5 novos).
+
+### Documentação
+- `systems/hud.md` (novo): arquitetura das 6 views, o bug de wiring, `BuildHUDCompleto` como
+  ponto único, a complicação de prefab-override no guarda, e a reclassificação de prioridades
+  do documento refutado.
+
 ## 2026-08-13 (23ª rodada) — 20 sementes, e o balanceamento que a amostra única escondia
 
 ### O instrumento passou a medir em vez de anedotar
