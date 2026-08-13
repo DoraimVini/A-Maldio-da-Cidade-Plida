@@ -70,6 +70,11 @@ namespace FavelaAmarela.Tests.EditMode
             ["ScreenFader"] = "Dormente: os dois consumidores (AberturaDesertoCinematica, " +
                                "QuedaZ4Z5Trigger) também não estão instanciados em cena nenhuma. " +
                                "Sem o gatilho em cena, não há onde a Fader precisar existir ainda.",
+
+            ["BarraAnimada"] = "Classe base ABSTRATA das barras de recurso — nunca é anexada a " +
+                                "um GameObject. Quem aparece em cena são as concretas " +
+                                "(ResilienciaBar, VitalidadeBar, VigorBar), verificadas nos " +
+                                "casos de HUDController_TemAsSeisViewsLigadas.",
         };
 
         // ── HUDController: os 6 campos ligados em toda cena de jogo ──────────

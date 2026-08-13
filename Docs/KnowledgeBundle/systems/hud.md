@@ -25,6 +25,26 @@ cada um ligando uma view por `Bind()`.
 Contrato (`Assets/Scripts/UI/CLAUDE.md`): view só lê estado e reage a evento C#, nunca faz
 polling fora de animação visual (Lerp de fill), nunca localiza por `Find`/`FindObjectOfType`.
 
+### `BarraAnimada<TFonte>`: a base das três barras de recurso
+
+`ResilienciaBar`, `VitalidadeBar` e `VigorBar` herdam de `BarraAnimada<TFonte>`
+(`Assets/Scripts/UI/BarraAnimada.cs`), que concentra o que era idêntico: os campos de
+`fillImage`/`backgroundImage`/`velocidadeLerp`, o Lerp do fill no `Update`, e o ciclo
+`Bind`/`Unbind` com `OnDisable → Unbind` (nunca deixa handler pendurado). A extração tirou
+**243 linhas das três e devolveu 50** — a base tem ~130.
+
+O que **não** subiu para a base, de propósito, é a **política de cor**. Foi ela que desmentiu a
+alegação de "~80% de código duplicado" de um roadmap externo: o núcleo realmente comum eram
+~40–50%, e o miolo restante muda de gatilho em cada barra — flags de transição no payload
+(`ResilienciaChangedArgs.EntrouEmPanico`…), limiar local comparado ao percentual (Vitalidade),
+booleano de evento dedicado (`OnExaustaoChanged`). Cada subclasse implementa quatro pontos:
+`Inscrever`/`Desinscrever` no(s) evento(s), `PercentualAtual` (para sincronizar o fill no `Bind`)
+e `AtualizarCor`.
+
+Regra que a base impõe: `AtualizarCor` lê o estado **ao vivo** da `Fonte`, nunca um booleano
+cacheado do payload. Assim o mesmo método serve tanto ao `Bind` (antes do primeiro evento)
+quanto aos handlers — e some o estado duplicado que cada barra guardava por conta própria.
+
 **A `BarraDeItens` é a exceção deliberada:** lê `InventoryManager.Instance` direto e captura
 teclado (`Keyboard.current`, Input System novo) no próprio `Update`, em vez de receber a fonte
 por injeção — o `GameManager.cs` documenta essa escolha explicitamente. Diverge do padrão, mas

@@ -6,6 +6,40 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-13 (25ª rodada) — Extração da base `BarraAnimada`
+
+Fecha a pendência deixada na 24ª rodada. As três barras de recurso (`ResilienciaBar`,
+`VitalidadeBar`, `VigorBar`) passam a herdar de `BarraAnimada<TFonte>`
+(`Assets/Scripts/UI/BarraAnimada.cs`).
+
+### O que subiu para a base, e o que não subiu
+Subiu o que era genuinamente idêntico: campos `fillImage`/`backgroundImage`/`velocidadeLerp`,
+o Lerp do fill no `Update`, o ciclo `Bind`/`Unbind` com `OnDisable → Unbind`. **-243 linhas nas
+três, +50** (a base tem ~130).
+
+**Não** subiu a política de cor — e isso confirma na prática a refutação da 24ª rodada. O
+roadmap externo alegava "~80% de duplicação"; o comum real eram ~40–50%, e a cor (o miolo)
+muda de gatilho em cada barra: flags de transição no payload (Resiliência), limiar local
+(Vitalidade), booleano de evento (Vigor). Cada subclasse implementa quatro pontos:
+`Inscrever`/`Desinscrever`, `PercentualAtual` e `AtualizarCor`.
+
+Decisão de desenho: `AtualizarCor` lê o estado **ao vivo** da `Fonte`, nunca um booleano
+cacheado do payload — some o estado duplicado (`_panico`, `_colapso` etc.) que cada barra
+mantinha, e o mesmo método serve ao `Bind` e aos handlers.
+
+### O guarda da rodada anterior pegou a mudança
+`HudCompletoTests.NenhumScriptDeUI_FicaOrfaoSemMotivoDocumentado` (escrito na 24ª rodada)
+**falhou** ao ver `BarraAnimada` sem uso em cena — corretamente: é classe abstrata, nunca vira
+componente. Documentada em `OrfasConhecidas` com o motivo. É o guarda funcionando como
+projetado: script novo de UI sem wiring quebra o teste em vez de sumir em silêncio.
+
+### Validação
+- EditMode: **503/503**.
+- PlayMode: **5/5** — o `ResilienciaBarPlayTests` injeta `fillImage` por reflection, e o campo
+  migrou para a classe base. Reflection em campo herdado (`GetField` com `NonPublic | Instance`)
+  sobe a hierarquia, então o teste passa sem alteração. Confirmado rodando PlayMode de propósito
+  (a suíte de rotina é só EditMode).
+
 ## 2026-08-13 (24ª rodada) — HUD: refutação de roadmap e o ponto único de montagem
 
 ### O documento refutado
