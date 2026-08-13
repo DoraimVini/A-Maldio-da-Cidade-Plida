@@ -45,7 +45,7 @@ namespace FavelaAmarela.EditorTools
                 if (!System.IO.File.Exists(caminho)) continue;
 
                 var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
-                if (Montar())
+                if (MontarNaCenaAberta())
                 {
                     EditorSceneManager.MarkSceneDirty(cena);
                     EditorSceneManager.SaveScene(cena);
@@ -60,7 +60,12 @@ namespace FavelaAmarela.EditorTools
             Debug.Log($"[PainelDeInventario] Pronto — {feitas} cena(s). Abre com Tab ou I.");
         }
 
-        private static bool Montar()
+        /// <summary>
+        /// Monta o painel na <b>cena já aberta</b>. Público pelo mesmo motivo da
+        /// <c>MontarBarraDeItens.MontarNaCenaAberta</c>: cenas montadas por outras ferramentas
+        /// precisam de HUD completo, não de metade dele.
+        /// </summary>
+        public static bool MontarNaCenaAberta()
         {
             var canvas = Object.FindAnyObjectByType<Canvas>(FindObjectsInactive.Include);
             if (canvas == null)

@@ -38,9 +38,14 @@ namespace FavelaAmarela.EditorTools
         private const string PastaDeTiles = "Assets/FavelaAmarela/Art/Tiles";
         private const string CaminhoPngDaArena = PastaDeTiles + "/arena_piso_placeholder.png";
         private const string CaminhoTileDaArena = PastaDeTiles + "/arena_piso_placeholder.asset";
+        private const string CaminhoTileDeColisao = PastaDeTiles + "/arena_colisao.asset";
 
-        /// <summary>Metade do lado do bloco de células. 16 → losango de 32 × 16 unidades em mundo.</summary>
-        private const int MetadeLadoDoChao = 16;
+        /// <summary>
+        /// Metade do lado do bloco de células. 32 → losango de <b>64 × 32</b> unidades em mundo
+        /// (dobrado a pedido em 2026-08-13; era 16, que dava 32 × 16 e ficava apertado para o
+        /// rasante do Byakhee atravessar).
+        /// </summary>
+        private const int MetadeLadoDoChao = 32;
 
         private static readonly Color CorDoChaoNeutro = new Color(0.22f, 0.21f, 0.20f, 1f);
 
@@ -74,7 +79,12 @@ namespace FavelaAmarela.EditorTools
 
             new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
 
+            // HUD completo: cada peça vem de uma ferramenta diferente, e chamar só o
+            // BuildHUDCompleto deixava a Arena com metade dele — sem barra de itens (teclas
+            // 1–8) e sem painel de inventário (Tab). Foi o que sumiu no playtest de 2026-08-13.
             BuildHUDCompleto.Build();
+            MontarBarraDeItens.MontarNaCenaAberta();
+            MontarPainelDeInventario.MontarNaCenaAberta();
             MontarBarraDeArtefatos();
         }
 
@@ -116,16 +126,24 @@ namespace FavelaAmarela.EditorTools
                 for (int gy = -MetadeLadoDoChao; gy < MetadeLadoDoChao; gy++)
                     tilemap.SetTile(new Vector3Int(gx, gy, 0), tile);
 
-            MontarBordaDeColisao(grid, tile);
+            MontarBordaDeColisao(grid);
         }
 
         /// <summary>
         /// Anel de células invisíveis em volta do piso, com <c>TilemapCollider2D</c>. Segura o
         /// jogador e o chefe dentro do losango sem desenhar parede — a arena continua legível
         /// de cima, mas deixa de ser um plano infinito.
+        ///
+        /// <para><b>Usa um tile próprio, com <c>colliderType Grid</c>.</b> A primeira versão
+        /// reaproveitou o tile do piso, que tem <c>colliderType None</c> — e o
+        /// <c>TilemapCollider2D</c> gera a geometria <b>a partir do colliderType dos tiles</b>,
+        /// então não gerava nada. O colisor existia na cena e não colidia com coisa alguma
+        /// (playtest de 2026-08-13).</para>
         /// </summary>
-        private static void MontarBordaDeColisao(Grid grid, TileBase tile)
+        private static void MontarBordaDeColisao(Grid grid)
         {
+            var tileColisao = GarantirTileDeColisao();
+
             var colGO = new GameObject("Colisao", typeof(Tilemap), typeof(TilemapRenderer));
             colGO.transform.SetParent(grid.transform, false);
 
@@ -135,18 +153,36 @@ namespace FavelaAmarela.EditorTools
             var colisao = colGO.GetComponent<Tilemap>();
             const int borda = MetadeLadoDoChao;
 
-            for (int gx = -borda - 1; gx <= borda; gx++)
-                for (int gy = -borda - 1; gy <= borda; gy++)
+            // Anel de duas células: com uma só, um ator rápido (o rasante do Byakhee) pode
+            // atravessar entre dois FixedUpdate mesmo com Continuous.
+            for (int gx = -borda - 2; gx <= borda + 1; gx++)
+                for (int gy = -borda - 2; gy <= borda + 1; gy++)
                 {
                     bool dentroDoPiso = gx >= -borda && gx < borda && gy >= -borda && gy < borda;
-                    if (dentroDoPiso) continue;
-
-                    bool encostaNoPiso =
-                        gx >= -borda - 1 && gx <= borda && gy >= -borda - 1 && gy <= borda;
-                    if (encostaNoPiso) colisao.SetTile(new Vector3Int(gx, gy, 0), tile);
+                    if (!dentroDoPiso) colisao.SetTile(new Vector3Int(gx, gy, 0), tileColisao);
                 }
 
             colGO.AddComponent<TilemapCollider2D>();
+        }
+
+        /// <summary>
+        /// Tile sem sprite e com <c>colliderType Grid</c>: não desenha nada, mas é o que faz o
+        /// <c>TilemapCollider2D</c> gerar geometria. Mesma função do
+        /// <c>colisao_invisivel.asset</c> que o Santuário usa.
+        /// </summary>
+        private static TileBase GarantirTileDeColisao()
+        {
+            var existente = AssetDatabase.LoadAssetAtPath<Tile>(CaminhoTileDeColisao);
+            if (existente != null) return existente;
+
+            var tile = ScriptableObject.CreateInstance<Tile>();
+            tile.sprite = null;
+            tile.colliderType = Tile.ColliderType.Grid;
+
+            Directory.CreateDirectory(PastaDeTiles);
+            AssetDatabase.CreateAsset(tile, CaminhoTileDeColisao);
+            AssetDatabase.SaveAssets();
+            return tile;
         }
 
         /// <summary>

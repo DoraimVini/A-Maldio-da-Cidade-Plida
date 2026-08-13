@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using FavelaAmarela.Core.Combat;
@@ -115,19 +117,68 @@ namespace FavelaAmarela.Tests.EditMode
             public bool Sangra => Acumulos > 0 && SangraPorSeg > 0f;
         }
 
+        /// <summary>
+        /// Quantas sementes cada cenário roda. <b>Uma só era anedota</b>: em 2026-08-13, subir
+        /// o dano do Estilete fez a linha de 70% "vencer em 12,7s contra 25,4s a 100%" — jogar
+        /// pior vencendo mais rápido, impossível por construção. Era ruído de uma semente única:
+        /// mudar o dano muda a sequência de sorteios e portanto quando o estouro cai e em que
+        /// fase o boss está. Mediana sobre 20 sementes responde o que uma não conseguia.
+        /// </summary>
+        private const int Sementes = 20;
+
         private static void Linha(Arma arma, float acerto, float esquiva,
             bool bolsa, FichaAtributosConfig byakhee, FichaAtributosConfig damiao)
         {
-            var r = Simular(byakhee, damiao, arma, acerto, esquiva,
-                ervas: bolsa ? 2 : 0, aguas: bolsa ? 2 : 0, semente: 12345);
+            var tempos = new List<float>();
+            var rms = new List<float>();
+            var estouros = new List<float>();
+            int vitorias = 0, colapsos = 0, mortes = 0;
 
-            string estouros = arma.Sangra ? $" estouros={r.estouros}" : "";
+            for (int s = 0; s < Sementes; s++)
+            {
+                var r = Simular(byakhee, damiao, arma, acerto, esquiva,
+                    ervas: bolsa ? 2 : 0, aguas: bolsa ? 2 : 0, semente: 1000 + s);
+
+                switch (r.desfecho)
+                {
+                    case "VENCEU": vitorias++; tempos.Add(r.segundos); break;
+                    case "COLAPSO MENTAL": colapsos++; break;
+                    case "MORTE FISICA": mortes++; break;
+                }
+
+                rms.Add(r.rm);
+                estouros.Add(r.estouros);
+            }
+
+            // Tempo mediano só entre as vitórias: misturar com derrota (que "termina" mais cedo)
+            // produziria um número que não significa nada.
+            string tempo = tempos.Count > 0
+                ? $"{Mediana(tempos),5:F1}s [{tempos.Min():F0}-{tempos.Max():F0}]"
+                : "     —        ";
+
+            string derrotas = colapsos + mortes > 0
+                ? $"  (colapso {colapsos}, morte {mortes})"
+                : "";
+
+            string burst = arma.Sangra ? $"  estouros~{Mediana(estouros):F0}" : "";
 
             TestContext.WriteLine(
-                $"{arma.Nome,-22} acerto={acerto,4:P0} esquiva={esquiva,4:P0} bolsa={(bolsa ? "sim" : "nao"),-3}  " +
-                $"{r.desfecho,-16} tempo={r.segundos,5:F1}s  " +
-                $"RM={r.rm,3:F0}/100  vida={r.vida,3:F0}/{damiao.VitalidadeMax:F0}  " +
-                $"garradas={r.garradas}  pousos={r.pousos}{estouros}");
+                $"{arma.Nome,-22} acerto={acerto,4:P0} esq={esquiva,4:P0} bolsa={(bolsa ? "sim" : "nao"),-3}  " +
+                $"vence {vitorias,2}/{Sementes}  tempo={tempo}  " +
+                $"RM~{Mediana(rms),3:F0}{derrotas}{burst}");
+        }
+
+        /// <summary>Mediana, e não média: uma luta que despenca não deve arrastar o número todo.</summary>
+        private static float Mediana(List<float> valores)
+        {
+            if (valores.Count == 0) return 0f;
+
+            var ordenado = valores.OrderBy(v => v).ToList();
+            int meio = ordenado.Count / 2;
+
+            return ordenado.Count % 2 == 1
+                ? ordenado[meio]
+                : (ordenado[meio - 1] + ordenado[meio]) * 0.5f;
         }
 
         private static (string desfecho, float rm, float vida, float segundos, int pousos, int garradas, int estouros)

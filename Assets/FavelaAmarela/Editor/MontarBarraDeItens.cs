@@ -51,7 +51,7 @@ namespace FavelaAmarela.EditorTools
                 if (!System.IO.File.Exists(caminho)) continue;
 
                 var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
-                if (Montar())
+                if (MontarNaCenaAberta())
                 {
                     EditorSceneManager.MarkSceneDirty(cena);
                     EditorSceneManager.SaveScene(cena);
@@ -66,7 +66,13 @@ namespace FavelaAmarela.EditorTools
             Debug.Log($"[BarraDeItens] Pronto — {feitas} cena(s).");
         }
 
-        private static bool Montar()
+        /// <summary>
+        /// Monta a barra na <b>cena já aberta</b>. Público para que outras ferramentas de
+        /// montagem de cena (como a <c>MontarArenaDeTestes</c>) produzam um HUD completo em vez
+        /// de meio HUD — até 2026-08-13 a Arena não tinha barra de itens nenhuma, porque esta
+        /// ferramenta só percorria a lista fixa de cenas de jogo.
+        /// </summary>
+        public static bool MontarNaCenaAberta()
         {
             var hud = Object.FindAnyObjectByType<HUDController>(FindObjectsInactive.Include);
             if (hud == null)

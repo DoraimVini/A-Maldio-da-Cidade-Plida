@@ -6,6 +6,56 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-13 (23ª rodada) — 20 sementes, e o balanceamento que a amostra única escondia
+
+### O instrumento passou a medir em vez de anedotar
+O relatório rodava **uma semente** (12345). Isso produziu, na rodada anterior, um resultado
+impossível: o Estilete buffado vencendo em 12,7s a 70% de acerto contra 25,4s a 100% — jogar
+pior vencendo mais rápido. Agora são **20 sementes por cenário** (240 simulações), com **taxa de
+vitória, mediana e faixa**.
+
+**Era ruído.** A mediana a 70% é 25,5s; os 12,7s eram o **mínimo** da distribuição
+(faixa `[12-28]`), uma semente sortuda. Todas as conclusões de balanceamento das rodadas 21 e 22
+saíram de amostra única e devem ser lidas com isso em mente.
+
+### A tabela real (dano do Estilete já em 30)
+
+| Arma | 100%/esq.90% | 85%/esq.75% | 70%/esq.60% | 70% + bolsa |
+|---|---|---|---|---|
+| **Estilete de Irem** | 20/20 · 25,4s | 20/20 · 25,7s | **19/20** · 25,5s | 20/20 · 25,6s |
+| **Cravo de Aklo** | 20/20 · 28,3s | 20/20 · 29,6s | **14/20** · 34,9s | 20/20 · 36,4s |
+| **Alfanje de Alhazred** | 20/20 · 34,6s | **15/20** · 36,5s | **9/20** · 37,2s | 16/20 · 39,1s |
+
+Três leituras que só apareceram com amostra:
+
+1. **O Alfanje é a arma fraca**, não o Estilete. A 70% ele vence **9 de 20** — pior que cara ou
+   coroa. A 85% já cai para 15/20. A conclusão da 21ª rodada ("o Cravo domina, o Estilete é
+   armadilha") estava invertida em relação ao que 240 corridas mostram.
+2. **A bolsa decide a luta.** Cravo 14/20 → 20/20; Alfanje 9/20 → 16/20. Os consumíveis não são
+   conforto: são a diferença entre perder metade das tentativas e vencer. Valida a 20ª rodada.
+3. **Ninguém morre de dano físico em 240 corridas** (`morte 0` em toda linha). O canal físico do
+   Byakhee é decorativo — confirmado agora com amostra, não com um caso.
+
+O Estilete com 30 de dano vence 19–20/20 em todo cenário. Se isso é forte demais é decisão do
+Vini; o número está medido.
+
+### Arena: três correções do playtest
+- **Colisor que não colidia.** O anel de borda reaproveitava o tile do piso, que tem
+  `colliderType None` — e o `TilemapCollider2D` gera geometria **a partir do colliderType dos
+  tiles**. O componente existia e não colidia com nada. Agora há `arena_colisao.asset`
+  (sem sprite, `colliderType Grid`), e o anel tem **duas células** de espessura, para o rasante
+  do Byakhee não atravessar entre dois `FixedUpdate`.
+- **Arena dobrada:** losango de 32×16 → **64×32** unidades de mundo.
+- **HUD completo.** A barra de itens não "sumiu": **nunca esteve na Arena**. O HUD do projeto é
+  montado por ferramentas separadas com listas de cena próprias — `BuildHUDCompleto` faz barras e
+  ações; `MontarBarraDeItens` e `MontarPainelDeInventario` percorrem só as cenas de jogo. O
+  resultado é que **nenhuma cena tinha HUD completo**: a Arena sem barra de itens e painel, o
+  Deserto sem barras de recurso e barra de ações. As duas ferramentas ganharam
+  `MontarNaCenaAberta()` público e a Arena chama as três.
+
+> ⚠️ **Pendente:** o Deserto continua com HUD parcial. O conserto de verdade é ter **um** ponto
+> de montagem que produza HUD completo em qualquer cena, em vez de cinco ferramentas parciais.
+
 ## 2026-08-13 (22ª rodada) — Playtest real: três bugs da Arena e a reviravolta do Estilete
 
 Primeiro playtest de verdade da Arena, feito pelo Vini. Rendeu três bugs e desmentiu uma
