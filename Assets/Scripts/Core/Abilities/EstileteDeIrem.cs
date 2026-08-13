@@ -29,7 +29,7 @@ namespace FavelaAmarela.Core.Abilities
         private readonly int acumulosDaHabilidade;
 
         public EstileteDeIrem(
-            float duracaoBasico = 0.25f, float cooldownBasico = 0.3f, float danoBasico = 25f,
+            float duracaoBasico = 0.25f, float cooldownBasico = 0.3f, float danoBasico = 30f,
             float duracaoHabilidade = 0.3f, float cooldownHabilidade = 5f, float danoHabilidade = 15f,
             float sangramentoPorSegundo = 4f, float duracaoSangramento = 5f,
             int acumulosDoBasico = 1, int acumulosDaHabilidade = 3)

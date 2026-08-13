@@ -78,7 +78,7 @@ namespace FavelaAmarela.Tests.EditMode
             var armas = new Arma[]
             {
                 new Arma("Cravo de Aklo", 40f, 0.5f),
-                new Arma("Estilete de Irem", 25f, 0.3f, sangraPorSeg: 4f, duracaoSangra: 5f, acumulos: 1),
+                new Arma("Estilete de Irem", 30f, 0.3f, sangraPorSeg: 4f, duracaoSangra: 5f, acumulos: 1),
                 new Arma("Alfanje de Alhazred", 45f, 0.7f),
             };
 

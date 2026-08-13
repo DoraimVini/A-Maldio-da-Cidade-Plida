@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7619090263655309016}
   - component: {fileID: 1165517560362630129}
   - component: {fileID: 5639470958258438907}
+  - component: {fileID: 3096421289379231945}
   m_Layer: 6
   m_Name: Byakhee
   m_TagString: Untagged
@@ -224,3 +225,50 @@ MonoBehaviour:
   corNoAr: {r: 0.35, g: 0.3, b: 0.45, a: 1}
   corPousado: {r: 0.85, g: 0.75, b: 0.25, a: 1}
   corFrenesi: {r: 0.85, g: 0.2, b: 0.15, a: 1}
+--- !u!114 &3096421289379231945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5445350593436559665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47dc724b70814f54197779f2ddd8bf23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.AnimadorDoByakhee
+  espreita:
+  - {fileID: 46109507, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 502409163, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 590810032, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -530757953, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  rasante:
+  - {fileID: 471588388, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 5691711, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 1943782811, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -16312281, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 64712983, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -1328267048, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  garras:
+  - {fileID: -1442036308, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -1957095223, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 1440102373, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -1651607785, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  grito:
+  - {fileID: -1249261228, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -1308498630, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 1301958419, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 1998018139, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 1981795859, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -840594740, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  dano:
+  - {fileID: 852549322, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 341698422, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  derrota:
+  - {fileID: 95948738, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: -135855753, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 330581152, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  - {fileID: 1487611686, guid: 73848713b2614a349ba2a46698b88384, type: 3}
+  quadrosPorSegundo: 8
+  aceleracaoDoFrenesi: 1.75
+  duracaoDaReacao: 0.18
