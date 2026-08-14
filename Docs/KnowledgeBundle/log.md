@@ -6,6 +6,78 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-14 (29ª rodada) — Auditoria do inventário + autorrevisão + validação por mutação
+
+Vini pediu análise profunda do inventário a partir de três queixas de playtest: TAB parece pause
+sem UI, equipamento cai na barra de ações, e não há como saber se atributos de item influenciam
+os do personagem. Depois pediu revisão da própria análise "como dev sênior caçando bugs", o que
+mudou o resultado em pontos que importavam.
+
+### Auditoria (`systems/inventario_analise.md`, novo)
+
+- **TAB parece pause:** `PainelDeInventario` ESTÁ ligado nas 4 cenas (12 slots de mochila, 7 de
+  corpo, todas as refs internas corretas) — não é o padrão usual de "não wired". `Pintar()`
+  desenha slot vazio com alpha 0.25 e ícone desligado; com a mochila vazia (baú quebrado até a
+  28ª rodada) não havia nada visível. O que falta de verdade: o painel é só leitura, sem
+  equipar/largar pela tela.
+- **Equipamento na barra:** por desenho, não bug. `BarraDeItens` é uma janela sobre
+  `Main.GetSlot(0..7)`; o código já trata `Arma/Armadura/Amuleto` explicitamente. Decisão de
+  design pendente (filtrar por tipo vs. slots próprios), não wiring.
+- **Atributos de item:** achado mais sério — nada lia `VitalidadeBridge.Atributos` para exibir,
+  o que tornava dois problemas invisíveis: um recálculo que zerava 7 dos 10 campos da ficha a
+  cada troca de equipamento, e vários `StatType` sem consumidor.
+
+### Autorrevisão pedida pelo Vini — 3 erros encontrados antes de qualquer commit
+
+1. **Bug do recálculo classificado como prioridade 1**, quando é **latente**: `Ficha_Damiao.asset`
+   já tem `resistenciaAnomala: 0` e o recálculo só roda para a tag `Player` (inimigos não trocam
+   equipamento). Corrigido do mesmo jeito, mas sem o alarme de urgência que eu tinha vendido.
+2. **`ComBonus`, o remédio que eu propus, podia lançar exceção.** O construtor rejeita valores
+   negativos; `ModificadorFixo.Valor` é float livre (item amaldiçoado é mecânica prevista) — um
+   `-8` de Defesa sobre base 6 estouraria `ArgumentOutOfRangeException` dentro do handler de
+   troca de equipamento, matando a atualização inteira. Corrigido com piso em 0 (1 na Vitalidade).
+3. **A tabela "quais StatType fazem efeito" nasceu errada duas vezes**: `RegenRM`/`DrenoRM` dados
+   como mortos quando são aplicados de fato no `Update`; `RMMaxima` dado como morto quando
+   funciona como efeito de CONSUMÍVEL (só não como passiva de equipamento). Contagem de
+   atributos decorativos: 7 → 5 → 4 (+1 só-como-consumível).
+
+### Correções aplicadas
+
+- **`FichaDeAtributos.ComBonus()`** (Core, novo) — preserva todo campo que não recebe bônus,
+  substituindo a reconstrução posicional do `VitalidadeBridge` (mesma família do bug do
+  `ArmaResult`, corrigido em 2026-08-12). Piso em 0/1 para bônus negativos.
+- **`GerenciadorEfeitosPassivos`** — duas assinaturas com lambda novo no `-=` que nunca
+  desassinavam (delegates comparam por alvo+método); viraram handlers nomeados. `Instance`
+  estático também não era limpo no `OnDestroy` — corrigido junto.
+- **`PainelDeFicha`** (UI, novo) — mostra só o que a `VitalidadeBridge` realmente governa
+  (Vitalidade, Defesa Física, Resistência Anômala); **deliberadamente omite** Ataque e
+  ResilienciaMax, que vêm de outros POCOs (arma, GameLoopBootstrap) — mostrá-los exibiria
+  "Trauma Físico: 0" para quem acabou de golpear algo. Seção separada de bônus de item marca
+  `SEM EFEITO PASSIVO` no que não é consumido. Vive sob a raiz do `PainelDeInventario`, sem
+  tecla própria — liga junto, resolvendo de quebra o "TAB não mostra nada".
+- **`AtributosConsumidosTests`** (novo) — compara a tabela do painel contra o código de produção
+  de verdade via regex, não lista escrita à mão. Foi ele que pegou o erro do `RMMaxima` ainda em
+  desenvolvimento.
+- **`BuildPainelDeFicha`** (Editor, novo) — monta a hierarquia via `SerializedObject`;
+  `MontarEmTodasAsCenas` para lote em batch mode, porque `Montar()` sozinho opera na cena
+  aberta, que não existe em `-executeMethod`.
+
+### Validação por mutação (4 mutações, 6 falhas previstas, 6 observadas)
+
+Sobre o estado já commitado (working tree limpo, cada mutação revertível por `git checkout`):
+
+| mutação | teste(s) que deveriam falhar |
+|---|---|
+| `ComBonus` dropa `ResistenciaAnomala` | 3 testes de `ComBonus` |
+| piso da Vitalidade removido | `ComBonus_ComBonusNegativo_NaoLanca...` |
+| `RegenRM` marcado `false` na tabela | `TabelaDoPainel_ConcordaComOQueOCodigoConsome` |
+| `corpo` zerado em `Deserto_Hali` | `PainelDeFicha_TemAsDuasReferencias(...)` |
+
+Resultado: **exatamente as 6 previstas, nem uma a mais nem a menos** — nenhum guarda
+sobre-acoplado, nenhum decorativo. Revertido; suíte de volta a 539/539.
+
+EditMode **539/539**. Commits: `fdd3ecf8`, `66773121`, `71984154`, `9eeb335c`.
+
 ## 2026-08-14 (28ª rodada) — A arma da Tumba: três sintomas, três causas distintas
 
 Playtest do Vini: "entra na tumba automaticamente recebe uma arma, o baú não gera outra, quando
