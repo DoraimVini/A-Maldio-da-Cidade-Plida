@@ -6,6 +6,88 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-13 (26ª rodada) — Refatoração de managers: Fase 1 + guarda de bootstrap
+
+Branch `develop_manager`, **refeita a partir de `develop_items`** — ela estava 69 commits atrás,
+em base anterior a todo o trabalho do dia, com `GameManager.cs`, `BarraDeItens.cs` e
+`HUDController.cs` divergindo dos dois lados. A versão antiga ficou preservada em
+`develop_manager_pre_20260813`.
+
+### O documento, e o que a verificação encontrou
+Um documento propôs quebrar o `GameManager` (God Object) em componentes com DI manual. O
+**diagnóstico se confirmou** — 375 linhas, 6 responsabilidades, 18 arquivos acessando
+`GameManager.Instance`, `ProgressionManager` como MonoBehaviour, `BarraDeItens` via singleton.
+Mas três coisas mudaram a execução:
+
+1. **Os caminhos propostos não existem.** O doc pede `Assets/Scripts/Runtime/GameLoop/`,
+   `Runtime/Companion/`, `Runtime/Progression/`. O *namespace* é `FavelaAmarela.Runtime.*`, a
+   **pasta** não — o projeto usa `Assets/Scripts/GameLoop/`, `Player/`, `Progression/`. Segui as
+   pastas reais; seguir o doc criaria estrutura paralela.
+2. **O `GameStateController` que o doc pede já existe.** `GameLoopStateMachine`
+   (`Core/GameLoop/`) tem os mesmos 5 estados, `OnStateChanged`, `TryTransition` — e ainda
+   **valida transições** (`CanTransition`), que o doc não menciona. Tem 8 testes. Criar uma
+   classe nova duplicaria a máquina de estados do jogo.
+3. **`ProgressionManager` está morto em runtime** — o GUID não aparece em cena nem prefab,
+   `Instance` é sempre null, e os 4 consumidores rodam no fallback (nível 1, sem Ecos, progressão
+   nunca salva). O doc não menciona isso, nem que `EstadoPersistenteDaProgressao` e
+   `EstadoPersistenteDoInventario` acham seus managers por singleton — nenhum dos dois está nos
+   "Critical Files to Review".
+
+### Fase 1 — componentes extraídos (isolados, nada migrado ainda)
+- `GameLoopStateMachine.MundoCongelado` — a **regra** de congelar sobe para o POCO; quem a
+  traduz em `Time.timeScale` é o adaptador, porque `Time` é `UnityEngine` e o Core o proíbe.
+  O doc queria `Time.timeScale` dentro do Core.
+- `GameLoop/GameStatePresenter.cs` — aplica timeScale + telas de pause/transição/gameplay.
+- `GameLoop/PlayerDeathController.cs` — os dois vetores de derrota, o `TipoDeDerrota` e a
+  `SequenciaDeColapso`. Ela ficou aqui, e não no presenter, porque escolhe o pool de frases pela
+  causa da morte — quem conhece a causa é o controlador de derrota.
+- `Player/CompanionManager.cs` — `RegistrarYugNeth` + `YugNeth`.
+- `GameLoop/CutsceneController.cs` — `JogadorInvulneravel` + propagação para
+  `VitalidadeBridge.IgnorarDano`.
+
+**Correção de comportamento no caminho:** `Derrotar()` só toca a sequência de morte **se a
+transição for aceita**. No `GameManager` original, mente e corpo zerando no mesmo frame chamavam
+`Tocar()` duas vezes — a segunda `TryTransition` retornava `false`, mas ninguém olhava o retorno.
+
+**Comentário obsoleto documentado:** o `GameManager` dizia que o Menu congelava junto com
+Pausado; o código nunca incluiu Menu, e desde 2026-08-11 o menu é cena própria, sem mundo atrás.
+`MundoCongelado` preserva o comportamento real, não o que o comentário afirmava.
+
+### O guarda de bootstrap (escrito ANTES da Fase 2)
+`BootstrapDeCenaTests` (15 casos). Nenhum teste cobria `GameManager`, `ProgressionManager` ou
+`BarraDeItens` — mover 12 passos de injeção sem rede seria refatorar às cegas. O guarda registra
+o contrato de wiring **de antes** da migração:
+
+- o componente de bootstrap existe nas 3 cenas jogáveis + Arena;
+- `maxResiliencia` (100) e `fracaoPanico` (0.25) **consistentes entre fases** — divergir aqui
+  mudaria a dificuldade de uma fase sem ninguém notar;
+- `sequenciaColapso` e `telaPause` ligadas nas cenas jogáveis.
+
+**Ele procura tanto `GameLoopBootstrap` quanto `GameManager`**, de propósito: precisa passar dos
+dois lados da Fase 2. Um guarda que só reconhecesse o estado final ficaria vermelho durante a
+migração inteira, e vermelho constante vira ruído que se aprende a ignorar.
+
+**Achados ao escrever o guarda:**
+- `telaTransicaoDeFase` e `gameplayRoot` são `fileID: 0` nas **5** cenas. Eu os classifiquei como
+  "dormentes"; o Vini corrigiu: são **mortos** — eram da cena antiga, anterior à Tumba, sem uso
+  futuro. O `GameStatePresenter` novo **já nasce sem eles** (removê-los de lá é risco zero, ele
+  ainda não está em cena alguma); nos `GameManager` eles morrem junto com a classe na Fase 2.
+  O teste `CamposMortos_ContinuamDesligadosEmTodaCena` garante que ninguém os religue por engano.
+  O estado `TransicaoDeFase` continua existindo e congelando o mundo — o que não existe é a tela.
+- `cena_1` é legado abandonado: fora do Build Settings, sem referência em código ou docs, e com
+  serialização obsoleta (a chave `sequenciaColapso` nem existe). Fora do guarda, com um teste que
+  falha se ela entrar no Build Settings sem ser atualizada.
+
+**Validado por mutação:** zerar `sequenciaColapso` no Deserto e divergir `maxResiliencia` no
+Santuário produziu **exatamente 2 falhas**, cada uma na cena e campo certos. Revertido.
+
+**Nota de infraestrutura:** a primeira rodada de mutação falhou com "Scripts have compiler
+errors" — mas era flakiness, não erro de código: a exceção real era
+`Can't find file \\.\pipe\unity-ilpp-…` (o servidor de IL Post Processing não subiu), e a
+compilação levou 156s contra os ~16s normais. Nenhum C# havia mudado. Repetir resolveu.
+
+EditMode: **524/524**.
+
 ## 2026-08-13 (25ª rodada) — Extração da base `BarraAnimada`
 
 Fecha a pendência deixada na 24ª rodada. As três barras de recurso (`ResilienciaBar`,
