@@ -42,4 +42,4 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Persistência (Save)](../architecture/persistencia.md) — Chaves de persistência (GUID imutável), Save Manager central, JSON e degradação graciosa
 - [Renderização Isométrica](renderizacao_isometrica.md) — Profundidade por Y-sort dinâmico + oclusão dither (silhueta atrás de paredes altas)
 - [Sistema de Vigor (Estamina)](vigor_estamina.md) — Consumo tático na corrida e esquiva, penalidade por exaustão
-- [Labirinto de Carcosa (Progressão)](progressao_labirinto_carcosa.md) — XP narrativo, Árvore de Símbolo Amarelo, Pontos de Eco e Santuários
+- [Labirinto de Carcosa (Progressão)](progressao_labirinto_carcosa.md) — XP narrativo, Árvore de Símbolo Amarelo, Pontos de Eco e Santuários. **§5 registra a divergência: zero nós autorados e o manager nunca instanciado.** §6 mapeia a proposta de 2026-08-14 (Lucidez, Sinal, 3 eixos) ao que já existe
