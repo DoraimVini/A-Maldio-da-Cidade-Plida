@@ -19,6 +19,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [As Três Armas da Tumba](armas_da_tumba.md) — Cravo/Estilete/Alfanje: básico + habilidade, e o sangramento por acúmulo
 - [Loot e Drop](loot_e_drop.md) — **[MOTOR IMPLEMENTADO]** Sorteio testável, tabelas de drop por arquétipo, tiers liberados por nível de Exposição e a regra que impede explosão de build
 - [Artefatos](artefatos.md) — **[IMPLEMENTADO]** Os 4 slots, passiva + habilidade por Artefato, a barra F1–F4 e a regra de que só vale o que está equipado
+- [Análise do Inventário](inventario_analise.md) — **[AUDITORIA 2026-08-14]** O que está de fato ligado, os 7 atributos que não fazem nada, o bug que apaga a ficha ao trocar equipamento, e a ordem de correção sugerida
 - [Áudio](audio.md) — **[IMPLEMENTADO, sem clipes]** Mixer com pool, banco autorável e síntese de andaime. Torna audível o ruído que Damião emite — o pilar que era invisível
 - [Boss Byakhee](boss_byakhee.md) — **[CORE+RUNTIME]** O cadeado dos Portões: imune no ar, vulnerável só no pouso; fecha a Fase 1
 - [Boss Rei em Amarelo](boss_rei_em_amarelo.md) — **[CORE+RUNTIME]** O confronto final: sem barra de vida, ritual de relíquias + selamento por reação (Máscara Pálida). Ver também o Carcosa Debugger e a Arena de Testes
