@@ -90,5 +90,45 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.IsFalse(success);
             Assert.AreEqual(GameState.TransicaoDeFase, sm.CurrentState);
         }
+
+        // ── MundoCongelado: a regra que o GameStatePresenter traduz em Time.timeScale ──
+
+        [TestCase(GameState.Pausado)]
+        [TestCase(GameState.TransicaoDeFase)]
+        public void MundoCongelado_VerdadeiroNosEstadosQueParamOTempo(GameState estado)
+        {
+            var sm = new GameLoopStateMachine(estado);
+            Assert.IsTrue(sm.MundoCongelado);
+        }
+
+        [TestCase(GameState.Menu)]
+        [TestCase(GameState.Gameplay)]
+        public void MundoCongelado_FalsoNosEstadosQueDeixamOTempoCorrer(GameState estado)
+        {
+            var sm = new GameLoopStateMachine(estado);
+            Assert.IsFalse(sm.MundoCongelado);
+        }
+
+        [Test]
+        public void MundoCongelado_FalsoNoColapso_ParaASequenciaDeMorteTocar()
+        {
+            // A dissolução do Colapso é animada: congelar o tempo aqui deixaria a tela de morte
+            // parada para sempre.
+            var sm = new GameLoopStateMachine(GameState.Colapso);
+            Assert.IsFalse(sm.MundoCongelado);
+        }
+
+        [Test]
+        public void MundoCongelado_AcompanhaATransicao()
+        {
+            var sm = new GameLoopStateMachine(GameState.Gameplay);
+            Assert.IsFalse(sm.MundoCongelado);
+
+            sm.TryTransition(GameState.Pausado);
+            Assert.IsTrue(sm.MundoCongelado, "Pausar tem de congelar.");
+
+            sm.TryTransition(GameState.Gameplay);
+            Assert.IsFalse(sm.MundoCongelado, "Despausar tem de soltar.");
+        }
     }
 }

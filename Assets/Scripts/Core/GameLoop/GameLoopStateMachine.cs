@@ -33,6 +33,24 @@ namespace FavelaAmarela.Core.GameLoop
         public GameState CurrentState { get; private set; }
 
         /// <summary>
+        /// Se o mundo deve estar congelado no estado atual — <b>a regra</b>, não a aplicação
+        /// dela. Quem traduz isto em <c>Time.timeScale</c> é o adaptador de Runtime
+        /// (<c>GameStatePresenter</c>), porque <c>Time</c> é <c>UnityEngine</c> e o Core não o
+        /// conhece.
+        ///
+        /// <para>Congela em <see cref="GameState.Pausado"/> e
+        /// <see cref="GameState.TransicaoDeFase"/>. <b>Não</b> congela no
+        /// <see cref="GameState.Colapso"/>: a sequência de morte precisa de tempo correndo para
+        /// tocar a dissolução.</para>
+        ///
+        /// <para><b>Nota:</b> um comentário no antigo <c>GameManager</c> dizia que o Menu também
+        /// congelava, mas o código nunca o incluiu — e desde 2026-08-11 o menu é cena própria,
+        /// sem mundo atrás para congelar. O comportamento aqui é o que sempre valeu de fato.</para>
+        /// </summary>
+        public bool MundoCongelado =>
+            CurrentState == GameState.Pausado || CurrentState == GameState.TransicaoDeFase;
+
+        /// <summary>
         /// Disparado quando ocorre uma transição de estado.
         /// (EstadoAnterior, EstadoAtual)
         /// </summary>
