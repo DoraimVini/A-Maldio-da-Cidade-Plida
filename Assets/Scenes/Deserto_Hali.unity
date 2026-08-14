@@ -1129,9 +1129,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.UI.VigorBar
   fillImage: {fileID: 97290584}
   backgroundImage: {fileID: 722799039}
+  velocidadeLerp: 4
   corNormal: {r: 0.35, g: 0.7, b: 0.25, a: 1}
   corExausto: {r: 0.4, g: 0.4, b: 0.4, a: 1}
-  velocidadeLerp: 4
 --- !u!224 &128816113
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3421,6 +3421,12 @@ GameObject:
   m_Component:
   - component: {fileID: 320214480}
   - component: {fileID: 320214479}
+  - component: {fileID: 320214486}
+  - component: {fileID: 320214485}
+  - component: {fileID: 320214484}
+  - component: {fileID: 320214483}
+  - component: {fileID: 320214482}
+  - component: {fileID: 320214481}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3442,9 +3448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.GameManager
   maxResiliencia: 100
   fracaoPanico: 0.25
-  telaTransicaoDeFase: {fileID: 0}
   telaPause: {fileID: 1395310251}
-  gameplayRoot: {fileID: 0}
   sequenciaColapso: {fileID: 1276720531}
 --- !u!4 &320214480
 Transform:
@@ -3461,6 +3465,82 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &320214481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320214478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d234c86ee3753e4f861385b8e4c3e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.CompanionManager
+--- !u!114 &320214482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320214478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2550ec2930b9969439bff558dba081c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.PausaInputHandler
+--- !u!114 &320214483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320214478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 642b44f58ddd646478b7aa71ebd103af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.CutsceneController
+--- !u!114 &320214484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320214478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64edccbaf8a8d2846b56288a24ce5007, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.PlayerDeathController
+  sequenciaColapso: {fileID: 1276720531}
+--- !u!114 &320214485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320214478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60dc1da28c9e31c449a98f7ed91b2a6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.GameStatePresenter
+  telaPause: {fileID: 1395310251}
+--- !u!114 &320214486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 320214478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77c35f106dfc8a744969dd219cb0b16b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.GameLoopBootstrap
+  maxResiliencia: 100
+  fracaoPanico: 0.25
 --- !u!1 &335196048
 GameObject:
   m_ObjectHideFlags: 0

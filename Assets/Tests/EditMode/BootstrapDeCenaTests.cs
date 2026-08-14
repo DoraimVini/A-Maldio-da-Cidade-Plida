@@ -112,10 +112,11 @@ namespace FavelaAmarela.Tests.EditMode
         // ── Os campos que a fase precisa de verdade ──────────────────────────
 
         [TestCaseSource(nameof(CenasJogaveis))]
-        public void CenaJogavel_TemSequenciaDeColapso(string caminhoDaCena)
+        public void CenaJogavel_TemSequenciaDeColapso_NoControladorDeMorte(string caminhoDaCena)
         {
-            var campos = CamposDoBootstrap(caminhoDaCena);
-            Assert.IsNotNull(campos, $"{Path.GetFileName(caminhoDaCena)}: sem bootstrap.");
+            var campos = CamposDe(caminhoDaCena, "PlayerDeathController.cs", "GameManager.cs");
+            Assert.IsNotNull(campos,
+                $"{Path.GetFileName(caminhoDaCena)}: sem PlayerDeathController nem GameManager.");
 
             Assert.AreNotEqual("0", ReferenciaDe(campos, "sequenciaColapso"),
                 $"{Path.GetFileName(caminhoDaCena)}: sem SequenciaDeColapso ligada. Morrer nesta " +
@@ -124,10 +125,11 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         [TestCaseSource(nameof(CenasJogaveis))]
-        public void CenaJogavel_TemTelaDePause(string caminhoDaCena)
+        public void CenaJogavel_TemTelaDePause_NoPresenter(string caminhoDaCena)
         {
-            var campos = CamposDoBootstrap(caminhoDaCena);
-            Assert.IsNotNull(campos, $"{Path.GetFileName(caminhoDaCena)}: sem bootstrap.");
+            var campos = CamposDe(caminhoDaCena, "GameStatePresenter.cs", "GameManager.cs");
+            Assert.IsNotNull(campos,
+                $"{Path.GetFileName(caminhoDaCena)}: sem GameStatePresenter nem GameManager.");
 
             Assert.AreNotEqual("0", ReferenciaDe(campos, "telaPause"),
                 $"{Path.GetFileName(caminhoDaCena)}: sem tela de pause ligada. O Esc congelaria " +
@@ -195,10 +197,24 @@ namespace FavelaAmarela.Tests.EditMode
         /// mudança — que é justamente o que o torna útil como rede.</para>
         /// </summary>
         private static List<string> CamposDoBootstrap(string caminhoDaCena)
+            => CamposDe(caminhoDaCena, "GameLoopBootstrap.cs", "GameManager.cs");
+
+        /// <summary>
+        /// Linhas do bloco YAML do <b>primeiro</b> script da lista que estiver na cena, ou
+        /// <c>null</c> se nenhum estiver.
+        ///
+        /// <para>A lista é uma cadeia de fallback ordenada do dono <b>novo</b> para o
+        /// <b>antigo</b>. Ela existe porque a Fase 2 não só troca o componente de bootstrap: ela
+        /// redistribui campos entre componentes — <c>telaPause</c> passa a morar no
+        /// <c>GameStatePresenter</c> (quem o liga/desliga) e <c>sequenciaColapso</c> no
+        /// <c>PlayerDeathController</c> (quem conhece a causa da morte). Procurar todos eles no
+        /// bootstrap encontraria o lugar errado depois da migração.</para>
+        /// </summary>
+        private static List<string> CamposDe(string caminhoDaCena, params string[] scriptsEmOrdem)
         {
             if (!File.Exists(caminhoDaCena)) return null;
 
-            foreach (var nomeDoScript in new[] { "GameLoopBootstrap.cs", "GameManager.cs" })
+            foreach (var nomeDoScript in scriptsEmOrdem)
             {
                 string guid = GuidDoScript(nomeDoScript);
                 if (string.IsNullOrEmpty(guid)) continue;
