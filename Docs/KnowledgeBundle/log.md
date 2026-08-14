@@ -6,6 +6,70 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-14 (27ª rodada) — Refatoração de managers: Fase 2 (GameLoopBootstrap)
+
+O `GameManager` deixou de fazer qualquer coisa por conta própria. Branch `develop_manager`.
+
+### O que passou a existir
+- **`GameLoop/GameLoopBootstrap.cs`** (`[DefaultExecutionOrder(-200)]`) — raiz de composição:
+  cria os 4 POCOs, faz os 12 passos de injeção e liga os componentes irmãos.
+- **`GameLoop/PausaInputHandler.cs`** — o toggle de Esc. Virou componente próprio porque era a
+  última coisa segurando um `Update` no `GameManager`. Quem **lê input** e quem **apresenta
+  estado** são papéis distintos: este pede a transição, o `GameStatePresenter` reage a ela.
+- **`Editor/MigrarParaGameLoopBootstrap.cs`** — ferramenta de uso único que acrescentou os 6
+  componentes às 4 cenas e copiou os valores serializados. Editar YAML de cena à mão exigiria
+  `fileID` inédito **e** entrada em `m_Component`; errar um dos dois corrompe a cena de um jeito
+  que só aparece ao abri-la.
+
+### `GameManager`: 375 linhas → casca de encaminhamento
+18 arquivos alcançam o singleton. Removê-lo junto com a extração viraria 18 mudanças simultâneas
+sem rede, então ele fica com propriedades `[Obsolete]`. **Isso não é dívida adiada — é a lista de
+trabalho da Fase 5 sendo gerada pelo compilador:** a rodada emitiu **74 avisos CS0618 em 18
+arquivos**, nomeando cada call-site.
+
+### A armadilha de ordem que quase custou dados de cena
+Retirar `telaPause` e `sequenciaColapso` do `GameManager` **antes** de migrar teria apagado as
+referências: a Unity descarta o valor serializado de um campo que não existe mais na classe. A
+ordem correta — e a que foi seguida — é (1) campos ainda declarados → (2) ferramenta copia →
+(3) campos saem. Ficaram um commit como `[HideInInspector]` só para servir de porta-valores.
+
+### O guarda teve de seguir os campos
+A Fase 2 não só troca o componente de bootstrap: **redistribui campos entre componentes.**
+`telaPause` foi para o `GameStatePresenter` (quem o liga/desliga) e `sequenciaColapso` para o
+`PlayerDeathController` (quem conhece a causa da morte). O guarda procurava os dois no bloco do
+bootstrap — depois da migração estaria olhando o lugar errado. Agora cada campo tem uma cadeia de
+fallback própria, do dono novo para o antigo, o que o mantém válido dos dois lados.
+
+### Quarto trecho de código morto encontrado
+O ramo `if (atual == GameState.Menu)` do antigo `HandleStateChanged` restaurava Resiliência e
+Vigor via `FindAnyObjectByType`. **Nenhum código de produção chama `TryTransition(GameState.Menu)`**
+— desde que o menu virou cena própria (2026-08-11), trocar de cena já recria tudo. Não migrou.
+
+### Correção de comportamento
+O `else` de `GameManager.cs:225` estava pendurado no `if` do HUD, mas a mensagem falava de
+`VitalidadeBridge`: cena sem HUD acusava falta de bridge mesmo tendo uma, e cena sem bridge não
+avisava nada. Cada aviso agora fala do que de fato checou.
+
+### Verificação
+- Migração conferida **lendo o YAML das 4 cenas**, não o log da ferramenta: os 6 componentes
+  presentes e os `fileID` batendo com a tabela de recon da 26ª rodada.
+- **Validado por mutação:** zerar `telaPause` no `GameStatePresenter` do Deserto e
+  `sequenciaColapso` no `PlayerDeathController` do Santuário produziu **exatamente 2 falhas**, nos
+  testes e cenas certos. Revertido pelos `fileID` conhecidos — `git checkout` não servia, as cenas
+  carregavam a migração legítima.
+- EditMode **524/524**, com marcador (`NoPresenter`) provando que o guarda novo executou.
+
+### Nota de infraestrutura: como capturar log da suíte
+`run_qa_tests.ps1` canaliza a saída da Unity por `Write-Host`, que não desce para arquivo — a
+única captura possível era `*>`, e é justamente ela que quebra: no PowerShell 5.1 o stderr de um
+executável nativo vira `NativeCommandError` terminante. Funcionou uma vez (sem stderr) e falhou na
+seguinte (`debugger-agent: Unable to listen on 3488`). **Solução: chamar a Unity direto com
+`Start-Process -Wait -PassThru` e `-logFile`** — não passa pelo pipeline, dá exit code real e um
+log legível. É o caminho para qualquer rodada em que se precise ler erro de compilação.
+
+Um processo Unity zumbi (sobra de execução morta no meio) segura o lock e faz a chamada seguinte
+morrer **sem sequer criar log** — sintoma que parece "não rodou nada".
+
 ## 2026-08-13 (26ª rodada) — Refatoração de managers: Fase 1 + guarda de bootstrap
 
 Branch `develop_manager`, **refeita a partir de `develop_items`** — ela estava 69 commits atrás,
