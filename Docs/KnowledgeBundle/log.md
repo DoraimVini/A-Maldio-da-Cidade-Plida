@@ -37,7 +37,8 @@ Mas três coisas mudaram a execução:
 - `GameLoopStateMachine.MundoCongelado` — a **regra** de congelar sobe para o POCO; quem a
   traduz em `Time.timeScale` é o adaptador, porque `Time` é `UnityEngine` e o Core o proíbe.
   O doc queria `Time.timeScale` dentro do Core.
-- `GameLoop/GameStatePresenter.cs` — aplica timeScale + telas de pause/transição/gameplay.
+- `GameLoop/GameStatePresenter.cs` — aplica `Time.timeScale` + a tela de pausa (só ela; ver
+  "campos mortos" abaixo).
 - `GameLoop/PlayerDeathController.cs` — os dois vetores de derrota, o `TipoDeDerrota` e a
   `SequenciaDeColapso`. Ela ficou aqui, e não no presenter, porque escolhe o pool de frases pela
   causa da morte — quem conhece a causa é o controlador de derrota.
@@ -86,7 +87,47 @@ errors" — mas era flakiness, não erro de código: a exceção real era
 `Can't find file \\.\pipe\unity-ilpp-…` (o servidor de IL Post Processing não subiu), e a
 compilação levou 156s contra os ~16s normais. Nenhum C# havia mudado. Repetir resolveu.
 
-EditMode: **524/524**.
+### Reconhecimento das 5 cenas (pré-requisito da Fase 2)
+
+O plano exige ler os 6 campos `[SerializeField]` das 5 cenas **antes** de mover qualquer um.
+Feito por leitura de YAML:
+
+| cena | maxResiliencia | fracaoPanico | telaPause | sequenciaColapso |
+|---|---|---|---|---|
+| `Deserto_Hali` | 100 | 0.25 | ligada | ligada |
+| `Playtest_RuinasPalidas` | 100 | 0.25 | ligada | ligada |
+| `Santuario_Yhtill` | 100 | 0.25 | ligada | ligada |
+| `Cena_ArenaDeTestes` | 100 | 0.25 | — | — |
+| `cena_1` | 100 | 0.25 | — | **chave ausente** |
+
+(`telaTransicaoDeFase` e `gameplayRoot`: `fileID: 0` nas cinco.)
+
+Três consequências para a Fase 2:
+
+1. **Zero divergência numérica.** `maxResiliencia` e `fracaoPanico` são idênticos nas 5 — a
+   migração move os dois com valor fixo, sem caso especial por cena. O risco que o guarda cobre
+   é o de *introduzir* divergência, não o de preservar uma existente.
+2. **A Arena não tem `sequenciaColapso` nem `telaPause`.** Conferido que
+   `PlayerDeathController.cs:103` já é null-safe (`if (sequenciaColapso != null)`) — morrer na
+   Arena não toca visual, mas também não estoura.
+3. **Em `cena_1` a chave `sequenciaColapso` não existe no YAML**, não é só `fileID: 0`: o bloco
+   serializado é anterior à criação do campo. Evidência independente de que ela é legado
+   abandonado, e mais um motivo para a Fase 2 não encostar nela.
+
+### Estado da verificação
+
+EditMode **524/524** — mas essa execução usou o assembly **anterior** às duas últimas edições
+(remoção dos campos mortos do `GameStatePresenter` e o rename `CamposDormentes` →
+`CamposMortos`). Detectado porque o XML de resultado ainda trazia o nome antigo do teste. A
+reexecução abortou sozinha: a Unity estava aberta, e a suíte em batch mode colide com o lock do
+projeto.
+
+**Pendente: uma rodada da suíte com o Editor fechado.** As duas edições são mecânicas e foram
+conferidas por inspeção, mas não foram compiladas nenhuma vez.
+
+Lição de infraestrutura — terceira variação do mesmo padrão no dia: **renomear algo e procurar o
+nome novo na saída** é o teste mais barato de "o código que escrevi foi o código que rodou".
+`exit code 0` e contagem de testes estável não distinguem execução nova de assembly velho.
 
 ## 2026-08-13 (25ª rodada) — Extração da base `BarraAnimada`
 
