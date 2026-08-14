@@ -6,6 +6,54 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-14 (28ª rodada) — A arma da Tumba: três sintomas, três causas distintas
+
+Playtest do Vini: "entra na tumba automaticamente recebe uma arma, o baú não gera outra, quando
+sai da tumba a arma some". Pareciam três faces do mesmo bug. Eram três causas separadas — e uma
+delas teria sobrevivido à correção das outras duas.
+
+| sintoma | causa | camada |
+|---|---|---|
+| Arma aparece na mão ao entrar | `armaInicialParaTeste` sobrescrito para `EstileteDeIrem` em `Playtest_RuinasPalidas` | cena |
+| Baú não entrega arma | `tabela` em `fileID: 0` — `Drop_BauDaTumba` nunca ligada | cena |
+| Arma some ao sair | `MaoFisicaBridge.Start()` assinava `OnSlotChanged` sem aplicar o slot corrente | **código** |
+
+### O bug que se escondia atrás dos outros
+`OnSlotChanged` só dispara em **mudança**. Trocar de cena não muda nada: o `InventoryManager` é
+`DontDestroyOnLoad` e continua com a arma no slot — quem morre e renasce é a **bridge**. A
+instância nova assinava e ficava esperando um evento que nunca vinha, então Damião chegava
+desarmado com a arma ainda no inventário.
+
+Ele estava mascarado: como o baú nunca entregava nada, a única arma em jogo era a de teste, que é
+equipada direto no `Awake` e **nunca entra no inventário**. Corrigir só as duas cenas faria o baú
+funcionar e o sintoma "a arma some" voltar na primeira troca de cena.
+
+**Mesma classe de erro que o `GameStatePresenter` tinha antes da Fase 2** — observar evento de
+mudança sem aplicar o estado corrente no momento da inscrição. Terceira ocorrência catalogada
+deste formato específico.
+
+Correção em `MaoFisicaBridge.Start()`: aplica o slot **apenas se houver arma**, para não destruir
+o caminho da arma de teste na Arena. O `0` mágico do slot virou `SlotDeArma` — havia dois
+leitores, o `Start` virou o terceiro.
+
+### Guardas novos (`BauDaTumbaNoMundoTests`)
+- Todo `BauDaTumba` em cena precisa de `tabela` **ou** `forcarArma` + `armaForcada`. Inclui
+  `Assert.Greater(bausEncontrados, 0)`: sem isso o teste passaria verde caso o baú sumisse de
+  todas as cenas — verde por ausência não garante nada.
+- Cena jogável não pode começar com `armaInicialParaTeste` ligado. `Cena_ArenaDeTestes` fica
+  de fora: lá o override é o uso legítimo do campo.
+
+**Validados recriando o bug real:** com `tabela` zerada e o override em `2`, exatamente **2
+falhas**, uma por sintoma. Revertido; o diff final da cena são as 2 linhas da correção.
+
+EditMode **528/528** (524 + 4), com marcador.
+
+### Nota de processo
+Na primeira tentativa mandei o Vini rodar um item de menu de um script recém-criado — **a Unity
+não recompila em Play Mode**, então o menu não existia. O `mtime` da cena (inalterado havia 4h)
+teria mostrado isso antes de eu escrever a instrução. Verificar o arquivo no disco custa uma
+linha e desmente a suposição na hora.
+
 ## 2026-08-14 (27ª rodada) — Refatoração de managers: Fase 2 (GameLoopBootstrap)
 
 O `GameManager` deixou de fazer qualquer coisa por conta própria. Branch `develop_manager`.
