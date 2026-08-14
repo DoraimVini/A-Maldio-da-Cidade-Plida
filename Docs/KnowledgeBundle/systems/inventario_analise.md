@@ -95,19 +95,35 @@ apaga atributos.**
 | `RegeneracaoVigor` | `GerenciadorDeVigor` | ✅ |
 | `CustoEsquivaVigor` | `GerenciadorDeVigor` | ✅ |
 | `CustoCorridaVigor` | `GerenciadorDeVigor` | ✅ |
-| `RMMaxima` | — | ❌ **nada** |
+| `RegenRM` | `GerenciadorEfeitosPassivos.Update` → `Ancorar` | ✅ |
+| `DrenoRM` | `GerenciadorEfeitosPassivos.Update` → `SofrerTrauma` | ✅ |
+| `RMMaxima` | `VitalidadeBridge.AplicarEfeitoConsumivel` → `Ancorar` | ⚠️ **só como consumível** |
 | `RCMaxima` | — | ❌ **nada** |
 | `Velocidade` | — | ❌ **nada** |
 | `Furtividade` | — | ❌ **nada** |
 | `DefesaAnomalia` | — | ❌ **nada** |
-| `RegenRM` | só lido no `Update`, ver 3c | ⚠️ |
-| `DrenoRM` | só lido no `Update`, ver 3c | ⚠️ |
 
-**Sete atributos são decorativos.** Um item com "+Furtividade" ou "+Resiliência Mental Máxima"
-pode ser autorado, salvo, equipado — e não muda nada. Nada avisa: nem console, nem teste.
+**Quatro atributos são decorativos** (`RCMaxima`, `Velocidade`, `Furtividade`, `DefesaAnomalia`),
+e um quinto (`RMMaxima`) **só funciona em consumível** — como bônus de item equipado, não faz
+nada. Um item com "+Furtividade" pode ser autorado, salvo, equipado, e não muda coisa alguma.
+Nada avisa: nem console, nem teste.
 
 `Furtividade` e `DefesaAnomalia` doem particularmente, porque furtividade é pilar do jogo e dano
 de anomalia é o que os chefes usam.
+
+> **Correção de 2026-08-14 (revisão):** a primeira versão desta tabela dizia **sete** mortos e
+> errou duas vezes.
+>
+> 1. `RegenRM` e `DrenoRM` foram classificados como duvidosos ("só lidos no `Update`"). São
+>    **aplicados de fato** — o `Update` os converte em `Ancorar`/`SofrerTrauma` a cada frame.
+> 2. `RMMaxima` foi dado como morto. Ele **funciona como consumível**
+>    (`VitalidadeBridge.AplicarEfeitoConsumivel` chama `Ancorar`); o que não existe é o uso dele
+>    como passiva de equipamento. O mesmo `StatType` carrega duas semânticas — daí o painel
+>    dizer "SEM EFEITO **PASSIVO**", e não "SEM EFEITO".
+>
+> A tabela do `PainelDeFicha` nasceu com os dois erros. `AtributosConsumidosTests` existe para
+> impedir que as listas divirjam de novo — e foi ele que pegou o caso do `RMMaxima`, na primeira
+> execução.
 
 ### 3b. Bug: trocar de equipamento apaga atributos da ficha
 
@@ -135,8 +151,15 @@ troca de equipamento:
 | `resilienciaMax` | **0** |
 
 Ou seja: o que o `FichaAtributosConfig` do Damião definir além de vida/ataque/defesa é
-**destruído no primeiro equipamento trocado**. `ResistenciaAnomala` zerada significa tomar dano
-cósmico cheio — e a única pista seria morrer mais rápido sem motivo aparente.
+**destruído no primeiro equipamento trocado**.
+
+> **Correção de 2026-08-14 (revisão): este bug é latente, não ativo.** A primeira versão deste
+> documento o classificou como prioridade 1, dizendo que zerar `ResistenciaAnomala` significava
+> "tomar dano cósmico cheio". Conferindo os dados: `Ficha_Damiao.asset` já tem
+> `resistenciaAnomala: 0` e não define `resilienciaMax`; e `AtualizarAtributosDeEquipamento` só
+> roda para quem tem a tag `Player` (inimigos não trocam equipamento). Logo, **hoje o bug não
+> tem efeito observável nenhum**. Ele vira real no dia em que Damião ganhar resistência anômala
+> ou uma ficha com resiliência própria. Vale corrigir como mina desarmada — não como incêndio.
 
 É a mesma família dos bugs de reconstrução posicional que já apareceram no `ArmaResult`
 (11 argumentos por posição, campos novos silenciosamente perdidos).
