@@ -44,16 +44,23 @@ namespace FavelaAmarela.Player
             Instance = this;
         }
 
+        // Handlers nomeados, não lambdas. `-=` compara delegates por alvo+método: um lambda
+        // escrito de novo no OnDestroy NUNCA casa com o registrado no Start, então a assinatura
+        // ficava para sempre. Como este componente vive no Player_Damiao (recriado a cada cena),
+        // cada troca deixava um assinante morto recebendo eventos de um objeto destruído.
+        private void HandleSlotDaMochilaMudou(int _) => NotificarMudanca();
+        private void HandleEcoDesbloqueado(EcoDef _) => NotificarMudanca();
+
         private void Start()
         {
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.Equipment.OnEquipmentChanged += NotificarMudanca;
-                InventoryManager.Instance.Main.OnSlotChanged += (i) => NotificarMudanca();
+                InventoryManager.Instance.Main.OnSlotChanged += HandleSlotDaMochilaMudou;
             }
             if (ProgressionManager.Instance != null)
             {
-                ProgressionManager.Instance.OnEcoDesbloqueado += (eco) => NotificarMudanca();
+                ProgressionManager.Instance.OnEcoDesbloqueado += HandleEcoDesbloqueado;
             }
         }
 
@@ -69,12 +76,14 @@ namespace FavelaAmarela.Player
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.Equipment.OnEquipmentChanged -= NotificarMudanca;
-                InventoryManager.Instance.Main.OnSlotChanged -= (i) => NotificarMudanca();
+                InventoryManager.Instance.Main.OnSlotChanged -= HandleSlotDaMochilaMudou;
             }
             if (ProgressionManager.Instance != null)
             {
-                ProgressionManager.Instance.OnEcoDesbloqueado -= (eco) => NotificarMudanca();
+                ProgressionManager.Instance.OnEcoDesbloqueado -= HandleEcoDesbloqueado;
             }
+
+            if (Instance == this) Instance = null;
         }
 
         private void Update()
