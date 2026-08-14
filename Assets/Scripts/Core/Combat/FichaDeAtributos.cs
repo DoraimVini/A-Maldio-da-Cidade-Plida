@@ -103,6 +103,50 @@ namespace FavelaAmarela.Core.Combat
             CadenciaDeAtaque = cadenciaDeAtaque;
         }
 
+        /// <summary>
+        /// Devolve uma ficha nova com os bônus somados, <b>preservando todo o resto</b>.
+        ///
+        /// <para><b>Por que existe:</b> o <c>VitalidadeBridge</c> recalculava a ficha final
+        /// chamando o construtor com 3 dos 10 parâmetros. Os outros sete voltavam ao default a
+        /// cada troca de equipamento — <see cref="ResistenciaAnomala"/> e
+        /// <see cref="ResilienciaMax"/> iam a <b>zero</b>, e velocidades, alcance e cadência
+        /// voltavam ao valor de fábrica. Tomar dano cósmico cheio sem motivo aparente era o único
+        /// sintoma.</para>
+        ///
+        /// <para>Mesma correção aplicada ao <c>ArmaResult</c> em 2026-08-12: quando um tipo tem
+        /// muitos campos, reconstruí-lo por posição é uma armadilha que cobra na próxima vez que
+        /// alguém acrescentar um campo. Aqui não há o que esquecer — o que não recebe bônus é
+        /// copiado.</para>
+        /// </summary>
+        /// <param name="bonusVitalidade">Somado a <see cref="VitalidadeMax"/>.</param>
+        /// <param name="bonusDefesa">Somado a <see cref="Defesa"/>.</param>
+        /// <param name="bonusAtaque">Somado a <see cref="Ataque"/>.</param>
+        /// <param name="bonusResistenciaAnomala">Somado a <see cref="ResistenciaAnomala"/>.</param>
+        /// <param name="bonusResilienciaMax">Somado a <see cref="ResilienciaMax"/>.</param>
+        public FichaDeAtributos ComBonus(
+            float bonusVitalidade = 0f,
+            float bonusDefesa = 0f,
+            float bonusAtaque = 0f,
+            float bonusResistenciaAnomala = 0f,
+            float bonusResilienciaMax = 0f)
+            => new FichaDeAtributos(
+                // Piso de 0 (e de 1 na Vitalidade). Bônus podem ser NEGATIVOS: `ModificadorFixo`
+                // é um float livre, e item amaldiçoado é mecânica prevista. Sem o piso, um
+                // -8 de Defesa sobre base 6 lançaria ArgumentOutOfRangeException do construtor
+                // dentro do recálculo de equipamento, matando a atualização inteira de
+                // atributos — proibido pela regra 7 do CLAUDE.md (nunca deixar exceção escapar
+                // de um caminho de Inspector/equipamento).
+                Math.Max(1f, VitalidadeMax + bonusVitalidade),
+                Math.Max(0f, Ataque + bonusAtaque),
+                Math.Max(0f, Defesa + bonusDefesa),
+                Conjuracao,
+                Math.Max(0f, ResistenciaAnomala + bonusResistenciaAnomala),
+                VelocidadeErrante,
+                VelocidadeCaca,
+                AlcanceDeGolpe,
+                CadenciaDeAtaque,
+                Math.Max(0f, ResilienciaMax + bonusResilienciaMax));
+
         private static void ExigirNaoNegativo(float valor, string nome)
         {
             if (valor < 0f)

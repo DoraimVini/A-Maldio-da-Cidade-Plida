@@ -150,11 +150,12 @@ namespace FavelaAmarela.Runtime.Combat
                 bonusDefesa = efeitos.GetBonus(FavelaAmarela.Inventario.StatType.DefesaFisica);
             }
 
-            _atributosFinais = new FichaDeAtributos(
-                vitalidadeMax: _atributosBase.VitalidadeMax + bonusVit,
-                ataque: _atributosBase.Ataque, 
-                defesa: _atributosBase.Defesa + bonusDefesa
-            );
+            // ComBonus preserva os campos que não recebem bônus. Chamar o construtor aqui
+            // passava 3 dos 10 parâmetros e zerava ResistenciaAnomala e ResilienciaMax a cada
+            // troca de equipamento — o defensor perdia a mitigação anômala em silêncio.
+            _atributosFinais = _atributosBase.ComBonus(
+                bonusVitalidade: bonusVit,
+                bonusDefesa: bonusDefesa);
 
             // Ajusta o max da vitalidade em tempo real mantendo a % de vida
             if (_vitalidade != null)
