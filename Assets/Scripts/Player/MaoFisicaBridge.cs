@@ -38,6 +38,13 @@ namespace FavelaAmarela.Player
                  "Desligue quando o combate estiver estável.")]
         [SerializeField] private bool logarGolpes = true;
 
+        /// <summary>
+        /// Índice do slot de Arma no <c>EquipmentInventory</c> (Mão Direita). Era um <c>0</c>
+        /// solto em dois pontos; virou constante porque o <see cref="Start"/> passou a ser um
+        /// terceiro leitor, e um deles divergir silenciosamente equivale a Damião ficar desarmado.
+        /// </summary>
+        private const int SlotDeArma = 0;
+
         // Golpe desarmado: POCO com dano 0 (a regra vive no Core, ver MaoVazia).
         // Instanciado uma vez — nunca por golpe (Regra de Ouro 1).
         private readonly IArma _maoVazia = new MaoVazia();
@@ -155,13 +162,38 @@ namespace FavelaAmarela.Player
             if (armaTeste != null) EquiparArma(armaTeste);
         }
 
+        /// <summary>
+        /// Assina o inventário <b>e aplica o slot corrente na hora</b>.
+        ///
+        /// <para>Aplicar aqui não é redundância — é o que faz a arma sobreviver à troca de cena.
+        /// <c>OnSlotChanged</c> só dispara em <b>mudança</b>, e trocar de cena não muda nada: o
+        /// <c>InventoryManager</c> é <c>DontDestroyOnLoad</c> e continua com a arma no slot, mas
+        /// quem é destruído e recriado é <b>esta bridge</b>. A instância nova assinava e ficava
+        /// esperando um evento que nunca vinha, então Damião chegava desarmado na cena seguinte
+        /// com a arma ainda no inventário (relatado em playtest: "quando saio da Tumba a arma
+        /// some").</para>
+        ///
+        /// <para>Mesma classe de bug que o <c>GameStatePresenter</c> tinha antes da Fase 2:
+        /// observar um evento de mudança sem aplicar o estado corrente no momento da inscrição.</para>
+        /// </summary>
         private void Start()
         {
             var inv = InventoryManager.Instance;
-            if (inv != null)
+            if (inv == null)
             {
-                inv.Equipment.OnSlotChanged += VerificarSlotDeArma;
+                Debug.LogError("[MaoFisicaBridge] InventoryManager.Instance nulo no Start — a " +
+                               "Mão Física não vai reagir ao inventário nem restaurar a arma " +
+                               "equipada.", this);
+                return;
             }
+
+            inv.Equipment.OnSlotChanged += VerificarSlotDeArma;
+
+            // Só sobrescreve se o inventário tiver mesmo uma arma: slot vazio deixa de pé o que
+            // o Awake equipou (o override de teste 'armaInicialParaTeste').
+            var slot = inv.Equipment.GetSlot(SlotDeArma);
+            if (slot != null && slot.Def != null && slot.Def.Tipo == ItemType.Arma)
+                EquiparArma(slot.Def.ArmaFisica);
         }
 
         private void OnDestroy()
@@ -180,8 +212,7 @@ namespace FavelaAmarela.Player
         /// </summary>
         private void VerificarSlotDeArma(int slotIndex)
         {
-            // Slot 0 é Weapon (Mão Direita/Arma)
-            if (slotIndex != 0) return;
+            if (slotIndex != SlotDeArma) return;
 
             var inv = InventoryManager.Instance;
             if (inv == null) return;

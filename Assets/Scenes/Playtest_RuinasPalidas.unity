@@ -4427,7 +4427,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.BauDaTumba
   forcarArma: 0
   armaForcada: {fileID: 0}
-  tabela: {fileID: 0}
+  tabela: {fileID: 11400000, guid: bbaaae72880e48a4bfd6ca81355e1e8e, type: 2}
   spriteDoBau: {fileID: 763110321}
   spriteAberto: {fileID: 0}
   hintUI: {fileID: 378349712}
@@ -28146,7 +28146,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3485682494645962060, guid: 4358c838d54b30c44809872563c21742, type: 3}
       propertyPath: armaInicialParaTeste
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3485682494645962060, guid: 4358c838d54b30c44809872563c21742, type: 3}
       propertyPath: camadaInimigos.m_Bits
