@@ -6,6 +6,86 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-18 (31ª rodada) — Vigor só existia na Arena + Fase 4 (BarraDeItens injetada)
+
+### O Vigor nunca funcionou fora da Arena de Testes
+
+Investigando "incluir Vigor na ficha", achei que ele **não existia nas cenas jogáveis**. O
+`GerenciadorDeVigor` não estava no `Player_Damiao.prefab` — tinha sido acrescentado como
+**override de instância só na `Cena_ArenaDeTestes`**.
+
+Todos os consumidores usam o mesmo padrão:
+
+```csharp
+if (_vigor != null && !_vigor.TentarConsumirEsquiva()) return;
+```
+
+Sem o componente a condição curto-circuita e a ação passa. Resultado: **esquiva grátis e corrida
+infinita** no jogo inteiro, sem um erro no console. **10ª ocorrência** catalogada do padrão
+dominante do projeto.
+
+Também corrige uma conclusão errada da auditoria de inventário: os 4 `StatType` de Vigor foram
+marcados como "vivos". São — **mas só na Arena**. Um item com `+VigorMaximo` não fazia nada no
+Deserto.
+
+O override da Arena foi removido junto: com o componente no prefab, a instância ficaria com
+**dois** `GerenciadorDeVigor`. Os valores do override eram idênticos aos defaults da classe
+(100/12/25/25/15/30), então nada de balanceamento se perdeu.
+
+**Guarda novo** (`VigorNoPrefabTests`), escrito **antes** da correção e visto falhar pelos 2
+motivos certos. Ele olha o **prefab**, não a cena — componente herdado de prefab não aparece no
+YAML da cena, então um guarda de cena jamais pegaria isto.
+
+> ⚠️ **Aviso de balanceamento:** as 3 cenas jogáveis ficam **mais difíceis** a partir daqui.
+> Esquiva e corrida passam a custar de verdade pela primeira vez. É a correção funcionando — mas
+> nenhum balanceamento de Vigor foi validado em playtest até hoje, porque ele nunca rodou fora da
+> Arena. Os números atuais são chute de escrivaninha.
+
+### Fase 4 — `BarraDeItens` recebe o inventário por injeção
+
+A barra alcançava `InventoryManager.Instance` em 5 pontos, um deles **dentro do `Update`** —
+busca de singleton a cada frame, proibida pela Regra de Ouro 1.
+
+**Achado não previsto:** o campo `barraDeItens` do `HUDController` estava declarado, ligado nas 4
+cenas, e **lido por nenhuma linha de código**. Referência serializada morta — **11ª ocorrência**
+do padrão. Isso decidiu o desenho: em vez de o bootstrap procurar a barra, o HUD passa a
+injectá-la pelo campo que já tinha em mãos, como faz com todas as outras views.
+
+Três defeitos corrigidos:
+
+1. `Update` buscava o singleton por frame.
+2. Havia `OnDisable → Unbind` **sem contrapartida** no `OnEnable`, e o bind original era no
+   `Start`, que não roda de novo. Desativar e reativar o GameObject deixava a barra
+   **permanentemente morta**: desenhada, congelada no último estado.
+3. **Não previsto:** o `Unbind` **re-buscava** o singleton para desinscrever. Se a instância
+   tivesse trocado no meio-tempo, o `-=` miraria outro objeto e a assinatura original vazaria.
+
+Separado "esquecer a fonte" (`Unbind`) de "suspender a inscrição" (`OnDisable`): a fonte injetada
+sobrevive ao disable, e é isso que permite ao `OnEnable` reatar sozinho sem voltar ao singleton.
+
+### Lição sobre o desenho de guarda
+
+A primeira versão de `BarraDeItensInjetadaTests` **deu falso positivo contra o código já
+corrigido**. Ela proibia a string `InventoryManager.Instance` no arquivo inteiro — e o XML doc da
+`BarraDeItens` **explica** que ela alcançava o singleton.
+
+Um guarda assim proíbe documentar o defeito: o próximo dev apagaria o comentário para o teste
+passar, e a razão da mudança se perderia. Corrigido para filtrar linhas de comentário — **mede
+código, não prosa**.
+
+### Verificação
+
+- Vigor: guarda vermelho pelos 2 motivos certos → correção → verde.
+- Fase 4: 3 mutações → **4 falhas, exatamente as previstas**. O guarda específico do `Update`
+  disparou junto com o genérico, provando que mede algo próprio e não é redundante. Revertido.
+
+EditMode **572/572** (567 + 5 da Fase 4), compilação limpa.
+
+### Estado da refatoração de managers
+
+Fases 0–4 concluídas. Resta a **Fase 5**: remover os encaminhamentos `[Obsolete]` do
+`GameManager` (74 avisos CS0618 em 18 arquivos, lista já gerada pelo compilador).
+
 ## 2026-08-18 (30ª rodada) — Fase 3: a progressão passa a existir em runtime
 
 Fecha o pré-requisito duro de todo o sistema de progressão. Branch `develop_manager`.
