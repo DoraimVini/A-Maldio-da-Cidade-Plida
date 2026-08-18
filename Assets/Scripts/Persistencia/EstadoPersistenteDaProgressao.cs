@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using UnityEngine;
 using FavelaAmarela.Core.Persistencia;
 using FavelaAmarela.Progression;
+using FavelaAmarela.Runtime.Progression;
 
 namespace FavelaAmarela.Runtime.Persistencia
 {
@@ -10,17 +10,18 @@ namespace FavelaAmarela.Runtime.Persistencia
     /// sobreviverem à troca de cena e ao save em disco.
     ///
     /// <para><b>Buraco que motivou (auditoria 2026-08-11):</b> igual ao inventário — o
-    /// <c>ProgressionManager.GetSaveData()</c> existia e nunca era chamado. Perder o nível ao
-    /// recarregar é pior que perder itens, porque agora o nível também <b>gateia o loot</b>
-    /// (ver <c>systems/loot_e_drop.md</c>).</para>
+    /// <c>GetSaveData()</c> existia e nunca era chamado. Perder o nível ao recarregar é pior que
+    /// perder itens, porque o nível também <b>gateia o loot</b> (ver
+    /// <c>systems/loot_e_drop.md</c>).</para>
+    ///
+    /// <para><b>Mudou em 2026-08-18 (Fase 3):</b> passou a falar com o
+    /// <see cref="ProgressionBridge"/> em vez do antigo <c>ProgressionManager</c>. O catálogo de
+    /// <c>EcoDef</c> saiu daqui e foi para o bridge — quem resolve id→asset é quem guarda os ids,
+    /// e ter as duas pontas montando o próprio dicionário era duplicação esperando divergir.</para>
     /// </summary>
     [AddComponentMenu("Favela Amarela/Persistência/Estado Persistente da Progressão")]
     public sealed class EstadoPersistenteDaProgressao : MonoBehaviour, IPersistente
     {
-        [Tooltip("Todos os EcoDef do jogo, para resolver os ids do save de volta em assets. " +
-                 "Vazio = carrega de Resources/Ecos. [ASSET]")]
-        [SerializeField] private EcoDef[] catalogoDeEcos;
-
         /// <inheritdoc />
         public string ChaveDePersistencia => ChavesDeSave.Progressao;
 
@@ -40,10 +41,10 @@ namespace FavelaAmarela.Runtime.Persistencia
         /// <inheritdoc />
         public string CapturarEstado()
         {
-            var progressao = ProgressionManager.Instance;
-            if (progressao == null) return "";
+            var bridge = ProgressionBridge.Instancia;
+            if (bridge == null) return "";
 
-            return JsonUtility.ToJson(progressao.GetSaveData());
+            return JsonUtility.ToJson(bridge.CapturarSaveData());
         }
 
         /// <inheritdoc />
@@ -51,8 +52,8 @@ namespace FavelaAmarela.Runtime.Persistencia
         {
             if (string.IsNullOrWhiteSpace(estado)) return;
 
-            var progressao = ProgressionManager.Instance;
-            if (progressao == null) return;
+            var bridge = ProgressionBridge.Instancia;
+            if (bridge == null) return;
 
             ProgressionSaveData dados;
             try
@@ -61,33 +62,14 @@ namespace FavelaAmarela.Runtime.Persistencia
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning($"[EstadoPersistenteDaProgressao] Save ilegível, progressão mantida no padrão: {e.Message}", this);
+                Debug.LogWarning("[EstadoPersistenteDaProgressao] Save ilegível, progressão " +
+                                 $"mantida no padrão: {e.Message}", this);
                 return;
             }
 
             if (dados == null) return;
 
-            progressao.RestoreFromSaveData(dados, MontarDicionario());
-        }
-
-        /// <summary>
-        /// Mapa id→<c>EcoDef</c>. O save guarda ids, e o <c>ProgressionManager</c> precisa dos
-        /// assets de volta — um Eco que não exista mais é simplesmente ignorado por ele.
-        /// </summary>
-        private Dictionary<string, EcoDef> MontarDicionario()
-        {
-            var fonte = catalogoDeEcos != null && catalogoDeEcos.Length > 0
-                ? catalogoDeEcos
-                : Resources.LoadAll<EcoDef>("Ecos");
-
-            var mapa = new Dictionary<string, EcoDef>();
-            foreach (var eco in fonte)
-            {
-                if (eco == null || string.IsNullOrEmpty(eco.Id)) continue;
-                mapa[eco.Id] = eco;
-            }
-
-            return mapa;
+            bridge.RestaurarSaveData(dados);
         }
     }
 }

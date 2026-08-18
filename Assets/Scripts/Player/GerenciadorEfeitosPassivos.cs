@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FavelaAmarela.Inventario;
 using FavelaAmarela.Progression;
 using FavelaAmarela.Runtime.GameLoop;
+using FavelaAmarela.Runtime.Progression;
 
 namespace FavelaAmarela.Player
 {
@@ -58,9 +59,9 @@ namespace FavelaAmarela.Player
                 InventoryManager.Instance.Equipment.OnEquipmentChanged += NotificarMudanca;
                 InventoryManager.Instance.Main.OnSlotChanged += HandleSlotDaMochilaMudou;
             }
-            if (ProgressionManager.Instance != null)
+            if (ProgressionBridge.Instancia != null)
             {
-                ProgressionManager.Instance.OnEcoDesbloqueado += HandleEcoDesbloqueado;
+                ProgressionBridge.Instancia.OnEcoDesbloqueado += HandleEcoDesbloqueado;
             }
         }
 
@@ -78,9 +79,9 @@ namespace FavelaAmarela.Player
                 InventoryManager.Instance.Equipment.OnEquipmentChanged -= NotificarMudanca;
                 InventoryManager.Instance.Main.OnSlotChanged -= HandleSlotDaMochilaMudou;
             }
-            if (ProgressionManager.Instance != null)
+            if (ProgressionBridge.Instancia != null)
             {
-                ProgressionManager.Instance.OnEcoDesbloqueado -= HandleEcoDesbloqueado;
+                ProgressionBridge.Instancia.OnEcoDesbloqueado -= HandleEcoDesbloqueado;
             }
 
             if (Instance == this) Instance = null;
@@ -166,9 +167,9 @@ namespace FavelaAmarela.Player
             }
 
             // 4. Ecos da Memória
-            if (ProgressionManager.Instance != null)
+            if (ProgressionBridge.Instancia != null)
             {
-                foreach (var eco in ProgressionManager.Instance.EcosDesbloqueados)
+                foreach (var eco in ProgressionBridge.Instancia.EcosDesbloqueados())
                 {
                     if (eco.Modificadores != null)
                     {

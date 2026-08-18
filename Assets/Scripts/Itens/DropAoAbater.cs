@@ -2,6 +2,7 @@ using UnityEngine;
 using FavelaAmarela.Core.Loot;
 using FavelaAmarela.Inventario;
 using FavelaAmarela.Progression;
+using FavelaAmarela.Runtime.Progression;
 using FavelaAmarela.Runtime.Enemies;
 
 namespace FavelaAmarela.Runtime.Itens
@@ -65,7 +66,7 @@ namespace FavelaAmarela.Runtime.Itens
                 return;
             }
 
-            int nivel = ProgressionManager.Instance != null ? ProgressionManager.Instance.NivelAtual : 1;
+            int nivel = ProgressionBridge.Instancia != null ? ProgressionBridge.Instancia.NivelAtual : 1;
             var sorteados = _sorteio.Sortear(tabela.ProjetarCandidatos(), nivel, _fonte, tabela.TetoDeItens);
 
             for (int i = 0; i < sorteados.Count; i++)

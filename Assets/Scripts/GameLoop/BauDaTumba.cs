@@ -4,6 +4,7 @@ using FavelaAmarela.Core.Loot;
 using FavelaAmarela.Core.Persistencia;
 using FavelaAmarela.Player;
 using FavelaAmarela.Progression;
+using FavelaAmarela.Runtime.Progression;
 using FavelaAmarela.Runtime.Interaction;
 using FavelaAmarela.Runtime.Itens;
 using FavelaAmarela.Runtime.Persistencia;
@@ -150,7 +151,7 @@ namespace FavelaAmarela.Runtime.GameLoop
                 return null;
             }
 
-            int nivel = ProgressionManager.Instance != null ? ProgressionManager.Instance.NivelAtual : 1;
+            int nivel = ProgressionBridge.Instancia != null ? ProgressionBridge.Instancia.NivelAtual : 1;
             var sorteado = _sorteio.SortearUm(tabela.ProjetarCandidatos(), nivel, _fonte);
 
             if (sorteado == null)
