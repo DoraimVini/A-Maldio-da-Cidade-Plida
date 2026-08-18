@@ -22,31 +22,36 @@ Existem 30 nós no total (10 por braço). Hierarquia de nós:
 O jogador **não pode** gastar Ecos pelo menu a qualquer momento. Para respeitar o ritmo do Survival Horror, a progressão só acontece fisicamente dentro dos **Santuários de Carcosa** (checkpoints escassos nas fases). A decisão cria tensão, já que o jogador precisa sobreviver até o Santuário carregando seus Ecos sem morrer.
 
 ## 4. Engenharia (Arquitetura)
-- **`ProgressionManager.cs`**: Calcula a XP, Ecos disponíveis e valida a compra de nós.
+- **`Core/Progression/Progressao.cs`**: POCO puro — calcula a Exposição, os Pontos de Eco e valida a compra de nós. Guarda **ids** de Eco, não assets (o Core não conhece `UnityEngine`).
+- **`Progression/ProgressionBridge.cs`**: adaptador Runtime. Traduz `EcoDef`↔id, resolve os pré-requisitos e **se auto-instancia** antes de qualquer cena (`[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]` + `DontDestroyOnLoad`), como o `GerenciadorDeSave`.
 - **`EcoDef.cs`**: ScriptableObject que define o nó, os pré-requisitos e seu GUID único para serialização.
 - **`GerenciadorEfeitosPassivos.cs`**: Aggregate Root que condensa os buffs de Ecos do Labirinto com os bônus de Relíquias da Tumba e Itens da Mochila. Repassa eventos `OnBonusChanged` para os consumidores sem acoplamento.
 - **`ProgressionSaveData.cs`**: Entidade POCO injetada no Save System para persistir quais nós (GUIDs) foram desbloqueados e quantos Ecos não gastos o jogador tem.
 
 ---
 
-## 5. Estado real vs. este documento (verificado em 2026-08-14)
+## 5. Estado real vs. este documento
 
-> ⚠️ **Divergência doc↔código.** As seções 1–4 descrevem o sistema *como deveria ser*. O que
-> existe hoje:
+As seções 1–4 descrevem o sistema *como deveria ser*. Esta seção registra o que existe de fato.
+
+**Auditoria de 2026-08-14** encontrou três divergências. **A Fase 3 (2026-08-18) fechou a
+primeira**; as outras duas continuam abertas:
+
+| afirmação das seções 1–4 | estado real |
+|---|---|
+| Sistema instanciado e rodando | ✅ **resolvido em 2026-08-18.** O `ProgressionBridge` se auto-instancia antes de qualquer cena. Antes disso o `ProgressionManager` era um `MonoBehaviour` ausente de todas as cenas — `Instance` sempre `null`, progressão inerte. |
+| "30 nós no total (10 por braço)" | ❌ **zero assets `EcoDef`** — a árvore não tem um único nó autorado. |
+| Buffs de Ecos chegam ao jogador | ❌ na prática ainda não: o sistema funciona, mas sem nós para desbloquear e **sem ninguém chamando `AdicionarExposicao` no mundo**, o nível nunca sobe em jogo. |
+
+> **Leitura honesta do estado:** o sistema saiu de *"código pronto, não ligado, sem conteúdo"*
+> para *"código pronto e ligado, sem conteúdo e sem fonte de Exposição"*. Ligar o bridge era
+> pré-requisito duro — nada acima funcionaria sem ele — mas **não é entrega jogável por si só**.
 >
-> | afirmação | realidade |
-> |---|---|
-> | "30 nós no total (10 por braço)" | **zero assets `EcoDef`** no projeto — a árvore não tem um único nó autorado |
-> | Sistema funcionando | `ProgressionManager` **não está em cena nem prefab nenhum**; `Instance` é sempre `null` |
-> | Buffs de Ecos chegam ao jogador | os 4 consumidores rodam permanentemente no *fallback* (nível 1, sem Ecos) |
+> Faltam duas coisas, nesta ordem: **(1)** alguém chamar `AdicionarExposicao` quando o jogador
+> explora ou vence um evento narrativo; **(2)** autorar alguns `EcoDef` para haver o que comprar.
 >
-> Ou seja: **o código está pronto, não está ligado, e não tem conteúdo.** Ligar o
-> `ProgressionManager` é a Fase 3 da refatoração de managers (`log.md`, 27ª rodada). Autorar os
-> 30 nós é trabalho de design ainda não começado.
->
-> Consequência prática para qualquer proposta de expansão: **acrescentar recurso a uma árvore
-> com zero nós é otimização prematura.** A ordem correta é ligar → autorar alguns nós → só então
-> expandir a mecânica.
+> Consequência para qualquer proposta de expansão: **acrescentar mecânica a uma árvore com zero
+> nós continua sendo otimização prematura.**
 
 ## 6. Proposta de adaptação (Vini, 2026-08-14) — FORA DO VERTICAL SLICE
 
@@ -63,9 +68,9 @@ Esta seção é registro de decisão para depois do edital, não plano de execu�
 | documento de design | já existe como | onde |
 |---|---|---|
 | **Lucidez** (sanidade, zera = fim) | `ResilienciaMental` — Trauma, Colapso, Ancoragem | Core, testado |
-| XP por exploração | **Exposição** (`exposicaoAtual`), curva fechada, cap 12 | `ProgressionManager` |
-| Teia de talentos, nós passivos | `EcoDef` com `PreRequisitos` + `Modificadores` | `ProgressionManager` |
-| +1 talento por nível | `pontosDeEcoDisponiveis++` no level up | idem |
+| XP por exploração | **Exposição** (`ExposicaoAtual`), curva fechada, cap 12 | `Core.Progression.Progressao` |
+| Teia de talentos, nós passivos | `EcoDef` com `PreRequisitos` + `Modificadores` | `ProgressionBridge` |
+| +1 talento por nível | 1 Ponto de Eco por nível | `Core.Progression.Progressao` |
 | Gastar pontos só em ponto seguro | já é regra: **Santuários de Carcosa** (seção 3) | idem |
 | 4 slots de ação | `BarraDeAcoes` (arma + Q/E/R) e `BarraDeArtefatos` (F1–F4) | UI |
 | Fragmentos de Identidade | mecanicamente idêntico a item/Artefato com `Modificadores` | `ArtefatoDef` |
@@ -105,12 +110,14 @@ trabalho real da proposta, e depende de a árvore ter nós (ver seção 5).
 
 ### 6.4 Ordem sugerida, quando o VS liberar
 
-1. **Ligar o `ProgressionManager`** (Fase 3 da refatoração de managers) — sem isso nada acima
-   funciona, porque `Instance` é `null` e a progressão nunca é salva.
-2. **Autorar um punhado de nós `EcoDef`** (não os 30 — o suficiente para validar o fluxo:
+1. ~~**Ligar o `ProgressionManager`**~~ — ✅ **feito em 2026-08-18** (Fase 3): virou
+   `Core.Progression.Progressao` + `ProgressionBridge` auto-instanciado.
+2. **Dar uma fonte de Exposição ao mundo** — hoje ninguém chama `AdicionarExposicao`, então o
+   nível nunca sobe em jogo. Sem isso o resto continua teórico.
+3. **Autorar um punhado de nós `EcoDef`** (não os 30 — o suficiente para validar o fluxo:
    ganhar Exposição → subir nível → gastar ponto no Santuário → sentir o efeito).
-3. **Sinal**, com `RMMaxima` negativo.
-4. **Nós ativos**, só depois de 1–3 estarem em pé.
+4. **Sinal**, com `RMMaxima` negativo.
+5. **Nós ativos**, só depois de 1–4 estarem em pé.
 
 Itens 1 e 2 são pré-requisitos duros. Começar por 3 ou 4 seria construir sobre sistema que não
 roda.

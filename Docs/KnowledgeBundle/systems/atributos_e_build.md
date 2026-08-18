@@ -184,14 +184,14 @@ sobreviver até o Santuário carregando os pontos.
 | a documentação diz | a verificação mostra |
 |---|---|
 | "30 nós no total (10 por braço)" | **zero assets `EcoDef`** — nenhum nó autorado |
-| sistema funcionando | `ProgressionManager` **não está em cena nem prefab**; `Instance` é sempre `null` |
+| ~~sistema funcionando~~ | ✅ **CORRIGIDO em 2026-08-18 (Fase 3):** `ProgressionBridge` auto-instanciado antes de qualquer cena |
 | buffs chegam ao jogador | os 4 consumidores rodam permanentemente no fallback: nível 1, sem Ecos |
 
 **A progressão inteira está inerte.** O código existe e é testável; falta ligar (Fase 3 da
 refatoração de managers) e falta conteúdo (autorar os nós).
 
 Consequência para o loot: `TabelaDeDrop` libera tiers por `NivelMinimo` comparado ao
-`ProgressionManager.NivelAtual` — que hoje é sempre 1. **Nenhum tier acima do 1 pode cair.**
+`ProgressionBridge.Instancia.NivelAtual`. **Antes da Fase 3 (2026-08-18) isso era sempre 1 e nenhum tier acima do 1 podia cair** — agora o nível sobe de verdade, mas continua faltando quem chame `AdicionarExposicao` no mundo.
 
 ---
 
@@ -223,7 +223,7 @@ Epoch por decisão explícita, e é o que torna 12 níveis suficientes.
 
 ## Fontes
 
-Verificado em 2026-08-14 contra: `FichaDeAtributos.cs`, `ItemEnums.cs`, `ProgressionManager.cs`,
+Verificado em 2026-08-14 contra: `FichaDeAtributos.cs`, `ItemEnums.cs`, `Core/Progression/Progressao.cs`, `ProgressionBridge.cs`,
 `EcoDef.cs`, `GerenciadorDeVigor.cs`, `GerenciadorEfeitosPassivos.cs`, `InventoryManager.cs`,
 `EquipmentInventory.cs`, `MainInventory.cs`, os 5 assets `Ficha_*.asset` e as 3 armas em
 `Core/Abilities`. Análises relacionadas: [inventario_analise.md](inventario_analise.md),

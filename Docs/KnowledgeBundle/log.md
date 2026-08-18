@@ -6,6 +6,79 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-18 (30ª rodada) — Fase 3: a progressão passa a existir em runtime
+
+Fecha o pré-requisito duro de todo o sistema de progressão. Branch `develop_manager`.
+
+### O problema
+
+`ProgressionManager` era um `MonoBehaviour` que **não estava em cena nenhuma**. `Instance` era
+sempre `null` e os 4 consumidores rodavam permanentemente no fallback — nível 1 fixo, sem Ecos,
+progressão nunca salva.
+
+**Consequência em cascata que ninguém tinha ligado:** o loot libera tiers comparando
+`NivelMinimo` com o nível atual. Com o nível travado em 1, **nenhum item de tier acima de 1
+podia cair no jogo**. Parecia problema do motor de sorteio; era o manager não existir.
+
+### O que passou a existir
+
+- **`Core/Progression/Progressao.cs`** — POCO puro. Guarda **ids** de Eco, não assets: `EcoDef`
+  é `ScriptableObject` e o Core não conhece `UnityEngine`. A tradução id↔asset, inclusive dos
+  pré-requisitos, é responsabilidade do bridge.
+- **`Progression/ProgressionBridge.cs`** — adaptador com
+  `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]` + `DontDestroyOnLoad`.
+
+**Por que auto-instanciação e não wiring de cena:** é o padrão que o `GerenciadorDeSave` já usa,
+e o comentário dele documenta exatamente o modo de falha que estávamos corrigindo — *"a
+persistência foi instalada na Tumba e o Deserto ficou sem, então a arma continuava sumindo"*.
+Depender de alguém lembrar de arrastar o componente para cada cena nova é como a progressão
+morreu da primeira vez. Não precisei decidir nada: havia precedente testado.
+
+### Divergi do plano, de propósito
+
+O plano previa casca `[Obsolete]`, como fiz com o `GameManager` na Fase 2. **Lá eram 18
+consumidores; aqui são 4.** E seria a casca de um `MonoBehaviour` ausente das cenas — `Instance`
+continuaria `null` e não resolveria nada. Removi a classe e migrei os 4 direto: `BauDaTumba`,
+`DropAoAbater`, `EstadoPersistenteDaProgressao`, `GerenciadorEfeitosPassivos`.
+
+O desvio de namespace que o `CLAUDE.md` mandava não replicar (`FavelaAmarela.Progression`, fora
+do par `Core.*`/`Runtime.*`) foi corrigido junto.
+
+### O catálogo de Ecos mudou de dono
+
+Estava duplicado: o adaptador de persistência montava um dicionário id→asset, e o manager tinha
+o dele. Quem guarda os ids passa a ser quem os resolve — duas cópias do mesmo mapa eram
+divergência esperando acontecer. Conferido que `catalogoDeEcos` estava **vazio nas 3 cenas**
+antes de remover o campo: a Unity descarta valor de campo removido da classe, e essa armadilha
+já custou caro na Fase 2.
+
+### Comportamento preservado (não misturar refatoração com balanceamento)
+
+- **No teto, a Exposição é ignorada por completo** — nem é somada. Herdado do manager.
+- **Pré-requisito de Eco é OU, não E** — basta ter qualquer um dos listados. A árvore tem
+  nós-Ponte ligando braços diferentes; exigir todos os tornaria inalcançáveis.
+
+### Verificação
+
+26 testes novos — a lógica de progressão **não tinha teste algum**, era o maior risco descoberto
+da refatoração inteira. Cobrem a curva completa (11 pontos por run), o teto, os eventos, o
+pré-requisito OU e o ciclo ganhar→gastar→salvar→restaurar→continuar progredindo.
+
+**Validado por mutação:** 4 defeitos introduzidos de propósito (não gastar o ponto;
+pré-requisito virar "só o último conta"; `Restaurar` disparar `OnLevelUp`; somar Exposição no
+teto) → **6 falhas**, cobrindo as 4. Previ 5; a sexta foi
+`Eco_JaDesbloqueado_NaoGastaPontoDeNovo`, acerto do teste e não ruído. Revertido; suíte de volta
+a 565/565.
+
+EditMode **565/565** (539 + 26), compilação limpa.
+
+### O que a Fase 3 NÃO entrega
+
+Ligar o bridge era pré-requisito, não entrega jogável. **Ninguém chama `AdicionarExposicao` no
+mundo** (verificado por busca) e existem **zero assets `EcoDef`**. O sistema saiu de "pronto, não
+ligado, sem conteúdo" para "pronto e ligado, sem conteúdo e sem fonte de Exposição". Faltam,
+nesta ordem: uma fonte de Exposição no mundo, e alguns nós autorados.
+
 ## 2026-08-14 (29ª rodada) — Auditoria do inventário + autorrevisão + validação por mutação
 
 Vini pediu análise profunda do inventário a partir de três queixas de playtest: TAB parece pause
