@@ -117,6 +117,30 @@ namespace FavelaAmarela.Runtime.UI
         }
 
         /// <summary>
+        /// Injeta o inventário na barra de itens (teclas 1–8).
+        ///
+        /// <para><b>Fase 4, 2026-08-18.</b> O campo <c>barraDeItens</c> já existia aqui, ligado
+        /// nas 4 cenas e <b>lido por nenhuma linha de código</b> — referência serializada morta.
+        /// A barra se virava sozinha alcançando <c>InventoryManager.Instance</c> em cinco
+        /// pontos, um deles dentro do <c>Update</c>. Agora ela recebe a fonte por aqui, como
+        /// todas as outras views do HUD.</para>
+        /// </summary>
+        public void InjetarInventario(FavelaAmarela.Inventario.InventoryManager fonte)
+        {
+            if (fonte == null) return;
+
+            if (barraDeItens != null)
+            {
+                barraDeItens.Bind(fonte);
+            }
+            else
+            {
+                Debug.LogWarning("[HUDController] Sem 'barraDeItens' ligada — as teclas 1–8 não " +
+                                 "vão consumir nem equipar nada, e a barra fica congelada.", this);
+            }
+        }
+
+        /// <summary>
         /// Injeta o Vigor de Damião na barra correspondente. Chamado pelo <c>GameManager</c>
         /// no bootstrap.
         /// </summary>

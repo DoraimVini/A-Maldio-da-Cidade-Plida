@@ -148,9 +148,13 @@ namespace FavelaAmarela.Runtime.GameLoop
                 if (abdul != null) abdul.AplicarEstadoSalvo(player.gameObject);
             }
 
-            // Inventário: o InventoryManager é Singleton e auto-resolve suas dependências
-            // (BarraDeItens assina sozinha, VitalidadeBridge se conecta ao evento de consumo).
-            // Não precisa injeção aqui. Ver Fase 4 do plano de refatoração.
+            // Inventário: o InventoryManager nasce sozinho, antes de qualquer cena
+            // ([RuntimeInitializeOnLoadMethod(BeforeSceneLoad)] a partir de
+            // Resources/InventoryManager.prefab, com DontDestroyOnLoad). O bootstrap não o cria —
+            // só o ENTREGA a quem precisa. A BarraDeItens deixou de alcançá-lo sozinha na Fase 4
+            // (2026-08-18): buscava o singleton em 5 pontos, um deles dentro do Update.
+            if (hud != null)
+                hud.InjetarInventario(FavelaAmarela.Inventario.InventoryManager.Instance);
 
             // Yug-Neth é companheiro, não obstáculo: o corpo dele não pode barrar a passagem de
             // Damião (relatado em playtest — ele entalava o jogador na arena). Feito aqui porque
