@@ -229,10 +229,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7e115225014c55418d5f3d9886cf608, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.GameManager
-  maxResiliencia: 100
-  fracaoPanico: 0.25
-  telaPause: {fileID: 0}
-  sequenciaColapso: {fileID: 0}
 --- !u!4 &10053812
 Transform:
   m_ObjectHideFlags: 0
@@ -2054,9 +2050,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
       insertIndex: -1
       addedObject: {fileID: 401415675}
-    - targetCorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 401415674}
   m_SourcePrefab: {fileID: 100100000, guid: 4358c838d54b30c44809872563c21742, type: 3}
 --- !u!4 &401415672 stripped
 Transform:
@@ -2068,24 +2061,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6566763281958862316, guid: 4358c838d54b30c44809872563c21742, type: 3}
   m_PrefabInstance: {fileID: 401415671}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &401415674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 401415673}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 947488318ccf0074a81f0aec7336ffaa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.GerenciadorDeVigor
-  vigorMaximoBase: 100
-  custoCorridaPorSegundo: 12
-  custoEsquiva: 25
-  regeneracaoPorSegundo: 25
-  regeneracaoExaustoPorSegundo: 15
-  limiarExaustao: 30
 --- !u!114 &401415675
 MonoBehaviour:
   m_ObjectHideFlags: 0
