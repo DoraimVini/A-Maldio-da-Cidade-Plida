@@ -74,9 +74,26 @@ namespace FavelaAmarela.Runtime.GameLoop
             col.isTrigger = true;
         }
 
+        // Resolvidas quando Damião entra (as duas bridges vivem nele) e injetada pelo bootstrap
+        // (o companheiro). Fase final da refatoração de managers, 2026-08-18.
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
+        private FavelaAmarela.Runtime.Combat.VitalidadeBridge _corpo;
+        private FavelaAmarela.Player.CompanionManager _companheiro;
+
+        /// <summary>Liga o registrador de companheiro. Chamado pelo <c>GameLoopBootstrap</c>.</summary>
+        public void Bind(FavelaAmarela.Player.CompanionManager companheiro)
+        {
+            _companheiro = companheiro;
+        }
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;
+
+            // Resolvidos a partir de quem entrou: o Refúgio não precisa de global nenhum, porque
+            // Damião carrega as duas bridges. O companheiro vem por injeção do bootstrap.
+            _mente = other.GetComponentInParent<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+            _corpo = other.GetComponentInParent<FavelaAmarela.Runtime.Combat.VitalidadeBridge>();
 
             bool algoAconteceu = ReanimarCompanheiro();
             algoAconteceu |= Ancorar();
@@ -113,10 +130,9 @@ namespace FavelaAmarela.Runtime.GameLoop
         {
             if (resilienciaRestaurada <= 0f) return false;
 
-            var resiliencia = GameManager.Instance != null ? GameManager.Instance.Resiliencia : null;
-            if (resiliencia == null) return false;
+            if (_mente == null) return false;
 
-            resiliencia.Ancorar(resilienciaRestaurada);
+            _mente.Ancorar(resilienciaRestaurada);
             return true;
         }
 
@@ -133,7 +149,7 @@ namespace FavelaAmarela.Runtime.GameLoop
         {
             if (fracaoDeVitalidadeRestaurada <= 0f) return false;
 
-            var vitalidade = GameManager.Instance != null ? GameManager.Instance.VitalidadeDoJogador : null;
+            var vitalidade = _corpo != null ? _corpo.Vitalidade : null;
             if (vitalidade == null) return false;
 
             vitalidade.Curar(vitalidade.Max * fracaoDeVitalidadeRestaurada);
@@ -147,7 +163,7 @@ namespace FavelaAmarela.Runtime.GameLoop
         /// </summary>
         private bool ReanimarCompanheiro()
         {
-            var yugNeth = GameManager.Instance != null ? GameManager.Instance.YugNeth : null;
+            var yugNeth = _companheiro != null ? _companheiro.YugNeth : null;
             if (yugNeth == null || !yugNeth.EstaIncapacitado) return false;
 
             yugNeth.Reanimar();

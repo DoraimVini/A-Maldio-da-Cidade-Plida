@@ -57,6 +57,7 @@ namespace FavelaAmarela.Runtime.Enemies
         private SpriteRenderer _sprite;
         private Rigidbody2D _rb;
         private Transform _jogador;
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
 
         private Vector3 _centro;
         private Vector2 _direcaoDoRasante;
@@ -96,6 +97,13 @@ namespace FavelaAmarela.Runtime.Enemies
             }
 
             _jogador = jogador.transform;
+
+            // A mente de Damião, resolvida uma vez: o grito infrassônico drena todo frame e não
+            // pode resolver dependência nem falhar calado.
+            _mente = jogador.GetComponentInChildren<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+            if (_mente == null)
+                Debug.LogError("[Byakhee] Damião sem ResilienciaBridge — o grito infrassônico, " +
+                               "que é o relógio da luta, não vai drenar nada.", this);
             _enemyBase.OnAbatido += HandleAbatido;
         }
 
@@ -179,7 +187,7 @@ namespace FavelaAmarela.Runtime.Enemies
             float dreno = _fsm.DrenoDeResilienciaPorSegundo;
             if (dreno <= 0f) return;
 
-            GameManager.Instance?.Resiliencia?.SofrerTrauma(dreno * Time.deltaTime);
+            _mente?.SofrerTrauma(dreno * Time.deltaTime);
         }
 
         private void Circundar()
@@ -250,7 +258,7 @@ namespace FavelaAmarela.Runtime.Enemies
             float distancia = Vector2.Distance(transform.position, _jogador.position);
             if (distancia > alcanceDoGrito) return;
 
-            GameManager.Instance?.Resiliencia?.SofrerTrauma(traumaDoGrito);
+            _mente?.SofrerTrauma(traumaDoGrito);
         }
 
         private void HandleAbatido()

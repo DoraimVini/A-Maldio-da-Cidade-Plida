@@ -64,6 +64,7 @@ namespace FavelaAmarela.Runtime.GameLoop
         public Vitalidade VitalidadeDoJogador => _vitalidadeDamiao?.Vitalidade;
 
         private VitalidadeBridge _vitalidadeDamiao;
+        private ResilienciaBridge _menteDamiao;
 
         private void Awake()
         {
@@ -123,6 +124,20 @@ namespace FavelaAmarela.Runtime.GameLoop
             _vitalidadeDamiao = player != null
                 ? player.GetComponent<VitalidadeBridge>()
                 : FindAnyObjectByType<VitalidadeBridge>();
+
+            // A contraparte mental: sem esta bridge, tudo que fere a mente de Damião precisaria
+            // de um global (era o caso dos 19 call-sites de GameManager.Instance.Resiliencia).
+            // Fica no Damião de propósito — quem o atinge já tem o collider dele em mãos.
+            _menteDamiao = player != null
+                ? player.GetComponent<ResilienciaBridge>()
+                : FindAnyObjectByType<ResilienciaBridge>();
+
+            if (_menteDamiao != null)
+                _menteDamiao.Bind(Resiliencia);
+            else
+                Debug.LogError("[GameLoopBootstrap] Sem ResilienciaBridge no Damião — nada que " +
+                               "fere a mente (Cone de Gelo, Coisa do Cemitério, zonas de pressão) " +
+                               "vai ter efeito, e em silêncio.", this);
 
             if (_vitalidadeDamiao != null)
             {
@@ -230,7 +245,7 @@ namespace FavelaAmarela.Runtime.GameLoop
                                this);
 
             var cutscene = GetComponent<CutsceneController>();
-            if (cutscene != null) cutscene.Bind(_vitalidadeDamiao);
+            if (cutscene != null) cutscene.Bind(_vitalidadeDamiao, _menteDamiao);
 
             var pausa = GetComponent<PausaInputHandler>();
             if (pausa != null) pausa.Bind(StateMachine);
@@ -278,6 +293,10 @@ namespace FavelaAmarela.Runtime.GameLoop
             foreach (var queda in FindObjectsByType<QuedaZ4Z5Trigger>(
                          FindObjectsInactive.Include))
                 queda.Bind(cutscene, TempestadeAmbiente);
+
+            foreach (var refugio in FindObjectsByType<RefugioDeLuz>(
+                         FindObjectsInactive.Include))
+                refugio.Bind(companheiro);
 
             // Abdul já é encontrado em InjetarNoMundo para AplicarEstadoSalvo; aqui recebe o
             // registrador de companheiro, usado quando Yug-Neth é libertado.

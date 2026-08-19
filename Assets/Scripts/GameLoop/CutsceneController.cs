@@ -20,6 +20,7 @@ namespace FavelaAmarela.Runtime.GameLoop
     public sealed class CutsceneController : MonoBehaviour
     {
         private VitalidadeBridge _vitalidade;
+        private ResilienciaBridge _mente;
 
         /// <summary>
         /// Verdadeiro enquanto uma sequência roteirizada estiver em curso. Fontes de morte
@@ -32,20 +33,32 @@ namespace FavelaAmarela.Runtime.GameLoop
         /// dano físico. Pode vir nula (cena sem Damião corpóreo): nesse caso só a proteção contra
         /// morte instantânea funciona.
         /// </summary>
-        public void Bind(VitalidadeBridge vitalidade)
+        public void Bind(VitalidadeBridge vitalidade, ResilienciaBridge mente = null)
         {
             _vitalidade = vitalidade;
+            _mente = mente;
 
             // Reaplica o estado corrente: se um bind acontecer no meio de uma cutscene (troca de
-            // cena roteirizada), a bridge nova precisa nascer já ignorando dano.
-            if (_vitalidade != null) _vitalidade.IgnorarDano = JogadorInvulneravel;
+            // cena roteirizada), as bridges novas precisam nascer já ignorando dano.
+            Propagar(JogadorInvulneravel);
         }
 
-        /// <summary>Liga/desliga a invulnerabilidade e propaga para a Vitalidade.</summary>
+        /// <summary>Liga/desliga a invulnerabilidade e propaga para os dois canais.</summary>
         public void DefinirInvulneravel(bool valor)
         {
             JogadorInvulneravel = valor;
-            if (_vitalidade != null) _vitalidade.IgnorarDano = valor;
+            Propagar(valor);
+        }
+
+        /// <summary>
+        /// Espalha o estado para as duas bridges. A de Resiliência entrou em 2026-08-18: antes,
+        /// cada fonte de morte instantânea consultava <c>GameManager.JogadorInvulneravel</c> por
+        /// conta própria — três cópias da regra, e toda fonte nova nascia sem ela.
+        /// </summary>
+        private void Propagar(bool invulneravel)
+        {
+            if (_vitalidade != null) _vitalidade.IgnorarDano = invulneravel;
+            if (_mente != null) _mente.IgnorarTrauma = invulneravel;
         }
     }
 }

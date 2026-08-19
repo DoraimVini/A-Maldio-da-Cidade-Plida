@@ -43,6 +43,13 @@ namespace FavelaAmarela.Player
                 return;
             }
             Instance = this;
+
+            // Componente irmão, resolvido no Awake: o Update roda todo frame e não pode resolver
+            // dependência (Regra de Ouro 1) nem falhar calado.
+            _mente = GetComponent<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+            if (_mente == null)
+                Debug.LogError("[GerenciadorEfeitosPassivos] Sem ResilienciaBridge no mesmo " +
+                               "GameObject — RegenRM e DrenoRM não terão efeito algum.", this);
         }
 
         // Handlers nomeados, não lambdas. `-=` compara delegates por alvo+método: um lambda
@@ -87,26 +94,30 @@ namespace FavelaAmarela.Player
             if (Instance == this) Instance = null;
         }
 
+        // Resolvida UMA vez, não por frame. Antes o Update alcançava
+        // GameManager.Instance.Resiliencia a cada quadro — e, com a fonte nula, ele simplesmente
+        // parava de drenar, sem erro. A regressão só apareceria em playtest, como "a Resiliência
+        // não cai mais". Resolver no Awake permite avisar uma vez, alto e claro.
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
+
         private void Update()
         {
-            if (GameManager.Instance == null || GameManager.Instance.Resiliencia == null)
-                return;
+            if (_mente == null || !_mente.Ligada) return;
 
             float regen = GetBonus(StatType.RegenRM);
             float dreno = GetBonus(StatType.DrenoRM);
-            
+
             // Keystone do Protetor: "O Pacto do Rei" anula o dreno de RM no escuro.
-            // Para simplificar no momento, estamos apenas agregando. A lógica de escuro virá do StealthManager.
-            
+            // Por ora apenas agregamos; a lógica de escuro virá do StealthManager.
             float deltaRM = (regen - dreno) * Time.deltaTime;
-            
+
             if (deltaRM > 0.001f)
             {
-                GameManager.Instance.Resiliencia.Ancorar(deltaRM); 
+                _mente.Ancorar(deltaRM);
             }
             else if (deltaRM < -0.001f)
             {
-                GameManager.Instance.Resiliencia.SofrerTrauma(Mathf.Abs(deltaRM)); 
+                _mente.SofrerTrauma(Mathf.Abs(deltaRM));
             }
         }
 

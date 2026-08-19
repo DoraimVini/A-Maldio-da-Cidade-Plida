@@ -222,11 +222,17 @@ namespace FavelaAmarela.Player
             _ultimoUso[slot] = Time.time;
 
             if (resultado.CustoRM > 0f)
-                GameManager.Instance?.Resiliencia?.SofrerTrauma(resultado.CustoRM);
+                Mente?.SofrerTrauma(resultado.CustoRM);
         }
 
-        private static float ResilienciaAtual()
-            => GameManager.Instance?.Resiliencia?.Atual ?? 0f;
+        // Componente irmão: a ResilienciaBridge vive no mesmo Damião. Resolvido sob demanda e
+        // cacheado — os Artefatos são acionados por tecla (F1–F4), não em hot path.
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
+
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge Mente =>
+            _mente != null ? _mente : (_mente = GetComponent<FavelaAmarela.Runtime.Combat.ResilienciaBridge>());
+
+        private float ResilienciaAtual() => Mente?.Atual ?? 0f;
 
         // ── Contexto concreto ─────────────────────────────────────────────────
 
@@ -256,7 +262,7 @@ namespace FavelaAmarela.Player
 
             /// <inheritdoc />
             public void AncorarJogador(float valor)
-                => GameManager.Instance?.Resiliencia?.Ancorar(valor);
+                => _bridge.Mente?.Ancorar(valor);
 
             /// <inheritdoc />
             public void SilenciarPassos(float duracao)

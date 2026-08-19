@@ -96,13 +96,15 @@ namespace FavelaAmarela.Runtime.Enemies
             if (congelamento != null) congelamento.AplicarAcumulo();
 
             // 2. Dano anômalo na Resiliência Mental, mitigado pela Resistência Anômala.
-            //    O GameManager é dono da ResilienciaMental (POCO), então o dreno passa por ele.
-            var gm = FavelaAmarela.Runtime.GameLoop.GameManager.Instance;
-            if (gm == null || gm.Resiliencia == null) return;
+            //    A mente vem do próprio alvo, igual à resistência logo abaixo — este cone é
+            //    instanciado pelo Abdul em RUNTIME, então nenhum bootstrap conseguiria injetar
+            //    nele. Perguntar a quem foi acertado resolve sem global.
+            var mente = alvo.GetComponentInParent<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+            if (mente == null) return;
 
             float resistencia = ObterResistenciaAnomala(alvo);
             float danoFinal = MitigacaoDeDano.Aplicar(danoAnomalo, resistencia);
-            if (danoFinal > 0f) gm.Resiliencia.SofrerTrauma(danoFinal);
+            if (danoFinal > 0f) mente.SofrerTrauma(danoFinal);
         }
 
         private static float ObterResistenciaAnomala(Collider2D alvo)

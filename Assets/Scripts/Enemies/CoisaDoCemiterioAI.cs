@@ -102,11 +102,14 @@ namespace FavelaAmarela.Runtime.Enemies
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (!collision.CompareTag("Player")) return;
-            if (GameManager.Instance == null || GameManager.Instance.Resiliencia == null) return;
-            // Se o Damião está preso numa cutscene (ex.: queda Z4→Z5), só tensão, sem morte.
-            if (GameManager.Instance.JogadorInvulneravel) return;
 
-            GameManager.Instance.Resiliencia.ForcarColapso();
+            var mente = collision.GetComponentInParent<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+            if (mente == null) return;
+
+            // A cutscene (ex.: queda Z4→Z5) é respeitada DENTRO da bridge: ela ignora Colapso
+            // forçado enquanto IgnorarTrauma estiver ativo. Antes, este if vivia aqui e em mais
+            // duas fontes de morte instantânea — três cópias da mesma regra.
+            mente.ForcarColapso();
         }
 
         private void HandleStateChanged(CoisaDoCemiterioState anterior, CoisaDoCemiterioState atual)

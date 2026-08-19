@@ -129,10 +129,11 @@ namespace FavelaAmarela.Runtime.Combat
                 // Cura a Resiliencia Mental
                 if (mod.Stat == FavelaAmarela.Inventario.StatType.RMMaxima)
                 {
-                    var resiliencia = FavelaAmarela.Runtime.GameLoop.GameManager.Instance?.Resiliencia;
-                    if (resiliencia != null)
+                    // Componente irmão: a ResilienciaBridge vive no mesmo Damião.
+                    var mente = GetComponent<ResilienciaBridge>();
+                    if (mente != null)
                     {
-                        resiliencia.Ancorar(mod.Valor);
+                        mente.Ancorar(mod.Valor);
                     }
                 }
             }

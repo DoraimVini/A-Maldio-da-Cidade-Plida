@@ -57,6 +57,7 @@ namespace FavelaAmarela.Runtime.Enemies
         private ReiEmAmareloFSM _fsm;
         private SpriteRenderer _sprite;
         private Transform _jogador;
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
         private PlayerMovement _movimentoDoJogador;
 
         /// <summary>A FSM do confronto, para HUD, cutscenes e o Carcosa Debugger observarem.</summary>
@@ -90,6 +91,13 @@ namespace FavelaAmarela.Runtime.Enemies
             }
 
             _jogador = jogadorGo.transform;
+
+            // Resolvida uma vez, junto do alvo — o Colapso do Rei é morte súbita e não pode
+            // depender de um global existir no momento exato.
+            _mente = jogadorGo.GetComponentInChildren<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+            if (_mente == null)
+                Debug.LogError("[ReiEmAmarelo] Damião sem ResilienciaBridge — o Colapso final " +
+                               "não teria efeito.", this);
             _movimentoDoJogador = jogadorGo.GetComponent<PlayerMovement>();
 
             if (_movimentoDoJogador == null)
@@ -149,15 +157,10 @@ namespace FavelaAmarela.Runtime.Enemies
                 _ => corEmRitual
             };
 
-            // Colapso é instantâneo e mata pela mente — mesmo mecanismo dos outros gatilhos
-            // de morte súbita do jogo (ColapsoTrigger, CoisaDoCemiterioAI), respeitando
-            // JogadorInvulneravel para não punir uma cutscene.
-            if (atual == ReiEmAmareloState.Colapso
-                && GameManager.Instance != null
-                && !GameManager.Instance.JogadorInvulneravel)
-            {
-                GameManager.Instance.Resiliencia?.ForcarColapso();
-            }
+            // Colapso é instantâneo e mata pela mente — mesmo mecanismo dos outros gatilhos de
+            // morte súbita (ColapsoTrigger, CoisaDoCemiterioAI). A proteção de cutscene é
+            // respeitada DENTRO da ResilienciaBridge, num lugar só, em vez de replicada aqui.
+            if (atual == ReiEmAmareloState.Colapso) _mente?.ForcarColapso();
         }
 
         private void HandleSelado() => OnVitoria?.Invoke();

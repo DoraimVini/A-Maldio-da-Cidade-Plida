@@ -36,14 +36,14 @@ namespace FavelaAmarela.Level
             }
         }
 
+        // Resolvida uma vez, quando o jogador entra na zona — não por frame. A bridge fica no
+        // próprio Damião, então quem o detectou já a tem em mãos.
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
+
         private void AplicarDreno()
         {
-            // O GameManager centraliza a posse do POCO ResilienciaMental
-            if (GameManager.Instance != null && GameManager.Instance.Resiliencia != null)
-            {
-                // Usa o termo diegético 'SofrerTrauma' para remover sanidade
-                GameManager.Instance.Resiliencia.SofrerTrauma(taxaDrenoRM * Time.deltaTime);
-            }
+            // 'SofrerTrauma' é o termo diegético para remover sanidade.
+            _mente?.SofrerTrauma(taxaDrenoRM * Time.deltaTime);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -53,6 +53,11 @@ namespace FavelaAmarela.Level
                 jogadorNaZona = true;
                 jogadorTransform = collision.transform;
                 playerMovement = collision.GetComponent<PlayerMovement>();
+                _mente = collision.GetComponentInParent<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+
+                if (_mente == null)
+                    Debug.LogWarning("[PressaoPsiquicaZone] Damião sem ResilienciaBridge — esta " +
+                                     "zona não vai drenar nada.", this);
             }
         }
 
@@ -63,6 +68,7 @@ namespace FavelaAmarela.Level
                 jogadorNaZona = false;
                 jogadorTransform = null;
                 playerMovement = null;
+                _mente = null;
             }
         }
     }

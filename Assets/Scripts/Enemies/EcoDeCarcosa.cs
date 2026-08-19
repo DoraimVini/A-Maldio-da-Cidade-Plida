@@ -24,6 +24,11 @@ namespace FavelaAmarela.Runtime.Enemies
             if (player != null)
             {
                 playerMovement = player.GetComponent<PlayerMovement>();
+                _mente = player.GetComponentInChildren<FavelaAmarela.Runtime.Combat.ResilienciaBridge>();
+
+                if (_mente == null)
+                    Debug.LogWarning("[EcoDeCarcosa] Damião sem ResilienciaBridge — o Eco não vai " +
+                                     "drenar nada.", this);
             }
             
             // Oculta inicialmente
@@ -90,13 +95,13 @@ namespace FavelaAmarela.Runtime.Enemies
             }
         }
 
+        // Resolvida uma vez no Start, junto com o playerMovement — não por frame.
+        private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
+
         private void DrenarResiliencia()
         {
-            // Drena a sanidade do Damião por causa da presença opressiva do Eco
-            if (GameManager.Instance != null && GameManager.Instance.Resiliencia != null)
-            {
-                GameManager.Instance.Resiliencia.SofrerTrauma(taxaDrenoRMPorSegundo * Time.deltaTime);
-            }
+            // Drena a sanidade do Damião pela presença opressiva do Eco.
+            _mente?.SofrerTrauma(taxaDrenoRMPorSegundo * Time.deltaTime);
         }
     }
 }
