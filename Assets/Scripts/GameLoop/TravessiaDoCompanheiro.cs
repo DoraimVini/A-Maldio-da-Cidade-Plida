@@ -43,6 +43,19 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Tooltip("Deslocamento da posição do jogador onde ele reaparece (não em cima do próprio jogador).")]
         [SerializeField] private Vector2 deslocamento = new Vector2(1.2f, -0.6f);
 
+        private FavelaAmarela.Player.CompanionManager _companheiro;
+
+        /// <summary>
+        /// Liga o registrador de companheiro. Chamado pelo <c>GameLoopBootstrap</c>.
+        ///
+        /// <para><b>Fase 5, 2026-08-18:</b> substitui
+        /// <c>GameManager.Instance.RegistrarYugNeth</c>.</para>
+        /// </summary>
+        public void Bind(FavelaAmarela.Player.CompanionManager companheiro)
+        {
+            _companheiro = companheiro;
+        }
+
         private void Start()
         {
             if (GerenciadorDeSave.ObterValor(ChavesDeSave.AbdulResolvido) == null) return; // nunca foi libertado
@@ -73,7 +86,10 @@ namespace FavelaAmarela.Runtime.GameLoop
             var colisorDoJogador = jogador.GetComponent<Collider2D>();
             if (colisorDoJogador != null) yugNeth.IgnorarColisaoCom(colisorDoJogador);
 
-            GameManager.Instance?.RegistrarYugNeth(yugNeth);
+            if (_companheiro != null) _companheiro.RegistrarYugNeth(yugNeth);
+            else
+                Debug.LogWarning("[TravessiaDoCompanheiro] Sem CompanionManager ligado — " +
+                                 "Yug-Neth não será registrado como companheiro da run.", this);
         }
     }
 }

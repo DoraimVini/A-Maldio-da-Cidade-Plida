@@ -55,6 +55,27 @@ namespace FavelaAmarela.Runtime.GameLoop
             StartCoroutine(SequenciaDeQueda(playerMovement, rb));
         }
 
+        private CutsceneController _cutscene;
+        private FavelaAmarela.Runtime.Environment.TempestadeAmbiente _tempestade;
+
+        /// <summary>
+        /// Liga a invulnerabilidade de cutscene e o driver da tempestade. Chamado pelo
+        /// <c>GameLoopBootstrap</c>.
+        ///
+        /// <para><b>Fase 5, 2026-08-18:</b> substitui <c>GameManager.Instance</c> nos dois pontos
+        /// desta sequência — a invulnerabilidade e o zeramento da faixa de tempestade.</para>
+        /// </summary>
+        public void Bind(CutsceneController cutscene,
+                         FavelaAmarela.Runtime.Environment.TempestadeAmbiente tempestade)
+        {
+            _cutscene = cutscene;
+            _tempestade = tempestade;
+
+            if (_cutscene == null)
+                Debug.LogError("[QuedaZ4Z5Trigger] Sem CutsceneController — Damião pode morrer " +
+                               "durante a queda roteirizada, que deveria ser só tensão.", this);
+        }
+
         private IEnumerator SequenciaDeQueda(PlayerMovement playerMovement, Rigidbody2D rb)
         {
             // Trava input — mesmo princípio de "lock" já usado em PlayerMovement
@@ -64,7 +85,7 @@ namespace FavelaAmarela.Runtime.GameLoop
             rb.linearVelocity = Vector2.zero;
 
             // Preso na cutscene: imune a morte instantânea (Coisa etc.) — só tensão, não dano.
-            if (GameManager.Instance != null) GameManager.Instance.DefinirInvulneravel(true);
+            if (_cutscene != null) _cutscene.DefinirInvulneravel(true);
 
             if (cerco != null)
             {
@@ -82,7 +103,7 @@ namespace FavelaAmarela.Runtime.GameLoop
             // Chegou na Zona 5 (subterrâneo fechado): sem tempestade. Zera a faixa
             // explicitamente — o teleporte adormece o Rigidbody e o TempestadeTrigger_Z5_Nula
             // não dispara OnTriggerEnter de forma confiável nesse caso.
-            GameManager.Instance?.TempestadeAmbiente?.DefinirFaixa(0f, 0f);
+            if (_tempestade != null) _tempestade.DefinirFaixa(0f, 0f);
 
             // Limpa os atores do cerco (Cultistas + Espectros) — eles eram set-piece da
             // Zona 4; sem isso o Espectro persegue e encalha na barreira de anomalia.
@@ -95,7 +116,7 @@ namespace FavelaAmarela.Runtime.GameLoop
             playerMovement.enabled = true;
 
             // Fim da cutscene: volta a ser vulnerável (já teleportado pra Z5, longe da Coisa).
-            if (GameManager.Instance != null) GameManager.Instance.DefinirInvulneravel(false);
+            if (_cutscene != null) _cutscene.DefinirInvulneravel(false);
         }
     }
 }

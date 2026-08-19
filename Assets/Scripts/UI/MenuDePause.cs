@@ -38,13 +38,32 @@ namespace FavelaAmarela.Runtime.UI
             if (botaoSair != null) botaoSair.onClick.AddListener(Sair);
         }
 
-        /// <summary>Volta ao gameplay. O <c>GameManager</c> cuida de descongelar o tempo.</summary>
+        private FavelaAmarela.Core.GameLoop.GameLoopStateMachine _maquina;
+
+        /// <summary>
+        /// Liga à máquina de estados da cena. Chamado pelo <c>GameLoopBootstrap</c>.
+        ///
+        /// <para><b>Fase 5, 2026-08-18:</b> substitui a busca por
+        /// <c>GameManager.Instance.StateMachine</c>.</para>
+        /// </summary>
+        public void Bind(FavelaAmarela.Core.GameLoop.GameLoopStateMachine maquina)
+        {
+            if (maquina == null)
+            {
+                Debug.LogError("[MenuDePause] Bind recebeu máquina nula — não dá para despausar.",
+                               this);
+                return;
+            }
+
+            _maquina = maquina;
+        }
+
+        /// <summary>Volta ao gameplay. O <c>GameStatePresenter</c> cuida de descongelar o tempo.</summary>
         public void Retomar()
         {
-            var gm = GameManager.Instance;
-            if (gm?.StateMachine == null) return;
+            if (_maquina == null) return;
 
-            gm.StateMachine.TryTransition(GameState.Gameplay);
+            _maquina.TryTransition(GameState.Gameplay);
         }
 
         private void Sair()

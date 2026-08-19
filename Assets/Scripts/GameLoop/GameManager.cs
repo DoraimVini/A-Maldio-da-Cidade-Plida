@@ -79,70 +79,36 @@ namespace FavelaAmarela.Runtime.GameLoop
             if (Instance == this) Instance = null;
         }
 
-        // ── Encaminhamentos para o GameLoopBootstrap ─────────────────────────
-
-        /// <summary>Máquina de estados do loop de jogo.</summary>
-        [Obsolete("Injete GameLoopStateMachine via Bind() a partir do GameLoopBootstrap.")]
-        public GameLoopStateMachine StateMachine => _bootstrap != null ? _bootstrap.StateMachine : null;
+        // ── O que sobrou, e por quê ──────────────────────────────────────────
+        //
+        // A Fase 5 (2026-08-18) removeu SETE encaminhamentos cujos consumidores migraram para
+        // injeção: StateMachine, TriggerTransicaoDeFase, RegistrarYugNeth, TempestadeAmbiente,
+        // DefinirInvulneravel, SoundBroadcaster e Environment. Os dois últimos nunca tiveram
+        // consumidor externo — nasceram encaminhamento morto.
+        //
+        // Os quatro abaixo ficam, e a razão é a mesma para todos: seus consumidores TAMBÉM usam
+        // `.Resiliencia`, que tem rodada própria (19 usos em 11 arquivos, dois deles chamando
+        // dentro do Update). Migrar só metade deixaria os mesmos arquivos dependendo desta casca
+        // — trabalho sem redução de acoplamento.
 
         /// <summary>Resiliência Mental de Damião.</summary>
         [Obsolete("Injete ResilienciaMental via Bind(). Migração própria — 19 call-sites.")]
         public ResilienciaMental Resiliencia => _bootstrap != null ? _bootstrap.Resiliencia : null;
 
-        /// <summary>Serviço de propagação sonora.</summary>
-        [Obsolete("Injete SoundBroadcastService via Bind() a partir do GameLoopBootstrap.")]
-        public SoundBroadcastService SoundBroadcaster => _bootstrap != null ? _bootstrap.SoundBroadcaster : null;
-
-        /// <summary>Estado do ambiente.</summary>
-        [Obsolete("Injete EnvironmentState via Bind() a partir do GameLoopBootstrap.")]
-        public EnvironmentState Environment => _bootstrap != null ? _bootstrap.Environment : null;
-
-        /// <summary>Driver da tempestade na cena.</summary>
-        [Obsolete("Injete TempestadeAmbiente via Bind() a partir do GameLoopBootstrap.")]
-        public TempestadeAmbiente TempestadeAmbiente => _bootstrap != null ? _bootstrap.TempestadeAmbiente : null;
-
         /// <summary>Vitalidade corpórea de Damião, ou <c>null</c> se não houver bridge na cena.</summary>
-        [Obsolete("Injete Vitalidade via Bind() a partir do GameLoopBootstrap.")]
+        [Obsolete("Injete Vitalidade via Bind(). Sai junto com .Resiliencia (mesmo consumidor).")]
         public Vitalidade VitalidadeDoJogador => _bootstrap != null ? _bootstrap.VitalidadeDoJogador : null;
-
-        /// <summary>
-        /// Dispara a transição de fim de fase/dungeon. Não é uma tela de "Vitória" — ver
-        /// <see cref="GameState.TransicaoDeFase"/>.
-        /// </summary>
-        [Obsolete("Peça a transição à GameLoopStateMachine injetada.")]
-        public void TriggerTransicaoDeFase()
-        {
-            if (_bootstrap?.StateMachine == null) return;
-            _bootstrap.StateMachine.TryTransition(GameState.TransicaoDeFase);
-        }
-
-        // ── Encaminhamentos para o CutsceneController ────────────────────────
 
         /// <summary>
         /// Verdadeiro enquanto Damião está preso numa sequência roteirizada e não pode agir.
         /// Fontes de morte instantânea por toque devem respeitar isto.
         /// </summary>
-        [Obsolete("Injete CutsceneController via Bind().")]
+        [Obsolete("Injete CutsceneController via Bind(). Sai junto com .Resiliencia.")]
         public bool JogadorInvulneravel => _cutscene != null && _cutscene.JogadorInvulneravel;
 
-        /// <summary>Liga/desliga a invulnerabilidade de cutscene.</summary>
-        [Obsolete("Injete CutsceneController via Bind().")]
-        public void DefinirInvulneravel(bool valor)
-        {
-            if (_cutscene != null) _cutscene.DefinirInvulneravel(valor);
-        }
-
-        // ── Encaminhamentos para o CompanionManager ──────────────────────────
-
-        /// <summary>Registra o companheiro Yug-Neth assim que ele é libertado.</summary>
-        [Obsolete("Injete CompanionManager via Bind().")]
-        public void RegistrarYugNeth(YugNethAI yugNeth)
-        {
-            if (_companheiro != null) _companheiro.RegistrarYugNeth(yugNeth);
-        }
-
         /// <summary>O companheiro Yug-Neth, se já libertado (<c>null</c> antes disso).</summary>
-        [Obsolete("Injete CompanionManager via Bind().")]
+        [Obsolete("Injete CompanionManager via Bind(). Sai junto com .Resiliencia.")]
         public YugNethAI YugNeth => _companheiro != null ? _companheiro.YugNeth : null;
+
     }
 }

@@ -23,6 +23,7 @@
 Consequências práticas ao propor trabalho:
 - **Inventário/barra de ações estão liberados** (item 2 depende deles) — ver bullet acima.
 - Continuam **fora** do VS: loot/raridade/níveis de personagem, árvore de talentos, percepção graduada, fast travel.
+- **Progressão por nível: reafirmado FORA do VS em 2026-08-18.** O motor existe e funciona (`Progressao` + `ProgressionBridge`, ligado desde a Fase 3), mas **ninguém concede Exposição no mundo e não há um único `EcoDef` autorado** — e pôr isso de pé atrasaria o edital. Decisão do Vini: não incluir níveis nem talentos no Vertical Slice; quando o VS estiver completo, avaliar expô-los pelo **Carcosa Debugger** primeiro. **Consequência que precisa ficar clara:** com o nível travado em 1, o loot **só entrega tier 1** — isso é esperado no VS, não bug. Não "consertar" autorando tiers altos nem criando fontes de Exposição às pressas.
 - O escopo é grande e o prazo é de edital: ao sugerir trabalho, prefira o que fecha um item da lista inteiro a polir algo já jogável. Quando em dúvida se algo pertence ao VS, pergunte ao Vini.
 - Ambientação: Ruínas Pálidas (Ruins of Hali) dentro da Cidade Pálida (Carcosa). Protagonista: Damião.
 - Controle de versão: Git.

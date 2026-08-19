@@ -237,6 +237,52 @@ namespace FavelaAmarela.Runtime.GameLoop
 
             // CompanionManager não recebe Bind: Yug-Neth se registra sob demanda, quando
             // libertado. Ver CompanionManager.RegistrarYugNeth.
+            var companheiro = GetComponent<CompanionManager>();
+
+            InjetarNosConsumidoresDaCena(cutscene, companheiro);
+        }
+
+        /// <summary>
+        /// Entrega as dependências aos consumidores espalhados pela cena — gatilhos, UI e o Abdul.
+        ///
+        /// <para><b>Fase 5, 2026-08-18.</b> Estes seis alcançavam <c>GameManager.Instance</c>
+        /// diretamente. Injetá-los aqui é o que permite removê-los do encaminhamento
+        /// <c>[Obsolete]</c>. Inclui inativos: gatilhos de set-piece costumam nascer desligados e
+        /// serem ativados por outro trigger — sem <c>FindObjectsInactive.Include</c> eles
+        /// receberiam a injeção nunca.</para>
+        ///
+        /// <para><b>O que NÃO migrou:</b> os consumidores de <c>.Resiliencia</c> (19 usos em 11
+        /// arquivos). Eles têm rodada própria, porque dois deles chamam dentro do <c>Update</c> e
+        /// quebram de forma silenciosa se a ordem de bind sair errada — o plano pede testes de
+        /// bootstrap escritos antes dessa migração.</para>
+        /// </summary>
+        private void InjetarNosConsumidoresDaCena(CutsceneController cutscene,
+                                                  CompanionManager companheiro)
+        {
+            foreach (var portao in FindObjectsByType<TransicaoDeFaseTrigger>(
+                         FindObjectsInactive.Include))
+                portao.Bind(StateMachine);
+
+            foreach (var menu in FindObjectsByType<MenuDePause>(
+                         FindObjectsInactive.Include))
+                menu.Bind(StateMachine);
+
+            foreach (var retorno in FindObjectsByType<RetornoDoColapso>(
+                         FindObjectsInactive.Include))
+                retorno.Bind(StateMachine);
+
+            foreach (var travessia in FindObjectsByType<TravessiaDoCompanheiro>(
+                         FindObjectsInactive.Include))
+                travessia.Bind(companheiro);
+
+            foreach (var queda in FindObjectsByType<QuedaZ4Z5Trigger>(
+                         FindObjectsInactive.Include))
+                queda.Bind(cutscene, TempestadeAmbiente);
+
+            // Abdul já é encontrado em InjetarNoMundo para AplicarEstadoSalvo; aqui recebe o
+            // registrador de companheiro, usado quando Yug-Neth é libertado.
+            var abdul = FindAnyObjectByType<AbdulAlhazredAI>(FindObjectsInactive.Include);
+            if (abdul != null) abdul.BindCompanheiro(companheiro);
         }
     }
 }

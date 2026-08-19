@@ -57,18 +57,27 @@ namespace FavelaAmarela.Runtime.UI
             if (botaoMenu != null) botaoMenu.onClick.AddListener(NavegacaoDeCenas.IrParaMenu);
         }
 
-        private void Start()
+        /// <summary>
+        /// Liga à máquina de estados da cena. Chamado pelo <c>GameLoopBootstrap</c>.
+        ///
+        /// <para><b>Fase 5, 2026-08-18:</b> antes buscava <c>GameManager.Instance.StateMachine</c>
+        /// no <c>Start</c>. A injeção acontece no <c>Awake</c> do bootstrap (ordem −200), bem
+        /// antes de qualquer <c>Start</c>.</para>
+        /// </summary>
+        public void Bind(FavelaAmarela.Core.GameLoop.GameLoopStateMachine maquina)
         {
-            _maquina = GameManager.Instance?.StateMachine;
-
-            if (_maquina == null)
+            if (maquina == null)
             {
-                Debug.LogError("[RetornoDoColapso] Sem GameManager — morrer viraria beco sem " +
-                               "saída.", this);
+                Debug.LogError("[RetornoDoColapso] Bind recebeu máquina nula — morrer viraria " +
+                               "beco sem saída.", this);
                 return;
             }
 
+            if (_maquina != null) _maquina.OnStateChanged -= HandleEstadoMudou;
+
+            _maquina = maquina;
             _maquina.OnStateChanged += HandleEstadoMudou;
+
             Esconder();
         }
 

@@ -189,6 +189,16 @@ namespace FavelaAmarela.Runtime.Enemies
         // Dano de sangramento já sofrido mas ainda não exibido — ver AcumularNumeroDeSangramento.
         private float _danoDeSangramentoPendente;
         private FichaDeAtributos _atributos;
+
+        // Injetado pelo GameLoopBootstrap (Fase 5, 2026-08-18). Usado uma vez, quando Yug-Neth é
+        // libertado — antes isso passava por GameManager.Instance.RegistrarYugNeth.
+        private FavelaAmarela.Player.CompanionManager _companheiro;
+
+        /// <summary>Liga o registrador de companheiro. Chamado pelo <c>GameLoopBootstrap</c>.</summary>
+        public void BindCompanheiro(FavelaAmarela.Player.CompanionManager companheiro)
+        {
+            _companheiro = companheiro;
+        }
         private SpriteRenderer _spriteRenderer;
 
         /// <summary>FSM da luta. Null antes do Awake.</summary>
@@ -429,14 +439,14 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_jogadorNaConversa != null)
                 yugNethNaArena.Bind(_jogadorNaConversa.transform);
 
-            // Registro pontual, não um hot-path: mesmo padrão já usado por
-            // ColapsoTrigger/TransicaoDeFaseTrigger para acionar o GameManager a partir
-            // de um evento de jogo específico (aqui, "Yug-Neth acabou de ser libertado").
-            if (GameManager.Instance != null)
-                GameManager.Instance.RegistrarYugNeth(yugNethNaArena);
+            // Registro pontual, não hot-path: acontece uma vez, no evento "Yug-Neth acabou de ser
+            // libertado". Fase 5 (2026-08-18): o CompanionManager chega por injeção do bootstrap,
+            // em vez de ser alcançado por GameManager.Instance.
+            if (_companheiro != null)
+                _companheiro.RegistrarYugNeth(yugNethNaArena);
             else
-                Debug.LogWarning("[AbdulAlhazredAI] GameManager.Instance ausente — a morte de " +
-                                 "Yug-Neth não encerrará a run.", this);
+                Debug.LogWarning("[AbdulAlhazredAI] Sem CompanionManager ligado — Yug-Neth não " +
+                                 "será registrado como companheiro da run.", this);
         }
 
         /// <summary>
