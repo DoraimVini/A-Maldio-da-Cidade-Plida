@@ -118,3 +118,10 @@ Tools/aseprite-bridge/node_modules/
 # só duplicam o que o histórico do Git já cobre.
 *.unity.bak*
 /Assets/_Recovery/
+
+# Tilesets CraftPix — baixados em 2026-08-19, ainda NAO usados no jogo.
+# Ficam fora do git ate o Templo do Povo-Serpente / Cursed Land serem construidos:
+# sao 118 MB de LFS (12% da cota gratuita do GitHub) de arte que nao esta em cena nenhuma.
+# Para trazer: remova estas linhas e faca git add da pasta.
+/Assets/ThirdParty/CraftPix_UndeadTileset/
+/Assets/ThirdParty/CraftPix_CursedLand/
