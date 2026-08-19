@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: 0c9a8177fe3d8f442b2c8f502c894fe3
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8144783573162304124
+    second: Rei_selar_0
+  - first:
+      213: 4837942781748439304
+    second: Rei_selar_1
+  - first:
+      213: 4314223797497147418
+    second: Rei_selar_2
+  - first:
+      213: -2140745080066583082
+    second: Rei_selar_3
+  - first:
+      213: -5836783347369699105
+    second: Rei_selar_4
+  - first:
+      213: -7670107608784754525
+    second: Rei_selar_5
+  - first:
+      213: -2983438887166860405
+    second: Rei_selar_6
+  - first:
+      213: -1838791589251619795
+    second: Rei_selar_7
+  - first:
+      213: -8357432582070088141
+    second: Rei_selar_8
+  - first:
+      213: -3936978085299567280
+    second: Rei_selar_9
+  - first:
+      213: 7384988918783832555
+    second: Rei_selar_10
+  - first:
+      213: -2385927689230091013
+    second: Rei_selar_11
+  - first:
+      213: -7530128396890419058
+    second: Rei_selar_12
+  - first:
+      213: 6201160994504949966
+    second: Rei_selar_13
+  - first:
+      213: 5361764510564094288
+    second: Rei_selar_14
+  - first:
+      213: 3884890787827369028
+    second: Rei_selar_15
+  - first:
+      213: 7723970899466653925
+    second: Rei_selar_16
+  - first:
+      213: 7390836030872694366
+    second: Rei_selar_17
+  - first:
+      213: 6198002770298626266
+    second: Rei_selar_18
+  - first:
+      213: -7462739207778382325
+    second: Rei_selar_19
+  - first:
+      213: 860960771815747827
+    second: Rei_selar_20
+  - first:
+      213: -1676904443530840653
+    second: Rei_selar_21
+  - first:
+      213: -5338821389075485975
+    second: Rei_selar_22
+  - first:
+      213: 6716757388409026333
+    second: Rei_selar_23
+  - first:
+      213: 3656868161767315246
+    second: Rei_selar_24
+  - first:
+      213: 7966766072645926770
+    second: Rei_selar_25
+  - first:
+      213: -4313847849881752423
+    second: rei_selar_0
+  - first:
+      213: -7962228235957561054
+    second: rei_selar_1
+  - first:
+      213: 465249957507648528
+    second: rei_selar_2
+  - first:
+      213: -1511433194596976154
+    second: rei_selar_3
+  - first:
+      213: -3999587317138513181
+    second: rei_selar_4
+  - first:
+      213: -7093694427113342616
+    second: rei_selar_5
+  - first:
+      213: -4076072016069462171
+    second: rei_selar_6
+  - first:
+      213: 2081560733563063999
+    second: rei_selar_7
+  - first:
+      213: 1501083484787341814
+    second: rei_selar_8
+  - first:
+      213: -4327790597699557456
+    second: rei_selar_9
+  - first:
+      213: -3046279139570316871
+    second: rei_selar_10
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: rei_selar_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99c27bc7c322224c0800000000000000
+      internalID: -4313847849881752423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_1
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2291a27ea9b708190800000000000000
+      internalID: -7962228235957561054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_2
+      rect:
+        serializedVersion: 2
+        x: 332
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01c42011f56e47600800000000000000
+      internalID: 465249957507648528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_3
+      rect:
+        serializedVersion: 2
+        x: 498
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e93056748f460be0800000000000000
+      internalID: -1511433194596976154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_4
+      rect:
+        serializedVersion: 2
+        x: 664
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e22dc9968c9e78c0800000000000000
+      internalID: -3999587317138513181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_5
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 869bdb6a0822e8d90800000000000000
+      internalID: -7093694427113342616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_6
+      rect:
+        serializedVersion: 2
+        x: 996
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 567f44be812ee67c0800000000000000
+      internalID: -4076072016069462171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_7
+      rect:
+        serializedVersion: 2
+        x: 1162
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbe8d66657033ec10800000000000000
+      internalID: 2081560733563063999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_8
+      rect:
+        serializedVersion: 2
+        x: 1328
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f974f0f97be4d410800000000000000
+      internalID: 1501083484787341814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_9
+      rect:
+        serializedVersion: 2
+        x: 1494
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b7a7d9816990f3c0800000000000000
+      internalID: -4327790597699557456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_selar_10
+      rect:
+        serializedVersion: 2
+        x: 1660
+        y: 0
+        width: 166
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b98a3f234179b5d0800000000000000
+      internalID: -3046279139570316871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Rei_selar_0: -8144783573162304124
+      Rei_selar_1: 4837942781748439304
+      Rei_selar_10: 7384988918783832555
+      Rei_selar_11: -2385927689230091013
+      Rei_selar_12: -7530128396890419058
+      Rei_selar_13: 6201160994504949966
+      Rei_selar_14: 5361764510564094288
+      Rei_selar_15: 3884890787827369028
+      Rei_selar_16: 7723970899466653925
+      Rei_selar_17: 7390836030872694366
+      Rei_selar_18: 6198002770298626266
+      Rei_selar_19: -7462739207778382325
+      Rei_selar_2: 4314223797497147418
+      Rei_selar_20: 860960771815747827
+      Rei_selar_21: -1676904443530840653
+      Rei_selar_22: -5338821389075485975
+      Rei_selar_23: 6716757388409026333
+      Rei_selar_24: 3656868161767315246
+      Rei_selar_25: 7966766072645926770
+      Rei_selar_3: -2140745080066583082
+      Rei_selar_4: -5836783347369699105
+      Rei_selar_5: -7670107608784754525
+      Rei_selar_6: -2983438887166860405
+      Rei_selar_7: -1838791589251619795
+      Rei_selar_8: -8357432582070088141
+      Rei_selar_9: -3936978085299567280
+      rei_selar_0: -4313847849881752423
+      rei_selar_1: -7962228235957561054
+      rei_selar_10: -3046279139570316871
+      rei_selar_2: 465249957507648528
+      rei_selar_3: -1511433194596976154
+      rei_selar_4: -3999587317138513181
+      rei_selar_5: -7093694427113342616
+      rei_selar_6: -4076072016069462171
+      rei_selar_7: 2081560733563063999
+      rei_selar_8: 1501083484787341814
+      rei_selar_9: -4327790597699557456
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

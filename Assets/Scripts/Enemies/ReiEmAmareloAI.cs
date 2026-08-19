@@ -54,6 +54,10 @@ namespace FavelaAmarela.Runtime.Enemies
         [SerializeField] private Color corDesvelado = new Color(0.9f, 0.1f, 0.1f);
         [SerializeField] private Color corSelado = new Color(0.9f, 0.85f, 0.6f);
 
+        [Header("Animação")]
+        [Tooltip("Animator com o ReiEmAmarelo_AC. Vazio: o Rei desenha o quadro parado.")]
+        [SerializeField] private Animator animator;
+
         private ReiEmAmareloFSM _fsm;
         private SpriteRenderer _sprite;
         private Transform _jogador;
@@ -70,6 +74,8 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             _sprite = GetComponent<SpriteRenderer>();
 
+            if (animator == null) animator = GetComponent<Animator>();
+
             _fsm = new ReiEmAmareloFSM(
                 idsDasReliquiasExigidas,
                 ciclosDeSelamento,
@@ -78,6 +84,7 @@ namespace FavelaAmarela.Runtime.Enemies
 
             _fsm.OnStateChanged += HandleEstadoMudou;
             _fsm.OnSelado += HandleSelado;
+            _fsm.OnReliquiaAtivada += HandleReliquiaAtivada;
         }
 
         private void Start()
@@ -110,6 +117,21 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_fsm == null) return;
             _fsm.OnStateChanged -= HandleEstadoMudou;
             _fsm.OnSelado -= HandleSelado;
+            _fsm.OnReliquiaAtivada -= HandleReliquiaAtivada;
+        }
+
+        /// <summary>
+        /// O Rei recua quando uma relíquia trava.
+        ///
+        /// <para>Ele <b>não leva dano</b> — não tem <c>Vitalidade</c> nem <c>IDanificavel</c>,
+        /// por decisão de design: é selado por rito, não abatido. Mas travar uma relíquia é o
+        /// equivalente ficcional de acertá-lo, e sem nenhum retorno visual o jogador não sabe
+        /// que a ação surtiu efeito. É o que o clipe <c>dano</c> do pacote serve aqui.</para>
+        /// </summary>
+        private void HandleReliquiaAtivada(string id, int total)
+        {
+            if (animator == null || animator.runtimeAnimatorController == null) return;
+            animator.Play(Anim.Dano, 0, 0f);
         }
 
         /// <summary>Começa o confronto: libera os pontos focais das relíquias.</summary>
@@ -161,6 +183,49 @@ namespace FavelaAmarela.Runtime.Enemies
             // morte súbita (ColapsoTrigger, CoisaDoCemiterioAI). A proteção de cutscene é
             // respeitada DENTRO da ResilienciaBridge, num lugar só, em vez de replicada aqui.
             if (atual == ReiEmAmareloState.Colapso) _mente?.ForcarColapso();
+
+            TocarAnimacaoDo(atual);
+        }
+
+        /// <summary>
+        /// Põe o Animator no clipe do estado. <b>Quem manda é a <c>ReiEmAmareloFSM</c></b> — por
+        /// isso o <c>ReiEmAmarelo_AC</c> não tem teia de transições com condições: duplicar a
+        /// lógica de ritual lá criaria uma segunda fonte de verdade, divergindo desta em
+        /// silêncio.
+        ///
+        /// <para><c>Selado</c> usa <c>queda</c>: selar o Rei é a vitória do jogador, e o corpo
+        /// tombando é o desfecho. <c>Colapso</c> é o contrário — o Rei venceu — e ele fica em
+        /// <c>idle</c>, de pé, enquanto Damião sucumbe.</para>
+        ///
+        /// <para>Degrada em silêncio: sem Animator, o Rei desenha o quadro parado, como antes.</para>
+        /// </summary>
+        private void TocarAnimacaoDo(ReiEmAmareloState estado)
+        {
+            if (animator == null || animator.runtimeAnimatorController == null) return;
+
+            int clipe = estado switch
+            {
+                ReiEmAmareloState.Selando => Anim.Selar,
+                ReiEmAmareloState.Desvelado => Anim.Desvelo,
+                ReiEmAmareloState.Selado => Anim.Queda,
+                _ => Anim.Idle,
+            };
+
+            animator.Play(clipe, 0, 0f);
+        }
+
+        /// <summary>
+        /// Hashes do <c>ReiEmAmarelo_AC</c>, resolvidos uma vez em campo estático: a troca de
+        /// estado acontece a cada ciclo do ritual, e a Regra de Ouro 1 proíbe alocar string em
+        /// caminho quente.
+        /// </summary>
+        private static class Anim
+        {
+            internal static readonly int Idle = Animator.StringToHash("idle");
+            internal static readonly int Selar = Animator.StringToHash("selar");
+            internal static readonly int Desvelo = Animator.StringToHash("desvelo");
+            internal static readonly int Dano = Animator.StringToHash("dano");
+            internal static readonly int Queda = Animator.StringToHash("queda");
         }
 
         private void HandleSelado() => OnVitoria?.Invoke();

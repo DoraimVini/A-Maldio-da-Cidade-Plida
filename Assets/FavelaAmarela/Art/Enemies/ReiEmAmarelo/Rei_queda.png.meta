@@ -1,0 +1,729 @@
+fileFormatVersion: 2
+guid: 0f917e7eddc273d4c8a101929699bc24
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1944345202917325795
+    second: Rei_queda_0
+  - first:
+      213: -4217477032884992015
+    second: Rei_queda_1
+  - first:
+      213: -5109940596972196090
+    second: Rei_queda_2
+  - first:
+      213: 7260701402718368162
+    second: Rei_queda_3
+  - first:
+      213: 4630313336971341218
+    second: Rei_queda_4
+  - first:
+      213: -6398271884349099946
+    second: Rei_queda_5
+  - first:
+      213: 4622564321749046540
+    second: Rei_queda_6
+  - first:
+      213: 7124225328926473887
+    second: Rei_queda_7
+  - first:
+      213: 6297913079236145824
+    second: Rei_queda_8
+  - first:
+      213: -5165126884095103390
+    second: Rei_queda_9
+  - first:
+      213: -2870738169101888686
+    second: Rei_queda_10
+  - first:
+      213: -3643356322770263371
+    second: Rei_queda_11
+  - first:
+      213: 1257094599521763264
+    second: Rei_queda_12
+  - first:
+      213: -1943839617160645073
+    second: Rei_queda_13
+  - first:
+      213: 8357330021833258327
+    second: Rei_queda_14
+  - first:
+      213: 7692525009984211337
+    second: Rei_queda_15
+  - first:
+      213: 773115007625936699
+    second: Rei_queda_16
+  - first:
+      213: 7286346079935435117
+    second: Rei_queda_17
+  - first:
+      213: -5373966550693678404
+    second: Rei_queda_18
+  - first:
+      213: -6718014928441230835
+    second: Rei_queda_19
+  - first:
+      213: -5100453903219455726
+    second: Rei_queda_20
+  - first:
+      213: -3539849810082129610
+    second: Rei_queda_21
+  - first:
+      213: 6034692996477140442
+    second: Rei_queda_22
+  - first:
+      213: -5964408040034271846
+    second: Rei_queda_23
+  - first:
+      213: 8516136373516677459
+    second: Rei_queda_24
+  - first:
+      213: -210021662045992346
+    second: Rei_queda_25
+  - first:
+      213: 2240330627404788325
+    second: Rei_queda_26
+  - first:
+      213: 5101258165315109977
+    second: Rei_queda_27
+  - first:
+      213: -4734711274358577419
+    second: Rei_queda_28
+  - first:
+      213: -6411563643272435066
+    second: Rei_queda_29
+  - first:
+      213: -2796296049654444575
+    second: Rei_queda_30
+  - first:
+      213: -3101389692056170758
+    second: Rei_queda_31
+  - first:
+      213: 2274895951777940312
+    second: Rei_queda_32
+  - first:
+      213: -7304087369316701792
+    second: Rei_queda_33
+  - first:
+      213: -3220654285459216626
+    second: rei_queda_0
+  - first:
+      213: 4719695597414946672
+    second: rei_queda_1
+  - first:
+      213: -723372506828355520
+    second: rei_queda_2
+  - first:
+      213: 6669145938999916736
+    second: rei_queda_3
+  - first:
+      213: 5453186369858563653
+    second: rei_queda_4
+  - first:
+      213: -873239153282182795
+    second: rei_queda_5
+  - first:
+      213: -7240975967447516421
+    second: rei_queda_6
+  - first:
+      213: -961127206021550961
+    second: rei_queda_7
+  - first:
+      213: 4865746076664284952
+    second: rei_queda_8
+  - first:
+      213: 258016491453529318
+    second: rei_queda_9
+  - first:
+      213: -4418030093546575014
+    second: rei_queda_10
+  - first:
+      213: -4590492584842226129
+    second: rei_queda_11
+  - first:
+      213: 69120311427703706
+    second: rei_queda_12
+  - first:
+      213: -9091606329065007305
+    second: rei_queda_13
+  - first:
+      213: -6221196426462807960
+    second: rei_queda_14
+  - first:
+      213: -4757948754369293988
+    second: rei_queda_15
+  - first:
+      213: -1143936837602062489
+    second: rei_queda_16
+  - first:
+      213: 4281246721684448538
+    second: rei_queda_17
+  - first:
+      213: -6070283853133331210
+    second: rei_queda_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: rei_queda_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e072ddabdffed43d0800000000000000
+      internalID: -3220654285459216626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_1
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07794ebc32abf7140800000000000000
+      internalID: 4719695597414946672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_2
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0484632a98016f5f0800000000000000
+      internalID: -723372506828355520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_3
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c8345995e09d8c50800000000000000
+      internalID: 6669145938999916736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_4
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54eeb657c1c9dab40800000000000000
+      internalID: 5453186369858563653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_5
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57117a0ed91a1e3f0800000000000000
+      internalID: -873239153282182795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_6
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfa7621d8b2e28b90800000000000000
+      internalID: -7240975967447516421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_7
+      rect:
+        serializedVersion: 2
+        x: 826
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8c2f1df5e369a2f0800000000000000
+      internalID: -961127206021550961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_8
+      rect:
+        serializedVersion: 2
+        x: 944
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81743d2e64a968340800000000000000
+      internalID: 4865746076664284952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_9
+      rect:
+        serializedVersion: 2
+        x: 1062
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ecb747c1a8a49300800000000000000
+      internalID: 258016491453529318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_10
+      rect:
+        serializedVersion: 2
+        x: 1180
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5bab23a90100b2c0800000000000000
+      internalID: -4418030093546575014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_11
+      rect:
+        serializedVersion: 2
+        x: 1298
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f261a68c05b4b40c0800000000000000
+      internalID: -4590492584842226129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_12
+      rect:
+        serializedVersion: 2
+        x: 1416
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a93a9699e8095f000800000000000000
+      internalID: 69120311427703706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_13
+      rect:
+        serializedVersion: 2
+        x: 1534
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 737136e863024d180800000000000000
+      internalID: -9091606329065007305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_14
+      rect:
+        serializedVersion: 2
+        x: 1652
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86831cabfced9a9a0800000000000000
+      internalID: -6221196426462807960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_15
+      rect:
+        serializedVersion: 2
+        x: 1770
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c515e4c01de58fdb0800000000000000
+      internalID: -4757948754369293988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: rei_queda_16
+      rect:
+        serializedVersion: 2
+        x: 1888
+        y: 0
+        width: 118
+        height: 129
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 76fce3dc18bef10f0800000000000000
+      internalID: -1143936837602062489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Rei_queda_0: -1944345202917325795
+      Rei_queda_1: -4217477032884992015
+      Rei_queda_10: -2870738169101888686
+      Rei_queda_11: -3643356322770263371
+      Rei_queda_12: 1257094599521763264
+      Rei_queda_13: -1943839617160645073
+      Rei_queda_14: 8357330021833258327
+      Rei_queda_15: 7692525009984211337
+      Rei_queda_16: 773115007625936699
+      Rei_queda_17: 7286346079935435117
+      Rei_queda_18: -5373966550693678404
+      Rei_queda_19: -6718014928441230835
+      Rei_queda_2: -5109940596972196090
+      Rei_queda_20: -5100453903219455726
+      Rei_queda_21: -3539849810082129610
+      Rei_queda_22: 6034692996477140442
+      Rei_queda_23: -5964408040034271846
+      Rei_queda_24: 8516136373516677459
+      Rei_queda_25: -210021662045992346
+      Rei_queda_26: 2240330627404788325
+      Rei_queda_27: 5101258165315109977
+      Rei_queda_28: -4734711274358577419
+      Rei_queda_29: -6411563643272435066
+      Rei_queda_3: 7260701402718368162
+      Rei_queda_30: -2796296049654444575
+      Rei_queda_31: -3101389692056170758
+      Rei_queda_32: 2274895951777940312
+      Rei_queda_33: -7304087369316701792
+      Rei_queda_4: 4630313336971341218
+      Rei_queda_5: -6398271884349099946
+      Rei_queda_6: 4622564321749046540
+      Rei_queda_7: 7124225328926473887
+      Rei_queda_8: 6297913079236145824
+      Rei_queda_9: -5165126884095103390
+      rei_queda_0: -3220654285459216626
+      rei_queda_1: 4719695597414946672
+      rei_queda_10: -4418030093546575014
+      rei_queda_11: -4590492584842226129
+      rei_queda_12: 69120311427703706
+      rei_queda_13: -9091606329065007305
+      rei_queda_14: -6221196426462807960
+      rei_queda_15: -4757948754369293988
+      rei_queda_16: -1143936837602062489
+      rei_queda_17: 4281246721684448538
+      rei_queda_18: -6070283853133331210
+      rei_queda_2: -723372506828355520
+      rei_queda_3: 6669145938999916736
+      rei_queda_4: 5453186369858563653
+      rei_queda_5: -873239153282182795
+      rei_queda_6: -7240975967447516421
+      rei_queda_7: -961127206021550961
+      rei_queda_8: 4865746076664284952
+      rei_queda_9: 258016491453529318
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

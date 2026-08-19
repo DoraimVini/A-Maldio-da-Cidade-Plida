@@ -52,8 +52,19 @@ namespace FavelaAmarela.EditorTools
         /// <c>transform.position.y + offsetPes</c>, e com <c>offsetPes = 0</c> isso só está
         /// certo se o pivô estiver nos pés.</para>
         /// </summary>
+        /// <param name="tamanhoMaximo">
+        /// Teto de resolução do import. O padrão da Unity é <b>2048</b>, e uma folha mais larga
+        /// que isso é <b>reescalada em silêncio</b> — pixel art borrada, sem aviso nenhum.
+        ///
+        /// <para><b>Aviso a quem for usar isto para escapar do teto:</b> subir este valor
+        /// <b>não resolveu</b> no caso do Rei em Amarelo. Nem <c>importer.maxTextureSize</c> nem
+        /// <c>SetPlatformTextureSettings("DefaultTexturePlatform")</c> chegaram a escrever o
+        /// <c>maxTextureSize</c> do topo do <c>.meta</c>, que continuou em 2048 — conferido no
+        /// arquivo, não no log. A saída foi eliminar a causa: empacotar folhas que já cabem.</para>
+        /// </param>
         public static bool FatiarFolha(string caminho, string prefixo, int larguraDoQuadro,
-                                       int alturaDoQuadro, IEnumerable<Faixa> faixas)
+                                       int alturaDoQuadro, IEnumerable<Faixa> faixas,
+                                       int tamanhoMaximo = 2048)
         {
             var importer = AssetImporter.GetAtPath(caminho) as TextureImporter;
             if (importer == null)
@@ -69,11 +80,18 @@ namespace FavelaAmarela.EditorTools
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.alphaIsTransparency = true;
             importer.mipmapEnabled = false;
+            importer.maxTextureSize = tamanhoMaximo;
 
-            foreach (string plataforma in new[] { "Standalone", "WebGL", "WindowsStoreApps" })
+            // DefaultTexturePlatform PRECISA estar na lista: os blocos por plataforma nascem com
+            // `overridden: 0`, ou seja, inertes — quem governa de fato é o default. Sem ele,
+            // atribuir `importer.maxTextureSize` deixava o topo do .meta em 2048 e a Unity
+            // reescalava as folhas de 2805px e 3135px do Rei em silêncio, borrando a pixel art.
+            foreach (string plataforma in new[]
+                     { "DefaultTexturePlatform", "Standalone", "WebGL", "WindowsStoreApps" })
             {
                 var ps = importer.GetPlatformTextureSettings(plataforma);
                 ps.textureCompression = TextureImporterCompression.Uncompressed;
+                ps.maxTextureSize = tamanhoMaximo;
                 importer.SetPlatformTextureSettings(ps);
             }
 

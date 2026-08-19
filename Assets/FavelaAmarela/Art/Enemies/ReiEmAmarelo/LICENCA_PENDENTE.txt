@@ -1,0 +1,17 @@
+LICENCA PENDENTE - Moonstone Keeper / Eldermoon Grove, por SUCART
+=================================================================
+
+O pacote baixado (Moonstone_Keeper Eldermoon_Grove - By SUCART.zip) NAO
+CONTEM arquivo de licenca. Conferido no zip em 2026-08-19: so ha .png e .gif,
+nenhum .txt, .md ou .pdf com termos.
+
+A arte esta em uso sob a autorizacao geral do Vini para os assets baixados
+("todos os assets baixados podem ser usados, sao de licenca aberta").
+
+O QUE FALTA ANTES DA SUBMISSAO DO EDITAL:
+capturar os termos da pagina do autor (itch.io) e salvar o texto AQUI, do
+mesmo jeito que foi feito com LICENCA_AshDeal.txt para o Abdul. Um link nao
+basta: pode sair do ar, mudar, ou nao valer como prova na submissao.
+
+Enquanto este arquivo existir com este conteudo, a arte do Rei em Amarelo e
+um placeholder de licenca nao comprovada.

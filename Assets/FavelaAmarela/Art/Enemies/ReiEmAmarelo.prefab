@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5503603534143902542}
   - component: {fileID: 3391826082878673162}
   - component: {fileID: 4654559023530953403}
+  - component: {fileID: 2402154893393499738}
   m_Layer: 6
   m_Name: ReiEmAmarelo
   m_TagString: Untagged
@@ -84,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 3e211d1da14419c4dbc28ad5380bdb1a, type: 3}
+  m_Sprite: {fileID: 5190009029928329710, guid: 43d9a59f6f8e0ea4ebca4f6fe02e9f86, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -168,3 +169,26 @@ MonoBehaviour:
   corSelando: {r: 0.7, g: 0.6, b: 0.2, a: 1}
   corDesvelado: {r: 0.9, g: 0.1, b: 0.1, a: 1}
   corSelado: {r: 0.9, g: 0.85, b: 0.6, a: 1}
+  animator: {fileID: 0}
+--- !u!95 &2402154893393499738
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635383446983437150}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: be46412a9277d9e4ba2e454f4683be8b, type: 2}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
