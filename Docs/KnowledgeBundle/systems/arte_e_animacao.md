@@ -143,9 +143,19 @@ Medidos, não lidos pelo nome. **Nenhum foi importado ainda.**
 
 ## 4.2 Estado em 2026-08-19 (fim do dia) — os três chefes animam
 
+> ⚠️ **Correção de 2026-08-19:** a linha do Byakhee abaixo dizia que eu tinha ligado a
+> animação dele. **Ele já animava antes** — pelo `AnimadorDoByakhee`, um `MonoBehaviour` que lê
+> a `ByakheeFSM` e troca o sprite, sem `AnimatorController`. Minha auditoria procurou por
+> `AnimationClip` e por componente `Animator`, não achou nenhum e concluiu errado. Montei
+> clipes e um controller **por cima** do componente existente, e os dois passaram a escrever no
+> mesmo `SpriteRenderer`. Revertido: os clipes, o controller e o Animator saíram; ficou só a
+> correção de pivô, que era um defeito real e independente.
+>
+> A lição vale para o resto: **procurar por `Animator` não é procurar por animação.**
+
 | chefe | arte | animação |
 |---|---|---|
-| **Byakhee** | folha própria, 26 quadros (já estava certa) | ✅ 6 clipes, `Byakhee_AC`, dirigido por `HandleEstadoMudou` |
+| **Byakhee** | folha própria, 26 quadros (já estava certa) | ✅ **já animava** — `AnimadorDoByakhee`, com aceleração no Frenesi e reação a dano |
 | **Abdul Alhazred** | **trocado** pelo *Mage* do Horror Enemy Pack (AshDeal), 29 quadros de 112×48 | ✅ 5 clipes, `Abdul_AC_Mage`, gatilhos em conjurar/invocar/apanhar/morrer |
 | **Rei em Amarelo** | **trocado** pelo *Moonstone Keeper* (SUCART) | ✅ 5 clipes, `ReiEmAmarelo_AC`, dirigido por estado + `OnReliquiaAtivada` |
 

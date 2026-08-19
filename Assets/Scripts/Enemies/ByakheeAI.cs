@@ -52,11 +52,6 @@ namespace FavelaAmarela.Runtime.Enemies
         [SerializeField] private Color corPousado = new Color(0.85f, 0.75f, 0.25f);
         [SerializeField] private Color corFrenesi = new Color(0.85f, 0.20f, 0.15f);
 
-        [Header("Animação")]
-        [Tooltip("Animator com o Byakhee_AC. Se ficar vazio, o boss desenha o quadro parado — " +
-                 "degrada para 'mais simples', nunca para 'invisível'.")]
-        [SerializeField] private Animator animator;
-
         private ByakheeFSM _fsm;
         private EnemyBase _enemyBase;
         private SpriteRenderer _sprite;
@@ -78,8 +73,6 @@ namespace FavelaAmarela.Runtime.Enemies
             _enemyBase = GetComponent<EnemyBase>();
             _sprite = GetComponent<SpriteRenderer>();
             _rb = GetComponent<Rigidbody2D>();
-
-            if (animator == null) animator = GetComponent<Animator>();
 
             _rb.gravityScale = 0f;
             _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -112,7 +105,6 @@ namespace FavelaAmarela.Runtime.Enemies
                 Debug.LogError("[Byakhee] Damião sem ResilienciaBridge — o grito infrassônico, " +
                                "que é o relógio da luta, não vai drenar nada.", this);
             _enemyBase.OnAbatido += HandleAbatido;
-            _enemyBase.OnDanoSofrido += HandleDanoSofrido;
         }
 
         private void OnDestroy()
@@ -124,11 +116,7 @@ namespace FavelaAmarela.Runtime.Enemies
                 _fsm.OnDerrotado -= HandleDerrotado;
             }
 
-            if (_enemyBase != null)
-            {
-                _enemyBase.OnAbatido -= HandleAbatido;
-                _enemyBase.OnDanoSofrido -= HandleDanoSofrido;
-            }
+            if (_enemyBase != null) _enemyBase.OnAbatido -= HandleAbatido;
         }
 
         /// <summary>Desce dos Portões e começa a luta. Chamado pelo gatilho da arena.</summary>
@@ -237,63 +225,6 @@ namespace FavelaAmarela.Runtime.Enemies
                 ByakheeState.Frenesi => corFrenesi,
                 _ => corNoAr
             };
-
-            TocarAnimacaoDo(atual);
-        }
-
-        /// <summary>
-        /// Põe o Animator no clipe do estado. <b>Quem manda é a FSM</b> — por isso o
-        /// <c>Byakhee_AC</c> não tem teia de transições com condições: duplicar a lógica de
-        /// estado lá criaria uma segunda fonte de verdade, que divergiria desta em silêncio.
-        ///
-        /// <para><c>Circundando</c> e <c>Frenesi</c> reaproveitam <c>rasante</c>: nos dois ele
-        /// está no ar em deslocamento, e a folha não tem quadros próprios para eles. A leitura
-        /// de qual é qual continua vindo da cor (<c>corFrenesi</c>), como antes.</para>
-        /// </summary>
-        private void TocarAnimacaoDo(ByakheeState estado)
-        {
-            if (animator == null || animator.runtimeAnimatorController == null) return;
-
-            int clipe = estado switch
-            {
-                ByakheeState.Rasante => Anim.Rasante,
-                ByakheeState.MergulhoDeGarras => Anim.Garras,
-                ByakheeState.GritoDirecionado => Anim.Grito,
-                ByakheeState.Derrotado => Anim.Derrota,
-                ByakheeState.Circundando => Anim.Rasante,
-                ByakheeState.Frenesi => Anim.Rasante,
-                _ => Anim.Espreita,
-            };
-
-            animator.Play(clipe, 0, 0f);
-        }
-
-        /// <summary>
-        /// Piscada de dano. Só interrompe se ele ainda estiver vivo: depois de
-        /// <see cref="ByakheeState.Derrotado"/> o corpo fica no último quadro da queda, e um
-        /// golpe no cadáver não pode ressuscitar a animação.
-        /// </summary>
-        private void HandleDanoSofrido(float _)
-        {
-            if (animator == null || animator.runtimeAnimatorController == null) return;
-            if (_fsm != null && _fsm.CurrentState == ByakheeState.Derrotado) return;
-
-            animator.Play(Anim.Dano, 0, 0f);
-        }
-
-        /// <summary>
-        /// Hashes dos estados do <c>Byakhee_AC</c>. <c>Animator.StringToHash</c> resolvido uma
-        /// vez em campo estático: <see cref="TocarAnimacaoDo"/> é chamado a cada troca de estado
-        /// da luta, e a Regra de Ouro 1 proíbe alocar string em caminho quente.
-        /// </summary>
-        private static class Anim
-        {
-            internal static readonly int Espreita = Animator.StringToHash("espreita");
-            internal static readonly int Rasante = Animator.StringToHash("rasante");
-            internal static readonly int Garras = Animator.StringToHash("garras");
-            internal static readonly int Grito = Animator.StringToHash("grito");
-            internal static readonly int Dano = Animator.StringToHash("dano");
-            internal static readonly int Derrota = Animator.StringToHash("derrota");
         }
 
         /// <summary>
