@@ -199,6 +199,10 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             _companheiro = companheiro;
         }
+        [Header("Animação")]
+        [Tooltip("Animator com o Abdul_AC_Mage. Vazio: o boss desenha o quadro parado, como antes.")]
+        [SerializeField] private Animator animator;
+
         private SpriteRenderer _spriteRenderer;
 
         /// <summary>FSM da luta. Null antes do Awake.</summary>
@@ -214,6 +218,8 @@ namespace FavelaAmarela.Runtime.Enemies
         private void Awake()
         {
             _spriteRenderer = GetComponent<SpriteRenderer>();
+
+            if (animator == null) animator = GetComponent<Animator>();
 
             if (ficha == null)
             {
@@ -505,6 +511,10 @@ namespace FavelaAmarela.Runtime.Enemies
 
             _vitalidade.Ferir(danoFinal);
 
+            // Piscada de dano. Não interrompe se o golpe já o abateu: a FSM vai trocar para
+            // Derrotado no AtualizarFracaoDeVida abaixo, e 'hit' passaria por cima da morte.
+            if (!_vitalidade.EstaAbatido) TocarAnimacao(Anim.Hit);
+
             if (mostrarNumerosDeDano)
                 DanoFlutuante.Mostrar(transform.position, danoFinal, corDoDano);
 
@@ -523,6 +533,8 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void HandleInvocarEsqueletos()
         {
+            TocarAnimacao(Anim.Attack);
+
             // Antes este `return` era mudo ("sem arte ainda"), o que escondia a causa quando
             // os esqueletos não apareciam em playtest: nada no console, nada na tela.
             if (prefabEsqueleto == null)
@@ -571,6 +583,10 @@ namespace FavelaAmarela.Runtime.Enemies
         /// </summary>
         private void HandleConjurarConeDeGelo()
         {
+            // Antes do guard do prefab de propósito: a conjuração acontece na ficção mesmo que
+            // o projétil não exista, e ver o boss erguer os braços é o aviso que o jogador lê.
+            TocarAnimacao(Anim.Attack);
+
             if (prefabConeDeGelo == null) return; // sem arte ainda: a luta segue sem cones
 
             var go = Instantiate(prefabConeDeGelo, transform.position, Quaternion.identity);
@@ -694,6 +710,42 @@ namespace FavelaAmarela.Runtime.Enemies
             {
                 RemoverPedrasRestantes();
             }
+
+            // Derrotado tem clipe próprio; todo o resto é a figura parada. O Abdul não anda
+            // nem teleporta (verificado no AbdulFSM), então 'walk' fica sem consumidor.
+            TocarAnimacao(novo == AbdulState.Derrotado ? Anim.Death : Anim.Idle);
+        }
+
+        /// <summary>
+        /// Põe o Animator num clipe. <b>Quem manda no estado é a <c>AbdulFSM</c></b> — por isso
+        /// o <c>Abdul_AC_Mage</c> não tem teia de transições com condições: duplicar a lógica de
+        /// fase lá criaria uma segunda fonte de verdade, divergindo desta em silêncio.
+        ///
+        /// <para>Degrada em silêncio de propósito: sem Animator (ou sem controller), o boss
+        /// desenha o quadro parado, como antes. "Mais simples", nunca "invisível".</para>
+        /// </summary>
+        private void TocarAnimacao(int clipe)
+        {
+            if (animator == null || animator.runtimeAnimatorController == null) return;
+            animator.Play(clipe, 0, 0f);
+        }
+
+        /// <summary>
+        /// Hashes do <c>Abdul_AC_Mage</c>, resolvidos uma vez: <see cref="TocarAnimacao"/> é
+        /// chamado a cada conjuração e a cada golpe recebido, e a Regra de Ouro 1 proíbe alocar
+        /// string em caminho quente.
+        ///
+        /// <para><c>Attack</c> serve tanto a <see cref="HandleConjurarConeDeGelo"/> quanto a
+        /// <see cref="HandleInvocarEsqueletos"/>: a folha do Mage não tem clipe separado de
+        /// invocação, e nas duas ele ergue os braços. Inventar um clipe de invocação seria
+        /// inventar arte que não existe.</para>
+        /// </summary>
+        private static class Anim
+        {
+            internal static readonly int Idle = Animator.StringToHash("idle");
+            internal static readonly int Attack = Animator.StringToHash("attack");
+            internal static readonly int Hit = Animator.StringToHash("hit");
+            internal static readonly int Death = Animator.StringToHash("death");
         }
 
         private void InvocarPedrasDePoder()

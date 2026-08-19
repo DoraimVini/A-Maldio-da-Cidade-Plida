@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6792242425801775998}
   - component: {fileID: 3695343334338554330}
   - component: {fileID: 5148482380955577737}
+  - component: {fileID: 6308427301270354659}
   m_Layer: 6
   m_Name: Abdul_Alhazred
   m_TagString: Untagged
@@ -84,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -8471483385537756339, guid: e62ac4429fb7f934db4bf37a28675084, type: 3}
+  m_Sprite: {fileID: -7111182527434469132, guid: ee9107a403a8f1041aefd97c23f18992, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 1
   m_FlipY: 0
@@ -131,8 +132,8 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0.79999924}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 4, y: 4}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 3.5310345, y: 1.5}
     newSize: {x: 4, y: 4}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -186,6 +187,7 @@ MonoBehaviour:
   mostrarNumerosDeDano: 1
   corDoDano: {r: 0.7, g: 0.9, b: 1, a: 1}
   corDoSangramento: {r: 0.85, g: 0.15, b: 0.2, a: 1}
+  animator: {fileID: 0}
 --- !u!114 &5148482380955577737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,3 +202,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.DynamicYSort
   fator: 10
   offsetPes: 0
+--- !u!95 &6308427301270354659
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629304085953094325}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8a08424e545006642869a89ef86f325a, type: 2}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

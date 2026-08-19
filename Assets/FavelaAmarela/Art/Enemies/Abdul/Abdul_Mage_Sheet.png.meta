@@ -1,0 +1,1213 @@
+fileFormatVersion: 2
+guid: ee9107a403a8f1041aefd97c23f18992
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2032616139756012525
+    second: Abdul_Mage_Sheet_0
+  - first:
+      213: 8677458846470641238
+    second: Abdul_Mage_Sheet_1
+  - first:
+      213: 2016988602073500352
+    second: Abdul_Mage_Sheet_2
+  - first:
+      213: -8690222237538129858
+    second: Abdul_Mage_Sheet_3
+  - first:
+      213: 4180756371044164464
+    second: Abdul_Mage_Sheet_4
+  - first:
+      213: -1895621974787718061
+    second: Abdul_Mage_Sheet_5
+  - first:
+      213: -2429540576464075670
+    second: Abdul_Mage_Sheet_6
+  - first:
+      213: -7890501038247342289
+    second: Abdul_Mage_Sheet_7
+  - first:
+      213: 1450526051702001990
+    second: Abdul_Mage_Sheet_8
+  - first:
+      213: 4246246017318786859
+    second: Abdul_Mage_Sheet_9
+  - first:
+      213: 5433484418147818353
+    second: Abdul_Mage_Sheet_10
+  - first:
+      213: -7736979070684611
+    second: Abdul_Mage_Sheet_11
+  - first:
+      213: -114886327638537062
+    second: Abdul_Mage_Sheet_12
+  - first:
+      213: -2548644375156013431
+    second: Abdul_Mage_Sheet_13
+  - first:
+      213: 8610728580747240235
+    second: Abdul_Mage_Sheet_14
+  - first:
+      213: 799160260114210248
+    second: Abdul_Mage_Sheet_15
+  - first:
+      213: -6967640580867029706
+    second: Abdul_Mage_Sheet_16
+  - first:
+      213: -7121720888188107111
+    second: Abdul_Mage_Sheet_17
+  - first:
+      213: 186676084149127909
+    second: Abdul_Mage_Sheet_18
+  - first:
+      213: -1277581805979721289
+    second: Abdul_Mage_Sheet_19
+  - first:
+      213: 1196189176984474411
+    second: Abdul_Mage_Sheet_20
+  - first:
+      213: 7288576435599745148
+    second: Abdul_Mage_Sheet_21
+  - first:
+      213: 5437509028376486687
+    second: Abdul_Mage_Sheet_22
+  - first:
+      213: 4119320450495242151
+    second: Abdul_Mage_Sheet_23
+  - first:
+      213: 6777331389359628144
+    second: Abdul_Mage_Sheet_24
+  - first:
+      213: -6840549520107359856
+    second: Abdul_Mage_Sheet_25
+  - first:
+      213: -1014551552312305440
+    second: Abdul_Mage_Sheet_26
+  - first:
+      213: -3213876788951947733
+    second: Abdul_Mage_Sheet_27
+  - first:
+      213: 40440610259372494
+    second: Abdul_Mage_Sheet_28
+  - first:
+      213: -8917673881076272951
+    second: Abdul_Mage_Sheet_29
+  - first:
+      213: 5701842822479427786
+    second: Abdul_Mage_Sheet_30
+  - first:
+      213: 2357343302909196838
+    second: Abdul_Mage_Sheet_31
+  - first:
+      213: 4969991440612294879
+    second: Abdul_Mage_Sheet_32
+  - first:
+      213: -1932582066559113518
+    second: Abdul_Mage_Sheet_33
+  - first:
+      213: 1938681772182908656
+    second: Abdul_Mage_Sheet_34
+  - first:
+      213: 8344095601419260059
+    second: Abdul_Mage_Sheet_35
+  - first:
+      213: -5639083298777106510
+    second: Abdul_Mage_Sheet_36
+  - first:
+      213: -6578908212923563132
+    second: Abdul_Mage_Sheet_37
+  - first:
+      213: 1303449195082748241
+    second: Abdul_Mage_Sheet_38
+  - first:
+      213: 1305571495012447187
+    second: Abdul_Mage_Sheet_39
+  - first:
+      213: 7662190322768415303
+    second: Abdul_Mage_Sheet_40
+  - first:
+      213: 6651300771971777471
+    second: Abdul_Mage_Sheet_41
+  - first:
+      213: 1167999459800888348
+    second: Abdul_Mage_Sheet_42
+  - first:
+      213: -2392008303374056540
+    second: Abdul_Mage_Sheet_43
+  - first:
+      213: 725430603487153920
+    second: Abdul_Mage_Sheet_44
+  - first:
+      213: 7847475307038952045
+    second: Abdul_Mage_Sheet_45
+  - first:
+      213: 4834561033607620232
+    second: Abdul_Mage_Sheet_46
+  - first:
+      213: 6288184659171930062
+    second: Abdul_Mage_Sheet_47
+  - first:
+      213: 8267998598646154083
+    second: Abdul_Mage_Sheet_48
+  - first:
+      213: 8117164185164470514
+    second: Abdul_Mage_Sheet_49
+  - first:
+      213: 6658953069072060333
+    second: Abdul_Mage_Sheet_50
+  - first:
+      213: 8275277616442405323
+    second: Abdul_Mage_Sheet_51
+  - first:
+      213: -4336180295776572585
+    second: Abdul_Mage_Sheet_52
+  - first:
+      213: -4295455290491432265
+    second: Abdul_Mage_Sheet_53
+  - first:
+      213: -1676093067120745420
+    second: Abdul_Mage_Sheet_54
+  - first:
+      213: -2414682586349053
+    second: Abdul_Mage_Sheet_55
+  - first:
+      213: -4570109461682539973
+    second: Abdul_Mage_Sheet_56
+  - first:
+      213: -3634830857202974458
+    second: Abdul_Mage_Sheet_57
+  - first:
+      213: -2279156172147251025
+    second: Abdul_Mage_Sheet_58
+  - first:
+      213: -2966012962630970282
+    second: Abdul_Mage_Sheet_59
+  - first:
+      213: -6812526051624088320
+    second: Abdul_Mage_Sheet_60
+  - first:
+      213: -3339994236638273368
+    second: Abdul_Mage_Sheet_61
+  - first:
+      213: -9111866348103275596
+    second: Abdul_Mage_Sheet_62
+  - first:
+      213: 8435075857065841605
+    second: Abdul_Mage_Sheet_63
+  - first:
+      213: 6922543793439405644
+    second: Abdul_Mage_Sheet_64
+  - first:
+      213: 7313610113004883216
+    second: Abdul_Mage_Sheet_65
+  - first:
+      213: 3707485866777254922
+    second: Abdul_Mage_Sheet_66
+  - first:
+      213: 948027138327151615
+    second: Abdul_Mage_Sheet_67
+  - first:
+      213: 5835190610483268014
+    second: Abdul_Mage_Sheet_68
+  - first:
+      213: 2631125581164006870
+    second: Abdul_Mage_Sheet_69
+  - first:
+      213: 3944762549566705835
+    second: Abdul_Mage_Sheet_70
+  - first:
+      213: 2381073233802924982
+    second: Abdul_Mage_Sheet_71
+  - first:
+      213: 8978625972441605443
+    second: Abdul_Mage_Sheet_72
+  - first:
+      213: -2656173345946133658
+    second: Abdul_Mage_Sheet_73
+  - first:
+      213: -3860814265520950242
+    second: Abdul_Mage_Sheet_74
+  - first:
+      213: -1493211287068204556
+    second: Abdul_Mage_Sheet_75
+  - first:
+      213: 1546208516849910147
+    second: Abdul_Mage_Sheet_76
+  - first:
+      213: 540690982889415071
+    second: Abdul_Mage_Sheet_77
+  - first:
+      213: 1390604710925256592
+    second: Abdul_Mage_Sheet_78
+  - first:
+      213: -7111182527434469132
+    second: abdul_idle_0
+  - first:
+      213: 357316855914402071
+    second: abdul_idle_1
+  - first:
+      213: 5493074760776516158
+    second: abdul_idle_2
+  - first:
+      213: 8000013491075007203
+    second: abdul_idle_3
+  - first:
+      213: -2195444586047260738
+    second: abdul_walk_0
+  - first:
+      213: -1077714418283656539
+    second: abdul_walk_1
+  - first:
+      213: 5220857154177745126
+    second: abdul_walk_2
+  - first:
+      213: 4140847038372593358
+    second: abdul_walk_3
+  - first:
+      213: -7725000721015135736
+    second: abdul_attack_0
+  - first:
+      213: -2282983116231508878
+    second: abdul_attack_1
+  - first:
+      213: -3796845584746193508
+    second: abdul_attack_2
+  - first:
+      213: 2961031586836156641
+    second: abdul_attack_3
+  - first:
+      213: 6926628418971361972
+    second: abdul_attack_4
+  - first:
+      213: -1982884551326626754
+    second: abdul_attack_5
+  - first:
+      213: -8605748097240412378
+    second: abdul_attack_6
+  - first:
+      213: -4135612771696862026
+    second: abdul_attack_7
+  - first:
+      213: -2004475197749454783
+    second: abdul_attack_8
+  - first:
+      213: 4246652965918567945
+    second: abdul_attack_9
+  - first:
+      213: 1239814979418929215
+    second: abdul_hit_0
+  - first:
+      213: -1630759015417258345
+    second: abdul_hit_1
+  - first:
+      213: -2855652584634156556
+    second: abdul_death_0
+  - first:
+      213: -5499873283679400233
+    second: abdul_death_1
+  - first:
+      213: 4722358368800293097
+    second: abdul_death_2
+  - first:
+      213: 6554210918702373632
+    second: abdul_death_3
+  - first:
+      213: 2925390635458148514
+    second: abdul_death_4
+  - first:
+      213: -8469449131982320383
+    second: abdul_death_5
+  - first:
+      213: 1159432427985378494
+    second: abdul_death_6
+  - first:
+      213: 6983641547514005178
+    second: abdul_death_7
+  - first:
+      213: 5104315586360981654
+    second: abdul_death_8
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: abdul_idle_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f0dd4ffa21005d90800000000000000
+      internalID: -7111182527434469132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_idle_1
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 711990d89c175f400800000000000000
+      internalID: 357316855914402071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_idle_2
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e328fb034625b3c40800000000000000
+      internalID: 5493074760776516158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_idle_3
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e2cbdd52e1c50f60800000000000000
+      internalID: 8000013491075007203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_walk_0
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb7399ce7c63881e0800000000000000
+      internalID: -2195444586047260738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_walk_1
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5aac2e052703b01f0800000000000000
+      internalID: -1077714418283656539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_walk_2
+      rect:
+        serializedVersion: 2
+        x: 672
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e042d1abe5347840800000000000000
+      internalID: 5220857154177745126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_walk_3
+      rect:
+        serializedVersion: 2
+        x: 784
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ece3d67317e377930800000000000000
+      internalID: 4140847038372593358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_0
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 802a146e5c84bc490800000000000000
+      internalID: -7725000721015135736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_1
+      rect:
+        serializedVersion: 2
+        x: 1008
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27c7ec893f63150e0800000000000000
+      internalID: -2282983116231508878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_2
+      rect:
+        serializedVersion: 2
+        x: 1120
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9d5136ae05ee4bc0800000000000000
+      internalID: -3796845584746193508
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_3
+      rect:
+        serializedVersion: 2
+        x: 1232
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e0941e3a82b71920800000000000000
+      internalID: 2961031586836156641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_4
+      rect:
+        serializedVersion: 2
+        x: 1344
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b2e9e329d3502060800000000000000
+      internalID: 6926628418971361972
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_5
+      rect:
+        serializedVersion: 2
+        x: 1456
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3c019f91016b74e0800000000000000
+      internalID: -1982884551326626754
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_6
+      rect:
+        serializedVersion: 2
+        x: 1568
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62fcd7563bd329880800000000000000
+      internalID: -8605748097240412378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_7
+      rect:
+        serializedVersion: 2
+        x: 1680
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bc9076781a5b96c0800000000000000
+      internalID: -4135612771696862026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_8
+      rect:
+        serializedVersion: 2
+        x: 1792
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14810158d6cae24e0800000000000000
+      internalID: -2004475197749454783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_attack_9
+      rect:
+        serializedVersion: 2
+        x: 1904
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90e6fed6f542fea30800000000000000
+      internalID: 4246652965918567945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_hit_0
+      rect:
+        serializedVersion: 2
+        x: 2016
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f38397ba725b43110800000000000000
+      internalID: 1239814979418929215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_hit_1
+      rect:
+        serializedVersion: 2
+        x: 2128
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79ed9cbc0516e59e0800000000000000
+      internalID: -1630759015417258345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_0
+      rect:
+        serializedVersion: 2
+        x: 2240
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f974faaa1fae58d0800000000000000
+      internalID: -2855652584634156556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_1
+      rect:
+        serializedVersion: 2
+        x: 2352
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7dec0a853668ca3b0800000000000000
+      internalID: -5499873283679400233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_2
+      rect:
+        serializedVersion: 2
+        x: 2464
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e04f629aef298140800000000000000
+      internalID: 4722358368800293097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_3
+      rect:
+        serializedVersion: 2
+        x: 2576
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00bdd38da1c35fa50800000000000000
+      internalID: 6554210918702373632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_4
+      rect:
+        serializedVersion: 2
+        x: 2688
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a8bcb79843199820800000000000000
+      internalID: 2925390635458148514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_5
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10d04f433e8767a80800000000000000
+      internalID: -8469449131982320383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_6
+      rect:
+        serializedVersion: 2
+        x: 2912
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebc132b76a1271010800000000000000
+      internalID: 1159432427985378494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_7
+      rect:
+        serializedVersion: 2
+        x: 3024
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab64b3e8cf0eae060800000000000000
+      internalID: 6983641547514005178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abdul_death_8
+      rect:
+        serializedVersion: 2
+        x: 3136
+        y: 0
+        width: 112
+        height: 48
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69839826bfb26d640800000000000000
+      internalID: 5104315586360981654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Abdul_Mage_Sheet_0: -2032616139756012525
+      Abdul_Mage_Sheet_1: 8677458846470641238
+      Abdul_Mage_Sheet_10: 5433484418147818353
+      Abdul_Mage_Sheet_11: -7736979070684611
+      Abdul_Mage_Sheet_12: -114886327638537062
+      Abdul_Mage_Sheet_13: -2548644375156013431
+      Abdul_Mage_Sheet_14: 8610728580747240235
+      Abdul_Mage_Sheet_15: 799160260114210248
+      Abdul_Mage_Sheet_16: -6967640580867029706
+      Abdul_Mage_Sheet_17: -7121720888188107111
+      Abdul_Mage_Sheet_18: 186676084149127909
+      Abdul_Mage_Sheet_19: -1277581805979721289
+      Abdul_Mage_Sheet_2: 2016988602073500352
+      Abdul_Mage_Sheet_20: 1196189176984474411
+      Abdul_Mage_Sheet_21: 7288576435599745148
+      Abdul_Mage_Sheet_22: 5437509028376486687
+      Abdul_Mage_Sheet_23: 4119320450495242151
+      Abdul_Mage_Sheet_24: 6777331389359628144
+      Abdul_Mage_Sheet_25: -6840549520107359856
+      Abdul_Mage_Sheet_26: -1014551552312305440
+      Abdul_Mage_Sheet_27: -3213876788951947733
+      Abdul_Mage_Sheet_28: 40440610259372494
+      Abdul_Mage_Sheet_29: -8917673881076272951
+      Abdul_Mage_Sheet_3: -8690222237538129858
+      Abdul_Mage_Sheet_30: 5701842822479427786
+      Abdul_Mage_Sheet_31: 2357343302909196838
+      Abdul_Mage_Sheet_32: 4969991440612294879
+      Abdul_Mage_Sheet_33: -1932582066559113518
+      Abdul_Mage_Sheet_34: 1938681772182908656
+      Abdul_Mage_Sheet_35: 8344095601419260059
+      Abdul_Mage_Sheet_36: -5639083298777106510
+      Abdul_Mage_Sheet_37: -6578908212923563132
+      Abdul_Mage_Sheet_38: 1303449195082748241
+      Abdul_Mage_Sheet_39: 1305571495012447187
+      Abdul_Mage_Sheet_4: 4180756371044164464
+      Abdul_Mage_Sheet_40: 7662190322768415303
+      Abdul_Mage_Sheet_41: 6651300771971777471
+      Abdul_Mage_Sheet_42: 1167999459800888348
+      Abdul_Mage_Sheet_43: -2392008303374056540
+      Abdul_Mage_Sheet_44: 725430603487153920
+      Abdul_Mage_Sheet_45: 7847475307038952045
+      Abdul_Mage_Sheet_46: 4834561033607620232
+      Abdul_Mage_Sheet_47: 6288184659171930062
+      Abdul_Mage_Sheet_48: 8267998598646154083
+      Abdul_Mage_Sheet_49: 8117164185164470514
+      Abdul_Mage_Sheet_5: -1895621974787718061
+      Abdul_Mage_Sheet_50: 6658953069072060333
+      Abdul_Mage_Sheet_51: 8275277616442405323
+      Abdul_Mage_Sheet_52: -4336180295776572585
+      Abdul_Mage_Sheet_53: -4295455290491432265
+      Abdul_Mage_Sheet_54: -1676093067120745420
+      Abdul_Mage_Sheet_55: -2414682586349053
+      Abdul_Mage_Sheet_56: -4570109461682539973
+      Abdul_Mage_Sheet_57: -3634830857202974458
+      Abdul_Mage_Sheet_58: -2279156172147251025
+      Abdul_Mage_Sheet_59: -2966012962630970282
+      Abdul_Mage_Sheet_6: -2429540576464075670
+      Abdul_Mage_Sheet_60: -6812526051624088320
+      Abdul_Mage_Sheet_61: -3339994236638273368
+      Abdul_Mage_Sheet_62: -9111866348103275596
+      Abdul_Mage_Sheet_63: 8435075857065841605
+      Abdul_Mage_Sheet_64: 6922543793439405644
+      Abdul_Mage_Sheet_65: 7313610113004883216
+      Abdul_Mage_Sheet_66: 3707485866777254922
+      Abdul_Mage_Sheet_67: 948027138327151615
+      Abdul_Mage_Sheet_68: 5835190610483268014
+      Abdul_Mage_Sheet_69: 2631125581164006870
+      Abdul_Mage_Sheet_7: -7890501038247342289
+      Abdul_Mage_Sheet_70: 3944762549566705835
+      Abdul_Mage_Sheet_71: 2381073233802924982
+      Abdul_Mage_Sheet_72: 8978625972441605443
+      Abdul_Mage_Sheet_73: -2656173345946133658
+      Abdul_Mage_Sheet_74: -3860814265520950242
+      Abdul_Mage_Sheet_75: -1493211287068204556
+      Abdul_Mage_Sheet_76: 1546208516849910147
+      Abdul_Mage_Sheet_77: 540690982889415071
+      Abdul_Mage_Sheet_78: 1390604710925256592
+      Abdul_Mage_Sheet_8: 1450526051702001990
+      Abdul_Mage_Sheet_9: 4246246017318786859
+      abdul_attack_0: -7725000721015135736
+      abdul_attack_1: -2282983116231508878
+      abdul_attack_2: -3796845584746193508
+      abdul_attack_3: 2961031586836156641
+      abdul_attack_4: 6926628418971361972
+      abdul_attack_5: -1982884551326626754
+      abdul_attack_6: -8605748097240412378
+      abdul_attack_7: -4135612771696862026
+      abdul_attack_8: -2004475197749454783
+      abdul_attack_9: 4246652965918567945
+      abdul_death_0: -2855652584634156556
+      abdul_death_1: -5499873283679400233
+      abdul_death_2: 4722358368800293097
+      abdul_death_3: 6554210918702373632
+      abdul_death_4: 2925390635458148514
+      abdul_death_5: -8469449131982320383
+      abdul_death_6: 1159432427985378494
+      abdul_death_7: 6983641547514005178
+      abdul_death_8: 5104315586360981654
+      abdul_hit_0: 1239814979418929215
+      abdul_hit_1: -1630759015417258345
+      abdul_idle_0: -7111182527434469132
+      abdul_idle_1: 357316855914402071
+      abdul_idle_2: 5493074760776516158
+      abdul_idle_3: 8000013491075007203
+      abdul_walk_0: -2195444586047260738
+      abdul_walk_1: -1077714418283656539
+      abdul_walk_2: 5220857154177745126
+      abdul_walk_3: 4140847038372593358
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
