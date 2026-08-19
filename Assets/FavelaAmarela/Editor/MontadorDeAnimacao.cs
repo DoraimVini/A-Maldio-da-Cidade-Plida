@@ -128,6 +128,62 @@ namespace FavelaAmarela.EditorTools
         }
 
         /// <summary>
+        /// Troca o pivô de uma folha <b>já fatiada</b>, preservando os retângulos e os nomes das
+        /// fatias existentes.
+        ///
+        /// <para>Existe para o caso do Byakhee: a folha dele foi fatiada por outra pessoa com
+        /// pivô <c>Center</c>, mas o <c>BoxCollider2D</c> do prefab foi dimensionado supondo
+        /// pivô no rodapé. Com <c>Center</c>, o colisor ficava <b>1,3 unidade acima da arte</b>;
+        /// e o <c>DynamicYSort</c> — que ordena por <c>transform.position.y + offsetPes</c> com
+        /// <c>offsetPes = 0</c> — ordenava pelo meio do sprite em vez dos pés.</para>
+        ///
+        /// <para>Refatiar do zero apagaria os nomes diegéticos que já estavam lá
+        /// (<c>byakhee_espreita_0</c>…) e quebraria os clipes que apontam para eles.</para>
+        ///
+        /// <para><b>O que a Unity grava:</b> pedindo <c>BottomCenter</c> (7) com pivô explícito,
+        /// ela serializa <c>alignment: 9</c> (<i>Custom</i>) e <c>pivot: {x: 0.5, y: 0}</c> — a
+        /// mesma coisa por outro caminho. Quem for escrever guarda para isto deve conferir o
+        /// <b>pivô</b>, não o enum; testar o enum reprova um import correto.</para>
+        /// </summary>
+        public static bool CorrigirPivoDasFatias(string caminho, SpriteAlignment alinhamento)
+        {
+            var importer = AssetImporter.GetAtPath(caminho) as TextureImporter;
+            if (importer == null)
+            {
+                Debug.LogError($"[MontadorDeAnimacao] Textura não encontrada em '{caminho}'.");
+                return false;
+            }
+
+#pragma warning disable CS0618
+            var fatias = importer.spritesheet;
+
+            if (fatias == null || fatias.Length == 0)
+            {
+                Debug.LogWarning($"[MontadorDeAnimacao] '{caminho}' não está fatiada — nada a corrigir.");
+                return false;
+            }
+
+            var pivo = alinhamento == SpriteAlignment.BottomCenter
+                ? new Vector2(0.5f, 0f)
+                : new Vector2(0.5f, 0.5f);
+
+            for (int i = 0; i < fatias.Length; i++)
+            {
+                fatias[i].alignment = (int)alinhamento;
+                fatias[i].pivot = pivo;
+            }
+
+            importer.spritesheet = fatias;
+#pragma warning restore CS0618
+
+            importer.SaveAndReimport();
+
+            Debug.Log($"[MontadorDeAnimacao] Pivô de {fatias.Length} fatia(s) de " +
+                      $"'{System.IO.Path.GetFileName(caminho)}' → {alinhamento}.");
+            return true;
+        }
+
+        /// <summary>
         /// Lê os sprites de uma folha já fatiada e agrupa por animação, a partir do nome.
         /// <c>abdul_attack_3</c> → grupo <c>attack</c>, índice 3.
         /// </summary>

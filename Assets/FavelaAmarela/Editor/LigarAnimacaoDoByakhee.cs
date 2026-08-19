@@ -47,6 +47,12 @@ namespace FavelaAmarela.EditorTools
         [MenuItem("Tools/FavelaAmarela/Ligar animacao do Byakhee")]
         public static void Executar()
         {
+            // Corrige o pivô ANTES de agrupar. A folha veio fatiada com pivô Center, mas o
+            // BoxCollider2D do prefab (size 2.625×2.633, offset 0,2.19) só faz sentido com pivô
+            // no rodapé: com Center ele ficava 1,3 unidade ACIMA da arte. E o offsetPes = 0 do
+            // DynamicYSort só está certo se o pivô estiver nos pés.
+            MontadorDeAnimacao.CorrigirPivoDasFatias(Folha, SpriteAlignment.BottomCenter);
+
             var grupos = MontadorDeAnimacao.AgruparPorNome(Folha, Prefixo);
             if (grupos == null) return;
 

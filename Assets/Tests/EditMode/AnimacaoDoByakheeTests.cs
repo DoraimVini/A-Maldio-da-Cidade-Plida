@@ -47,6 +47,40 @@ namespace FavelaAmarela.Tests.EditMode
                 "Byakhee'.\n  " + string.Join("\n  ", falhas));
         }
 
+        /// <summary>
+        /// A folha veio fatiada com pivô <c>Center</c>, mas o <c>BoxCollider2D</c> do prefab
+        /// (size 2.625×2.633, offset 0,2.19) só faz sentido com pivô no rodapé: com
+        /// <c>Center</c> o colisor ficava <b>1,3 unidade acima da arte</b>. E o
+        /// <c>offsetPes = 0</c> do <c>DynamicYSort</c> ordenava pelo meio do sprite em vez dos
+        /// pés. Corrigido em 2026-08-19.
+        /// </summary>
+        [Test]
+        public void Folha_TemPivoNoRodape()
+        {
+            const string meta = "Assets/FavelaAmarela/Art/Enemies/Byakhee_Spritesheet.png.meta";
+            Assert.IsTrue(File.Exists(meta), $"Meta ausente: {meta}");
+
+            string txt = File.ReadAllText(meta);
+
+            // Confere o PIVÔ de cada fatia, não o enum `alignment`: pedindo BottomCenter (7) a
+            // Unity grava 9 (Custom) com pivot (0.5, 0), que é a mesma coisa. Testar o enum
+            // reprovaria um import correto — o valor que governa de fato é o pivô.
+            var pivos = Regex.Matches(txt, @"(?m)^\s+pivot:\s*\{x:\s*([\d.eE+-]+),\s*y:\s*([\d.eE+-]+)\}")
+                             .Cast<Match>()
+                             .Select(m => (x: m.Groups[1].Value, y: m.Groups[2].Value))
+                             .ToList();
+
+            Assert.IsNotEmpty(pivos, "Nenhum pivô de fatia encontrado no meta.");
+
+            var forasDaRegra = pivos.Where(p => p.y != "0").ToList();
+
+            Assert.IsEmpty(forasDaRegra,
+                $"{forasDaRegra.Count} de {pivos.Count} fatias do Byakhee não estão com o pivô " +
+                "no rodapé (y = 0). Com pivô no centro, o BoxCollider2D (offset 0,2.19) fica " +
+                "1,3 unidade ACIMA da arte, e o DynamicYSort — que usa offsetPes = 0 — ordena " +
+                "pelo meio do sprite em vez dos pés.");
+        }
+
         [Test]
         public void Controlador_TemOsSeisEstados_E_UmDefault()
         {
