@@ -66,7 +66,7 @@ namespace FavelaAmarela.Tests.EditMode
                 "Icone_AguaDaCacimba", "Icone_ErvaDeAncoragem", "Icone_RaizDeYhtill",
                 "Icone_CapuzDeFarrapos", "Icone_ColeteDeSucata", "Icone_CaneleirasDeFerro",
                 "Icone_ElmoDeSet", "Icone_PeitoralDeSet", "Icone_GrevasDeSet",
-                "Icone_Necronomicon",
+                "Icone_Necronomicon", "Icone_AnelDoSinalAmarelo", "Icone_Estilete",
             };
 
             Assert.IsTrue(Directory.Exists(pasta), $"Pasta de ícones ausente: {pasta}");

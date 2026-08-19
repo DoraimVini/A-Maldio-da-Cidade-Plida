@@ -181,6 +181,74 @@ nenhum) e o Necronomicon reaproveitando o sprite de mundo.
 
 ---
 
+## 4.3 Levantamento dos 23 pacotes de 2026-08-19 (09:18–09:41)
+
+Medidos, **não lidos pelo nome** — dois deles prometiam no nome e não serviam. As dimensões
+foram lidas do cabeçalho IHDR dentro do zip, sem extrair os ~230 MB.
+
+### ⭐ Áudio — destrava o buraco sistêmico nº 1
+
+| pacote | conteúdo | licença |
+|---|---|---|
+| **Abyssal Horror SFX Vol.1** | 19 mp3: `DeepOne_Chatter`, `DeepOne_Growl` ×5, `DeepOne_Groan` ×2, `Abyssal_Descent` | ✅ Riria/Ririsaurus — *"commercial, non-commercial, and personal uses. Do not redistribute."* |
+| **Abyssal Horror SFX Vol.2** | 13 mp3: `CosmicHorror_Rumble` ×5, `EldritchAbomination_Breathing/Growl/HeartBeat/Roar` | ✅ mesma |
+
+**Por que isto é o achado mais importante da leva:** o projeto tem **zero arquivos de som**, e o
+pilar do jogo é furtividade **sonora** — o Cultista caça por ruído, a tempestade abafa, a Esquiva
+faz barulho de propósito. Hoje se joga um stealth sonoro sem ouvir nada. Estes 32 arquivos cobrem
+o grito do Byakhee, a Coisa do Cemitério, o rumor da Tempestade e a presença do Rei.
+
+⚠️ **Não basta importar:** não existe `AudioSource` nem `AudioClip` em gameplay nenhum. Ligar som
+é trabalho de sistema, não de asset.
+
+### ⭐ Ícones em pixel art 32×32 — a escala do projeto
+
+| pacote | 32×32? | serve? |
+|---|---|---|
+| **`free-undead-loot-pixel-art-icons`** (50 transparentes) | ✅ | ✅ **O melhor da leva para itens.** Grimório com caveira, anel com gema, adaga, pergaminhos, ossos, frascos, raízes — tema e escala certos. **Já em uso** (Necronomicon, Anel do Sinal Amarelo, Estilete). |
+| `Free-Chaos-Monsters-32x32-Icon-Pack` (100) | ✅ | a avaliar — ícones de monstro |
+| `Free-Clothing-32x32-Pixel-Icons` (40) | ✅ | ❌ **cyberpunk moderno** — moletom, jeans, tênis, tiara de orelha de gato, paleta neon. Não serve para Capuz de Farrapos nem Elmo de Set. |
+| `Free-Melee-Weapon-Pixel-Icons-for-Cyberpunk` (40) | ✅ | ❌ **lâminas neon**. Uns 3 ou 4 passam (`Icon28_16` é uma faca lisa), o resto destoaria. |
+
+> Os dois "❌" são o motivo de olhar a arte antes de importar: pelo nome, *Clothing 32×32* e
+> *Melee Weapon Pixel Icons* eram exatamente armadura e arma que faltavam.
+
+### Ícones pintados de alta resolução
+
+| pacote | conteúdo | nota |
+|---|---|---|
+| `Abyss_Dark_Armory_91_Icons` (66 MB, 469 png) | 91 armas dark fantasy em 1024/256/128 + atlas, separadas por `BLADE/HEAVY/LEGEND/POLE/RANGED` | ✅ licença e README próprios; a avaliar para armas se aceitarmos ícone pintado |
+| `Free Liquid Loot RPG Icons` (80 MB, 256×256, com e sem sombra) | poções e líquidos | candidato a consumíveis |
+| `Free-Undead-Loot-Game-Icons` (256×256) | versão pintada do pixel acima | redundante |
+| `Cursed_Attributes_Free_Icon_Pack` (64→1024) | "atributos amaldiçoados" | possível para a **ficha de atributos** |
+| `dark_rpg_icons` (25 × 512) · `Fantasy-Mage-Outfit` (10 × 512) | — | genéricos |
+
+### Personagens e criaturas
+
+| pacote | conteúdo | nota |
+|---|---|---|
+| `Knight.rar` / `Striker.rar` | tiras de animação com versão **`noBKG`** (transparente) | vista lateral de plataforma |
+| `Dreadnought_Mordekaiser` (421 png + fonte Aseprite) | personagem grande completo | candidato a chefe, se o estilo casar |
+| `Free-City-Trader-Character-Sprite-Sheets` | 3 mercadores, quadros de 128px | candidato a **NPC** |
+| `Agis`, `Trash Monster`, `PixelWhale_SF_Project` | avulsos; o PixelWhale é sci-fi | baixa prioridade |
+
+### Cenário
+
+`free-2d-top-down-pixel-dungeon-asset-pack` (top-down, o que o jogo usa) · `Dungeon Ruins
+Tileset` · `Forgotten Wilds Starter Pack` · `neo_zero` / `nero_zero` (demos minúsculas).
+
+### Licenças — o que confirmar antes da submissão
+
+| origem | situação |
+|---|---|
+| Ririsaurus (SFX) | ✅ termos completos no `.txt` do pacote |
+| AshDeal (Abdul) | ✅ copiados em `LICENCA_AshDeal.txt` |
+| CraftPix (vários) | ⚠️ só **URL** (`craftpix.net/file-licenses`) — frágil para edital, precisa do texto salvo |
+| SUCART (Rei em Amarelo) | ⚠️ **nenhum arquivo de termos no pacote** |
+| `Agis`, `dark_rpg_icons`, `Dungeon Ruins`, `neo_zero`, `PixelWhale`, `Trash Monster` | ⚠️ **sem licença no pacote** |
+
+---
+
 ## 5. Ordem recomendada
 
 1. **Reexportar o `.ase` do Abdul** com alfa — desbloqueia os 7 clipes que já existem.

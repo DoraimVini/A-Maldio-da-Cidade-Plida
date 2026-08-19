@@ -69,7 +69,10 @@ namespace FavelaAmarela.EditorTools
             "Icone_AguaDaCacimba", "Icone_ErvaDeAncoragem", "Icone_RaizDeYhtill",
             "Icone_CapuzDeFarrapos", "Icone_ColeteDeSucata", "Icone_CaneleirasDeFerro",
             "Icone_ElmoDeSet", "Icone_PeitoralDeSet", "Icone_GrevasDeSet",
-            "Icone_Necronomicon",
+            // Trocados em 2026-08-19 por pixel art 32×32 do CraftPix "Undead Loot", que é do
+            // tema e da escala do projeto — antes eram pintura reduzida (o Anel e o Estilete)
+            // e um sprite de 16×16 autorado (o Necronomicon).
+            "Icone_Necronomicon", "Icone_AnelDoSinalAmarelo", "Icone_Estilete",
         };
 
         [MenuItem("Tools/FavelaAmarela/Ligar icones dos itens")]
