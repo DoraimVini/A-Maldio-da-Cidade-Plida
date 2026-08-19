@@ -10,6 +10,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 
 ## Sistemas Core
 
+- [Arte e Animação — estado medido](arte_e_animacao.md) — Nada no jogo anima; o defeito de alfa na folha do Abdul; avaliação dos pacotes de sprite e suas licenças
 - [Sistema de Combate Pálido](combate.md) — Combate Tático (Priming/Defesas) como alternativa ao Stealth
 - [Resiliência Mental](resiliencia_mental.md) — Sistema central de sanidade (HP diegético)
 - [Vitalidade Corpórea](vitalidade.md) — Vida física (a "carne"), distinta da sanidade; zerá-la abate o ator
