@@ -6,6 +6,68 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-18 (32ª rodada) — Fase 5 parcial + uma medição minha que estava errada
+
+### Decisão de escopo do Vini
+
+**Níveis e talentos ficam FORA do Vertical Slice.** Pôr progressão de pé atrasaria o edital;
+quando o VS estiver completo, avaliar expô-la pelo **Carcosa Debugger** primeiro. Registrado no
+`CLAUDE.md` §1.1.
+
+Isso **desbloqueia a lista de pendências**: as perguntas "quem concede Exposição?" e "quantos
+`EcoDef` autorar?" deixam de ser bloqueios e viram trabalho pós-edital.
+
+> **Consequência que precisa ficar clara:** com o nível travado em 1, o loot **só entrega tier
+> 1**. Isso é esperado no VS, não bug — não "consertar" autorando tiers altos nem criando fontes
+> de Exposição às pressas.
+
+### Fase 5 — a premissa do plano estava errada
+
+O plano dizia "remover os `[Obsolete]` cujos consumidores já migraram". Ao olhar, **nenhum
+consumidor tinha migrado** — os 31 call-sites ainda passavam pela casca. O que o plano chamava de
+limpeza **era a migração em si**.
+
+**Seis arquivos saíram inteiros** do `GameManager`, recebendo por injeção do bootstrap:
+`TransicaoDeFaseTrigger`, `MenuDePause`, `RetornoDoColapso`, `TravessiaDoCompanheiro`,
+`QuedaZ4Z5Trigger` e `AbdulAlhazredAI`.
+
+**Sete encaminhamentos removidos.** Dois deles — `SoundBroadcaster` e `Environment` — **nunca
+tiveram consumidor externo**: nasceram encaminhamento morto na Fase 2.
+
+**Quatro ficam**, pelo mesmo motivo: seus consumidores também usam `.Resiliencia`, que tem rodada
+própria (19 usos, 11 arquivos, dois chamando dentro do `Update`). Migrar metade deixaria
+`ColapsoTrigger`, `CoisaDoCemiterioAI`, `ReiEmAmareloAI` e `RefugioDeLuz` presos à casca de
+qualquer jeito.
+
+### Correção de uma medição que eu vinha repetindo
+
+Os **"74 avisos CS0618"** que apresentei como "a lista de trabalho da Fase 5" — em commits, no
+devlog e no relatório — **nunca foram só do `GameManager`**. A maioria era `FindObjectsSortMode`,
+**API depreciada na Unity 6**, sem relação com a refatoração. Eu estava medindo duas coisas
+diferentes com um número só.
+
+Pior: ao escrever o código desta sessão **introduzi 10 avisos novos** usando exatamente essa API
+— mesmo havendo um comentário em `MarcarInimigosComoPersistentes.cs:26` explicando que a
+sobrecarga está depreciada. Copiei o padrão errado de um arquivo antigo em vez de seguir o que o
+projeto já documentava.
+
+Corrigido em 8 arquivos. **Efeito: CS0618 únicos caem de 51 para 26** — e os 26 restantes são
+todos do `GameManager` de verdade, o que finalmente torna o número uma medida útil do que falta.
+
+### Nota de ambiente
+
+O hook `post-commit` (Git LFS) falha com `cannot spawn` de forma intermitente. Não é o hook nem o
+repositório: o PATH do shell perde os binários POSIX no meio da sessão, e o Git não acha o `sh`.
+Os commits passam; o que quebra é a cadeia `&&` depois deles. Refazer o push à parte resolve.
+
+EditMode **572/572**, compilação limpa.
+
+### Estado da refatoração de managers
+
+Fases 0–4 concluídas; **Fase 5 parcial**. Falta só a rodada dedicada de `.Resiliencia` — 19 usos
+em 11 arquivos, que o plano pede que venha com testes de bootstrap escritos **antes**, porque dois
+desses consumidores chamam dentro do `Update` e falham em silêncio se a ordem de bind sair errada.
+
 ## 2026-08-18 (31ª rodada) — Vigor só existia na Arena + Fase 4 (BarraDeItens injetada)
 
 ### O Vigor nunca funcionou fora da Arena de Testes
