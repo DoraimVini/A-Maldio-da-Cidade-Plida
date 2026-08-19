@@ -121,6 +121,26 @@ de mundo. **A busca por arte de chefe continua aberta.**
 
 ---
 
+## 4.1 Sete pacotes baixados em 19/08 01:39–01:42
+
+Medidos, não lidos pelo nome. **Nenhum foi importado ainda.**
+
+| pacote | o que é | veredito |
+|---|---|---|
+| **Horror Enemy pack** (`.rar`) | 4 criaturas em pixel art **animadas**: Abomination (48px), Cat monster (32px), Mad Ghost (64px), **Mage** (48px). Folhas em "Separated Tags" e "Single Row". | ✅ **O melhor achado.** Estilo de **silhueta quase-preta com acento vermelho** — criatura de sombra. Combina com Carcosa, e o *Mage* é uma figura encapuzada com um olho vermelho: candidato a Abdul. Escala compatível (32–64px contra os 32×48 do projeto). ⚠️ Sem `ReadMe` legível — **licença a confirmar antes de usar em edital.** |
+| **Moonstone Keeper** (SUCART) | Personagem animado completo: 13 animações (Idle 17q, Attack1/2, Death 19q, Hit, Dash, Walk, Run, Jump), com pasta **"No BG"** (transparente). | ✅ Figura alta encapuzada com sigilo brilhante, **0,56 × 2,19 un** — três vezes a altura do Damião na mesma largura, silhueta imponente. Quase monocromática, então trocar o ciano por amarelo é viável sem degradar. Candidato a **Rei em Amarelo**. ⚠️ Tem `Jump Start`/`Land`: é sprite de **plataforma**, vista lateral. |
+| **Dark World** | UI de inventário: `inventory_bag_frame` (214×171), `inventory_slot_1x1/1x2/2x2`, `slot_elbow`, `slot_layout` + ícones de item. | ✅ Útil **já**: o `PainelDeInventario` é somente leitura e sem moldura própria. Slots de 20×20 e 43×43 casam com grade. |
+| **free-demon-characters** (CraftPix) | 8 personagens × 4 direções, 121×273 px. | ⚠️ Pixel art boa, mas **8,5 unidades de altura**, estática, e o clima é fantasia D&D (chifres, cajados). Serve como **retrato de NPC**, não sprite de mundo. |
+| **weapon RPG icons** | 50 ícones, ~485×497 px, com e sem fundo. | ⚠️ Pintura em alta resolução, não pixel art. Serviria para `ItemDef.Icone` se a UI aceitasse ícone pintado — hoje os ícones do projeto são 16×16 pixel art (`Patua`, `Barra_Enferrujada`), então **misturar destoa**. |
+| **Free Warlock Skills** | 50 imagens 512×512. | ⚠️ Mesmo caso: ícone de habilidade pintado, alta resolução. |
+| **Survivors RPG Starter Pack** | 1 arquivo (`enemy (7).png`). | — desprezível. |
+
+> **Nenhum destes é isométrico.** O único pacote com a perspectiva do jogo continua sendo o
+> Lords of Pain. Os demais são vista frontal ou lateral — o que **funciona** para os chefes
+> (Byakhee e Abdul já são frontais), mas não para inimigos que andam pelo mapa.
+
+---
+
 ## 5. Ordem recomendada
 
 1. **Reexportar o `.ase` do Abdul** com alfa — desbloqueia os 7 clipes que já existem.
