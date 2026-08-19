@@ -6,6 +6,99 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-18 (33ª rodada) — Fim da refatoração: o GameManager não existe mais
+
+O God Object de 375 linhas e 6 responsabilidades foi removido do código **e das 5 cenas**.
+Cinco fases, uma peça de arquitetura que faltava, e um bug de gameplay achado no caminho.
+
+### A causa raiz dos 19 call-sites de `.Resiliencia`
+
+**Não existia `ResilienciaBridge`.** A Vitalidade sempre teve uma no Damião — por isso tudo que
+fere a carne resolve o alvo com `GetComponentInParent<VitalidadeBridge>()`. A Resiliência não
+tinha nenhuma, e `GameManager.Instance.Resiliencia` era **literalmente a única porta**.
+
+Passei duas rodadas tratando os 19 como "consumidores mal-comportados" a serem disciplinados. Era
+uma peça faltando. Com a bridge no `Player_Damiao.prefab`, eles se dividem em dois grupos e
+nenhum precisa de global:
+
+| grupo | como resolve |
+|---|---|
+| quem está **no** Damião (`VitalidadeBridge`, `ArtefatosBridge`, `GerenciadorEfeitosPassivos`) | componente irmão |
+| quem **atinge** o Damião (`ConeDeGelo`, `CoisaDoCemiterioAI`, `ByakheeAI`, `ReiEmAmareloAI`, `EcoDeCarcosa`, `ColapsoTrigger`, `PressaoPsiquicaZone`, `RefugioDeLuz`) | `GetComponentInParent` a partir do collider |
+
+**O caso que só isto resolve:** o `ConeDeGelo` é instanciado pelo Abdul em **runtime**. Bootstrap
+nenhum alcançaria. Com a bridge, ele não precisa ser alcançado — pergunta a quem acertou, igual
+já fazia para a Resistência Anômala.
+
+### Bug de gameplay que a centralização revelou
+
+A invulnerabilidade de cutscene era replicada em **três** fontes de morte instantânea — e
+**faltava numa quarta**: o `EcoDeCarcosa` drenava Resiliência durante a queda roteirizada Z4→Z5,
+porque ninguém tinha copiado o `if` para lá.
+
+Agora a regra mora dentro da `ResilienciaBridge` (`IgnorarTrauma`, espelhando o `IgnorarDano` da
+`VitalidadeBridge`) e vale para todas as fontes, **inclusive as que ainda não existem**.
+
+> ⚠️ **É mudança de comportamento observável.** Se no playtest o Eco parar de drenar em algum
+> momento específico, é essa correção.
+
+### `RaizPersistente` — e o que ela NÃO resolve
+
+Vini perguntou se não valia usar o `GameManager` para coordenar os outros. A resposta que o
+código deu: o papel existe, mas em **dois** lugares — o `GameLoopBootstrap` coordena a cena, e
+faltava quem coordenasse o que atravessa cenas. Eram 4 `GameObject` soltos em
+`DontDestroyOnLoad`, cada um se criando por conta própria.
+
+> **Correção de uma justificativa minha:** apresentei "ordem indefinida entre os quatro" como
+> risco. Fui verificar e **não existe dependência de ordem hoje** — o `InventoryManager` só
+> instancia um prefab, o `ItemDatabase` só lê `Resources`, nenhum toca o outro na inicialização.
+> A ordem no código é **gancho** para quando houver, não correção de bug. Está escrito no resumo
+> da classe para ninguém concluir o contrário depois.
+
+**Por que ela não vira o próximo God Object:** não intermedia chamada nenhuma. Ninguém pede nada
+*a ela*. Garante existência e parentesco, e sai da frente. Um componente que encaminha acessos
+vira o lugar de menor atrito para pendurar responsabilidade — foi assim que o `GameManager`
+juntou seis.
+
+### A remoção quase criou um bug (12ª ocorrência do padrão)
+
+`MontarTelasDeFluxo` escrevia `telaPause` e `sequenciaColapso` no `GameManager` — campos que
+**migraram** para `GameStatePresenter` e `PlayerDeathController` na Fase 2. Trocar só o tipo da
+variável faria a ferramenta **compilar, reportar sucesso e escrever em propriedades
+inexistentes**: cena aparentemente montada, tela de pause que não abre.
+
+E **seis** ferramentas criavam um GameObject "GameManager" com um componente só. O papel virou
+seis componentes; replicar a lista em seis arquivos garantiria que uma cena nova nascesse
+incompleta, em silêncio — como o Vigor que só existia na Arena e a persistência que só estava na
+Tumba. Daí o `MontarBootstrapDaCena`: ponto único, mexe-se num lugar.
+
+### Ordem que importava
+
+Componente removido das 5 cenas **antes** de apagar o arquivo. O inverso deixaria *Missing
+Script* em cada uma — bloco serializado com GUID órfão, sem componente para remover pelo
+Inspector. Incluí a `cena_1`, legado que ficou fora de todas as outras migrações: deixar script
+órfão nela seria pior que tocá-la.
+
+### Processo
+
+Os testes foram escritos **antes** da migração (commit `526c7ba4`), vistos vermelhos nos 5 pontos
+certos, e só então o código. Os dois commits estão separados de propósito — dá para ver o que a
+rede pegava antes de existir código para satisfazê-la.
+
+**Erro meu de processo:** usei `2>$null` num `git rm`, o comando falhou e eu segui achando que
+tinha funcionado. O arquivo só apareceu na compilação. Silenciar a saída de um comando destrutivo
+é o oposto do que esta sessão vem praticando.
+
+### Números
+
+- **CS0618: 26 → 0.** Nenhum código de produção alcança o `GameManager` (que nem existe mais).
+- EditMode **578/578**, compilação limpa.
+- Commits: `526c7ba4` (testes vermelhos), `2a2cd9a4` (ResilienciaBridge), `22aa741d` (remoção + RaizPersistente).
+
+### Estado da refatoração de managers
+
+**Concluída.** Fases 0–5 fechadas.
+
 ## 2026-08-18 (32ª rodada) — Fase 5 parcial + uma medição minha que estava errada
 
 ### Decisão de escopo do Vini
