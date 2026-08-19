@@ -6,6 +6,139 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-19 (35ª rodada) — Os cinco prefabs que ainda usavam o "Knob" da Unity
+
+Cinco prefabs desenhavam o sprite embutido da Unity (`fileID: 10905`, o botão redondo
+usado como placeholder): **Pedra de Poder, Cone de Gelo, Esqueleto Invocado, Necronomicon
+e Yug-Neth**. Resolvidos numa passada só, para o Vini abrir o Editor uma vez.
+
+### A arte do Yug-Neth já existia
+
+`Characters/MiGo/yug_neth_idle.png` — 40×50, um Mi-Go completo (asa membranosa, corpo
+fungoide) — estava no projeto, importado, **sem estar ligado a nada**. O prefab desenhava o
+Knob tingido de amarelo. É o modo de falha dominante deste projeto outra vez: *a peça
+existe e não está ligada*.
+
+### Os outros quatro foram autorados
+
+Varri os pacotes de terceiros antes de desenhar qualquer coisa e **nenhum servia**:
+
+| pacote | o que tem | por que não serve |
+|---|---|---|
+| `kenney_particle-pack` | 193 texturas de partícula | suaves/anti-aliased; a PPU 32 com Point viram mancha serrilhada ao lado de um sprite de 32×48 |
+| `kenney_game-icons-expansion` | 790 ícones | mouse, controle, setas — UI de input, não objeto de mundo |
+| `kenney_isometric-miniature-dungeon` | 747 peças | arquitetura 3D renderizada (paredes, escadas); sem esqueleto, livro nem cristal |
+| `CraftPix_UndeadTileset` | 262 png, incl. 70 de osso | ossos são adereço de chão; o Esqueleto **anda e persegue** (`SeguidorDeAlvo`), precisa ficar em pé |
+| `CraftPix_CursedLand` | 144 png, incl. `Rock_eyes` | pixel art ótima, mas body-horror vermelho — outra paleta |
+
+Então os quatro foram desenhados na paleta de Carcosa, com mapa de caracteres validado
+(erro de largura de linha vira exceção, não pixel torto silencioso).
+
+**A primeira versão da Pedra de Poder saiu errada e eu vi olhando, não pelo log:** gerei a
+silhueta com `pow(t, 0.62)` e sombreado contínuo, e o resultado foi um **cone liso** — um
+cone de trânsito roxo. Cristal precisa de aresta reta e faceta chapada; refiz à mão.
+
+### Dois detalhes que decidiram os números
+
+**Pivô.** O Knob tem pivô no centro; a convenção do projeto é `Bottom` (`alignment: 7`, como
+Damião). Trocar o sprite sobe a arte em relação ao transform. De quebra isso **conserta** o
+Y-sort: `DynamicYSort` ordena por `transform.position.y + offsetPes`, e os cinco têm
+`offsetPes = 0` — valor que só está certo com o pivô nos pés. Com o Knob, ordenavam pelo
+meio do sprite.
+
+**O Cone de Gelo é a exceção:** pivô `Center`, porque `ConeDeGelo.Lancar` gira o transform
+para a direção de viagem e a rotação acontece em torno do pivô. O sprite dele é autorado
+apontando para **+X**, que é o zero daquele `Atan2`.
+
+### Regra que guiou escala e colisor: preservar todo volume de jogo
+
+A escala antiga fora calibrada para o Knob (32 px a PPU 100 = 0.32 unidades). Recalculei
+escala **e** tamanho local do colisor juntos, para o volume em **unidades de mundo** ficar
+idêntico ao de antes. Trocar arte não é hora de reequilibrar hitbox.
+
+| prefab | escala | colisor no mundo | tamanho final |
+|---|---|---|---|
+| Yug-Neth | 0.5 | 0.6 × 0.6 (inalterado) | 0.63 × 0.78 un |
+| Esqueleto Invocado | 0.5 | 0.416 × 0.544 (inalterado) | 0.5 × 0.75 un — igual ao Damião |
+| Pedra de Poder | 0.9 | 1.0 × 1.35 (inalterado) | 0.9 × 1.35 un |
+| Cone de Gelo | 0.4 | 0.6 × 0.3 (inalterado) | 0.4 × 0.2 un |
+| Necronomicon | 0.4 | 0.84 × 1.05 (inalterado) | 0.2 × 0.2 un |
+
+A `PedraDePoder` já tinha colisor de 1.0 × 1.35 — quem montou dimensionou para uma pedra de
+altura humana. O sprite novo só passou a ocupar o volume que o colisor sempre teve.
+
+### O único que estava numa cena
+
+Quatro dos cinco **nascem por `Instantiate` em runtime** — corrigir o prefab basta. Só o
+Yug-Neth está colocado em `Playtest_RuinasPalidas`, e aquela instância **sobrescrevia a
+escala** (1.0348, 1.2947). Override de instância ganha do prefab: sem tratar isso, a
+correção não apareceria na única cena onde ele está, e o Mi-Go entraria com mais de 2
+unidades de altura. A ferramenta ajusta a instância junto.
+
+### Guarda, e a validação por mutação
+
+`ArteDosPlaceholdersTests` (3 testes). Não podia simplesmente banir o Knob: ele aparece de
+**7 a 16 vezes em cada cena**, porque todo `Image` de UI nasce com o sprite embutido — e o
+próprio Yug-Neth continua com um, na barra de vida. O guarda confere, por prefab, o **GUID
+do PNG esperado**, o import (PPU 32 / Point / sem compressão / pivô) e se escala × colisor
+ainda dá o volume de mundo esperado.
+
+**Mutação:** revertendo só `ConeDeGelo.prefab`, dois dos três testes ficaram vermelhos com
+mensagem exata (`escala (0,6, 0,3), esperado (0,4, 0,4)`). O guarda morde.
+
+### Dois erros meus nesta rodada
+
+1. **Regex quebrada no meu próprio teste:** `textureCompression:\s*[^0]` acusava compressão
+   em textura descomprimida, porque `\s*` casa vazio e `[^0]` come o **espaço** depois dos
+   dois-pontos. Cinco falsos positivos. Trocado por captura de dígito.
+2. **Li o `m_LocalScale` errado do YugNeth** na primeira passada — peguei o primeiro do
+   arquivo, que é o da barra de vida, e conclui que a raiz estava (4.11, 0.56). A raiz era
+   (1, 1). Passei a parsear o documento YAML da raiz (`!u!4` com `m_Father: {fileID: 0}`).
+
+E um achado menor, relatado sem inflar: `importer.textureCompression` só escreve o
+`DefaultTexturePlatform`; os blocos por plataforma ficavam em 1. Como vêm com
+`overridden: 0`, são inertes hoje — **não era bug vivo**, mas divergia de como todo sprite
+do projeto está serializado. Agora a ferramenta grava explícito nas três plataformas.
+
+**Estado:** EditMode **581/581** (578 + 3), compilação limpa, marcador de assembly novo
+conferido no XML.
+
+---
+
+## 2026-08-19 (34ª rodada) — Tipografia e molduras do Dark Ages UI nas 5 cenas
+
+*(entrada escrita em retrospecto na 35ª rodada: esta rodada foi commitada em `e8e0dd1f` sem
+registro no log, contrariando o `CLAUDE.md` §3.3.)*
+
+Três pacotes novos em `Assets/ThirdParty` (baixados pelo Vini, licença aberta): **DarkAgesUI**
+(Hypnobius, tilesheet 384×352 com 25 elementos), **CraftPix_UndeadTileset** (262 png) e
+**CraftPix_CursedLand** (144 png).
+
+`PaletaDaInterface` (nova) é a fonte única de verdade de tipografia, cores e molduras. A fonte
+estava chumbada em **12 ferramentas** de montagem, cada uma chamando `GetBuiltinResource` por
+conta própria — trocar a tipografia exigia 12 edições, e esquecer uma faria uma tela nascer
+diferente das outras em silêncio. Mesmo problema que `MontarBootstrapDaCena` resolve para os
+componentes.
+
+**Por que Dark Ages e não o `ui-pack` da Kenney:** cheguei a montar sobre o Kenney, mas ele é
+cartoon RPG (bege-madeira, cantos arredondados) e precisaria ser **tingido** — e tingir pixel
+art degrada. O pacote da Hypnobius já *é* Carcosa: ouro ornamentado sobre quase-preto. A paleta
+que ele declara (`#DCC47C`, `#2E322A`) bate com o que medi na arte. Entra na cor original.
+
+**Bordas 9-slice medidas na arte, não estimadas:** a trama lateral tem 11px, mas o ornamento de
+canto vai até **23px** — fatiar em 11 esticaria a espiral. O slot usa 10px.
+
+**Bug que eu mesmo introduzi e corrigi:** a primeira versão tinha uma guarda
+`if (img.sprite != null) continue`, escrita para não sobrescrever ícone de item. Só que um
+`Image` da Unity **nasce** com o sprite embutido atribuído — a guarda pulava quase todo painel.
+Resultado: 1 painel por cena em vez de seis, com a ferramenta reportando sucesso. Também chutei
+o nome `CaixaDeTexto`; o objeto se chama `CaixaDeDialogo`. A lista passou a vir lida das cenas.
+
+**Resultado:** 245 textos com Kenney Pixel, 18 painéis e 80 slots nas 5 cenas — conferido no
+YAML, não no log da ferramenta. EditMode 578/578.
+
+---
+
 ## 2026-08-18 (33ª rodada) — Fim da refatoração: o GameManager não existe mais
 
 O God Object de 375 linhas e 6 responsabilidades foi removido do código **e das 5 cenas**.
