@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 1028256812353556202}
   - component: {fileID: 7955806002487804414}
   - component: {fileID: 1065975709646073976}
+  - component: {fileID: 3692641686616710655}
   m_Layer: 8
   m_Name: Player_Damiao
   m_TagString: Player
@@ -41,7 +42,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.2857143, y: 0.2857143, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -141,13 +142,13 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 1, y: 1.5}
+    oldSize: {x: 1.0625, y: 2.625}
     newSize: {x: 2, y: 3}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.7499999, y: 1.7499999}
   m_EdgeRadius: 0
 --- !u!114 &3169780706233688791
 MonoBehaviour:
@@ -228,7 +229,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: c6a617b6b8854e5fbed38c5e29115837, type: 3}
+  m_Sprite: {fileID: 5011133355727201732, guid: 86a3074d9c04a0d4c960cd7df97b881f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -373,3 +374,64 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05b6c1dc55ca10d408f005135017c639, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.ResilienciaBridge
+--- !u!114 &3692641686616710655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566763281958862316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc36db3ef91e26c41bc931d5b875707e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.AnimadorDoDamiao
+  idle:
+  - {fileID: 5011133355727201732, guid: 86a3074d9c04a0d4c960cd7df97b881f, type: 3}
+  - {fileID: 7962505382894598461, guid: 86a3074d9c04a0d4c960cd7df97b881f, type: 3}
+  - {fileID: 7076361828315288437, guid: 86a3074d9c04a0d4c960cd7df97b881f, type: 3}
+  - {fileID: 1245443258417088279, guid: 86a3074d9c04a0d4c960cd7df97b881f, type: 3}
+  correrBaixo:
+  - {fileID: 507295886635789381, guid: 5f589bdb94479564c9a1addc2bd024f8, type: 3}
+  - {fileID: 3174697671440991766, guid: 5f589bdb94479564c9a1addc2bd024f8, type: 3}
+  - {fileID: 4142963437575164428, guid: 5f589bdb94479564c9a1addc2bd024f8, type: 3}
+  - {fileID: 6098066233077859709, guid: 5f589bdb94479564c9a1addc2bd024f8, type: 3}
+  - {fileID: -6695342340152759378, guid: 5f589bdb94479564c9a1addc2bd024f8, type: 3}
+  correrCima:
+  - {fileID: 7909006625956656457, guid: 3f9c65e02eda71f4687e25751b76d7f4, type: 3}
+  - {fileID: -5394801128378418409, guid: 3f9c65e02eda71f4687e25751b76d7f4, type: 3}
+  - {fileID: 4434267462804198049, guid: 3f9c65e02eda71f4687e25751b76d7f4, type: 3}
+  - {fileID: 1879237314589519628, guid: 3f9c65e02eda71f4687e25751b76d7f4, type: 3}
+  - {fileID: 2854985482767496289, guid: 3f9c65e02eda71f4687e25751b76d7f4, type: 3}
+  correrEsquerda:
+  - {fileID: 2567902311650492123, guid: b9eb26642b0059f4fb64b4f607b69d8a, type: 3}
+  - {fileID: 2231791903561648090, guid: b9eb26642b0059f4fb64b4f607b69d8a, type: 3}
+  - {fileID: -1023367738890120793, guid: b9eb26642b0059f4fb64b4f607b69d8a, type: 3}
+  - {fileID: -8274621288104862732, guid: b9eb26642b0059f4fb64b4f607b69d8a, type: 3}
+  - {fileID: 6562144063321728249, guid: b9eb26642b0059f4fb64b4f607b69d8a, type: 3}
+  - {fileID: -6817224805383639978, guid: b9eb26642b0059f4fb64b4f607b69d8a, type: 3}
+  correrDireita:
+  - {fileID: -1821937461142877593, guid: bde1ae76c7ed7c74cbac2a9980022109, type: 3}
+  - {fileID: 3453047457909842849, guid: bde1ae76c7ed7c74cbac2a9980022109, type: 3}
+  - {fileID: -1386304057197191431, guid: bde1ae76c7ed7c74cbac2a9980022109, type: 3}
+  - {fileID: -2471933783004280355, guid: bde1ae76c7ed7c74cbac2a9980022109, type: 3}
+  - {fileID: 2398807798113235429, guid: bde1ae76c7ed7c74cbac2a9980022109, type: 3}
+  - {fileID: -8650790901349521753, guid: bde1ae76c7ed7c74cbac2a9980022109, type: 3}
+  golpeBaixo:
+  - {fileID: -6019668094308468557, guid: a9bc477681dbcd047a43423484781c2a, type: 3}
+  - {fileID: 2997181213326924067, guid: a9bc477681dbcd047a43423484781c2a, type: 3}
+  - {fileID: 5723473625444463522, guid: a9bc477681dbcd047a43423484781c2a, type: 3}
+  golpeCima:
+  - {fileID: 5486400107257149192, guid: 1a229de293a17fa469d327d7e1e16263, type: 3}
+  - {fileID: 2440475683691705782, guid: 1a229de293a17fa469d327d7e1e16263, type: 3}
+  - {fileID: 3397240503864428186, guid: 1a229de293a17fa469d327d7e1e16263, type: 3}
+  golpeEsquerda:
+  - {fileID: -78211269001796077, guid: 9726fc7a40fba684e9f3242dffbf794a, type: 3}
+  - {fileID: -4288199929240742299, guid: 9726fc7a40fba684e9f3242dffbf794a, type: 3}
+  - {fileID: 1648600542288275837, guid: 9726fc7a40fba684e9f3242dffbf794a, type: 3}
+  golpeDireita:
+  - {fileID: 2971056332813080117, guid: f537cd6df9c7c854399ca232fae0ec7a, type: 3}
+  - {fileID: 6492490416272295779, guid: f537cd6df9c7c854399ca232fae0ec7a, type: 3}
+  - {fileID: 3188439098408049458, guid: f537cd6df9c7c854399ca232fae0ec7a, type: 3}
+  quadrosPorSegundoCorrida: 10
+  quadrosPorSegundoGolpe: 14

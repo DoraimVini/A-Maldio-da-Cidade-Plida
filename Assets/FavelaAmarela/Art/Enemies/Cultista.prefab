@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 6360046265921058457}
   - component: {fileID: 4695545914089126774}
   - component: {fileID: 4727924443773620933}
+  - component: {fileID: 1537815508846015432}
   m_Layer: 6
   m_Name: Cultista
   m_TagString: Untagged
@@ -93,7 +94,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: ed5e938c6dce7994b9dd7c52b7f37351, type: 3}
+  m_Sprite: {fileID: -6826580139733386429, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -223,6 +224,7 @@ MonoBehaviour:
   ehAparicaoPrimordial: 0
   mostrarNumerosDeDano: 1
   corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}
+  corDoTraumaAnomalo: {r: 0.9, g: 0.85, b: 0.4, a: 1}
 --- !u!114 &6186456781152706504
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,7 +256,7 @@ MonoBehaviour:
   alcanceDeGolpe: 1.2
   cadenciaDeAtaque: 1.2
   danoDoGolpe: 20
-  camadaDoJogador:
+  camadasAlvo:
     serializedVersion: 2
     m_Bits: 0
 --- !u!114 &1318061846628413486
@@ -331,3 +333,36 @@ MonoBehaviour:
   tabela: {fileID: 11400000, guid: 6a8d57e5f1c34daeb81a8e0062bef7a1, type: 2}
   prefabColetavel: {fileID: 0}
   raioDeEspalhamento: 0.4
+--- !u!114 &1537815508846015432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b8ea239ee70055459b187dfc28f8039, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.AnimadorDoCultista
+  idle:
+  - {fileID: -6826580139733386429, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 8949307216501182991, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: -3324857527176373601, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: -7495846382921510002, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  walk:
+  - {fileID: 8891509303765263076, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 3134199315888735020, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 2525687268140680856, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: -4972513062873434083, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  attack:
+  - {fileID: -689876105669198883, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 6170654990217370214, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: -2623288889452240930, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: -1319430870675592835, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  death:
+  - {fileID: 7824003198560239237, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 5702020066755662229, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 6504199954082708626, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 4056992777920460888, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  quadrosPorSegundo: 6

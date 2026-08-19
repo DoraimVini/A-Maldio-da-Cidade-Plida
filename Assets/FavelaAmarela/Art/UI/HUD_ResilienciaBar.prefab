@@ -127,11 +127,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.UI.VitalidadeBar
   fillImage: {fileID: 2408946915189685939}
   backgroundImage: {fileID: 8482436415959905305}
+  velocidadeLerp: 2.5
   corNormal: {r: 0.72, g: 0.18, b: 0.18, a: 1}
   corCritica: {r: 0.95, g: 0.45, b: 0.1, a: 1}
   corAbatido: {r: 0.15, g: 0.15, b: 0.15, a: 1}
   fracaoCritica: 0.3
-  velocidadeLerp: 2.5
 --- !u!1 &2036309587477570801
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,12 +359,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -404,6 +404,7 @@ MonoBehaviour:
   vitalidadeBar: {fileID: 6022917652822640462}
   barraDeAcoes: {fileID: 0}
   barraDeItens: {fileID: 0}
+  barraDeArtefatos: {fileID: 0}
   resilienciaMax: 100
   fracaoThresholdPanico: 0.25
 --- !u!1 &7210133132011883742
@@ -609,10 +610,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.UI.ResilienciaBar
   fillImage: {fileID: 4071621408466441321}
   backgroundImage: {fileID: 1506235074937915087}
+  velocidadeLerp: 2.5
   corNormal: {r: 0.85, g: 0.78, b: 0.3, a: 1}
   corPanico: {r: 0.8, g: 0.2, b: 0.15, a: 1}
   corColapso: {r: 0.15, g: 0.15, b: 0.15, a: 1}
-  velocidadeLerp: 2.5
   overlayPanico: {fileID: 7210133132011883742}
   colapsoAnimator: {fileID: 0}
   colapsoTrigger: Colapso

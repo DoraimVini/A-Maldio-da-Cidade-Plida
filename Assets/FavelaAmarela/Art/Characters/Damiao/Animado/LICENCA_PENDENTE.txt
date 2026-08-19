@@ -1,0 +1,20 @@
+LICENCA PENDENTE - "4 directional character" (knight iso char)
+================================================================
+
+O pacote baixado ("4 directional character.zip") NAO CONTEM arquivo de
+licenca. Conferido no zip em 2026-08-19: 39 arquivos, todos .png (capa +
+idle/run/slice), nenhum .txt, .md ou .pdf com termos.
+
+A arte esta em uso sob a autorizacao geral do Vini para os assets baixados
+("todos os assets baixados podem ser usados, sao de licenca aberta"), e foi
+RECOLORIDA (manto/tabardo vermelho -> ouro de Carcosa, troca exata de 5 tons,
+nao tingimento) antes de entrar no jogo como a arte animada de Damiao.
+
+O QUE FALTA ANTES DA SUBMISSAO DO EDITAL:
+capturar os termos da pagina de origem do pacote e salvar o texto AQUI, do
+mesmo jeito que foi feito com LICENCA_AshDeal.txt (Abdul). Um link nao basta:
+pode sair do ar, mudar, ou nao valer como prova na submissao.
+
+Enquanto este arquivo existir com este conteudo, a arte animada de Damiao e
+um placeholder de licenca nao comprovada -- mesma situacao do Rei em Amarelo
+(Moonstone Keeper / SUCART).

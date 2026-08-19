@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 438514192186063642}
   - component: {fileID: 5903542959564898073}
   - component: {fileID: 5903542959564898080}
+  - component: {fileID: 1533339138125788716}
   m_Layer: 6
   m_Name: EspectroHali
   m_TagString: Untagged
@@ -85,7 +86,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: bcb3f3b4969a4af4ab4c07051b70ccdc, type: 3}
+  m_Sprite: {fileID: -7629438401198770719, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -198,3 +199,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.DynamicYSort
   fator: 10
   offsetPes: 0
+--- !u!114 &1533339138125788716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890151004144615060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d083cde17bf81d5448b0fcb957366352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.AnimadorDoEspectro
+  idle:
+  - {fileID: -7629438401198770719, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  - {fileID: -3903424982399568849, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  - {fileID: 5997207723377475120, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  - {fileID: -778430374258942635, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  mover:
+  - {fileID: -6534531863675921825, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  - {fileID: 4364440770189493416, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  - {fileID: 6927245828185313299, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  - {fileID: 1057120856260277735, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
+  quadrosPorSegundo: 6

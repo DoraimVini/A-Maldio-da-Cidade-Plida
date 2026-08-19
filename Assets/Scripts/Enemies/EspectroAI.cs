@@ -25,6 +25,9 @@ namespace FavelaAmarela.Runtime.Enemies
         private Rigidbody2D _rb;
         private Vector2 _alvoCerco;
 
+        /// <summary>A FSM do Espectro, para o <see cref="AnimadorDoEspectro"/> observar.</summary>
+        public EspectroFSM Fsm => _fsm;
+
         private void Awake()
         {
             _spriteRenderer = GetComponent<SpriteRenderer>();

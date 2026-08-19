@@ -184,6 +184,76 @@ namespace FavelaAmarela.EditorTools
         }
 
         /// <summary>
+        /// Corrige PPU, filtro e compressão de uma folha <b>já fatiada por outra pessoa</b>,
+        /// preservando os retângulos e os nomes das fatias. Depois chama
+        /// <see cref="CorrigirPivoDasFatias"/> para o pivô.
+        ///
+        /// <para>Existe para o caso do Cultista e do Espectro: as folhas
+        /// (<c>Cultista_Spritesheet_16x32</c>, <c>EspectroHali_Spritesheet_24x48</c>) chegaram
+        /// importadas a <b>PPU 16</b> — a convenção do projeto é PPU 32 — enquanto o sprite
+        /// único que cada prefab usava antes (<c>Cultista_Idle.png</c>,
+        /// <c>EspectroHali_Idle.png</c>) já estava correto a PPU 32. Sem esta correção, trocar
+        /// para a folha animada dobraria o tamanho do ator em cena, sem erro nenhum no
+        /// console.</para>
+        /// </summary>
+        public static bool AjustarImportDeFolhaFatiada(string caminho, float ppu,
+                                                        SpriteAlignment alinhamento)
+        {
+            var importer = AssetImporter.GetAtPath(caminho) as TextureImporter;
+            if (importer == null)
+            {
+                Debug.LogError($"[MontadorDeAnimacao] Textura não encontrada em '{caminho}'.");
+                return false;
+            }
+
+            importer.spritePixelsPerUnit = ppu;
+            importer.filterMode = FilterMode.Point;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.alphaIsTransparency = true;
+            importer.mipmapEnabled = false;
+
+            foreach (string plataforma in new[]
+                     { "DefaultTexturePlatform", "Standalone", "WebGL", "WindowsStoreApps" })
+            {
+                var ps = importer.GetPlatformTextureSettings(plataforma);
+                ps.textureCompression = TextureImporterCompression.Uncompressed;
+                importer.SetPlatformTextureSettings(ps);
+            }
+
+            // O PIVÔ VAI NO MESMO SaveAndReimport, de propósito. A primeira versão chamava
+            // SaveAndReimport() aqui e só depois CorrigirPivoDasFatias() — e o reimport
+            // intermediário reescrevia o `spritesheet` a partir do estado anterior, desfazendo
+            // a correção de pivô da execução passada. O sintoma: rodar a ferramenta duas vezes
+            // devolvia os pivôs para (0.5, 0.5), e o guarda pegou isso na segunda rodada.
+#pragma warning disable CS0618
+            var fatias = importer.spritesheet;
+            if (fatias == null || fatias.Length == 0)
+            {
+                Debug.LogWarning($"[MontadorDeAnimacao] '{caminho}' não está fatiada.");
+                return false;
+            }
+
+            var pivo = alinhamento == SpriteAlignment.BottomCenter
+                ? new Vector2(0.5f, 0f)
+                : new Vector2(0.5f, 0.5f);
+
+            for (int i = 0; i < fatias.Length; i++)
+            {
+                fatias[i].alignment = (int)alinhamento;
+                fatias[i].pivot = pivo;
+            }
+
+            importer.spritesheet = fatias;
+#pragma warning restore CS0618
+
+            importer.SaveAndReimport();
+
+            Debug.Log($"[MontadorDeAnimacao] '{System.IO.Path.GetFileName(caminho)}': PPU {ppu}, " +
+                      $"pivô de {fatias.Length} fatia(s) → {alinhamento}.");
+            return true;
+        }
+
+        /// <summary>
         /// Lê os sprites de uma folha já fatiada e agrupa por animação, a partir do nome.
         /// <c>abdul_attack_3</c> → grupo <c>attack</c>, índice 3.
         /// </summary>

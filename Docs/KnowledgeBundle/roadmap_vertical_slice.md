@@ -102,11 +102,32 @@ confirmar** — não é bug.
 
 ---
 
+## Caminho crítico para a build (definido em 2026-08-19)
+
+O Vini pediu o caminho mais curto até **uma build entregável**, para então focar inteiramente no
+Templo do Povo-Serpente. Contado sobre o estado medido, sobram **cinco** itens — a cinemática
+(13) saiu por decisão dele, e o Templo (14) é o destino, não o caminho.
+
+| ordem | item | o que falta | tamanho |
+|---|---|---|---|
+| 1 | 3 — Companheiro | barra do Yug-Neth no HUD | pequeno |
+| 2 | 9 — Byakhee | a **arena dos Portões em cena** (o chefe está pronto e animado) | médio |
+| 3 | 10 — Transição de Fase | os Portões em si — depende do 9 | pequeno |
+| 4 | 12 — Rei em Amarelo | **Trono de Aldebaran em cena** + fonte jogável da Coroa de Ossos | médio |
+| 5 | 11 — Blockout do Castelo | **a cena não existe** — só `CasteloDeCarcosaZone.cs` | **o maior** |
+
+> ⚠️ **O Build Settings tem só 4 cenas** (`Cena_Menu`, `Deserto_Hali`, `Playtest_RuinasPalidas`,
+> `Santuario_Yhtill`). Não há Castelo, e a `Cena_ArenaDeTestes` está fora de propósito (cena de
+> dev). Ou seja: **hoje o jogo compila sem o desfecho** — o item 11 é o que separa a build atual
+> da tese "abertura + desfecho" do VS.
+
+---
+
 ## Prioridade 5 — Polimento
 
 | # | Item | Estado |
 |---|---|---|
-| 13 | **Cinemática de abertura** | ❌ Não implementada (design existe em `systems/cinematica_abertura_deserto.md`). |
+| 13 | **Cinemática de abertura** | ⏸️ **ADIADA — decisão do Vini, 2026-08-19.** Não há artista para produzi-la e não há ferramenta definida para fazê-la. **Sai do caminho crítico da build**: não bloqueia a entrega do VS. O design continua em `systems/cinematica_abertura_deserto.md` e o esqueleto de código em `Assets/Scripts/Cinematics/AberturaDesertoCinematica.cs`. Reavaliar só depois que a build estiver entregue. |
 | 14 | **Dungeon 2 (Templo da Serpente)** | ⚠️ **Começada** — corrigido em 2026-08-19; a linha anterior dizia "❌ Não começada" e estava errada. Existem três arquivos: `Assets/FavelaAmarela/Editor/GeradorCenaTemploSerpente.cs`, `Assets/FavelaAmarela/Editor/TemploSerpenteSceneBuilder.cs` e `Assets/Scripts/Dungeons/TemploSerpenteSetup.cs`. **Não verifiquei ainda** se produzem cena jogável nem se há cena salva — só que o código existe. Design completo em `lore/templo_da_serpente.md`. |
 
 ---
