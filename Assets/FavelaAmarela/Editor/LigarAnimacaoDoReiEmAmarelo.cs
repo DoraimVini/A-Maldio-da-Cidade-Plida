@@ -23,6 +23,12 @@ namespace FavelaAmarela.EditorTools
     /// passam do padrão de 2048 da Unity, que reescalaria em silêncio e borraria a arte. Daí o
     /// <c>maxTextureSize</c> de 4096.</para>
     ///
+    /// <para><b>Ele flutua, e isso é de propósito.</b> O recorte inclui 35px de efeito de
+    /// ataque <i>abaixo</i> dos pés, então com pivô no rodapé o Rei fica ~1,09 unidade acima do
+    /// solo. Levantei isso como defeito e o Vini confirmou em 2026-08-19 que <b>ele não encosta
+    /// no chão mesmo</b> — a Aparição Primordial paira. <b>Não "conserte" ajustando o pivô</b>:
+    /// é desenho, não bug. Foi por isso que este parágrafo existe.</para>
+    ///
     /// <para><b>Licença:</b> o pacote da SUCART <b>não traz arquivo de termos</b> — só PNG e
     /// GIF. Está em uso sob a autorização geral do Vini para os assets baixados, mas os termos
     /// precisam ser capturados da página do autor antes da submissão. Ver

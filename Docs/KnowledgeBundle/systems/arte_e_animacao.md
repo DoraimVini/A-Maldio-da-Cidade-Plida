@@ -141,6 +141,46 @@ Medidos, não lidos pelo nome. **Nenhum foi importado ainda.**
 
 ---
 
+## 4.2 Estado em 2026-08-19 (fim do dia) — os três chefes animam
+
+| chefe | arte | animação |
+|---|---|---|
+| **Byakhee** | folha própria, 26 quadros (já estava certa) | ✅ 6 clipes, `Byakhee_AC`, dirigido por `HandleEstadoMudou` |
+| **Abdul Alhazred** | **trocado** pelo *Mage* do Horror Enemy Pack (AshDeal), 29 quadros de 112×48 | ✅ 5 clipes, `Abdul_AC_Mage`, gatilhos em conjurar/invocar/apanhar/morrer |
+| **Rei em Amarelo** | **trocado** pelo *Moonstone Keeper* (SUCART) | ✅ 5 clipes, `ReiEmAmarelo_AC`, dirigido por estado + `OnReliquiaAtivada` |
+
+O miolo comum virou `MontadorDeAnimacao` (folha → clipes → controller → `Animator` no prefab).
+Nenhum dos três controllers tem teia de transições com condições, de propósito: quem manda no
+estado é a FSM de cada chefe, e duplicar isso no Animator criaria duas fontes de verdade.
+
+**O Rei flutua e está certo.** O recorte inclui 35px de efeito de ataque abaixo dos pés, então
+ele fica ~1,09 unidade acima do solo. Levantei como defeito; o Vini confirmou que **a Aparição
+Primordial paira mesmo**. Registrado aqui e no XML doc da ferramenta para ninguém "corrigir".
+
+**Ícones:** 18 dos 20 `ItemDef` estavam com `Icone` vazio — tudo em branco na mochila e na
+barra. Resolvido: armas e artefatos de pacotes pintados (reescalados a 64×64 com bicúbico),
+consumíveis do *Dark World* (já é pixel art), armaduras **autoradas** (não existem em pacote
+nenhum) e o Necronomicon reaproveitando o sprite de mundo.
+
+### Pendências de licença
+
+| pacote | situação |
+|---|---|
+| **AshDeal** (Abdul) | ✅ termos completos copiados em `LICENCA_AshDeal.txt` — uso comercial e modificação permitidos |
+| **SUCART** (Rei em Amarelo) | ⚠️ **o pacote não traz arquivo de termos** — só PNG e GIF. Em uso sob autorização geral; `LICENCA_PENDENTE.txt` marca o buraco e um teste impede que o aviso seja apagado |
+| CraftPix, Trevor Pupkin, Hypnobius | termos conhecidos, mas conferir se estão copiados no repositório |
+
+### O que continua aberto
+
+- A folha antiga do Abdul e seus 7 clipes ficaram **órfãos** (não apagados — decisão do Vini).
+- O `Byakhee_Spritesheet` está com pivô **Center** (`alignment: 0`), não `BottomCenter`. Como
+  `DynamicYSort` ordena por `transform.position.y + offsetPes`, isso ordena pelo meio do sprite.
+  **Não mexi:** trocar o pivô move o chefe na arena, e isso é anterior a este trabalho.
+- Damião, Cultista e Espectro seguem em **um quadro parado**, com 208, 16 e 16 fatias
+  disponíveis. São os próximos candidatos naturais.
+
+---
+
 ## 5. Ordem recomendada
 
 1. **Reexportar o `.ase` do Abdul** com alfa — desbloqueia os 7 clipes que já existem.
