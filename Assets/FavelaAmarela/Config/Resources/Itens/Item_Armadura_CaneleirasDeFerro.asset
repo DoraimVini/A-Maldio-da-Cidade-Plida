@@ -14,13 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: caneleiras_ferro
   Nome: Caneleiras de Ferro Enferrujado
-  Icone: {fileID: 0}
+  Icone: {fileID: 21300000, guid: a1dbe17c9839b4f4e824eec97a66c538, type: 3}
   Descricao: "Dobradas de barras que os Cultistas largam quando caem. A ferrugem
     \xE9 da cor errada para ser s\xF3 ferrugem."
   Tipo: 1
   SlotEquipamento: 4
   EmpilhamentoMaximo: 1
   ArmaFisica: 0
+  Empunhadura: 0
   Modificadores:
   - Stat: 7
     Valor: 1

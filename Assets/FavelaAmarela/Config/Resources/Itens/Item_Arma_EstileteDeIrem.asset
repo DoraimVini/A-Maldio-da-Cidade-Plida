@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: c360f6eeb0b14b5ba40c9ddd16161367
   Nome: Estilete de Irem
-  Icone: {fileID: 0}
-  Descricao:
+  Icone: {fileID: 21300000, guid: 487c8f313a8e00f47a53cb23bf2fbc53, type: 3}
+  Descricao: 
   Tipo: 0
   SlotEquipamento: 1
   EmpilhamentoMaximo: 1
   ArmaFisica: 2
+  Empunhadura: 0
   Modificadores: []

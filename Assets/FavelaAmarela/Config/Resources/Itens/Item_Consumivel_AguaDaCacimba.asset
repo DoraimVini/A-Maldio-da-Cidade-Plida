@@ -14,13 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: consumivel_agua_cacimba
   Nome: "\xC1gua da Cacimba"
-  Icone: {fileID: 0}
+  Icone: {fileID: 21300000, guid: b0f2fd9abbd542f46a46720fadbcff8c, type: 3}
   Descricao: "Recolhida de um po\xE7o que o deserto ainda n\xE3o secou. Tem gosto
     de ferro e fecha a carne aberta."
   Tipo: 3
   SlotEquipamento: 0
   EmpilhamentoMaximo: 5
   ArmaFisica: 0
+  Empunhadura: 0
   Modificadores:
   - Stat: 0
     Valor: 30

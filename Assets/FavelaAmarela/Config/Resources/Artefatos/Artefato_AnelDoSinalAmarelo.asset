@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ArtefatoDef
   Id: anel_sinal_amarelo
   Nome: Anel do Sinal Amarelo
-  Icone: {fileID: 0}
-  Descricao: "Gravação sacra arrancada do Byakhee. O Sinal encara de volta, e as
-    sentinelas desviam os olhos."
+  Icone: {fileID: 21300000, guid: 0fb0ddd8f0794e149982ef5c36e56062, type: 3}
+  Descricao: "Grava\xE7\xE3o sacra arrancada do Byakhee. O Sinal encara de volta,
+    e as sentinelas desviam os olhos."
   Item: {fileID: 11400000, guid: 748bf24d78b8471f812df3438e8c4211, type: 2}
   Passivas:
   - Stat: 6
