@@ -17,9 +17,11 @@ namespace FavelaAmarela.EditorTools
             MontarAnimacaoDoDamiao.Executar();
             PadronizarCanvasDasCenas.Executar();
 
-            // Depois do Canvas: a tela de inventário usa PaletaDaInterface.AplicarSlot, que
-            // precisa do tilesheet já fatiado.
-            MontarTelaDeInventario.Executar();
+            // Aqui havia uma chamada a MontarTelaDeInventario, que CONSTRUÍA casas novas de
+            // inventário. Era duplicação: a Janela já tinha Mochila/Slot_0..11 e Corpo/Corpo_0..6
+            // diagramados — faltava só preencher os arrays do PainelDeInventario. A ferramenta
+            // foi apagada e substituída por LigarSlotsDoInventarioExistentes, que NÃO entra
+            // nesta rodada: é correção pontual, não passo recorrente de montagem de arte.
         }
     }
 }
