@@ -128,7 +128,7 @@ namespace FavelaAmarela.EditorTools
         private static List<TempestadeZonaTrigger> SetoresOrdenados()
         {
             var encontrados = UnityEngine.Object.FindObjectsByType<TempestadeZonaTrigger>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             var lista = new List<TempestadeZonaTrigger>();
             foreach (var s in encontrados)

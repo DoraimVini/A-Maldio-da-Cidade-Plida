@@ -56,7 +56,10 @@ namespace FavelaAmarela.Dungeons
         [System.Diagnostics.Conditional("UNITY_EDITOR")]
         private void ValidarYSort()
         {
-            var componentes = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+            // Sem o parâmetro de ordenação: a sobrecarga com FindObjectsSortMode foi depreciada
+            // na Unity 6 (a mensagem manda usar FindObjectsByType<T>() ou a versão só com
+            // FindObjectsInactive). Aqui a ordem nunca importou — é varredura, não índice.
+            var componentes = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
             foreach (var componente in componentes)
                 if (componente is IDanificavel && componente.GetComponent<DynamicYSort>() == null)
                     Debug.LogWarning($"[TemploSerpenteSetup] '{componente.name}' é danificável mas " +

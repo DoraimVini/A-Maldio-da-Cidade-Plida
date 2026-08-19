@@ -63,7 +63,7 @@ namespace FavelaAmarela.EditorTools
             int ligados = 0;
 
             foreach (var bau in Object.FindObjectsByType<Runtime.GameLoop.BauDaTumba>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+                         FindObjectsInactive.Include))
             {
                 var so = new SerializedObject(bau);
                 var pTabela = so.FindProperty("tabela");
@@ -99,7 +99,7 @@ namespace FavelaAmarela.EditorTools
             int zerados = 0;
 
             foreach (var mao in Object.FindObjectsByType<Player.MaoFisicaBridge>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+                         FindObjectsInactive.Include))
             {
                 var so = new SerializedObject(mao);
                 var p = so.FindProperty("armaInicialParaTeste");

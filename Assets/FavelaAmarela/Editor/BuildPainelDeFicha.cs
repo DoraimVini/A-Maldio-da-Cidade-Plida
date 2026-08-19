@@ -175,7 +175,7 @@ namespace FavelaAmarela.EditorTools
         private static VitalidadeBridge AcharVitalidadeDoJogador()
         {
             foreach (var v in Object.FindObjectsByType<VitalidadeBridge>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+                         FindObjectsInactive.Include))
             {
                 if (v.CompareTag("Player")) return v;
             }

@@ -201,7 +201,7 @@ namespace FavelaAmarela.EditorTools
             bool mudou = false;
 
             var todos = Object.FindObjectsByType<AudioDeStealth>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             foreach (var comp in todos)
             {

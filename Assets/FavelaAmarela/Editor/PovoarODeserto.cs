@@ -88,7 +88,7 @@ namespace FavelaAmarela.EditorTools
             grupo.transform.SetParent(null);
 
             var setores = Object.FindObjectsByType<TempestadeZonaTrigger>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             if (setores.Length == 0)
             {

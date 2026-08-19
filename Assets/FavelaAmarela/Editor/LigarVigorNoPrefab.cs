@@ -81,7 +81,7 @@ namespace FavelaAmarela.EditorTools
             var cena = EditorSceneManager.OpenScene(CenaDaArena, OpenSceneMode.Single);
 
             var todos = Object.FindObjectsByType<GerenciadorDeVigor>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             int removidos = 0;
             foreach (var vigor in todos)
