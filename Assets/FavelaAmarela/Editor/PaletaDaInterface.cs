@@ -123,6 +123,31 @@ namespace FavelaAmarela.EditorTools
         public static Sprite Slot =>
             _slot != null ? _slot : (_slot = CarregarSprite(SpriteSlot));
 
+        /// <summary>
+        /// Aplica o tratamento de botão: <b>chapado na cor <see cref="Pedra"/></b>, sem moldura.
+        ///
+        /// <para><b>Por que sem moldura, depois de três tentativas.</b> Botão de menu aqui tem
+        /// 76px de altura. Testei as três opções do tilesheet, olhando o jogo rodando a cada
+        /// vez: <c>moldura_slot</c> é quadrada (64×64) e esticada vira listras horizontais
+        /// ilegíveis; <c>painel_ornado</c> tem borda 9-slice de 23px por lado — 46px de moldura
+        /// em 76px de altura, e as bordas quase se tocam; e as barras da linha <c>y=96</c> do
+        /// tilesheet têm só <b>19px de conteúdo</b> (medido, não estimado) e ficam coladas umas
+        /// nas outras, então esticá-las 4× na vertical deforma o ornamento.</para>
+        ///
+        /// <para>Conclusão: <b>este tilesheet não tem moldura desenhada para botão largo e
+        /// baixo.</b> O chapado é escolha deliberada, não default esquecido — e o ornamento fica
+        /// onde funciona, no painel de fundo do menu. Se entrar arte de botão própria um dia, é
+        /// só trocar o corpo deste método.</para>
+        /// </summary>
+        public static void AplicarBotao(Image alvo)
+        {
+            if (alvo == null) return;
+
+            alvo.sprite = null;
+            alvo.type = Image.Type.Simple;
+            alvo.color = Pedra;
+        }
+
         /// <summary>Aplica a moldura de slot. O ícone do item fica num filho, por cima.</summary>
         public static void AplicarSlot(Image alvo)
         {

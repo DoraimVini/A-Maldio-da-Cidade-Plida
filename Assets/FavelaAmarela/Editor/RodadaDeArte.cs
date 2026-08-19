@@ -16,6 +16,10 @@ namespace FavelaAmarela.EditorTools
             MontarAnimacaoDoEspectro.Executar();
             MontarAnimacaoDoDamiao.Executar();
             PadronizarCanvasDasCenas.Executar();
+
+            // Depois do Canvas: a tela de inventário usa PaletaDaInterface.AplicarSlot, que
+            // precisa do tilesheet já fatiado.
+            MontarTelaDeInventario.Executar();
         }
     }
 }

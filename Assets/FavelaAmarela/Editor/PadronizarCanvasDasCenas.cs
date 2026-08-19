@@ -204,8 +204,13 @@ namespace FavelaAmarela.EditorTools
                 }
                 else if (EhBotaoDoMenu(nome))
                 {
+                    // Duas tentativas erradas antes desta, ambas vistas no jogo rodando:
+                    // a moldura de SLOT é quadrada (64×64) e esticada num botão de 76px de
+                    // altura vira listras horizontais ilegíveis; a de PAINEL tem borda de 23px
+                    // por lado — 46px de moldura em 76px de altura, e as bordas quase se tocam.
+                    // A de BOTÃO é a única do tilesheet já desenhada na proporção de barra.
                     Undo.RecordObject(img, "Aplicar moldura de botão");
-                    PaletaDaInterface.AplicarSlot(img);
+                    PaletaDaInterface.AplicarBotao(img);
                     EditorUtility.SetDirty(img);
                     botoes++;
                 }
