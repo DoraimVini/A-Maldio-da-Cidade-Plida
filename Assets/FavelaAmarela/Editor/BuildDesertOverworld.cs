@@ -55,7 +55,7 @@ namespace FavelaAmarela.EditorTools
             camGO.transform.rotation = Quaternion.identity;
 
             // 3. GameManager (bootstrap dos POCOs + Bind do jogador).
-            new GameObject("GameManager", typeof(GameManager));
+            MontarBootstrapDaCena.Garantir();
 
             // 4. Raiz do deserto + geometria do planner.
             var root = new GameObject("Deserto_Root").transform;

@@ -132,11 +132,7 @@ namespace FavelaAmarela.EditorTools
             }
         }
 
-        private static void GarantirGameManager()
-        {
-            if (Object.FindAnyObjectByType<GameManager>(FindObjectsInactive.Include) != null) return;
-            new GameObject("GameManager", typeof(GameManager));
-        }
+        private static void GarantirGameManager() => MontarBootstrapDaCena.Garantir();
 
         private static void GarantirPrefabPorNome(string caminho, string nome)
         {

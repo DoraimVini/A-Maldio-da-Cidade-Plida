@@ -2404,6 +2404,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.PlayerMovement
   useIsometricGridAlignment: 1
+  locomocaoConfig: {fileID: 0}
+  esquivaNoiseRadius: 6.5
   showNoiseGizmo: 1
   debugStormIntensity: 0
 --- !u!61 &783921916
@@ -2679,6 +2681,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8794055300915269734, guid: 49c4f983dce7b5949ae8dc6113737890, type: 3}
       propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794055300915269734, guid: 49c4f983dce7b5949ae8dc6113737890, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794055300915269734, guid: 49c4f983dce7b5949ae8dc6113737890, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8794055300915269734, guid: 49c4f983dce7b5949ae8dc6113737890, type: 3}
+      propertyPath: m_LocalScale.z
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8794055300915269734, guid: 49c4f983dce7b5949ae8dc6113737890, type: 3}
@@ -3234,8 +3248,24 @@ MonoBehaviour:
     Zone3Width: 2.5
     Zone4Length: 12
     Zone4Width: 12
+    Zone5Length: 10
+    Zone5Width: 8
+    Zone6Length: 12
+    Zone6Width: 10
+    Zone7Length: 4
+    Zone7Width: 4.5
+    Zone8Length: 14
+    Zone8Width: 14
+    Zone9Length: 16
+    Zone9Width: 12
+    Zone6bLength: 7
+    Zone6bWidth: 6
   wallColor: {r: 0.4, g: 0.35, b: 0.25, a: 1}
   floorColor: {r: 0.2, g: 0.18, b: 0.15, a: 0.5}
+  anomalyWallColor: {r: 0.55, g: 0.15, b: 0.65, a: 1}
+  wallSprite: {fileID: 0}
+  wallHeight: 1.5
+  limitesInvisiveis: 0
   generationRoot: {fileID: 1853498838}
 --- !u!4 &973620801
 Transform:
@@ -4122,7 +4152,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1267011224}
-  - component: {fileID: 1267011223}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -4130,23 +4159,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1267011223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267011222}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7e115225014c55418d5f3d9886cf608, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.GameManager
-  maxResiliencia: 100
-  fracaoPanico: 0.25
-  telaTransicaoDeFase: {fileID: 0}
-  telaPause: {fileID: 0}
-  gameplayRoot: {fileID: 0}
 --- !u!4 &1267011224
 Transform:
   m_ObjectHideFlags: 0

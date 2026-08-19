@@ -217,10 +217,9 @@ namespace FavelaAmarela.Editor
             blockoutGen.GenerateBlockout();
             Debug.Log("[Migração] Blockout gerado.");
 
-            // ── 2. GameManager ─────────────────────────────────────────────────
-            var gmGo = new GameObject("GameManager");
-            gmGo.AddComponent<GameManager>();
-            Debug.Log("[Migração] GameManager criado.");
+            // ── 2. Bootstrap da cena ──────────────────────────────────────────
+            FavelaAmarela.EditorTools.MontarBootstrapDaCena.Garantir();
+            Debug.Log("[Migração] Bootstrap da cena criado (GameLoopBootstrap + focados).");
 
             // ── 3. Player (instância do prefab) ───────────────────────────────
             const string playerPrefabPath = "Assets/FavelaAmarela/Art/Player/Player_Damiao.prefab";

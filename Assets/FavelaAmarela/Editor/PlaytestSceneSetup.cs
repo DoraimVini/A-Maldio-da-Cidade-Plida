@@ -25,12 +25,7 @@ namespace FavelaAmarela.Editor
             }
             blockoutGen.GenerateBlockout();
             
-            var gameManager = Object.FindAnyObjectByType<GameManager>();
-            if (gameManager == null)
-            {
-                var go = new GameObject("GameManager");
-                gameManager = go.AddComponent<GameManager>();
-            }
+            FavelaAmarela.EditorTools.MontarBootstrapDaCena.Garantir();
 
             // 2. Player (Damião)
             var player = GameObject.Find("Player_Damiao");

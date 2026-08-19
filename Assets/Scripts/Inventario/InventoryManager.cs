@@ -7,8 +7,16 @@ namespace FavelaAmarela.Inventario
     {
         public static InventoryManager Instance { get; private set; }
 
+        /// <summary>
+        /// Garante que o inventário exista. Idempotente.
+        ///
+        /// <para>Continua com <c>[RuntimeInitializeOnLoadMethod]</c> próprio de propósito: a
+        /// <c>RaizPersistente</c> chama este método em ordem explícita, mas a Unity não garante
+        /// qual dos dois roda primeiro. Manter os dois caminhos faz o inventário existir de
+        /// qualquer jeito.</para>
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void GarantirInstancia()
+        public static void GarantirInstancia()
         {
             if (Instance == null)
             {

@@ -70,7 +70,7 @@ namespace FavelaAmarela.EditorTools
         {
             MontarChao();
 
-            new GameObject("GameManager", typeof(GameManager));
+            MontarBootstrapDaCena.Garantir();
 
             var damiao = InstanciarDamiao();
             MontarCamera(damiao);

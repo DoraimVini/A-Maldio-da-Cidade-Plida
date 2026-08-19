@@ -91,7 +91,7 @@ namespace FavelaAmarela.Runtime.Progression
         /// onde alguém lembrou de colocar o componente — que é como ela morreu antes.
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void GarantirInstancia()
+        public static void GarantirInstancia()
         {
             if (_instancia != null) return;
 

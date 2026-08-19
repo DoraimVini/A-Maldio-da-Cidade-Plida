@@ -28,8 +28,11 @@ namespace FavelaAmarela.Inventario
         // Sem isto o método nunca era chamado por ninguém: ItemDatabase.Instance ficava
         // null fora dos testes (que chamam InitializeForTesting() manualmente), e todo
         // ItemInstance.Def resolvia null — armas, Patuá e futuros consumíveis, todos.
+        /// <summary>
+        /// Garante que o catálogo exista. Idempotente — a <c>RaizPersistente</c> também chama.
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void GarantirInstancia()
+        public static void GarantirInstancia()
         {
             if (Instance != null) return;
             var go = new GameObject("[Singleton] ItemDatabase");

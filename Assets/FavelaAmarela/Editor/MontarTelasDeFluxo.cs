@@ -73,10 +73,11 @@ namespace FavelaAmarela.EditorTools
 
         private static bool Montar()
         {
-            var gm = Object.FindAnyObjectByType<GameManager>(FindObjectsInactive.Include);
-            if (gm == null)
+            var bootstrap = Object.FindAnyObjectByType<FavelaAmarela.Runtime.GameLoop.GameLoopBootstrap>(
+                FindObjectsInactive.Include);
+            if (bootstrap == null)
             {
-                Debug.LogWarning("[TelasDeFluxo] Sem GameManager nesta cena — pulada.");
+                Debug.LogWarning("[TelasDeFluxo] Sem GameLoopBootstrap nesta cena — pulada.");
                 return false;
             }
 
@@ -100,11 +101,37 @@ namespace FavelaAmarela.EditorTools
             var pause = MontarPause(canvas.transform);
             var (colapso, sequencia) = MontarColapso(canvas.transform);
 
-            var so = new SerializedObject(gm);
-            so.FindProperty("telaPause").objectReferenceValue = pause;
-            so.FindProperty("sequenciaColapso").objectReferenceValue = sequencia;
-            so.ApplyModifiedPropertiesWithoutUndo();
-            EditorUtility.SetDirty(gm);
+            // Os dois campos migraram para componentes diferentes na Fase 2 (2026-08-14):
+            // telaPause vive no GameStatePresenter (quem a liga/desliga) e sequenciaColapso no
+            // PlayerDeathController (quem conhece a causa da morte). Escrever no lugar errado
+            // aqui produziria uma cena que parece montada e não funciona.
+            var presenter = bootstrap.GetComponent<FavelaAmarela.Runtime.GameLoop.GameStatePresenter>();
+            if (presenter != null)
+            {
+                var soP = new SerializedObject(presenter);
+                soP.FindProperty("telaPause").objectReferenceValue = pause;
+                soP.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(presenter);
+            }
+            else
+            {
+                Debug.LogWarning("[TelasDeFluxo] Sem GameStatePresenter — a tela de pause não " +
+                                 "será ligada.");
+            }
+
+            var morte = bootstrap.GetComponent<FavelaAmarela.Runtime.GameLoop.PlayerDeathController>();
+            if (morte != null)
+            {
+                var soM = new SerializedObject(morte);
+                soM.FindProperty("sequenciaColapso").objectReferenceValue = sequencia;
+                soM.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(morte);
+            }
+            else
+            {
+                Debug.LogWarning("[TelasDeFluxo] Sem PlayerDeathController — a sequência de " +
+                                 "Colapso não será ligada.");
+            }
 
             // gameplayRoot fica de fora de propósito: cada cena tem uma raiz diferente
             // (Deserto_Root, Blockout_Root...) e chutar errado esconderia o jogo inteiro.

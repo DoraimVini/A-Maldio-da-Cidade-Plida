@@ -59,8 +59,11 @@ namespace FavelaAmarela.Runtime.Persistencia
         /// <para>Um gerenciador colocado à mão numa cena continua funcionando: o guarda de
         /// instância única no <c>Awake</c> faz o duplicado se destruir.</para>
         /// </summary>
+        /// <summary>
+        /// Garante que o gerenciador exista. Idempotente — a <c>RaizPersistente</c> também chama.
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void GarantirInstancia()
+        public static void GarantirInstancia()
         {
             if (_instancia != null) return;
 

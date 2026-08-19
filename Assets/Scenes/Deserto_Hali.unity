@@ -3420,7 +3420,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 320214480}
-  - component: {fileID: 320214479}
   - component: {fileID: 320214486}
   - component: {fileID: 320214485}
   - component: {fileID: 320214484}
@@ -3434,18 +3433,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &320214479
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 320214478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7e115225014c55418d5f3d9886cf608, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.GameManager
 --- !u!4 &320214480
 Transform:
   m_ObjectHideFlags: 0
@@ -6504,7 +6491,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aacbafbef9b06d449a56336ce8cd1ead, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.EstadoPersistenteDaProgressao
-  catalogoDeEcos: []
 --- !u!114 &686885855
 MonoBehaviour:
   m_ObjectHideFlags: 0
