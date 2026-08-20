@@ -13779,6 +13779,10 @@ PrefabInstance:
       propertyPath: hintUI
       value: 
       objectReference: {fileID: 378349712}
+    - target: {fileID: 6110000000000000005, guid: b1f7c2a9e4d3486fa0c15d2e3f4a5b60, type: 3}
+      propertyPath: caixaDeTexto
+      value: 
+      objectReference: {fileID: 378349712}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

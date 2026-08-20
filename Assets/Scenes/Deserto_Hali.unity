@@ -1459,7 +1459,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: b68cff8c29434837a8016156f5dc2c06, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_erva_ancoragem.1
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &152755860
 CircleCollider2D:
@@ -2675,7 +2675,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 28533932b0a54e038b5b1fca6e1b2462, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_agua_cacimba.1
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &255202095
 CircleCollider2D:
@@ -10934,7 +10934,7 @@ MonoBehaviour:
   fracaoDeVitalidadeRestaurada: 0.4
   intervaloDeAncoragem: 30
   salvaAoDescansar: 1
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagemDeDescanso: "A luz te alcan\xE7a. Por um instante, o amarelo l\xE1 fora
     n\xE3o parece te ver."
   mensagemDeReanimacao: Sob a luz, Yug-Neth estremece e volta a pulsar. Ele se levanta.
@@ -11024,7 +11024,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 28533932b0a54e038b5b1fca6e1b2462, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_agua_cacimba.2
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &1342681582
 CircleCollider2D:
@@ -13326,7 +13326,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 28533932b0a54e038b5b1fca6e1b2462, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_agua_cacimba.3
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &1561870109
 CircleCollider2D:
@@ -13720,7 +13720,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 756dfc95f9c9462bb77578e105422713, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_raiz_yhtill.0
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &1609430209
 CircleCollider2D:
@@ -13956,7 +13956,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 28533932b0a54e038b5b1fca6e1b2462, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_agua_cacimba.0
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &1632148555
 CircleCollider2D:
@@ -72830,7 +72830,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: b68cff8c29434837a8016156f5dc2c06, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_erva_ancoragem.2
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &1819029464
 CircleCollider2D:
@@ -73081,7 +73081,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: b68cff8c29434837a8016156f5dc2c06, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_erva_ancoragem.0
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &1843428895
 CircleCollider2D:
@@ -73687,7 +73687,7 @@ MonoBehaviour:
   item: {fileID: 11400000, guid: 756dfc95f9c9462bb77578e105422713, type: 2}
   quantidade: 1
   chaveDeSave: Item.Deserto.consumivel_raiz_yhtill.1
-  caixaDeTexto: {fileID: 0}
+  caixaDeTexto: {fileID: 1901118518}
   mensagem: 
 --- !u!58 &1898100628
 CircleCollider2D:

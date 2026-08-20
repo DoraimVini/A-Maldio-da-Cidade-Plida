@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Santuario_Yhtill.unity
     guid: ff39ed961f098d84b8b311379c296d1b
+  - enabled: 1
+    path: Assets/Scenes/Castelo_Carcosa.unity
+    guid: 00000000000000000000000000000000
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 3590b91b4603b465dbb4216d601bff33, type: 3}

@@ -97,7 +97,21 @@ confirmar** — não é bug.
 
 | # | Item | Estado |
 |---|---|---|
-| 11 | **Blockout do Castelo** | ❌ **Não começado** — cena inexistente. |
+| 11 | **Blockout do Castelo** | ⚠️ **Greybox jogável** (2026-08-19) — `Castelo_Carcosa.unity` existe, está no Build Settings e é alcançável por um `PortalDeCena` no Santuário. Quatro zonas do caminho crítico montadas por `MontarCasteloCarcosa`: **Z1 Portões** (chegada + Refúgio), **Z2 Salão do Banquete** (6 nobres fossilizados como cobertura + 2 `CortesaoPalido` patrulhando), **Z3 Biblioteca** (3 Espelhos de Aldebaran com `PressaoPsiquicaZone` + 2 `EcoDeCarcosa`), **Z5 Trono** (Rei + 3 pontos focais). **Z4 Observatório fica de fora seguindo o design** — é dungeon opcional, aberta só com o Set Lendário 4/4. **O achado que destravou:** `PressaoPsiquicaZone`, `CortesaoPalido`, `EcoDeCarcosa`, `PontoFocalDeReliquia` e `DetectorDeCostas` já estavam **todos escritos e em cena nenhuma** — o Castelo era ligação, não sistema novo. **Falta:** vestir com arte (ver nota abaixo) e playtest. Guarda: `CasteloDeCarcosaTests` (4 testes). |
+
+> **Nota de arte do Castelo (2026-08-19).** `Carcosa_Tiles.png` foi conferido e **não é interior
+> de palácio**, apesar do nome: são tiles isométricos de **deserto** (dunas douradas, rocha negra,
+> Sol Negro). A paleta preto-e-ouro serve ao "mármore negro com adornos de ouro manchado" do
+> design, mas o arquivo está a **PPU 100 e não fatiado** — fora do padrão do projeto. Também
+> avaliei e descartei o `Aquanoctis_IsoSliceBasicDungeonAssets`: o README revela que é para
+> **Sprite Stacking** (os 16 "quadros" são fatias horizontais de um voxel, não animação), técnica
+> que o projeto não usa. O greybox usa retângulos coloridos nessa paleta.
+
+> **Divergência OKF × código no rito final.** O documento de level design fala de **4 relíquias**
+> (Anel, Coroa, Patuá, Necronomicon), mas `ReiEmAmareloAI.idsDasReliquiasExigidas` exige **3** — a
+> Coroa de Ossos está de fora porque não tem fonte jogável. A ferramenta lê os ids **do Rei**, não
+> de uma lista própria, então criou 3 pontos focais; o guarda segue o código, como manda o
+> `CLAUDE.md` §3.1 regra 4. Decidir se a Coroa entra no rito é chamada de design.
 | 12 | **Boss Rei em Amarelo** | ⚠️ **Core, Runtime e prefab prontos** (2026-08-12) — `ReiEmAmareloFSM` (ritual de relíquias + selamento em ciclos, 13 testes), `DetectorDeCostas` (geometria da Máscara Pálida, 7 testes), `ReiEmAmareloAI` e `PontoFocalDeReliquia`. `ReiEmAmarelo.prefab` com sprite emprestado (recorte do spritesheet "Necromancer" da Inbox — arquétipo certo, cores erradas). A Coroa de Ossos ainda não tem fonte jogável — contornado com o `CarcosaDebuggerWindow` (concede/invoca sob demanda, agora instanciando os prefabs reais dos dois chefes) e a `Cena_ArenaDeTestes` (cena de dev, fora do Build Settings). **Falta:** arte final (cores, Máscara Pálida), o Trono de Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos. Ver [systems/boss_rei_em_amarelo.md](systems/boss_rei_em_amarelo.md). |
 
 ---

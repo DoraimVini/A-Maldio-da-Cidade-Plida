@@ -69,9 +69,9 @@ namespace FavelaAmarela.EditorTools
             int n = 0;
 
             // FindObjectsInactive.Include é obrigatório: a Janela vive desligada até o TAB,
-            // então tudo que está dentro dela é inativo em edição.
-            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include,
-                                                                  FindObjectsSortMode.None))
+            // então tudo que está dentro dela é inativo em edição. Sem FindObjectsSortMode —
+            // o parâmetro foi deprecado na Unity 6 e a sobrecarga com ele emite CS0618.
+            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include))
             {
                 if (t == null) continue;
                 if (!Duplicatas.Contains(t.name)) continue;

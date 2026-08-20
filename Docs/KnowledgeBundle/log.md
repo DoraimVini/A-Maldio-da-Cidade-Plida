@@ -6,6 +6,71 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 # Log de Atualizações
 
+## 2026-08-19 (37ª rodada) — O Castelo de Carcosa existe, e o inventário duplicado saiu
+
+Duas frentes, e as duas foram **correções de erros meus** antes de virarem avanço.
+
+### O inventário: eu tinha duplicado a tela
+
+A captura do Vini mostrou casas espalhadas e sobrepostas. Causa: ao investigar "TAB não mostra
+nada" achei os arrays `slotsDaMochila`/`slotsDoCorpo` vazios e concluí que as casas não
+existiam — então construí `Grade_Mochila` e `Grade_Corpo` do zero. Mas a `Janela` **já tinha**
+`Mochila/Slot_0..11` e `Corpo/Corpo_0..6`, diagramados com âncoras explícitas. Faltava só
+**preencher os arrays**.
+
+E a minha grade estava **errada além de duplicada**: 6 casas de corpo, lendo o array `anatomia`
+do `InventoryManager` — que tem **7**. A sétima é `MaoSecundaria`.
+
+Corrigido por `LigarSlotsDoInventarioExistentes`: remove as duas grades e liga o painel nas
+casas originais. Conferido no YAML das 4 cenas — mochila 12, corpo 7, zero duplicatas.
+
+Removi a ferramenta `MontarTelaDeInventario` (era ela que criava as grades, com o `6` cravado) e
+a classe `TelaDeInventarioTests`, cujo teste reprovava a cena **correta**. O único teste que era
+só dela foi portado.
+
+**Bug no meu próprio contador**, pego na conferência: `"{campo}:\s*"` engolia a quebra de linha
+**e o recuo da primeira entrada**, então ela não casava com `^\s+-`. A contagem vinha sempre um a
+menos (11 e 6) e o guarda reprovaria cena correta — mesmo erro do teste de `alignment` do
+Byakhee.
+
+### O Castelo: era ligação, não sistema novo
+
+O levantamento revelou o estado assinatura deste projeto: `PressaoPsiquicaZone`,
+`CortesaoPalido`, `EcoDeCarcosa`, `PontoFocalDeReliquia` e `DetectorDeCostas` **todos escritos e
+em cena nenhuma**. O que faltava para o VS não era escrever sistema, era a fase existir.
+
+`MontarCasteloCarcosa` monta as quatro zonas do caminho crítico (Z1 Portões, Z2 Salão, Z3
+Biblioteca, Z5 Trono) em greybox, liga tudo, registra no Build Settings e cria o portal no
+Santuário. **Z4 fica de fora seguindo o design** — é dungeon opcional com Set Lendário 4/4.
+
+**Três erros meus no caminho, todos por desviar do padrão estabelecido:**
+
+1. **`GetComponent<T>() ?? AddComponent<T>()`** — o `??` testa null real, mas a Unity devolve
+   *fake-null*, então o `AddComponent` nunca acontecia. `MissingComponentException` no
+   `CircleCollider2D` do Refúgio. O `MontarCenaDoSantuario` usa `if (x == null)` justamente por
+   isso. 14 ocorrências corrigidas.
+2. **`SaveScene` falhou em silêncio** e o método seguiu — o log anunciou "Cena montada" com o
+   Build Settings e o portal já apontando para um arquivo inexistente. Agora `Construir()`
+   devolve `bool`, confere o retorno **e o disco**, e aborta as ligações se não salvou.
+3. **A causa da falha era eu chamar `MontarCaixaDeDialogo.Executar()`** — ferramenta que percorre
+   as cenas jogáveis com `OpenScene(..., Single)` e **fecha a cena nova ainda não salva**. O
+   Santuário monta a caixa inline exatamente por isso; passei a fazer o mesmo.
+
+### Achados de arte registrados
+
+`Carcosa_Tiles.png` **não é interior de palácio** apesar do nome: é tileset de deserto, a PPU 100
+e não fatiado. E o `Aquanoctis_IsoSliceBasicDungeonAssets` foi descartado após ler o README — é
+para **Sprite Stacking**, técnica que o projeto não usa.
+
+**Divergência OKF × código sinalizada:** o design fala de 4 relíquias no rito final, o
+`ReiEmAmareloAI` exige 3 (a Coroa de Ossos não tem fonte jogável). A ferramenta lê os ids **do
+Rei**, então criou 3 pontos focais — e foi isso que expôs a divergência.
+
+**Estado:** EditMode **622/622**, compilação limpa, marcador conferido no XML. Corrigi também o
+`CS0618` que eu havia introduzido em `LigarSlotsDoInventarioExistentes`.
+
+---
+
 ## 2026-08-19 (35ª rodada) — Os cinco prefabs que ainda usavam o "Knob" da Unity
 
 Cinco prefabs desenhavam o sprite embutido da Unity (`fileID: 10905`, o botão redondo
