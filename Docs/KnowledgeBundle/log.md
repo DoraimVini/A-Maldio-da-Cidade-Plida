@@ -4,7 +4,702 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+
+
+## 2026-08-20 — A Tumba vira obrigatória (trava de portal)
+
+Decisão do Vini: a Tumba de Alhazred passa a ser pré-requisito dos Portões das Ruínas. Motivo
+diegético — é lá que Yug-Neth é libertado de Abdul, e `TravessiaDoCompanheiro` deriva a
+presença dele de `ChavesDeSave.AbdulResolvido`. Sem a trava, dava para ir do Deserto direto ao
+Byakhee **sem arma e sem companheiro**, e entrar no Castelo sem o NPC de artesanato. O Vini
+pesou as alternativas (destravar com aviso; arma inicial no Deserto) e escolheu a trava para
+simplificar o Vertical Slice.
+
+### Runtime
+- `PortalDeCena` ganhou `chaveExigida` (chave de save), `linhaSeTrancado` (**texto provisório,
+  serializado para o Vini reescrever**) e `caixaDeTexto` injetada. Vazio em `chaveExigida`
+  mantém o portal livre, que é o caso de todos os outros. `EstaTrancado()` é público para o
+  Carcosa Debugger. O aviso sai **uma vez por aproximação** (`OnTriggerExit2D` rearma): repetir
+  a fala a cada quadro de contato viraria ruído, e o jogador encosta várias vezes tentando
+  passar.
+
+### Editor
+- `MontarPortoesDasRuinas.LigarOPortalNoDeserto` grava a chave e injeta a caixa de texto, e
+  avisa se a caixa não existir — uma trava sem aviso lê como parede invisível.
+- `LigarPortal` passou a devolver o componente em vez de `void`.
+
+### Testes
+- **Novo** `TumbaObrigatoriaTests` (2 testes): o portal exige a chave, e tem como avisar o
+  jogador. Validado por mutação — destrancando o portal na cena, o guarda fica vermelho e
+  nomeia a ferramenta que conserta. A primeira versão do regex usava `\S*`, que pula a linha
+  quando o valor é vazio e casava o campo seguinte; a mensagem de falha dizia
+  `But was: "linhaSeTrancado:"`. Preso à mesma linha, agora diz `<string.Empty>`.
+
+Suíte EditMode: **646/646**.
+
+
+
+
+## 2026-08-20 — O chefe invencível, o combate mudo e a identidade da build
+
+Três achados, todos do mesmo tipo: sistema inteiro escrito, ligado em ponta nenhuma.
+
+### 1. O Byakhee não tinha colisor
+`Byakhee.prefab` tinha `Rigidbody2D` e **zero colisores**. `MaoFisicaBridge.ResolverGolpe`
+resolve o golpe por `Physics2D.OverlapCircle` — sem colisor, **o chefe era impossível de
+acertar**. É a causa do *"aparentemente o Damião não causou dano na Byakhee"* que o Vini
+relatou e que eu não tinha encontrado em duas rodadas anteriores de investigação da luta.
+
+**Consequência de escopo:** o Vertical Slice termina no Rei em Amarelo, e o caminho para lá
+passa pelo Byakhee. Um chefe invencível trancava o VS inteiro, não só a arena.
+
+### 2. Quatro dos nove sons nunca tocavam
+Contando disparos de `SomDoJogo` no código: `GolpeDesferido`, `HabilidadeDeArma`,
+`ItemRecolhido` e `ArtefatoInvocado` **só existiam como forma de onda** em `SinteseDeSom`.
+Ninguém chamava `Tocar` com eles. Somado ao `AudioDeCombate` estar apenas no `Cultista.prefab`,
+o jogador atacava o chefe **sem ouvir o próprio golpe nem o acerto**. Era a outra metade do
+"combate sem feel".
+
+⚠️ **Correção do roadmap:** a linha "Áudio: ausente — zero `AudioSource`, zero arquivos de som"
+estava errada e foi reescrita. Existe áudio **sintetizado** (zero `.wav` é o esperado, não
+sintoma), com `MixerDeAudio`, `AudioDeStealth` e `AudioDeResiliencia` nas cinco cenas de
+gameplay.
+
+### 3. A build sairia com o título errado
+`productName` = **"A Maldição da Cidade Pálida"** — o nome do *repositório*. O título oficial
+visível ao jogador é **"Caminho para Carcosa"** (`CLAUDE.md`, primeira seção). Janela e
+executável sairiam errados num envio de edital. `companyName` estava em `DefaultCompany`.
+
+### Runtime
+- **Novo** `AudioDoJogador`: observador com `Bind`/`Unbind` que assina
+  `MaoFisicaBridge.OnAtaqueExecutado` e `OnHabilidadeExecutada`. Molde dos irmãos
+  `AudioDeStealth`/`AudioDeResiliencia` — o `MaoFisicaBridge` não passa a conhecer áudio.
+- `GameLoopBootstrap` liga o `AudioDoJogador`, com aviso se faltar na cena.
+
+### Editor
+- **Novo** `LigarAudioDoCombate`: põe `AudioDoJogador` no Damião e `AudioDeCombate` no Byakhee.
+  Nos **prefabs**, não nas cenas — assim não nasce uma sexta lista de cenas para envelhecer.
+- **Novo** `RevisarColisores`: dá ao Byakhee uma cápsula **trigger** de 2,0 × 3,0 (trigger
+  porque o filtro do golpe usa `useTriggers = true`, e um chefe voador sólido empurraria o
+  jogador e enroscaria nas paredes), e normaliza a pegada humana para **0,60 × 0,30** em
+  unidades de mundo. As pegadas nunca tinham sido calibradas entre si: Damião **1,467**, Abdul
+  1,200, Rei 1,000, Yug-Neth 0,600, Cultista 0,576, Espectro 0,416 — o Damião com **2,5× a
+  pegada do Cultista**, e um colisor mais largo que a própria figura desenhada (0,84) e 4,7× a
+  largura dos pés (0,31).
+- **Novo** `PrepararIdentidadeDaBuild`: `productName` → "Caminho para Carcosa",
+  `companyName` → "Favela Amarela".
+
+**Por que encolher a pegada é seguro:** os inimigos aplicam dano por `Vector2.Distance` +
+`IDanificavel`, **não** por sobreposição de colisor (conferido em `ByakheeAI`,
+`AbdulAlhazredAI`, `CoisaDoCemiterioAI`). A pegada do jogador só governa o que barra movimento.
+
+**Sobre cápsula (pergunta do Vini):** cápsula *em pé* é forma de plataforma lateral, onde o eixo
+alto é altura real. No isométrico o Y da tela é **profundidade** — a pegada é área no chão, e o
+que importa é ser achatada em 2:1, acompanhando o losango da grade. Trocar `BoxCollider2D` por
+`CapsuleCollider2D` nos humanos ganharia só cantos arredondados, e troca de tipo muda `fileID`;
+ficou de fora na véspera da build por risco/benefício. O Byakhee leva cápsula porque o colisor
+dele é novo.
+
+### Testes
+- **Novo** `ColisoresDoElencoTests` (3): pegada igual para todo humano, o Byakhee **tem**
+  colisor, e o colisor dele é trigger. Centraliza a regra que antes vivia duplicada em
+  `AnimacaoDoDamiaoTests` e `AnimacaoDoCultistaTests`, cada uma com sua constante — duas fontes
+  da verdade para a mesma regra é como uma delas envelhece calada.
+- **Novo** `AudioDoCombateTests` (3): mede **disparo**, não existência — um guarda que só
+  contasse os valores do enum teria passado durante todo o período em que o combate era mudo.
+- **Novo** `IdentidadeDaBuildTests` (3): título, estúdio e cena de índice 0.
+- `AnimacaoDoDamiaoTests` e `AnimacaoDoCultistaTests` perderam os testes de colisor (foram para
+  o arquivo centralizado); 5 testes cada.
+
+### Documentação
+- **Novo** `Docs/KnowledgeBundle/plano_da_build.md` — checklist da entrega em ordem de risco,
+  com a dívida conhecida que **não** bloqueia (hitbox/hurtbox inexistentes e as quatro camadas
+  `PlayerHitbox`/`EnemyHitbox`/`PlayerHurtbox`/`EnemyHurtbox` declaradas e usadas por nada;
+  golpe não emite ruído de stealth; arte adiada).
+
+**Nada foi aplicado ainda: a Unity está aberta e bloqueia o batch mode.** As três ferramentas e
+a suíte rodam assim que ela fechar.
+
+
+## 2026-08-20 — Cultista: arte nova fatiada e ligada
+
+A folha antiga (`Sprites/Cultistas/Cultista_Spritesheet_16x32.png`) estava destruída — fundo
+opaco e buracos na figura, e o `.aseprite` de origem com o mesmo dano. As quatro tiras novas
+saem do mesmo pacote do Damião, recoloridas com o gradiente roxo→amarelo-doente.
+
+### Editor
+- **Novo** `MontarAnimacaoDoCultista`: fatia as quatro tiras (78 × 86; idle 4, walk 5, attack 3,
+  death 4 = 16 quadros) e preenche o `AnimadorDoCultista`. A folha antiga ficou com **zero**
+  referências no projeto.
+- **A escala era o ponto delicado.** O prefab trazia `localScale 1.8`, calibrado para a arte
+  antiga de 32 px. Com a arte nova de 86 px isso daria **4,84 un** contra os 2,20 do Damião —
+  exatamente a queixa do Vini no playtest (*"o cultista está visivelmente maior que o Damião"*),
+  que eu tinha diagnosticado errado na época por comparar pixels ignorando o `localScale`. Nova
+  escala 0,6698 → **1,80 un**, o número que ele já tinha.
+- **Colisor preservado**: `localScale` na raiz escala o `BoxCollider2D` junto, então a queda de
+  1,8 para 0,67 reduziria a pegada de 0,576 para 0,214 de mundo. O tamanho do colisor foi
+  recalculado (0,32 → 0,86) para o volume em mundo continuar 0,576.
+
+### O pivô, e por que ele falhou calado duas vezes
+O gerador desenha a elipse de sombra centrada 2 px acima da base do quadro — é o centro dela que
+marca onde o Cultista pisa. `FatiarFolha` assume pivô em `(0,5, 0)`, o que enterraria o Cultista
+2 px no chão.
+
+Corrigir isso exigiu mexer nos **dois níveis**: mudar só `spritesheet[i].pivot`/`alignment` não
+adianta, porque no reimport a Unity reaplica o `spriteAlignment` **da textura** por cima de cada
+fatia — como `FatiarFolha` deixa `BottomCenter`, ela regravava `alignment: 7` e forçava o pivô de
+volta para zero, **sem erro nenhum**. O ajuste parecia aplicado e não estava. Só apareceu quando
+instrumentei o método para reler e comparar `pedi` × `gravou`. A instrumentação ficou.
+
+### Testes
+`AnimacaoDoCultistaTests` reescrito: os **três originais continuam**
+(`Prefab_TemOAnimadorComOsQuatroCiclosPreenchidos`, `Componente_NaoUsaAnimatorController`, e o de
+folha — que virou `AsQuatroTiras_TemPpu32EPivoNaLinhaDoChao`, agora exigindo pivô em
+`MargemDaSombra / altura` em vez de zero). Três novos: escala menor que a do Damião, pegada do
+colisor preservada, e a folha antiga sem referências.
+
+**Erro de processo:** eu sobrescrevi o arquivo de testes com `cat >` sem checar que ele já
+existia, destruindo os três guardas originais. Só percebi porque a contagem da suíte fechou em
+647 quando eu esperava 650. Recuperados com `git show HEAD:` e reintegrados.
+
+Suíte EditMode: **649/649**.
+
+
+## 2026-08-20 — Inventário: o esticamento dos slots de equipamento
+
+Relato do Vini: a UI do inventário "está esticada e distorce o desenho dos itens".
+
+Medido no YAML da cena, canvas 1920 × 1080:
+
+| slot | tamanho | proporção |
+|---|---|---|
+| Mochila (12, grade 4 × 3) | 217 × 215 px | 1,01 : 1 — correto |
+| **Corpo (7, coluna única)** | **600 × 81 px** | **7,37 : 1** |
+
+A linha de 7,37 : 1 está certa: um slot de corpo *é* uma linha de lista, com rótulo. O errado
+era o **ícone preencher a linha inteira** (âncoras 0,16–0,84 nos dois eixos). Uma peça de
+armadura de 32 × 32 saía esticada **12,7× na horizontal contra 1,7× na vertical**.
+
+### Editor
+- `MontarPainelDeInventario`: o ícone do slot de corpo virou **miniatura quadrada** na ponta
+  esquerda (65 × 65 px, conferido na cena a 1,00 : 1), e o rótulo foi para o lado dela em vez
+  de por cima. Slot de mochila não mudou — a proporção dele nunca foi o problema.
+- `preserveAspect = true` em todos os ícones do painel. A barra de ações já fazia isso desde
+  sempre (`MontarBarraDeItens.cs:187`); o painel tinha ficado de fora. Importa mesmo em slot
+  quadrado: a arte não é toda quadrada (Água da Cacimba 11 × 31, Raiz de Yhtill 51 × 35).
+- Fontes do painel de 10/12/13/20 para 30/33/36/60, alinhando com o ×3 aplicado ao resto da UI
+  mais cedo no mesmo dia.
+
+### Duas retratações minhas
+- Afirmei que "os 16 `ItemDef` estão com ícone nulo". **Falso.** Os 16 têm ícone ligado, os seis
+  de armadura inclusive. Meu probe procurou `icone:` minúsculo; o campo é público e serializa
+  como `Icone:`. Cheguei a escrever uma ferramenta (`LigarIconesDosItens`) sobre essa premissa —
+  ela reportou "o ItemDef não tem campo 'icone'" em vez de gravar errado, e foi apagada.
+- Afirmei que o Castelo não tinha o ponto `PortoesInternos`. **Falso.** Tem: é o
+  `identificador` do objeto chamado `Refugio_DosPortoes`. Eu estava lendo nomes de
+  `GameObject` em vez de identificadores.
+
+### Ligação Portões → Castelo: já estava montada
+Conferido campo a campo — `PortaoDosPortoes.passagemParaOCastelo` ligado, portal com
+`cenaDestino: Castelo_Carcosa` / `chegarEm: PortoesInternos`, e o ponto correspondente existe
+no Castelo. `TravessiaDoCompanheiro` está nas duas cenas, com `aposentarAoChegar` em 0 nos
+Portões e 1 no Castelo, `postoDeArtesao` e `caixaDeTexto` ligados.
+
+**O risco não é de wiring, é de ordem.** `PortalDeCena` não tem campo de condição — nenhum
+portal é travado. E Yug-Neth só nasce se `ChavesDeSave.AbdulResolvido` existir, isto é, se a
+Tumba foi feita. Quem for Deserto → Portões direto chega ao Byakhee **sem arma e sem
+companheiro**, e segue para o Castelo sem o Yug-Neth que deveria virar o NPC de artesanato.
+É a mesma raiz do "o Damião não causou dano na Byakhee" relatado antes. Decisão de desenho
+pendente com o Vini.
+
+Suíte EditMode: **644/644**.
+
+
+## 2026-08-20 — Os cinco defeitos da luta contra o Byakhee
+
+Playtest do Vini apontou cinco problemas na arena dos Portões. Três eram erro de montagem
+meu, e um deles era mais grave do que o relato sugeria.
+
+### Runtime
+- `ByakheeAI.CircundarAlvo`: a órbita passou a girar em torno do **jogador**, não do centro
+  fixo da arena — era isso que fazia o chefe "rodar 360° perdido" longe de quem ele caça. A
+  velocidade virou `ClampMagnitude(erro × 2, velocidadeCircundando)`; antes era
+  `erro × velocidade`, proporcional à distância e sem teto (a 20 un do alvo, com velocidade 4,
+  ele saía a 80 un/s e atravessava a arena num quadro).
+- `ArenaDosPortoes`: novo campo `voltaAoDeserto`. O portal de saída é desligado quando a luta
+  começa e religado com o chefe abatido. Dava para abandonar a luta pelo portal, deixando o
+  Byakhee vivo numa cena descarregada.
+- `PortaoDosPortoes`: estado passa a se ler por **cor** (`corFechado`/`corAberto`), não por
+  troca de quadro. A troca segue suportada se um dia houver arte de portão fechado.
+
+### Editor
+- `LigarSistemasNovos.Cenas`: acrescentadas `Portoes_Das_Ruinas` e `Castelo_Carcosa`. **Quarta**
+  lista de cenas do projeto a ficar para trás das cenas novas (depois de `BuildHUDCompleto`,
+  `HudCompletoTests` e `PadronizarCanvasDasCenas`; uma quinta, `BootstrapDeCenaTests`, foi
+  encontrada no mesmo dia). Sem os três `EstadoPersistente*`, o jogador chegava ao Byakhee
+  **sem inventário nem progressão**, e no Castelo as relíquias do rito não sobreviviam à
+  entrada no Trono — o Rei era invencível por montagem, não por desenho.
+- `MontarPortoesDasRuinas`: monta `TravessiaDoCompanheiro` (Yug-Neth não entrava na arena) e
+  liga `voltaAoDeserto` no gatilho.
+- `MontarPortoesDasRuinas.GarantirPortoes`: reescrito para usar `Entrada_PortoesDeCarcosa` — a
+  arte que já marca os Portões no Deserto de Hali — em vez do kit Kenney. A montagem anterior
+  estava errada por três motivos mensuráveis: as peças tinham 8 × 16 un (o Damião tem 2,20);
+  só 229 das 512 linhas do PNG têm arte, então o "levante" de meia altura posicionava errado
+  por construção; e as peças eram enfileiradas em X puro com passo de largura cheia, o que
+  peça isométrica nunca encosta. A arte do mapa tem 4,00 × 4,12 un e pivô no pé, e já desenha
+  batentes e plataforma — a fileira de muralha saiu inteira. `RemoverMuralhaAntiga` limpa as
+  peças de cenas montadas pela versão anterior.
+
+### Testes
+- **Novo** `CenasNaoFicamParaTrasTests` (2 testes): **varre a pasta** `Assets/Scenes` em vez de
+  enumerar cenas, exigindo os três `EstadoPersistente*` e o `GameLoopBootstrap` de toda cena de
+  mundo. Cena nova entra na cobertura no instante em que o arquivo existe; sai só por entrada
+  justificada em `ForaDoMundo`. É o guarda contra o padrão das cinco listas, não contra este
+  caso. Validado por mutação (tirar `Cena_ArenaDeTestes` das exceções deixa o teste vermelho
+  nomeando as três ausências e a ferramenta que conserta).
+- `AnimacaoDoDamiaoTests`: dois guardas atualizados para o contrato novo, com o porquê no doc.
+  O pivô do rodapé deixou de ser `y = 0` — o contorno acrescentou 2 px sob os pés para a sombra
+  caber, então o esperado virou `MargemDaSombra / altura` (2/88, conferido idêntico nas nove
+  tiras). E a pegada do colisor foi de 0,5 para 1,467, proporcional à mudança deliberada de
+  escala do Damião (0,2857 → 0,8381): mesma razão pegada/altura de antes. Ganhou uma asserção
+  que faltava — a pegada tem que caber no corredor mais estreito do Castelo.
+
+Suíte EditMode: **644/644**.
+
+
 # Log de Atualizações
+
+## 2026-08-20 (42ª rodada) — O Castelo era top-down, e o Yug-Neth virou artesão
+
+Dois pedidos do Vini. O primeiro era um defeito meu.
+
+### 1. O chão do Castelo não era isométrico
+
+**Zero `Grid`, zero `Tilemap`.** O piso eram `SpriteRenderer` retangulares em espaço de mundo —
+top-down puro, enquanto Deserto, Santuário e Portões têm `Grid` com `cellLayout: 2` (Isometric) e
+`cellSize (1, 0.5)`. Só o Castelo, montado por mim em 19/08.
+
+**Nenhum teste percebia**, e o motivo importa: todos verificavam *o que existe* e nenhum
+verificava *em que projeção está desenhado*. Quem viu foi o Vini, olhando a cena.
+
+Reescrito na receita do `BuildSantuarioIsoFloor` — que, ao ser lido, revelou ter passado pela
+**mesma migração**, inclusive com um `DesativarPisoEParedesAntigas`. E ela resolve um segundo
+problema pela raiz: **a colisão é derivada do piso pintado**. Onde o corredor encosta na sala há
+piso, logo não há parede — as portas passam a existir *por construção*, em vez de dependerem de
+calcular um vão. Foi exatamente esse cálculo que lacrou o Z1 em 19/08.
+
+**A consequência que precisou ser encarada:** num grid isométrico, um bloco de células vira
+**losango 2:1**, não retângulo. Cinco peças caíam fora da sala nova — dois nobres fossilizados,
+dois espelhos e os pontos focais das relíquias (que davam 19 numa sala de raio 15). Todas
+recolocadas; os focais formam um triângulo em torno do trono.
+
+**Verificado por flood-fill, não por contagem:** 4224 células pintadas, exatamente o que a
+ferramenta reportou, e **região totalmente conexa** — os quatro centros alcançáveis a partir do
+Z1, sem ilha. Piso presente não é passagem; o Z1 lacrado ensinou isso.
+
+### O conserto que eu só pensei ter feito
+
+Ao mexer no `MarcarZona`, achei que em 20/08 eu tinha corrigido o tamanho do gatilho de zona.
+Tinha trocado **a assinatura e as quatro chamadas** — e esquecido **o corpo**, que seguiu usando
+`SalaGrande` fixo. O parâmetro `tamanho` ficou sem uso desde então, e o Z1 continuou com gatilho
+de sala grande.
+
+**Parâmetro não usado não gera erro de compilação.** Só aparece lendo o corpo — e eu tinha
+declarado a correção feita sem reler.
+
+### 2. Yug-Neth entra no Castelo e deixa de ser companheiro
+
+Decisão do Vini: ele atravessa com Damião e, ao chegar, vira o NPC que ensina o artesanato. Como
+**o artesanato é conteúdo pós-Vertical Slice**, ele não pode seguir acumulando as
+responsabilidades de companheiro — barra de RC, reanimação no Refúgio, bloqueio de progresso ao
+cair.
+
+- `CompanionManager.Aposentar()` + `OnCompanheiroAposentado`. É o oposto de registrar, **não uma
+  morte**: o objeto segue em cena.
+- `YugNethAI.TornarNpc()` — zera o alvo (o `Update` sai cedo com alvo nulo) e a velocidade, senão
+  ele desliza pela inércia do último quadro em que ainda seguia.
+- `TravessiaDoCompanheiro` ganhou `aposentarAoChegar`: ao chegar, **não** chama `Bind`, **não**
+  registra, põe o `YugNethArtesao` e aposenta.
+- `HUDController.RetirarCompanheiro()` faz **`Unbind` antes de esconder** — um GameObject
+  desativado não roda `OnDisable` de novo, então sem isso a barra ficaria assinada na Vitalidade
+  de quem não é mais companheiro.
+- `YugNethArtesao` (novo, `IInteragivel`): falas **provisórias e serializadas**. Yug-Neth não
+  fala — pisca; as linhas são a leitura que Damião faz da bioluminescência, e essa voz é do Vini
+  para escrever. **Nenhum artesanato foi implementado.**
+
+O posto dele fica no **Z1**: a única parte do Castelo onde parar para conversar não compete com
+dreno de RM nem com patrulha.
+
+### Erros meus, os dois pegos antes de rodar
+
+1. **Chutei o caminho do prefab** do Yug-Neth (`Characters/YugNeth/`); é `Characters/MiGo/`.
+   Conferido imediatamente, em vez de rodar e ver quebrar.
+2. Pus um `FindAnyObjectByType<TutorialHintUI>` como fallback — e o `Scripts/UI/CLAUDE.md`
+   **proíbe** localizar elemento de UI por busca. Trocado por injeção via `Configurar()`,
+   necessária porque o componente é acrescentado em runtime e não dá para ligar no Inspector
+   algo que ainda não existe.
+
+### Guardas
+
+- `CasteloDeCarcosaTests.OChaoDoCastelo_EIsometricoComoOResto` — exige `Grid`, `cellLayout: 2`,
+  `cellSize (1, 0.5)` e `TilemapCollider2D`. Testar o **número** do layout, e não só a presença
+  do `Grid`, é o que separa "tem grid" de "tem grid isométrico".
+- `AposentadoriaDoYugNethTests` (2) — a cadeia inteira, e que o Castelo **ligue a flag de
+  fato**: o código pode estar certo e o `bool` vir `false`, e aí Yug-Neth segue Damião até o
+  Trono sem uma linha no console. Validado por mutação (flag desligada → reprova).
+- O teste antigo de paredes `_A`/`_B` saiu: aquelas paredes deixaram de existir.
+
+**EditMode 639/639.**
+
+### Consequência a conferir no playtest
+
+**O Refúgio do Z1 deixa de reanimar o Yug-Neth**, já que ele não é mais companheiro ao entrar.
+Coerente com a decisão, mas significa que cair com ele incapacitado nos Portões e entrar no
+Castelo assim o leva ao posto de artesão sem ter sido reanimado. Se a aposentadoria também
+dever curar, é uma linha.
+
+## 2026-08-20 (41ª rodada) — A lista do caminho crítico fechou, e o HUD estava pela metade nas duas lutas de chefe
+
+Rodada autônoma. Três achados, e os três vieram de **desconfiar do verde**, não de construir
+coisa nova.
+
+### 1. Auditoria do caminho crítico — uma ligação muda
+
+Escrevi um script que confere, cena a cena: está no Build Settings, cada portal aponta para cena
+existente, e — o teste que revelou algo — **cada `chegarEm` tem um `PontoDeChegada`
+correspondente na cena de destino**.
+
+Acusou dez problemas. **Oito eram falso positivo do meu próprio script:** jogador e HUD são
+instâncias de prefab, então o guid do script vive no prefab, não no texto da cena. Refeita a
+detecção pelo guid do prefab, as cinco cenas têm os dois.
+
+Sobrou **um bug real, meu**: a volta dos Portões para o Deserto pedia
+`chegarEm: "PortoesDasRuinas"`, identificador que não existe lá. O efeito é mudo —
+`PortalDeCena` escreve `PontoDeChegada.Pendente`, ninguém consome, e o jogador aparece na
+entrada do deserto, longe dos Portões, sem uma linha no console. Apontado para
+`Refugio_PortoesDasRuinas`, que já existe colado no marco.
+
+O outro achado **não era defeito**: o portal para as Ruínas tem `chegarEm` vazio, e vazio
+significa "não reposicione" — caminho tratado explicitamente em `PortalDeCena`.
+
+Guarda novo: **`NavegacaoEntreCenasTests`**. Os testes por cena não pegavam porque cada um
+olhava a sua; este erro só existe **entre** duas — o portal numa, o ponto que falta na outra.
+Validado em vermelho→verde de verdade: a asserção rodou antes (vermelho, com exatamente o bug
+real), a cena foi remontada, rodou depois (verde).
+
+### 2. Item 3 fechado — barra do companheiro
+
+`CompanheiroBar`, na família `BarraAnimada<TFonte>` que `VitalidadeBar` e `VigorBar` já usam.
+
+O ponto de desenho: Yug-Neth é registrado **em runtime**, quando libertado do Abdul — não no
+bootstrap. Então a barra não pode ser ligada no arranque como as outras. `CompanionManager`
+ganhou `OnCompanheiroRegistrado`; consultar todo frame para descobrir quando deixou de ser nulo
+violaria a Regra de Ouro 8.
+
+**Os dois caminhos de ligação são necessários:** o evento cobre a libertação durante a cena; a
+ligação imediata (`companheiro.YugNeth != null`) cobre trocar de cena depois de libertá-lo, ou
+carregar um save. Só o evento faria a barra sumir na primeira transição depois da Tumba; só a
+ligação imediata nunca a mostraria na cena em que ele é solto.
+
+Nasce **desativada**. Incapacitado pinta em cor apagada em vez de sumir — o jogador precisa ver
+que há alguém para reanimar.
+
+### 3. O achado que valeu mais: o HUD estava pela metade nas lutas de chefe
+
+Ao acrescentar a barra, dois testes reprovaram. Investigando o porquê, apareceu o problema
+maior:
+
+| barra | Deserto | Santuário | **Portões** | **Castelo** |
+|---|---|---|---|---|
+| Vigor | sim | sim | **não** | **não** |
+| Ações | sim | sim | **não** | **não** |
+| Artefatos | sim | sim | **não** | **não** |
+| Itens | sim | sim | **não** | **não** |
+
+As duas cenas criadas em 19 e 20/08 só recebiam o prefab `HUD_ResilienciaBar`, que liga **duas
+das seis** views. Na luta do Byakhee e na do Rei o jogador ficava **sem barra de Vigor** — o
+recurso da Esquiva, a única defesa em luta de chefe —, sem ver a arma empunhada, sem os quatro
+Artefatos (que é como o rito é acionado) e sem os consumíveis.
+
+Passou despercebido porque a lista de cenas do montador tinha **três** e a do guarda **quatro**,
+ambas escritas antes de o Castelo e os Portões existirem. As duas foram estendidas.
+
+### O defeito latente que isso destapou
+
+Rodar `BuildHUDCompleto.BuildEmTodasAsCenas` **apagou o `PainelDeFicha`** de três cenas que o
+tinham. Causa: a ficha é filha da `Janela`, que é filha do `PainelDeInventario` — e
+`MontarPainelDeInventario.MontarNaCenaAberta()` faz `DestroyImmediate` no painel inteiro para
+refazer. A ficha ia junto, calada. **Qualquer pessoa que rodasse aquele montador teria feito o
+mesmo**, desde sempre.
+
+Confirmado pelo git (`antes=1, agora=0`), não por impressão. Corrigido encadeando
+`BuildPainelDeFicha.Montar()` logo após o inventário, dentro do próprio `BuildHUDCompleto` — a
+ordem importa. Efeito colateral bom: as duas cenas de chefe ganharam a ficha, que nunca tiveram.
+
+### Erros meus nesta rodada
+
+1. `GetBuiltinExtraResource<Font>("Arial.ttf")` — lança exceção na Unity 6. O nome certo estava
+   em seis arquivos do projeto.
+2. `AtribuirCampo` escrito num escopo onde a variável não existia (CS0103).
+3. Rodei `BuildHUDCompleto.Build` (**cena aberta**) em vez de `BuildEmTodasAsCenas`. Em batch a
+   cena aberta é uma sem título, e o log dizia `HUD completo em ''` — nome vazio, sinal na cara.
+
+**O padrão dos três é o mesmo:** escrevi de cabeça, ou peguei a primeira variante que encontrei,
+em vez de ler o bloco ao redor e ver o que mais havia ali. A informação certa estava sempre a
+poucas linhas de distância.
+
+### O que os guardas fizeram
+
+Três me pegaram em sequência, e **nenhum era falso positivo**:
+- `HudCompletoTests` viu o `CompanheiroBar` órfão no instante em que foi criado (ele existe
+  desde o incidente da `VigorBar`, e cumpriu exatamente o papel para o qual foi escrito);
+- `PainelDeFichaNoMundoTests` viu a ficha sumir de três cenas;
+- `BarraDoCompanheiroTests`, escrito nesta rodada, viu a barra faltando.
+
+**EditMode 638/638.**
+
+### Estado do caminho crítico
+
+```
+Cena_Menu → Deserto_Hali ⇄ Playtest_RuinasPalidas
+                         ⇄ Santuario_Yhtill
+                         → Portoes_Das_Ruinas → Castelo_Carcosa
+```
+
+As seis cenas estão no Build Settings, ligadas ponta a ponta, com HUD completo e ficha em todas.
+A lista de cinco itens do caminho crítico (definida em 2026-08-19) **fechou**.
+
+**O que separa isto de uma build entregue é playtest, não construção:** nada do caminho foi
+jogado de ponta a ponta por um humano ainda.
+
+## 2026-08-20 (40ª rodada) — Portões com arte, poste pós-luta e o atalho do Santuário fora
+
+Três decisões do Vini nesta rodada, e um erro meu que a execução pegou.
+
+### 1. O atalho Santuário → Castelo saiu
+
+Ele existiu por um motivo que acabou: foi criado em 2026-08-19 porque o Castelo era cena solta,
+alcançável só pelo Editor. Com os Portões em cena, o caminho verdadeiro passou a existir
+(Deserto → Portões → Castelo, como o GDD sempre descreveu) e o atalho virou defeito: **ele pula
+o Byakhee**, que é a única fonte do Anel do Sinal Amarelo. Levava ao chefe final sem o que é
+preciso para vencê-lo, sem dar sinal nenhum disso.
+
+A remoção vive dentro do próprio `MontarCasteloCarcosa` — `LigarOPortalNoSantuario` virou
+`RemoverOAtalhoDoSantuario`. Como era essa ferramenta quem criava o atalho, pôr a remoção nela
+é o que garante idempotência: rodá-la de novo continua tirando, em vez de ressuscitar o que foi
+decidido remover.
+
+E o teste `CasteloDeCarcosaTests` **inverteu**: ele exigia o portal do Santuário, agora o
+**proíbe** — cobrando em troca que o Castelo seja alcançável pelos Portões.
+
+### 2. Os Portões ganharam arte
+
+Kenney "Dungeon Pack" 2.3, **CC0** — sem pendência de licença. `stoneWallGateClosed_S` e
+`stoneWallGateOpen_S`: portão isométrico de pedra com folhas de madeira, e o par fechado/aberto
+do **mesmo kit**, então os quadros se sobrepõem sem salto de posição. O `PortaoDosPortoes`
+trocou o "duas caixas deslizando" por troca de sprite, que é o que a arte entrega pronto.
+
+Cada peça do kit é estreita e alta, e o pacote já trazia a fatia recortada
+(`stoneWallGateClosed_S_0`, 162 × 239 px → 5,06 × 7,47 em mundo a PPU 32). Uma só não barra os
+18 de piso, então a muralha é o portão no centro ladeado por `stoneWallAged_S` — 5 peças,
+25,3 de vão barrado. **A largura sai de `sprite.bounds` em tempo de montagem**, não de
+estimativa: o dado verdadeiro está no asset e custa uma linha.
+
+**O desencontro que só apareceu por eu ir olhar o YAML:** o pivô das fatias é **central**. Com a
+peça centrada em y = 11 — onde está o colisor — o pé desenhado do portão descia até y ≈ 7,3, e o
+jogador atravessaria três unidades da base visível antes de esbarrar em nada. Corrigido levantando
+cada peça por metade da própria altura, lida de `bounds`. Conferido na cena: `local y = 3,734`,
+que é exatamente 7,47 / 2.
+
+### 3. O Yug-Neth, resolvido por recompensa em vez de bloqueio
+
+O GDD fazia do Yug-Neth a "chave dimensional dos Portões", e previa que ele **incapacitado
+bloqueia a passagem**. Decisão do Vini: trocar por um **Poste de Luz liberado ao fim da luta**.
+
+Isso resolve pela porta certa, porque o `RefugioDeLuz` **já reanima o companheiro**
+(`ReanimarCompanheiro`), além de ancorar a Resiliência, curar 40% da Vitalidade e **gravar a
+partida**. Então vencer o Byakhee é o que devolve o Yug-Neth de pé — em vez de exigi-lo de pé
+para passar. Um pré-requisito escondido virou consequência de vencer.
+
+O poste **nasce apagado e acende** no abate: desligo o componente e o colisor, não o GameObject.
+Um poste que surge do nada lê como bug; um apagado que acende lê como recompensa. E o objeto
+vivo desde o início mantém o `PontoDeChegada` irmão registrável — sem ele o renascimento cai na
+posição padrão da cena em vez de sob a luz.
+
+### O erro: `Arial.ttf`
+
+Escrevi `GetBuiltinExtraResource<Font>("Arial.ttf")` no montador novo. Na Unity 6 esse nome não
+só foi removido — ele **lança** `ArgumentException` e derrubou a ferramenta inteira em batch. A
+armadilha estava documentada em **seis** arquivos do projeto e mesmo assim eu digitei o nome
+antigo, porque escrevi a linha de cabeça em vez de copiar a que já existia ao lado.
+
+Por que nada avisou antes: `FonteBuiltinTests` já existia e passava verde — os dois testes dele
+medem o comportamento da **Unity** (que a fonte nova existe, que a velha lança). Nenhum olha
+para o nosso código.
+
+Acrescentei `NenhumCodigo_PedeAFonteAntiga`, que varre os `.cs`. **E ele nasceu errado:** na
+primeira versão acusava **três arquivos corretos**, porque os comentários que explicam a
+armadilha citam a chamada e o nome antigo na mesma linha, justamente para avisar. Descoberto por
+mutação antes de confiar nele; agora corta a linha no `//` antes de testar. Validados os três
+casos: estado atual limpo, chamada plantada pega, comentário plantado ignorado.
+
+Um guarda que reprova código certo é pior que guarda nenhum — ensina a desligá-lo.
+
+**EditMode 632/632.**
+
+### A olho, pendente de playtest
+- **Escala do portão:** 7,47 de altura contra 2,62 do Damião (2,85×). Imponente; se exagerar, é
+  um `localScale` nas peças.
+- **A muralha sobra 3,6 de cada lado do piso** — lê como parede embutida na rocha ou como erro?
+
+## 2026-08-20 (39ª rodada) — Os Portões das Ruínas existem, e o jogo virou terminável
+
+### O buraco que isto fecha
+
+O Rei em Amarelo exige três relíquias. Uma delas, o **Anel do Sinal Amarelo**, é espólio
+garantido do Byakhee — a descrição do próprio item diz: "gravação sacra *arrancada do Byakhee*".
+E o Byakhee **não estava em cena nenhuma**: FSM com 3 fases e 10 testes, ficha calibrada por
+simulação, prefab com spritesheet de 26 quadros, tabela `Drop_Byakhee` autorada — tudo pronto,
+`IniciarLuta()` chamado só pelo Carcosa Debugger.
+
+Pior: mesmo com a arena, o Anel não cairia. O `DropAoAbater` **nunca foi anexado ao prefab do
+Byakhee** — só existia no `Cultista.prefab`. Duas ligações faltando, e a consequência somada era
+que **dava para chegar ao Rei e não havia como selá-lo**.
+
+### O que foi construído
+
+- **`LigarDropDoByakhee`** — anexa `DropAoAbater` → `Drop_Byakhee` no prefab. Confere no asset
+  recarregado, não na cópia em memória.
+- **`MontarPortoesDasRuinas`** — a cena `Portoes_Das_Ruinas.unity`: chão de losango isométrico
+  com anel de colisão, Byakhee com `centroDaArena` ligado, gatilho de luta, os Portões, passagem
+  para o Castelo e volta ao Deserto. Registra no Build Settings e põe um `PortalDeCena` no marco
+  `Portoes_DasRuinas` do Deserto, que até agora era **pura decoração** (Transform +
+  `SpriteRenderer` + `DynamicYSort`, sem colisor e sem portal).
+- **`ArenaDosPortoes`** (Runtime) — desperta o chefe quando Damião entra e **destranca** os
+  Portões no abate. A luta começa por gatilho e não no `Start` porque o grito infrassônico drena
+  2 RM/s passivamente: começar ao carregar a cena cobraria Resiliência antes de o jogador
+  escolher entrar.
+- **`PortaoDosPortoes`** (Runtime, `IInteragivel`) — duas folhas de pedra visíveis que deslizam
+  ao abrir. **Abater destranca; quem abre é o jogador**, encostando e apertando interagir
+  (pedido do Vini). O portão abrindo sozinho no instante do abate rouba o gesto e joga a
+  transição de fase por cima da morte do chefe.
+
+### Reuso, e o que ele evitou
+
+O chão saiu de `MontarArenaDeTestes`, que já fora feita pensando nesta luta e carregava duas
+armadilhas pagas com um playtest cada:
+
+1. **O anel de colisão precisa de duas células.** Com uma, um ator rápido — o rasante do Byakhee
+   é o caso — atravessa entre dois `FixedUpdate` mesmo com `Continuous`.
+2. **O tile do anel precisa de `colliderType Grid`.** Reaproveitar o tile do piso (que é `None`)
+   faz o `TilemapCollider2D` não gerar geometria nenhuma: colisor em cena que não colide com
+   coisa alguma.
+
+E uma terceira, que estava documentada em texto: o prefab do Damião **não** traz `ArtefatosBridge`
+nem `GerenciadorDeVigor` — as cenas os acrescentam por wiring. Sem o Vigor a Esquiva não tem
+recurso para cobrar, e esquivar é a única defesa em luta de chefe.
+
+### O erro de geometria, pego antes de rodar
+
+O piso **não é um retângulo**. Com `cellLayout Isometric` e `cellSize (1, 0.5)`, a célula
+`(gx,gy)` cai em `x=(gx-gy)/2`, `y=(gx+gy)/4` — um bloco quadrado de células vira um **losango**
+de 64 × 32 que afina até virar ponta nos extremos de Y.
+
+O gatilho de luta estava dimensionado em 24 numa altura onde o piso tem 36: o jogador passaria
+**ao lado** dele e chegaria ao Byakhee sem despertá-lo. Mesma família do Castelo lacrado —
+geometria presumida em vez de calculada. Corrigido antes da primeira execução: gatilho 38 em
+y = −7, Portões 20 em y = 11.
+
+### Debugger
+
+As quatro relíquias já estavam lá, uma por botão. Faltava o **set num clique**:
+- "Conceder o set do rito" — lê `idsDasReliquiasExigidas` **do Rei em cena**, não de uma cópia.
+  Uma cópia fora de sincronia concederia o conjunto errado e o rito nunca fecharia, sem erro
+  nenhum aparecendo. Sem Rei em cena o botão se desabilita em vez de adivinhar.
+- "Conceder o Set Lendário (4/4)", rótulo de progresso ao vivo, e aviso quando uma relíquia não
+  couber: são 4 slots de porte e o ponto focal só aceita relíquia **portada**, não dormente.
+
+`ReiEmAmareloAI.ReliquiasExigidas` virou propriedade pública para isso.
+
+### Guardas
+
+- **`PortoesDasRuinasTests`** (4) — cena no disco + Build Settings + alcançável pelo Deserto;
+  as peças da luta instanciadas; **o gatilho e os Portões atravessam o losango** na altura em que
+  estão; o Byakhee larga o espólio.
+- **`ReliquiasDoRitoTests`** (3) — cada relíquia exigida tem `ArtefatoDef` com `Item` ligado; o
+  set cabe nos slots de porte; o Byakhee aponta para a tabela **certa** com o Anel em
+  `NivelMinimo: 1` (o nível está travado em 1 no VS — uma entrada acima disso nunca cairia).
+
+O leitor de YAML do teste de geometria foi validado por discriminação antes de virar verde:
+devolve 38 / 20 / 10 / 6 para os quatro colisores e `NaN` para um objeto inexistente — não é
+bug de primeiro-match passando por acidente.
+
+**EditMode 630/630.**
+
+### Pendente nos Portões
+- **Yug-Neth é a chave dimensional** pelo GDD, e incapacitado bloqueia a passagem. Não
+  implementado: exige o companheiro em cena e é um beat de design próprio.
+- **Arte.** As folhas são caixas de placeholder.
+- **Decisão aberta:** o portal Santuário → Castelo continua existindo. É atalho de quando o
+  Castelo não tinha como ser alcançado, e hoje permite chegar ao Rei sem o Anel.
+
+## 2026-08-19 (38ª rodada) — O Castelo estava lacrado: o jogador não saía de Z1
+
+Relato do Vini depois do primeiro playtest do Castelo: **"não dá para passar da primeira
+parte"**.
+
+### Diagnóstico
+
+Não era colisor mal calibrado nem trigger de zona faltando — era **topologia**. `Sala()`
+fechava as **quatro** paredes de toda sala, e `Corredor()` desenhava só o piso: `Transform` +
+`SpriteRenderer`, colisor nenhum, e nenhuma abertura na parede que ele encostava. Cada zona era
+uma caixa de mármore soldada. Confirmado no YAML antes de escrever qualquer correção:
+
+```
+Z1_PortoesInternos  Parede_Norte  local=(0, 6)  size=(18, 0.5)  solido
+Corredor_Z1_Z2      componentes: Transform, SpriteRenderer
+```
+
+**Por que a suíte não pegou:** os testes existentes verificavam *presença* — as 4 zonas na cena,
+os sistemas instanciados, um ponto focal por relíquia. Tudo passava. **Presença não é
+conectividade**, e nada media a segunda.
+
+### Correção — `MontarCasteloCarcosa.cs`
+
+- `LarguraDoVao = 4f` e `enum Vao { Nenhum, Norte, Sul, NorteESul }`; `Sala()` passa a receber
+  onde abrir porta.
+- `ParedeHorizontal()` monta a parede inteira **ou** partida em `_A`/`_B` em torno de um vão
+  central. Remove a variante oposta antes de montar — sem isso, numa segunda execução a parede
+  inteira antiga continuaria lacrando o vão que os segmentos novos abriram.
+- `Corredor()` ganhou `Lateral_Oeste`/`Lateral_Leste` com colisor: sem elas o corredor seria
+  tapete no vácuo, com a porta aberta e nada segurando o jogador pelos lados.
+- Portas por zona, seguindo Z1 embaixo → Trono no topo: Z1 `Norte`, Z2 e Z3 `NorteESul`,
+  Z5 `Sul`. A `Parede_Norte` inteira que sobra no Z5 é o fundo atrás do trono, e é intencional.
+- **Corrigido no caminho:** `MarcarZona()` usava `SalaGrande` para todas as zonas. Em Z1 (18×12)
+  o gatilho transbordava as próprias paredes e anunciava a zona antes de o jogador entrar. Agora
+  recebe o tamanho real da sala.
+
+### Geometria conferida no YAML, não no log
+
+| peça | x | y |
+|---|---|---|
+| Z1 `Parede_Norte_A` / `_B` | −9…−2 e +2…+9 | −24 |
+| `Corredor_Z1_Z2` (+ laterais em x = ±2) | −2…+2 | −24…−9 |
+| Z2 `Parede_Sul_A` / `_B` | −13…−2 e +2…+13 | −9 |
+
+O vão cai exatamente sobre a boca do corredor e as laterais encostam na ponta de cada segmento.
+Também decodifiquei `m_LayerCollisionMatrix` de `Physics2DSettings.asset`: Player (8) × Obstacle
+(9) colidem, então as paredes bloqueiam de fato — a checagem que faltava para a conclusão não ser
+suposição.
+
+### Guarda novo — `CasteloDeCarcosaTests`
+
+`AsSalas_TemPortaEOsCorredores_TemParedeLateral`: exige os 6 pares `_A`/`_B` nas seis portas do
+caminho crítico e as laterais nos 3 corredores. As regex foram conferidas por discriminação
+(nome inexistente → 0 ocorrências) antes de virar teste verde, para não repetir o padrão do
+guarda que só sabe concordar.
+
+**EditMode 623/623**, marcador do teste novo presente no XML de resultados.
 
 ## 2026-08-19 (37ª rodada) — O Castelo de Carcosa existe, e o inventário duplicado saiu
 

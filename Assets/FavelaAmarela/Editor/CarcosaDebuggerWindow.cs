@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using FavelaAmarela.Core.Artefatos;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Inventario;
 using FavelaAmarela.Player;
@@ -75,6 +77,8 @@ namespace FavelaAmarela.EditorTools
 
             DesenharSecaoArtefatos();
             GUILayout.Space(8);
+            DesenharSecaoSet();
+            GUILayout.Space(8);
             DesenharSecaoArmas();
             GUILayout.Space(8);
             DesenharSecaoChefes();
@@ -122,6 +126,105 @@ namespace FavelaAmarela.EditorTools
             Debug.Log(slot >= 0
                 ? $"[CarcosaDebugger] '{nome}' concedido no slot {slot}."
                 : $"[CarcosaDebugger] Falha ao conceder '{nome}' — sem slot livre ou id inválido.");
+        }
+
+        // ── Set de relíquias ──────────────────────────────────────────────────
+
+        /// <summary>
+        /// Concede um <b>set inteiro</b> de relíquias num clique — o que faz o Rei em Amarelo
+        /// ser derrotável sem catar relíquia por relíquia.
+        ///
+        /// <para><b>Por que o botão do rito lê o Rei da cena:</b> a lista <see cref="Artefatos"/>
+        /// aqui é conveniência de UI e pode divergir do que o rito realmente exige — o campo
+        /// <c>idsDasReliquiasExigidas</c> é serializado por instância e pode ser editado no
+        /// Inspector. Uma segunda cópia da lista que saísse de sincronia concederia o conjunto
+        /// errado, e o rito simplesmente nunca fecharia, <b>sem erro nenhum aparecendo</b>. O
+        /// Rei é a fonte da verdade; sem Rei em cena o botão se desabilita em vez de adivinhar.</para>
+        ///
+        /// <para><b>O que isto NÃO conserta:</b> o Anel do Sinal Amarelo é espólio garantido do
+        /// Byakhee (<c>Drop_Byakhee</c>), mas o Byakhee não está em cena nenhuma — falta a arena
+        /// dos Portões (roadmap, item 9). Enquanto ela não existir, este atalho é o único
+        /// caminho até o rito completo. Ele destrava o teste; não substitui a arena.</para>
+        /// </summary>
+        private void DesenharSecaoSet()
+        {
+            EditorGUILayout.LabelField("Set de relíquias", EditorStyles.boldLabel);
+
+            var artefatos = ObterArtefatosBridge();
+            var rei = FindFirstObjectByType<ReiEmAmareloAI>();
+
+            using (new EditorGUI.DisabledScope(artefatos == null || rei == null))
+            {
+                if (GUILayout.Button("Conceder o set do rito (lido do Rei em cena)"))
+                    ConcederSet(artefatos, rei.ReliquiasExigidas, "rito do Rei");
+            }
+
+            using (new EditorGUI.DisabledScope(artefatos == null))
+            {
+                if (GUILayout.Button($"Conceder o Set Lendário ({Artefatos.Length}/{Artefatos.Length})"))
+                    ConcederSet(artefatos, System.Array.ConvertAll(Artefatos, a => a.Id), "Set Lendário");
+            }
+
+            if (rei == null)
+                EditorGUILayout.HelpBox(
+                    "Nenhum Rei em Amarelo nesta cena — o botão do rito fica desabilitado em vez " +
+                    "de adivinhar a lista. Use o Set Lendário, ou abra Castelo_Carcosa.",
+                    MessageType.Info);
+
+            if (artefatos != null && rei != null)
+                EditorGUILayout.LabelField("Rito exigido",
+                    DescreverProgresso(artefatos, rei.ReliquiasExigidas));
+        }
+
+        /// <summary>
+        /// Concede cada id da lista, pulando o que já está portado. Relata em uma linha só —
+        /// e avisa quando alguma relíquia <b>não coube</b>: os slots de porte são
+        /// <see cref="InventarioDeArtefatos.TotalDeSlots"/>, e um set maior que isso deixaria
+        /// relíquia dormente, com o ponto focal recusando a interação sem dizer por quê.
+        /// </summary>
+        private static void ConcederSet(ArtefatosBridge artefatos, IReadOnlyList<string> ids,
+                                         string rotuloDoSet)
+        {
+            if (artefatos == null || ids == null || ids.Count == 0)
+            {
+                Debug.LogWarning($"[CarcosaDebugger] Set '{rotuloDoSet}' vazio — nada concedido.");
+                return;
+            }
+
+            var concedidos = new List<string>();
+            var jaTinha = new List<string>();
+            var recusados = new List<string>();
+
+            foreach (var id in ids)
+            {
+                if (artefatos.Inventario.Contem(id)) { jaTinha.Add(id); continue; }
+
+                if (artefatos.EquiparNoPrimeiroSlotLivre(id) >= 0) concedidos.Add(id);
+                else recusados.Add(id);
+            }
+
+            Debug.Log($"[CarcosaDebugger] Set '{rotuloDoSet}': " +
+                      $"{concedidos.Count} concedida(s), {jaTinha.Count} já portada(s), " +
+                      $"{recusados.Count} recusada(s).");
+
+            if (recusados.Count > 0)
+                Debug.LogWarning(
+                    $"[CarcosaDebugger] Sem slot livre (ou id inválido) para: " +
+                    $"{string.Join(", ", recusados)}. São {InventarioDeArtefatos.TotalDeSlots} " +
+                    "slots de porte, e o ponto focal só aceita relíquia PORTADA — uma dormente " +
+                    "faz o rito travar em silêncio.");
+        }
+
+        /// <summary>"2/3 — falta: anel_sinal_amarelo", para o rito ser lido de relance.</summary>
+        private static string DescreverProgresso(ArtefatosBridge artefatos, IReadOnlyList<string> ids)
+        {
+            var faltando = new List<string>();
+            foreach (var id in ids)
+                if (!artefatos.Inventario.Contem(id)) faltando.Add(id);
+
+            return faltando.Count == 0
+                ? $"{ids.Count}/{ids.Count} — completo"
+                : $"{ids.Count - faltando.Count}/{ids.Count} — falta: {string.Join(", ", faltando)}";
         }
 
         // ── Armas ────────────────────────────────────────────────────────────

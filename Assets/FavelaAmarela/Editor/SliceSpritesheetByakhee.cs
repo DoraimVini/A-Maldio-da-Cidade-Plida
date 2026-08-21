@@ -10,7 +10,7 @@ namespace FavelaAmarela.EditorTools
     /// <c>Assets/Arte/Inbox/byakhee_v2_animated.aseprite</c>, exportado via Aseprite CLI para
     /// <c>Byakhee_Spritesheet.png</c>) em frames nomeados por animação.
     ///
-    /// <para><b>26 frames em fita única, 140×140 cada.</b> O <c>.aseprite</c> já vem com 6
+    /// <para><b>26 frames em grid 6×6, 164×164 cada.</b> O <c>.aseprite</c> já vem com 6
     /// tags (Idle/Walk/Attack/Special/Hurt/Death), mas o campo "to" de cada tag está com bug
     /// — todas terminam no frame 25. Os "from" continuam confiáveis (0, 4, 10, 14, 20, 22) e
     /// são não-sobrepostos entre si, então cada tag foi reconstruída aqui como
@@ -26,8 +26,9 @@ namespace FavelaAmarela.EditorTools
         private const string CaminhoTextura =
             "Assets/FavelaAmarela/Art/Enemies/Byakhee_Spritesheet.png";
 
-        private const int TamanhoFrame = 140;
-        private const int AlturaTextura = 140; // fita única: 1 linha, sem inversão de eixo Y
+        private const int TamanhoFrame = 164;
+
+        private const int AlturaTextura = TamanhoFrame * 6; // 6 linhas
 
         private readonly struct Linha
         {
@@ -96,15 +97,19 @@ namespace FavelaAmarela.EditorTools
         {
             var lista = new List<SpriteRect>();
 
-            foreach (var info in _linhas)
+            // O indice da LINHA e o que posiciona no grid, nao o numero global do quadro:
+            // as fileiras tem 4, 6, 4, 6, 2 e 4 quadros, entao 'frameGlobal / 6' cairia na
+            // fileira errada. Cada Linha deste array E uma fileira do arquivo.
+            for (int fileira = 0; fileira < _linhas.Length; fileira++)
             {
+                var info = _linhas[fileira];
+
                 for (int i = 0; i < info.Frames; i++)
                 {
-                    int frameGlobal = info.FrameInicial + i;
                     var sr = new SpriteRect
                     {
                         name = $"byakhee_{info.Nome}_{i}",
-                        rect = RectDoFrame(frameGlobal),
+                        rect = RectDoFrame(fileira, i),
                         // Pivot nos pés/sombra: a arte já desenha uma sombra elíptica na base
                         // de cada frame, então o centro-base bate com o Y-sort do projeto.
                         alignment = SpriteAlignment.Custom,
@@ -137,10 +142,32 @@ namespace FavelaAmarela.EditorTools
         /// A folha é uma fita única (1 linha, 26 colunas) — sem a inversão de eixo Y que o
         /// grid do Abdul precisa, só a coluna do frame.
         /// </summary>
-        private static Rect RectDoFrame(int frameGlobal)
+        /// <summary>
+        /// Retângulo de um quadro no <b>grid</b> 6×6.
+        ///
+        /// <para><b>Deixou de ser fita única em 2026-08-20, por dois motivos.</b> O primeiro: a
+        /// fita anterior estava <b>quebrada</b> — as células do arquivo original medem
+        /// 1024/6 = 170,67 px e quem gerou a fita cortou blocos de 140, então o erro acumulava e
+        /// cada quadro continha o fim de um e o começo do próximo, com as linhas de grade
+        /// atravessando. O segundo: 26 quadros de 164 em uma linha dão <b>4264 px</b>, e o
+        /// <c>maxTextureSize</c> é 2048 — a Unity reduziria a textura em silêncio e os
+        /// retângulos daqui apontariam para o lugar errado. Em grid são 984×984, que cabe.</para>
+        ///
+        /// <para><b>Y invertido:</b> a fileira 0 do arquivo é a de cima, mas o retângulo de
+        /// sprite da Unity tem origem embaixo. Sem a inversão, "espreita" traria os quadros de
+        /// derrota.</para>
+        ///
+        /// <para><b>Recebe a fileira, e não o número global do quadro:</b> as fileiras têm 4, 6,
+        /// 4, 6, 2 e 4 quadros, então dividir o índice global por 6 cairia na fileira errada —
+        /// erro que a primeira versão desta reescrita cometeu e que só apareceu ao imprimir o
+        /// mapeamento antes de rodar.</para>
+        /// </summary>
+        private static Rect RectDoFrame(int fileira, int coluna)
         {
-            float x = frameGlobal * TamanhoFrame;
-            return new Rect(x, 0, TamanhoFrame, TamanhoFrame);
+            float x = coluna * TamanhoFrame;
+            float y = AlturaTextura - (fileira + 1) * TamanhoFrame;
+
+            return new Rect(x, y, TamanhoFrame, TamanhoFrame);
         }
     }
 }

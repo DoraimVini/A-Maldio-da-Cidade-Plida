@@ -130,9 +130,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 140
-        height: 140
+        y: 820
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -151,10 +151,10 @@ TextureImporter:
       name: byakhee_espreita_1
       rect:
         serializedVersion: 2
-        x: 140
-        y: 0
-        width: 140
-        height: 140
+        x: 164
+        y: 820
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -173,10 +173,10 @@ TextureImporter:
       name: byakhee_espreita_2
       rect:
         serializedVersion: 2
-        x: 280
-        y: 0
-        width: 140
-        height: 140
+        x: 328
+        y: 820
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -195,10 +195,10 @@ TextureImporter:
       name: byakhee_espreita_3
       rect:
         serializedVersion: 2
-        x: 420
-        y: 0
-        width: 140
-        height: 140
+        x: 492
+        y: 820
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -217,10 +217,10 @@ TextureImporter:
       name: byakhee_rasante_0
       rect:
         serializedVersion: 2
-        x: 560
-        y: 0
-        width: 140
-        height: 140
+        x: 0
+        y: 656
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -239,10 +239,10 @@ TextureImporter:
       name: byakhee_rasante_1
       rect:
         serializedVersion: 2
-        x: 700
-        y: 0
-        width: 140
-        height: 140
+        x: 164
+        y: 656
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -261,10 +261,10 @@ TextureImporter:
       name: byakhee_rasante_2
       rect:
         serializedVersion: 2
-        x: 840
-        y: 0
-        width: 140
-        height: 140
+        x: 328
+        y: 656
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -283,10 +283,10 @@ TextureImporter:
       name: byakhee_rasante_3
       rect:
         serializedVersion: 2
-        x: 980
-        y: 0
-        width: 140
-        height: 140
+        x: 492
+        y: 656
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -305,10 +305,10 @@ TextureImporter:
       name: byakhee_rasante_4
       rect:
         serializedVersion: 2
-        x: 1120
-        y: 0
-        width: 140
-        height: 140
+        x: 656
+        y: 656
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -327,10 +327,10 @@ TextureImporter:
       name: byakhee_rasante_5
       rect:
         serializedVersion: 2
-        x: 1260
-        y: 0
-        width: 140
-        height: 140
+        x: 820
+        y: 656
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -349,10 +349,10 @@ TextureImporter:
       name: byakhee_garras_0
       rect:
         serializedVersion: 2
-        x: 1400
-        y: 0
-        width: 140
-        height: 140
+        x: 0
+        y: 492
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -371,10 +371,10 @@ TextureImporter:
       name: byakhee_garras_1
       rect:
         serializedVersion: 2
-        x: 1540
-        y: 0
-        width: 140
-        height: 140
+        x: 164
+        y: 492
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -393,10 +393,10 @@ TextureImporter:
       name: byakhee_garras_2
       rect:
         serializedVersion: 2
-        x: 1680
-        y: 0
-        width: 140
-        height: 140
+        x: 328
+        y: 492
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -415,10 +415,10 @@ TextureImporter:
       name: byakhee_garras_3
       rect:
         serializedVersion: 2
-        x: 1820
-        y: 0
-        width: 140
-        height: 140
+        x: 492
+        y: 492
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -437,10 +437,10 @@ TextureImporter:
       name: byakhee_grito_0
       rect:
         serializedVersion: 2
-        x: 1960
-        y: 0
-        width: 140
-        height: 140
+        x: 0
+        y: 328
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -459,10 +459,10 @@ TextureImporter:
       name: byakhee_grito_1
       rect:
         serializedVersion: 2
-        x: 2100
-        y: 0
-        width: 140
-        height: 140
+        x: 164
+        y: 328
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -481,10 +481,10 @@ TextureImporter:
       name: byakhee_grito_2
       rect:
         serializedVersion: 2
-        x: 2240
-        y: 0
-        width: 140
-        height: 140
+        x: 328
+        y: 328
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -503,10 +503,10 @@ TextureImporter:
       name: byakhee_grito_3
       rect:
         serializedVersion: 2
-        x: 2380
-        y: 0
-        width: 140
-        height: 140
+        x: 492
+        y: 328
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -525,10 +525,10 @@ TextureImporter:
       name: byakhee_grito_4
       rect:
         serializedVersion: 2
-        x: 2520
-        y: 0
-        width: 140
-        height: 140
+        x: 656
+        y: 328
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -547,10 +547,10 @@ TextureImporter:
       name: byakhee_grito_5
       rect:
         serializedVersion: 2
-        x: 2660
-        y: 0
-        width: 140
-        height: 140
+        x: 820
+        y: 328
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -569,10 +569,10 @@ TextureImporter:
       name: byakhee_dano_0
       rect:
         serializedVersion: 2
-        x: 2800
-        y: 0
-        width: 140
-        height: 140
+        x: 0
+        y: 164
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -591,10 +591,10 @@ TextureImporter:
       name: byakhee_dano_1
       rect:
         serializedVersion: 2
-        x: 2940
-        y: 0
-        width: 140
-        height: 140
+        x: 164
+        y: 164
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -613,10 +613,10 @@ TextureImporter:
       name: byakhee_derrota_0
       rect:
         serializedVersion: 2
-        x: 3080
+        x: 0
         y: 0
-        width: 140
-        height: 140
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -635,10 +635,10 @@ TextureImporter:
       name: byakhee_derrota_1
       rect:
         serializedVersion: 2
-        x: 3220
+        x: 164
         y: 0
-        width: 140
-        height: 140
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -657,10 +657,10 @@ TextureImporter:
       name: byakhee_derrota_2
       rect:
         serializedVersion: 2
-        x: 3360
+        x: 328
         y: 0
-        width: 140
-        height: 140
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -679,10 +679,10 @@ TextureImporter:
       name: byakhee_derrota_3
       rect:
         serializedVersion: 2
-        x: 3500
+        x: 492
         y: 0
-        width: 140
-        height: 140
+        width: 164
+        height: 164
       alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

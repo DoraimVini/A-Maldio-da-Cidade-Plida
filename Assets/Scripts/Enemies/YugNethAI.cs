@@ -170,6 +170,20 @@ namespace FavelaAmarela.Runtime.Enemies
             }
         }
 
+        /// <summary>
+        /// Faz Yug-Neth parar de seguir e ficar onde está — ele deixa de ser companheiro e passa
+        /// a ser NPC. Usado ao entrar no Castelo.
+        ///
+        /// <para>Basta zerar o alvo: o <c>Update</c> sai cedo quando <c>_alvo</c> é nulo. Zerar a
+        /// velocidade junto é o que impede que ele siga deslizando pela inércia do último quadro
+        /// em que ainda seguia.</para>
+        /// </summary>
+        public void TornarNpc()
+        {
+            _alvo = null;
+            if (_rb != null) _rb.linearVelocity = Vector2.zero;
+        }
+
         public void Bind(Transform alvoASeguir)
         {
             _alvo = alvoASeguir;

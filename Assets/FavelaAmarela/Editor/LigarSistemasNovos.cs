@@ -30,6 +30,13 @@ namespace FavelaAmarela.EditorTools
             "Assets/Scenes/Deserto_Hali.unity",
             "Assets/Scenes/Playtest_RuinasPalidas.unity",
             "Assets/Scenes/Santuario_Yhtill.unity",
+            // Acrescentadas em 2026-08-20. Sem elas, Portões e Castelo ficavam SEM os
+            // estados persistentes — o jogador chegava ao Byakhee e ao Rei sem
+            // inventário, sem artefatos e sem progressão. No Castelo isso tornava o
+            // rito impossível: as relíquias não sobreviviam à entrada no Trono.
+            // QUARTA lista de cenas do projeto a ficar para trás das cenas novas.
+            "Assets/Scenes/Portoes_Das_Ruinas.unity",
+            "Assets/Scenes/Castelo_Carcosa.unity",
         };
 
         private const string PrefabCultista = "Assets/FavelaAmarela/Art/Enemies/Cultista.prefab";

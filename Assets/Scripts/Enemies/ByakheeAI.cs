@@ -194,12 +194,22 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             _anguloCircundando += velocidadeCircundando * Time.fixedDeltaTime;
 
-            var alvo = _centro + new Vector3(
+            // Circunda o JOGADOR, nao o centro da arena. Orbitar um ponto fixo fazia o chefe
+            // girar sozinho no meio do mapa, ignorando quem ele esta cacando -- foi o
+            // "perdido, girando 360 graus" que o Vini relatou no playtest. "Circunda" no
+            // design descreve rodear a presa, e e isso que a orbita precisa exprimir.
+            Vector3 eixo = _jogador != null ? _jogador.position : _centro;
+
+            var alvo = eixo + new Vector3(
                 Mathf.Cos(_anguloCircundando) * raioDeVoo,
                 Mathf.Sin(_anguloCircundando) * raioDeVoo * 0.6f,   // elipse: o isométrico achata o eixo Y
                 0f);
 
-            _rb.linearVelocity = ((Vector2)(alvo - transform.position)) * velocidadeCircundando;
+            // Proporcional PERTO, limitada LONGE. A versao anterior multiplicava a distancia
+            // inteira pela velocidade: a 20 unidades do alvo, com velocidade 4, ele saia a 80
+            // un/s -- atravessava a arena num quadro e voltava, o que le como teletransporte.
+            var paraOAlvo = (Vector2)(alvo - transform.position);
+            _rb.linearVelocity = Vector2.ClampMagnitude(paraOAlvo * 2f, velocidadeCircundando);
         }
 
         private void HandleEstadoMudou(ByakheeState anterior, ByakheeState atual)

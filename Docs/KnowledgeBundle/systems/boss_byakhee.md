@@ -7,8 +7,8 @@ tags: [boss, byakhee, combate, fase1, portoes]
 
 # Boss Byakhee
 
-> **Status:** Core e Runtime implementados em 2026-08-11. **Falta prefab, arte e a arena em
-> cena.** Item 9 da lista do edital. Design narrativo em
+> **Status:** jogável de ponta a ponta desde 2026-08-20 — Core, Runtime, prefab, espólio
+> ligado e arena em cena. **Falta animação e arte.** Item 9 da lista do edital. Design narrativo em
 > [lore/cassilda_e_byakhee.md](../lore/cassilda_e_byakhee.md) §IV.
 
 ## A inversão que define a luta
@@ -130,12 +130,38 @@ partir deles bateu exato com o total de 26 frames — não foi preciso adivinhar
 mesma convenção do Abdul ("tudo estático" até animação entrar em escopo do VS). Números de
 combate (dano, alcance, velocidades) continuam nos defaults calibrados por simulação, intactos.
 
+## A arena (2026-08-20)
+
+`Portoes_Das_Ruinas.unity`, montada por `MontarPortoesDasRuinas`. Alcançável pelo marco
+`Portoes_DasRuinas` do Deserto — que era **pura decoração** até aqui, sem colisor nem portal.
+
+A luta **começa por gatilho**, não no `Start`: o grito drena 2 RM/s passivamente, então começar
+ao carregar a cena cobraria Resiliência antes de o jogador escolher entrar.
+
+O portão é arte de verdade — Kenney "Dungeon Pack" 2.3 (CC0), o par
+`stoneWallGateClosed_S`/`stoneWallGateOpen_S` ladeado por `stoneWallAged_S`. As peças são
+levantadas por metade da própria altura porque o pivô das fatias é central: sem isso o pé
+desenhado fica abaixo da linha do colisor e o jogador atravessa a base visível.
+
+**Abater destranca; quem abre é o jogador.** `ArenaDosPortoes` chama `PortaoDosPortoes.Destrancar()`
+no abate, e o portão — duas folhas de pedra que deslizam — é um `IInteragivel`: o jogador encosta
+e aperta interagir. O portão abrindo sozinho roubaria o gesto e jogaria a transição de fase por
+cima da animação de morte do chefe.
+
+O chão reusa a receita da `MontarArenaDeTestes` (losango isométrico, anel de colisão de **duas**
+células com tile de `colliderType Grid`). O gatilho de luta tem 38 de largura e os Portões 20 —
+larguras calculadas, não estimadas: o losango afina com Y, e uma faixa estreita demais seria
+contornada pela beirada.
+
 ## Pendente
 - **Animação de verdade.** Os 26 frames existem e estão nomeados; falta o `Animator`/
   `AnimatorController` que os reproduza — hoje só o frame de idle é usado.
-- **Arena em cena:** os Portões das Ruínas não existem como local jogável.
-- **Cena de abertura** (o grito antes da forma) e a abertura dos Portões ao morrer.
-- **`DropAoAbater`** precisa ser anexado ao prefab com a `Drop_Byakhee`.
+- **Cena de abertura** (o grito antes da forma).
+- ~~Yug-Neth como chave dimensional~~ — **descartado em 2026-08-20** (decisão do Vini). Em
+  vez de um bloqueio a mais, o fim da luta libera um **Poste de Luz**: o `RefugioDeLuz` já
+  reanima o companheiro, ancora a RM, cura e grava a partida. Vencer o Byakhee é o que
+  devolve o Yug-Neth de pé.
+- **Arte:** as folhas dos Portões são caixas de placeholder.
 
 ## Relacionados
 - [Ficha de Atributos](ficha_de_atributos.md) — a fórmula de mitigação que rege o dano

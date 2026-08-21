@@ -31,6 +31,17 @@ namespace FavelaAmarela.Player
         public YugNethAI YugNeth => _yugNeth;
 
         /// <summary>
+        /// Disparado quando o companheiro passa a valer para a run.
+        ///
+        /// <para>Existe porque o registro acontece <b>no meio do jogo</b>, e não no bootstrap:
+        /// quem quiser reagir a ele — a barra do HUD é o caso — não pode simplesmente perguntar
+        /// no arranque, porque no arranque a resposta é <c>null</c>. E consultar todo frame para
+        /// descobrir quando deixou de ser null violaria a Regra de Ouro 8 (eventos, não
+        /// polling).</para>
+        /// </summary>
+        public event System.Action<YugNethAI> OnCompanheiroRegistrado;
+
+        /// <summary>
         /// Registra o companheiro assim que ele é libertado. Idempotente e defensivo: passar
         /// <c>null</c> ou o mesmo já registrado não faz nada — quem chama nem sempre sabe se já
         /// registrou.
@@ -39,6 +50,35 @@ namespace FavelaAmarela.Player
         {
             if (yugNeth == null || _yugNeth == yugNeth) return;
             _yugNeth = yugNeth;
+
+            // Depois de gravar o campo: quem escuta pode consultar YugNeth no callback e tem
+            // que encontrar o valor novo, não o anterior.
+            OnCompanheiroRegistrado?.Invoke(yugNeth);
+        }
+
+        /// <summary>
+        /// Disparado quando Yug-Neth deixa de ser companheiro da run.
+        /// </summary>
+        public event System.Action OnCompanheiroAposentado;
+
+        /// <summary>
+        /// <b>Aposenta</b> o companheiro: ele continua existindo no mundo, mas pára de contar
+        /// como companheiro da run.
+        ///
+        /// <para><b>Por que existe:</b> ao entrar no Castelo, Yug-Neth vira o NPC que ensina o
+        /// artesanato (decisão do Vini, 2026-08-20). Como o artesanato é conteúdo pós-Vertical
+        /// Slice, ele não pode seguir acumulando as responsabilidades de companheiro até lá —
+        /// a barra de RC no HUD, a reanimação no Refúgio, o bloqueio de progresso quando cai.
+        /// Aposentar é o oposto de registrar, não uma morte: o objeto segue em cena.</para>
+        ///
+        /// <para>Idempotente: aposentar duas vezes não dispara o evento duas vezes.</para>
+        /// </summary>
+        public void Aposentar()
+        {
+            if (_yugNeth == null) return;
+
+            _yugNeth = null;
+            OnCompanheiroAposentado?.Invoke();
         }
     }
 }

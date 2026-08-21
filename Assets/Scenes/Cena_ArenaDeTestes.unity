@@ -2821,82 +2821,103 @@ MonoBehaviour:
   raizDoPainel: {fileID: 1578050692}
   slotsDaMochila:
   - grupo: {fileID: 181036830}
+    moldura: {fileID: 0}
     icone: {fileID: 1412597495}
     quantidade: {fileID: 1765279104}
     rotulo: {fileID: 0}
   - grupo: {fileID: 1172615793}
+    moldura: {fileID: 0}
     icone: {fileID: 634350886}
     quantidade: {fileID: 1706754439}
     rotulo: {fileID: 0}
   - grupo: {fileID: 1376772084}
+    moldura: {fileID: 0}
     icone: {fileID: 4985058}
     quantidade: {fileID: 1914061892}
     rotulo: {fileID: 0}
   - grupo: {fileID: 1979207527}
+    moldura: {fileID: 0}
     icone: {fileID: 1294202457}
     quantidade: {fileID: 297562756}
     rotulo: {fileID: 0}
   - grupo: {fileID: 1351281766}
+    moldura: {fileID: 0}
     icone: {fileID: 1446894549}
     quantidade: {fileID: 732884409}
     rotulo: {fileID: 0}
   - grupo: {fileID: 510391190}
+    moldura: {fileID: 0}
     icone: {fileID: 340937836}
     quantidade: {fileID: 1552170318}
     rotulo: {fileID: 0}
   - grupo: {fileID: 1406981529}
+    moldura: {fileID: 0}
     icone: {fileID: 230747774}
     quantidade: {fileID: 188245188}
     rotulo: {fileID: 0}
   - grupo: {fileID: 1404800411}
+    moldura: {fileID: 0}
     icone: {fileID: 1741103291}
     quantidade: {fileID: 987206958}
     rotulo: {fileID: 0}
   - grupo: {fileID: 127658014}
+    moldura: {fileID: 0}
     icone: {fileID: 482673073}
     quantidade: {fileID: 1513160626}
     rotulo: {fileID: 0}
   - grupo: {fileID: 659772509}
+    moldura: {fileID: 0}
     icone: {fileID: 1379479444}
     quantidade: {fileID: 2143764129}
     rotulo: {fileID: 0}
   - grupo: {fileID: 1678975414}
+    moldura: {fileID: 0}
     icone: {fileID: 384593524}
     quantidade: {fileID: 2033884458}
     rotulo: {fileID: 0}
   - grupo: {fileID: 2104284263}
+    moldura: {fileID: 0}
     icone: {fileID: 793491663}
     quantidade: {fileID: 1863324970}
     rotulo: {fileID: 0}
   slotsDoCorpo:
   - grupo: {fileID: 1388464944}
+    moldura: {fileID: 0}
     icone: {fileID: 1175757528}
     quantidade: {fileID: 446651194}
     rotulo: {fileID: 1662760467}
   - grupo: {fileID: 1738439583}
+    moldura: {fileID: 0}
     icone: {fileID: 29076882}
     quantidade: {fileID: 614186184}
     rotulo: {fileID: 608438459}
   - grupo: {fileID: 816500029}
+    moldura: {fileID: 0}
     icone: {fileID: 474429527}
     quantidade: {fileID: 1034403594}
     rotulo: {fileID: 716687806}
   - grupo: {fileID: 1430208455}
+    moldura: {fileID: 0}
     icone: {fileID: 1162645946}
     quantidade: {fileID: 228807816}
     rotulo: {fileID: 938017733}
   - grupo: {fileID: 1863318939}
+    moldura: {fileID: 0}
     icone: {fileID: 167259115}
     quantidade: {fileID: 1564273051}
     rotulo: {fileID: 1960156522}
   - grupo: {fileID: 1776414235}
+    moldura: {fileID: 0}
     icone: {fileID: 828160416}
     quantidade: {fileID: 1020441171}
     rotulo: {fileID: 311555862}
   - grupo: {fileID: 1354830986}
+    moldura: {fileID: 0}
     icone: {fileID: 1140449116}
     quantidade: {fileID: 1752748719}
     rotulo: {fileID: 218751843}
+  molduraVazia: {fileID: 0}
+  molduraCheia: {fileID: 0}
   opacidadeVazio: 0.25
   opacidadeCheio: 1
   pausarAoAbrir: 1
@@ -6270,6 +6291,7 @@ MonoBehaviour:
   barraDeAcoes: {fileID: 1457270869}
   barraDeItens: {fileID: 1564690437}
   barraDeArtefatos: {fileID: 2115156030}
+  companheiroBar: {fileID: 0}
   resilienciaMax: 100
   fracaoThresholdPanico: 0.25
 --- !u!114 &1304427737

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using FavelaAmarela.Core.Enemies;
 using FavelaAmarela.Player;
@@ -32,6 +33,16 @@ namespace FavelaAmarela.Runtime.Enemies
             "patua_luas_gemeas",
             "anel_sinal_amarelo",
         };
+
+        /// <summary>
+        /// Os ids de Artefato que o rito de selamento exige — o Rei é a <b>fonte da verdade</b>
+        /// do que é preciso trazer ao Trono.
+        ///
+        /// <para>Existe para que ferramentas (o Carcosa Debugger, o montador da cena) não
+        /// mantenham uma segunda cópia da lista: uma cópia que saísse de sincronia concederia
+        /// as relíquias erradas e o rito nunca fecharia, sem erro nenhum aparecendo.</para>
+        /// </summary>
+        public IReadOnlyList<string> ReliquiasExigidas => idsDasReliquiasExigidas;
 
         [Header("Selamento")]
         [Tooltip("Quantas vezes o Rei se desvela até o rito se completar.")]

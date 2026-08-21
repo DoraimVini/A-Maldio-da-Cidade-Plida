@@ -40,7 +40,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.8, y: 1.8, z: 1}
+  m_LocalScale: {x: 0.85873413, y: 0.85873413, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -94,7 +94,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -6826580139733386429, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  m_Sprite: {fileID: 6274779080818023352, guid: 3727af62a027f6e4699f3662170ac082, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -129,7 +129,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &2290442817582334516
 MonoBehaviour:
@@ -185,14 +185,14 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
-    oldSize: {x: 0.5, y: 1}
+    pivot: {x: 0.5, y: 0.023255814}
+    oldSize: {x: 2.4375, y: 2.6875}
     newSize: {x: 0.32, y: 0.32}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.32, y: 0.32}
+  m_Size: {x: 0.6987029, y: 0.34935144}
   m_EdgeRadius: 0
 --- !u!114 &2290442817582334520
 MonoBehaviour:
@@ -346,23 +346,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.AnimadorDoCultista
   idle:
-  - {fileID: -6826580139733386429, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: 8949307216501182991, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: -3324857527176373601, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: -7495846382921510002, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 6274779080818023352, guid: 3727af62a027f6e4699f3662170ac082, type: 3}
+  - {fileID: 2343389331318071947, guid: 3727af62a027f6e4699f3662170ac082, type: 3}
+  - {fileID: 4104317910596084968, guid: 3727af62a027f6e4699f3662170ac082, type: 3}
+  - {fileID: 5970379120645057400, guid: 3727af62a027f6e4699f3662170ac082, type: 3}
   walk:
-  - {fileID: 8891509303765263076, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: 3134199315888735020, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: 2525687268140680856, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: -4972513062873434083, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: -4182520821832879202, guid: 392b21c6db6b9354eb984ab6d42aba51, type: 3}
+  - {fileID: -7715303136867129189, guid: 392b21c6db6b9354eb984ab6d42aba51, type: 3}
+  - {fileID: 2805974245366365325, guid: 392b21c6db6b9354eb984ab6d42aba51, type: 3}
+  - {fileID: -1676139762880000797, guid: 392b21c6db6b9354eb984ab6d42aba51, type: 3}
+  - {fileID: 6591063033268301763, guid: 392b21c6db6b9354eb984ab6d42aba51, type: 3}
   attack:
-  - {fileID: -689876105669198883, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: 6170654990217370214, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: -2623288889452240930, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: -1319430870675592835, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 1900150818701143473, guid: 9cf0bc4f041b93c439b0b72a57dcb8ac, type: 3}
+  - {fileID: -2005337512499798020, guid: 9cf0bc4f041b93c439b0b72a57dcb8ac, type: 3}
+  - {fileID: -9056798304105211871, guid: 9cf0bc4f041b93c439b0b72a57dcb8ac, type: 3}
   death:
-  - {fileID: 7824003198560239237, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: 5702020066755662229, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: 6504199954082708626, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
-  - {fileID: 4056992777920460888, guid: fbb4b9f10adb41d3af02bf5732e9c933, type: 3}
+  - {fileID: 4042100691363730451, guid: 33e5ba6bb14e2cb4fb5f49b6cfec6cdf, type: 3}
+  - {fileID: 5853049061770987082, guid: 33e5ba6bb14e2cb4fb5f49b6cfec6cdf, type: 3}
+  - {fileID: 9211146236915512317, guid: 33e5ba6bb14e2cb4fb5f49b6cfec6cdf, type: 3}
+  - {fileID: 3993599605470242577, guid: 33e5ba6bb14e2cb4fb5f49b6cfec6cdf, type: 3}
   quadrosPorSegundo: 6

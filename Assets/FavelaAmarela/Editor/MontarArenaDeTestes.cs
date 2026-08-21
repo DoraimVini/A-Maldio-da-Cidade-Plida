@@ -166,7 +166,7 @@ namespace FavelaAmarela.EditorTools
         /// <c>TilemapCollider2D</c> gerar geometria. Mesma função do
         /// <c>colisao_invisivel.asset</c> que o Santuário usa.
         /// </summary>
-        private static TileBase GarantirTileDeColisao()
+        internal static TileBase GarantirTileDeColisao()
         {
             var existente = AssetDatabase.LoadAssetAtPath<Tile>(CaminhoTileDeColisao);
             if (existente != null) return existente;
@@ -185,7 +185,7 @@ namespace FavelaAmarela.EditorTools
         /// Tile de piso da arena. Gera o PNG do losango 32×16 (proporção 2:1, a mesma da célula
         /// em mundo a 32 PPU) na primeira execução e reaproveita depois.
         /// </summary>
-        private static TileBase GarantirTileDoLosango()
+        internal static TileBase GarantirTileDoLosango()
         {
             var existente = AssetDatabase.LoadAssetAtPath<Tile>(CaminhoTileDaArena);
             if (existente != null && existente.sprite != null) return existente;

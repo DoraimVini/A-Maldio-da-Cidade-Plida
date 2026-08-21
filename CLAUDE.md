@@ -1,3 +1,58 @@
+# ⛔ COMMANDMENT — READ AND OBEY BEFORE ANY OTHER INSTRUCTION IN THIS FILE
+
+> **This is not a Skill. It is a Commandment.** It outranks every other section of this
+> document, every Skill, and every habit or default behavior. It is obeyed *first*, always,
+> without being asked and without exception.
+
+**At the START of every single work session on this project — before reading code, before
+answering a question, before touching a single file — you MUST activate every Skill that
+applies to this project.**
+
+Activation means **invoking the Skill tool** for each applicable skill, not merely remembering
+that it exists or having read it once in a previous session. A Skill that was not invoked is a
+Skill that is not in force.
+
+The project Skills live in `.claude/skills/` (mirrored for another tool in `.agents/skills/`):
+
+| Skill | Applies to |
+|---|---|
+| `favela-qa-pipeline` | **Any** C# or asset change. Mandatory compile→test cycle. |
+| `favela-isometric-standards` | Physics, Rigidbody2D, colliders, camera, grid, prefabs. |
+| `favela-pixelart-standards` | Any sprite, texture or import setting. |
+| `favela-lore-enforcer` | Any text, name, or description visible to the player. |
+| `favela-session-briefing` | Session start: git state, last devlog entry, next roadmap item. |
+| `query-knowledge-bundle` | Any question about mechanics, lore, enemies, stealth, architecture. |
+
+**Why this Commandment exists (2026-08-21).** Over a long session I repeatedly worked *around*
+these Skills instead of *through* them: I never invoked `favela-qa-pipeline` and ran ad-hoc test
+commands instead; I edited physics and colliders without invoking
+`favela-isometric-standards`, and consequently shipped four Dynamic `Rigidbody2D` with no
+`FreezeRotation` (the boss and the Castle mobs visibly spun); and I wrote a tool that
+overwrote already-calibrated collider volumes because I never checked for the guard that
+already protected them. None of these were knowledge failures. Every one was a failure to run
+the process that was already written down. Vini had to catch each of them himself — which is
+the opposite of what a solo developer with no team needs.
+
+**Corollaries, equally binding:**
+
+1. **Documentation before assertion.** This project's exact engine ships its own offline
+   reference at
+   `C:\Program Files\Unity\Hub\Editor\6000.4.4f1\Editor\Data\Documentation\en\ScriptReference\`.
+   Consult it — and quote it — before using or explaining any Unity API. Never answer Unity
+   behavior from memory alone; the engine renames APIs between versions
+   (`Rigidbody2D.velocity` → `linearVelocity`).
+2. **Audit against the standard before investigating a symptom.** When something behaves
+   strangely, sweep *all* prefabs and scenes for the relevant fields first (constraints,
+   gravityScale, collisionDetection, collider existence, wiring). Comparing actors side by
+   side exposes the outlier; studying one actor in isolation hides it.
+3. **Never let work sit unbacked in silence.** If the working tree accumulates significant
+   uncommitted work, say so and offer a checkpoint. Do not commit without explicit approval —
+   but do not stay quiet about the risk either.
+4. **Verify, then report.** A tool's exit code and its own log are not evidence. Re-read the
+   file on disk, or run the suite, and report the real number.
+
+---
+
 # Caminho para Carcosa
 
 > **Título oficial, visível ao jogador: "Caminho para Carcosa"** (decisão do Vini, 2026-08-11).

@@ -28,7 +28,7 @@ Nesses três casos, **repita a mesma chamada uma ou duas vezes** antes de tratar
 
 ## Caminho alternativo: script batch (só com o Editor fechado)
 
-`c:\Users\Vini\Desktop\projeto_amarelo\tools\run_qa_tests.ps1` roda os testes em batch mode e é mais determinístico (sem flakiness de MCP), mas **falha imediatamente com "another Unity instance running"** se o Editor estiver aberto. Use-o só quando:
+`C:\Users\Vini\Desktop\Peregrino_Amarelo\Peregrino_Amarelo\Tools\run_qa_tests.ps1` roda os testes em batch mode e é mais determinístico (sem flakiness de MCP), mas **falha imediatamente com "another Unity instance running"** se o Editor estiver aberto. Use-o só quando:
 - O usuário pedir explicitamente uma rodada de QA "limpa"/definitiva (ex.: antes de um commit importante), ou
 - O MCP estiver genuinamente indisponível após as tentativas acima.
 

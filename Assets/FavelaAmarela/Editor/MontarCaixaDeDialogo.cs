@@ -54,6 +54,21 @@ namespace FavelaAmarela.EditorTools
                 EditorSceneManager.OpenScene(cenaOriginal, OpenSceneMode.Single);
         }
 
+        /// <summary>
+        /// Monta/corrige a caixa <b>só na cena aberta</b>, sem <c>OpenScene</c>.
+        ///
+        /// <para>Existe para o <c>BuildHUDCompleto</c> poder encadear: o <see cref="Executar"/>
+        /// percorre as cenas com <c>OpenScene(..., Single)</c>, o que <b>fecharia</b> a cena que
+        /// o montador do HUD está editando — armadilha que este projeto já pagou uma vez, com o
+        /// <c>SaveScene</c> recusando salvar em silêncio depois.</para>
+        /// </summary>
+        public static void MontarNaCenaAberta()
+        {
+            var caixa = GarantirCaixa();
+            int ligados = LigarQuemFala(caixa);
+            Debug.Log($"[CaixaDeDialogo] Cena aberta: caixa pronta, {ligados} componente(s) ligados.");
+        }
+
         private static TutorialHintUI GarantirCaixa()
         {
             var existente = Object.FindAnyObjectByType<TutorialHintUI>(FindObjectsInactive.Include);
@@ -79,8 +94,12 @@ namespace FavelaAmarela.EditorTools
             painel.transform.SetParent(canvas.transform, false);
 
             var rt = painel.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.08f, 0.04f);
-            rt.anchorMax = new Vector2(0.92f, 0.28f);
+            // Ancorada ACIMA do rodapé: a barra de itens e a de ações ocupam de y=48 a y=180
+            // (de 1080), e a caixa ia de 0.04 a 0.28 — ou seja, POR CIMA das duas. Era isso o
+            // "os diálogos não se encaixam na UI" que o Vini relatou. Frações, e não pixels,
+            // para a caixa acompanhar o viewport em qualquer resolução.
+            rt.anchorMin = new Vector2(0.08f, 0.20f);
+            rt.anchorMax = new Vector2(0.92f, 0.44f);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
 
@@ -115,7 +134,9 @@ namespace FavelaAmarela.EditorTools
             if (texto.font == null)
                 Debug.LogError("[CaixaDeDialogo] Fonte built-in não encontrada — a caixa " +
                                "existirá mas não mostrará texto.");
-            texto.fontSize = 20;
+            // ×3: a caixa vive no canvas de referência 1920×1080, e este número
+            // vinha da época de 640×360.
+            texto.fontSize = 60;
             texto.alignment = TextAnchor.UpperLeft;
             texto.color = new Color(0.93f, 0.89f, 0.72f);  // amarelo-pálido de Carcosa
             texto.raycastTarget = false;
@@ -169,7 +190,46 @@ namespace FavelaAmarela.EditorTools
                 EditorUtility.SetDirty(fundo);
             }
 
-            Debug.Log("[CaixaDeDialogo] Caixa existente corrigida (alpha 0, fundo Sliced).", caixa);
+            // ANCORAS E FONTE tambem, e nao so alpha e Sliced. Sem isto, a caixa ja existente
+            // ficava com os numeros da epoca de 640x360 -- fonte 20 num canvas de referencia
+            // 1920x1080 (microscopica) e ancorada de 4% a 28% da altura, ou seja POR CIMA da
+            // barra de itens e da barra de acoes. Era o "letras sem nenhum sentido e uma barra
+            // gigante sem espaco preenchido" que o Vini relatou olhando a tela.
+            var rt = caixa.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                Undo.RecordObject(rt, "Reancorar a caixa");
+                rt.anchorMin = new Vector2(0.08f, 0.20f);
+                rt.anchorMax = new Vector2(0.92f, 0.44f);
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
+                EditorUtility.SetDirty(rt);
+            }
+
+            if (so.FindProperty("texto").objectReferenceValue is Text texto)
+            {
+                Undo.RecordObject(texto, "Fonte da caixa");
+                texto.fontSize = 60;
+                texto.alignment = TextAnchor.UpperLeft;
+                texto.horizontalOverflow = HorizontalWrapMode.Wrap;
+                texto.verticalOverflow = VerticalWrapMode.Truncate;
+
+                var rtTexto = texto.GetComponent<RectTransform>();
+                if (rtTexto != null)
+                {
+                    // Respiro interno: com o texto colado na moldura ornamentada, as letras
+                    // encostam no ouro e ficam ilegiveis.
+                    rtTexto.anchorMin = new Vector2(0.04f, 0.08f);
+                    rtTexto.anchorMax = new Vector2(0.96f, 0.92f);
+                    rtTexto.offsetMin = Vector2.zero;
+                    rtTexto.offsetMax = Vector2.zero;
+                }
+
+                EditorUtility.SetDirty(texto);
+            }
+
+            Debug.Log("[CaixaDeDialogo] Caixa existente corrigida (alpha 0, Sliced, ancoras e " +
+                      "fonte 60).", caixa);
         }
 
         /// <summary>

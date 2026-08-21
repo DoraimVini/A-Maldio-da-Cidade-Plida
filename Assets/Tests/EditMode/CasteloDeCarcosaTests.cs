@@ -25,10 +25,22 @@ namespace FavelaAmarela.Tests.EditMode
     {
         private const string Cena = "Assets/Scenes/Castelo_Carcosa.unity";
         private const string CenaSantuario = "Assets/Scenes/Santuario_Yhtill.unity";
+        private const string CenaPortoes = "Assets/Scenes/Portoes_Das_Ruinas.unity";
         private const string BuildSettings = "ProjectSettings/EditorBuildSettings.asset";
 
+        /// <summary>
+        /// O Castelo tem que ser alcançável <b>pelos Portões das Ruínas</b>, e por mais nenhum
+        /// caminho.
+        ///
+        /// <para><b>Este teste já exigiu o contrário.</b> Até 2026-08-19 ele cobrava um portal
+        /// Santuário → Castelo, porque o Castelo era cena solta e um atalho direto era melhor que
+        /// nada. Com os Portões em cena, o atalho virou defeito: ele pula o Byakhee, que é a
+        /// <b>única fonte do Anel do Sinal Amarelo</b> — uma das três relíquias do rito. Um
+        /// caminho que leva ao chefe final sem o que é preciso para vencê-lo, e sem avisar
+        /// disso. Por isso o teste agora <b>proíbe</b> o que antes exigia.</para>
+        /// </summary>
         [Test]
-        public void ACena_ExisteEstaNaBuildEAlcancavelPeloSantuario()
+        public void ACena_ExisteEstaNaBuildEAlcancavelSoPelosPortoes()
         {
             Assert.IsTrue(File.Exists(Cena),
                 "Castelo_Carcosa.unity não existe. Rode 'Tools/FavelaAmarela/Montar Castelo de " +
@@ -39,16 +51,24 @@ namespace FavelaAmarela.Tests.EditMode
                 "O Castelo não está no Build Settings — a cena existiria mas nenhuma build a " +
                 "carregaria.");
 
-            // O portal do Santuário é o único caminho até o Castelo. Sem ele, a fase final só
-            // seria alcançável abrindo a cena no Editor.
-            var portais = Regex.Matches(File.ReadAllText(CenaSantuario), @"cenaDestino:\s*(\S+)")
-                               .Cast<Match>()
-                               .Select(m => m.Groups[1].Value)
-                               .ToList();
-
-            CollectionAssert.Contains(portais, "Castelo_Carcosa",
-                "Nenhum PortalDeCena do Santuário aponta para Castelo_Carcosa — o Castelo " +
+            CollectionAssert.Contains(DestinosDe(CenaPortoes), "Castelo_Carcosa",
+                "Nenhum PortalDeCena dos Portões das Ruínas leva ao Castelo — a fase final " +
                 "ficaria inalcançável em jogo.");
+
+            CollectionAssert.DoesNotContain(DestinosDe(CenaSantuario), "Castelo_Carcosa",
+                "O Santuário ainda tem o atalho para o Castelo. Ele pula o Byakhee, que é a " +
+                "única fonte do Anel do Sinal Amarelo — o jogador chegaria ao Rei sem poder " +
+                "selá-lo. Rode 'Tools/FavelaAmarela/Montar Castelo de Carcosa', que remove.");
+        }
+
+        private static List<string> DestinosDe(string cena)
+        {
+            Assert.IsTrue(File.Exists(cena), $"Cena ausente: {cena}");
+
+            return Regex.Matches(File.ReadAllText(cena), @"cenaDestino:\s*(\S+)")
+                        .Cast<Match>()
+                        .Select(m => m.Groups[1].Value)
+                        .ToList();
         }
 
         [Test]
@@ -64,6 +84,96 @@ namespace FavelaAmarela.Tests.EditMode
                 Assert.IsTrue(Regex.IsMatch(txt, $@"(?m)^\s+m_Name:\s*{zona}\s*$"),
                     $"Zona '{zona}' ausente do Castelo.");
             }
+        }
+
+        /// <summary>
+        /// O chão do Castelo é <b>isométrico</b>, como o do resto do jogo.
+        ///
+        /// <para><b>O defeito que motivou:</b> a primeira versão desenhava cada sala como um
+        /// <c>SpriteRenderer</c> retangular em espaço de mundo — o Castelo era <b>top-down</b>
+        /// enquanto Deserto, Santuário e Portões usam <c>Grid</c> isométrico com
+        /// <c>cellSize (1, 0.5)</c>. Relatado pelo Vini olhando a cena; nenhum teste percebia,
+        /// porque todos verificavam <i>o que existe</i> e nenhum verificava <i>em que projeção
+        /// está desenhado</i>.</para>
+        ///
+        /// <para><c>m_CellLayout: 2</c> é <c>GridLayout.CellLayout.Isometric</c> (Rectangle é 0).
+        /// Testar o número, e não só a presença do <c>Grid</c>, é o que separa "tem grid" de
+        /// "tem grid isométrico" — um <c>Grid</c> retangular passaria no primeiro.</para>
+        /// </summary>
+        [Test]
+        public void OChaoDoCastelo_EIsometricoComoOResto()
+        {
+            string txt = File.ReadAllText(Cena);
+
+            Assert.IsTrue(Regex.IsMatch(txt, @"(?m)^Grid:\s*$"),
+                "O Castelo não tem componente Grid — o chão voltou a ser SpriteRenderer " +
+                "retangular, ou seja, top-down. Rode 'Tools/FavelaAmarela/Montar Castelo de " +
+                "Carcosa'.");
+
+            Assert.IsTrue(Regex.IsMatch(txt, @"m_CellLayout:\s*2"),
+                "O Grid do Castelo não está em cellLayout Isometric (2). Um Grid retangular " +
+                "desenha o mesmo mundo em projeção errada.");
+
+            Assert.IsTrue(Regex.IsMatch(txt, @"m_CellSize:\s*\{x:\s*1,\s*y:\s*0\.5"),
+                "cellSize do Castelo não é (1, 0.5) — a proporção 2:1 é o que faz o losango " +
+                "isométrico do projeto (skill favela-isometric-standards).");
+
+            // A colisão vem de um TilemapCollider2D sobre as células de borda. Sem ele o
+            // jogador anda para fora do chão — e sem as células, o colisor não gera geometria
+            // nenhuma (a armadilha do colliderType, paga com um playtest na Arena de Testes).
+            Assert.IsTrue(txt.Contains("TilemapCollider2D"),
+                "O Castelo não tem TilemapCollider2D — o chão existiria sem nada segurando o " +
+                "jogador dentro dele.");
+        }
+
+        /// <summary>
+        /// Vencer o Rei tem que <b>fazer alguma coisa</b>.
+        ///
+        /// <para><b>O buraco que motivou:</b> <c>ReiEmAmareloAI.OnVitoria</c> passou a existir
+        /// com o comentário "quem monta a cena decide o que fazer com isso" — e ninguém decidia.
+        /// O evento tinha <b>zero assinantes</b>. Completar o rito, o clímax do Vertical Slice,
+        /// só repintava o Rei; o jogo seguia rodando, indiferente.</para>
+        ///
+        /// <para><b>Por que nenhum outro teste pegava:</b> um evento C# sem assinante é
+        /// perfeitamente válido. Não há exceção, não há aviso, não há linha no console. Compila,
+        /// roda, e não acontece nada — a forma mais silenciosa do modo de falha assinatura deste
+        /// projeto, na última cena do jogo.</para>
+        /// </summary>
+        [Test]
+        public void VencerORei_TemConsequencia()
+        {
+            string guid = GuidDoScript("SequenciaDeSelamento");
+            Assert.IsNotNull(guid,
+                "Script SequenciaDeSelamento não existe — ninguém consome ReiEmAmareloAI.OnVitoria.");
+
+            string txt = File.ReadAllText(Cena);
+
+            Assert.IsTrue(txt.Contains(guid),
+                "O Castelo não tem SequenciaDeSelamento. O evento OnVitoria do Rei ficaria sem " +
+                "assinante e selá-lo não faria nada. Rode 'Tools/FavelaAmarela/Montar Castelo " +
+                "de Carcosa'.");
+
+            // Presença não basta: o componente precisa apontar para o Rei e para o painel.
+            // Um SequenciaDeSelamento com campos nulos loga erro em Awake e, no melhor caso,
+            // some do console no meio de um playtest.
+            var doc = Regex.Match(txt,
+                $@"---\s*!u!114\s*&-?\d+\r?\n(?:(?!^---)[\s\S])*?{guid}(?:(?!^---)[\s\S])*",
+                RegexOptions.Multiline);
+
+            Assert.IsTrue(doc.Success, "Componente SequenciaDeSelamento ilegível no YAML.");
+
+            var falhas = new List<string>();
+            foreach (var campo in new[] { "rei", "painel", "texto" })
+            {
+                var m = Regex.Match(doc.Value, $@"(?m)^\s*{campo}:\s*\{{fileID:\s*(-?\d+)");
+
+                if (!m.Success) falhas.Add($"{campo}: ausente do YAML");
+                else if (m.Groups[1].Value == "0") falhas.Add($"{campo}: nulo");
+            }
+
+            Assert.IsEmpty(falhas,
+                "SequenciaDeSelamento com referência solta — o desfecho existiria pela metade:\n  " +
+                string.Join("\n  ", falhas));
         }
 
         [Test]

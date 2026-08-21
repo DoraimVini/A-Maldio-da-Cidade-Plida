@@ -36,6 +36,10 @@ namespace FavelaAmarela.Runtime.UI
         [Tooltip("Barra dos 4 Artefatos equipados (teclas F1–F4). Alimentada pelo GameManager.")]
         [SerializeField] private BarraDeArtefatos barraDeArtefatos;
 
+        [Tooltip("Barra da Resiliência do Companheiro (Yug-Neth). Nasce oculta: só aparece " +
+                 "quando ele é libertado no meio do jogo.")]
+        [SerializeField] private CompanheiroBar companheiroBar;
+
         [Header("Config inicial (usado se nenhuma fonte for injetada de fora)")]
         [Tooltip("Resiliência máxima inicial de Damião.")]
         [SerializeField] private float resilienciaMax = 100f;
@@ -170,6 +174,56 @@ namespace FavelaAmarela.Runtime.UI
         {
             if (fonte == null) return;
             if (barraDeArtefatos != null) barraDeArtefatos.Bind(fonte);
+        }
+
+        /// <summary>
+        /// Revela e liga a barra do companheiro. Chamado quando Yug-Neth é <b>libertado</b>, não
+        /// no bootstrap — no arranque ele ainda é cativo e não vale para a run.
+        ///
+        /// <para>Ativa o objeto <b>antes</b> de ligar: a barra nasce desativada na cena de
+        /// propósito (uma barra vazia no HUD desde o menu anunciaria um recurso que o jogador
+        /// ainda não tem, e leria como recurso zerado).</para>
+        /// </summary>
+        public void InjetarCompanheiro(FavelaAmarela.Runtime.Enemies.YugNethAI companheiro)
+        {
+            if (companheiro == null) return;
+
+            var corpo = companheiro.Vitalidade;
+            if (corpo == null)
+            {
+                Debug.LogError("[HUDController] Yug-Neth registrado sem VitalidadeBridge — a " +
+                               "barra do companheiro não teria o que mostrar.", this);
+                return;
+            }
+
+            if (companheiroBar == null)
+            {
+                // Mesma falha silenciosa que a VigorBar teve em 2026-08-13: o dado chega, não há
+                // view ligada, e nada no console aponta a causa.
+                Debug.LogError("[HUDController] Campo 'companheiroBar' vazio — Yug-Neth foi " +
+                               "libertado mas não há barra ligada para mostrá-lo. Rode " +
+                               "'Tools/FavelaAmarela/Montar HUD Completo'.", this);
+                return;
+            }
+
+            if (!companheiroBar.gameObject.activeSelf) companheiroBar.gameObject.SetActive(true);
+            companheiroBar.Bind(corpo.Vitalidade);
+        }
+
+        /// <summary>
+        /// Esconde a barra do companheiro. Chamado quando Yug-Neth se <b>aposenta</b> — ao entrar
+        /// no Castelo ele vira NPC e deixa de ser companheiro da run.
+        ///
+        /// <para><c>Unbind</c> antes de esconder: um <c>GameObject</c> desativado não roda
+        /// <c>OnDisable</c> de novo, então a barra ficaria assinada na Vitalidade de alguém que
+        /// não é mais companheiro — um assinante fantasma que só apareceria como vazamento.</para>
+        /// </summary>
+        public void RetirarCompanheiro()
+        {
+            if (companheiroBar == null) return;
+
+            companheiroBar.Unbind();
+            companheiroBar.gameObject.SetActive(false);
         }
 
         // ── Atalhos de teste (removíveis) ────────────────────────────────────

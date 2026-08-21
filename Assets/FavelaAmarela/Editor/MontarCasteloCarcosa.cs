@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using FavelaAmarela.Level;
@@ -48,6 +50,7 @@ namespace FavelaAmarela.EditorTools
             "Assets/FavelaAmarela/Art/Characters/Damiao/Player_Damiao.prefab";
         private const string PrefabHUD = "Assets/FavelaAmarela/Art/UI/HUD_ResilienciaBar.prefab";
         private const string PrefabRei = "Assets/FavelaAmarela/Art/Enemies/ReiEmAmarelo.prefab";
+        private const string PrefabYugNeth = "Assets/FavelaAmarela/Art/Characters/MiGo/YugNeth.prefab";
 
         /// <summary>Identificador do <c>PontoDeChegada</c> ao entrar no Castelo.</summary>
         private const string IdChegadaNoCastelo = "PortoesInternos";
@@ -59,8 +62,12 @@ namespace FavelaAmarela.EditorTools
         private static readonly Vector3 CentroZ3 = new Vector3(0f, 30f, 0f);
         private static readonly Vector3 CentroZ5 = new Vector3(0f, 62f, 0f);
 
-        private static readonly Vector2 SalaPequena = new Vector2(18f, 12f);
-        private static readonly Vector2 SalaGrande = new Vector2(26f, 18f);
+        // Caixa envolvente do losango de cada sala, em unidades de mundo: raio r em células dá
+        // um losango de 2r de largura por r de altura. Usadas só pelo gatilho de zona, que é um
+        // BoxCollider2D — uma caixa sobre um losango sobra nos cantos, e para "você entrou na
+        // Biblioteca" isso é aceitável.
+        private static readonly Vector2 SalaPequena = new Vector2(RaioSalaPequena * 2f, RaioSalaPequena);
+        private static readonly Vector2 SalaGrande = new Vector2(RaioSalaGrande * 2f, RaioSalaGrande);
 
         /// <summary>Mármore negro do palácio (design §1.1).</summary>
         private static readonly Color MarmoreNegro = new Color(0.13f, 0.12f, 0.15f);
@@ -84,7 +91,7 @@ namespace FavelaAmarela.EditorTools
             }
 
             RegistrarEmBuildSettings();
-            LigarOPortalNoSantuario();
+            RemoverOAtalhoDoSantuario();
 
             AssetDatabase.SaveAssets();
             Debug.Log("[Castelo] Cena montada: Z1 Portões, Z2 Salão, Z3 Biblioteca, Z5 Trono.");
@@ -113,11 +120,13 @@ namespace FavelaAmarela.EditorTools
 
             var raiz = GameObject.Find("Castelo_Root") ?? new GameObject("Castelo_Root");
 
+            MontarChaoIsometrico(raiz.transform);
+
             MontarZ1(raiz.transform, caixa);
             MontarZ2(raiz.transform);
             MontarZ3(raiz.transform);
             MontarZ5(raiz.transform);
-            MontarCorredores(raiz.transform);
+            MontarDesfecho(raiz.transform);
 
             // Marcar suja antes de salvar: cena recém-criada por NewScene pode não ser
             // considerada modificada, e SaveScene então não escreve nada.
@@ -156,10 +165,11 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static void MontarZ1(Transform raiz, TutorialHintUI caixa)
         {
-            var zona = Sala(raiz, "Z1_PortoesInternos", CentroZ1, SalaPequena, MarmoreNegro);
-            MarcarZona(zona, "Os Portões Internos");
+            var zona = Sala(raiz, "Z1_PortoesInternos", CentroZ1);
+            MarcarZona(zona, "Os Portões Internos", SalaPequena);
 
             GarantirChegada(zona.transform, CentroZ1 + new Vector3(0f, -3f, 0f));
+            GarantirPostoDoArtesao(zona.transform, CentroZ1 + new Vector3(5f, 1f, 0f), caixa);
             GarantirRefugio(zona.transform, CentroZ1 + new Vector3(-5f, 0f, 0f), caixa);
         }
 
@@ -169,14 +179,14 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static void MontarZ2(Transform raiz)
         {
-            var zona = Sala(raiz, "Z2_SalaoDoBanquete", CentroZ2, SalaGrande, MarmoreNegro);
-            MarcarZona(zona, "O Salão do Banquete Fossilizado");
+            var zona = Sala(raiz, "Z2_SalaoDoBanquete", CentroZ2);
+            MarcarZona(zona, "O Salão do Banquete Fossilizado", SalaGrande);
 
             // Nobreza fossilizada: obstáculos que servem de cobertura para o stealth visual.
             var posturas = new[]
             {
-                new Vector3(-8f, 4f, 0f), new Vector3(-3f, 5f, 0f), new Vector3(3f, 5f, 0f),
-                new Vector3(8f, 4f, 0f), new Vector3(-6f, -4f, 0f), new Vector3(6f, -4f, 0f),
+                new Vector3(-10f, 2f, 0f), new Vector3(-3f, 5f, 0f), new Vector3(3f, 5f, 0f),
+                new Vector3(10f, 2f, 0f), new Vector3(-6f, -4f, 0f), new Vector3(6f, -4f, 0f),
             };
             for (int i = 0; i < posturas.Length; i++)
                 Estatua(zona.transform, $"Nobre_Fossilizado_{i}", CentroZ2 + posturas[i]);
@@ -197,13 +207,13 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static void MontarZ3(Transform raiz)
         {
-            var zona = Sala(raiz, "Z3_BibliotecaEsquecida", CentroZ3, SalaGrande, MarmoreNegro);
-            MarcarZona(zona, "A Biblioteca Esquecida");
+            var zona = Sala(raiz, "Z3_BibliotecaEsquecida", CentroZ3);
+            MarcarZona(zona, "A Biblioteca Esquecida", SalaGrande);
 
             // Três espelhos, cada um com sua zona de pressão apontando para si.
             var pontos = new[]
             {
-                new Vector3(-9f, 6f, 0f), new Vector3(9f, 6f, 0f), new Vector3(0f, -7f, 0f),
+                new Vector3(-10f, 2f, 0f), new Vector3(10f, 2f, 0f), new Vector3(0f, -7f, 0f),
             };
             for (int i = 0; i < pontos.Length; i++)
                 EspelhoComPressao(zona.transform, i, CentroZ3 + pontos[i]);
@@ -219,8 +229,8 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static void MontarZ5(Transform raiz)
         {
-            var zona = Sala(raiz, "Z5_TronoDeAldebaran", CentroZ5, SalaGrande, MarmoreNegro);
-            MarcarZona(zona, "O Trono de Aldebaran");
+            var zona = Sala(raiz, "Z5_TronoDeAldebaran", CentroZ5);
+            MarcarZona(zona, "O Trono de Aldebaran", SalaGrande);
 
             var rei = GarantirRei(zona.transform, CentroZ5 + new Vector3(0f, 5f, 0f));
             if (rei == null) return;
@@ -229,8 +239,8 @@ namespace FavelaAmarela.EditorTools
 
             var cantos = new[]
             {
-                new Vector3(-9f, -5f, 0f), new Vector3(9f, -5f, 0f),
-                new Vector3(-9f, 3f, 0f), new Vector3(9f, 3f, 0f),
+                new Vector3(-10f, -1f, 0f), new Vector3(10f, -1f, 0f),
+                new Vector3(0f, -6f, 0f), new Vector3(0f, 4f, 0f),
             };
 
             for (int i = 0; i < ids.Length && i < cantos.Length; i++)
@@ -260,85 +270,338 @@ namespace FavelaAmarela.EditorTools
             return ids;
         }
 
-        // ── Peças ────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Liga o <b>desfecho</b> à vitória sobre o Rei.
+        ///
+        /// <para><b>O buraco:</b> <c>ReiEmAmareloAI.OnVitoria</c> tinha <b>zero assinantes</b>.
+        /// O evento existia com o comentário "quem monta a cena decide o que fazer com isso" e
+        /// ninguém decidia — completar o rito, o clímax do Vertical Slice, só repintava o Rei.
+        /// Achado auditando a cadeia do rito em 2026-08-20.</para>
+        ///
+        /// <para>O painel espelha o da <c>SequenciaDeColapso</c>: os dois fins do jogo passam a
+        /// ter a mesma forma. <b>A linha do desfecho é provisória</b> e fica serializada no
+        /// componente, para o Vini trocar no Inspector sem recompilar.</para>
+        /// </summary>
+        private static void MontarDesfecho(Transform raiz)
+        {
+            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>(FindObjectsInactive.Include);
+            if (rei == null)
+            {
+                Debug.LogWarning("[Castelo] Sem Rei em cena — desfecho não ligado.");
+                return;
+            }
 
-        private static GameObject Sala(Transform raiz, string nome, Vector3 centro,
-                                        Vector2 tamanho, Color cor)
+            var canvas = Object.FindAnyObjectByType<Canvas>(FindObjectsInactive.Include);
+            if (canvas == null)
+            {
+                Debug.LogWarning("[Castelo] Sem Canvas — desfecho não ligado.");
+                return;
+            }
+
+            // O painel nasce inativo; quem o acende é a coroutine do selamento.
+            var t = canvas.transform.Find("Painel_Desfecho");
+            var painelGo = t != null ? t.gameObject
+                                     : new GameObject("Painel_Desfecho", typeof(CanvasGroup), typeof(Image));
+            if (t == null) painelGo.transform.SetParent(canvas.transform, false);
+
+            var rt = painelGo.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            var fundo = painelGo.GetComponent<Image>();
+            if (fundo == null) fundo = painelGo.AddComponent<Image>();
+            fundo.color = new Color(0.02f, 0.02f, 0.03f, 1f);
+
+            var grupo = painelGo.GetComponent<CanvasGroup>();
+            if (grupo == null) grupo = painelGo.AddComponent<CanvasGroup>();
+
+            var tt = painelGo.transform.Find("Linha");
+            var textoGo = tt != null ? tt.gameObject : new GameObject("Linha", typeof(Text));
+            if (tt == null) textoGo.transform.SetParent(painelGo.transform, false);
+
+            var rtTexto = textoGo.GetComponent<RectTransform>();
+            rtTexto.anchorMin = new Vector2(0.1f, 0.4f);
+            rtTexto.anchorMax = new Vector2(0.9f, 0.6f);
+            rtTexto.offsetMin = Vector2.zero;
+            rtTexto.offsetMax = Vector2.zero;
+
+            var texto = textoGo.GetComponent<Text>();
+            if (texto == null) texto = textoGo.AddComponent<Text>();
+            // Resources, e "LegacyRuntime.ttf": o nome antigo LANÇA na Unity 6.
+            texto.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            texto.fontSize = 28;
+            texto.color = new Color(0.92f, 0.86f, 0.55f);
+            texto.alignment = TextAnchor.MiddleCenter;
+            texto.raycastTarget = false;
+
+            // O componente vive no mesmo GameObject do Rei? Não: numa raiz própria, para
+            // sobreviver caso o Rei seja destruído por algum efeito no fim da luta.
+            var host = raiz.Find("Desfecho");
+            var hostGo = host != null ? host.gameObject : new GameObject("Desfecho");
+            if (host == null) hostGo.transform.SetParent(raiz, false);
+
+            var seq = hostGo.GetComponent<SequenciaDeSelamento>();
+            if (seq == null) seq = hostGo.AddComponent<SequenciaDeSelamento>();
+
+            var so = new SerializedObject(seq);
+            so.FindProperty("rei").objectReferenceValue = rei;
+            so.FindProperty("painel").objectReferenceValue = grupo;
+            so.FindProperty("texto").objectReferenceValue = texto;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            painelGo.SetActive(false);
+
+            Debug.Log("[Castelo] Desfecho ligado ao OnVitoria do Rei (a linha de texto é " +
+                      "provisória — trocar no Inspector).");
+        }
+
+        // ── Chão isométrico ──────────────────────────────────────────────────
+
+        /// <summary>
+        /// Raio de cada sala, <b>em células</b>. Um bloco quadrado de células vira um losango
+        /// 2:1 em mundo: raio <c>r</c> → losango de <c>2r</c> de largura por <c>r</c> de altura.
+        /// </summary>
+        private const int RaioSalaPequena = 10;
+        private const int RaioSalaGrande = 15;
+
+        /// <summary>Meia-largura do corredor em células — <c>|gx-gy| &lt;= 4</c> dá 4 de vão em mundo.</summary>
+        private const int MeiaLarguraDoCorredor = 4;
+
+        /// <summary>
+        /// Espessura do anel de colisão. <b>Duas células, não uma:</b> com uma só, um ator rápido
+        /// atravessa entre dois <c>FixedUpdate</c> mesmo com <c>Continuous</c> — custou um
+        /// playtest na Arena de Testes.
+        /// </summary>
+        private const int EspessuraDaColisao = 2;
+
+        // Centro de cada sala em células. Andar em (+1,+1) move em +Y no mundo sem mexer em X,
+        // então centros na diagonal gx==gy empilham as salas verticalmente: world y = c/2.
+        private const int CelulaZ1 = -60;   // world y = -30
+        private const int CelulaZ2 = 0;     // world y =   0
+        private const int CelulaZ3 = 60;    // world y =  30
+        private const int CelulaZ5 = 124;   // world y =  62
+
+        /// <summary>
+        /// Pinta o chão do Castelo como <b>losangos isométricos</b> e deriva a colisão da borda
+        /// do que foi pintado.
+        ///
+        /// <para><b>O defeito que isto corrige:</b> a primeira versão desenhava cada sala como um
+        /// <c>SpriteRenderer</c> retangular em espaço de mundo. O Castelo era <b>top-down</b>
+        /// enquanto Deserto, Santuário e Portões são isométricos — relatado pelo Vini. Num
+        /// losango 2:1 uma unidade em Y vale metade de uma em X; um chão retangular mente sobre
+        /// distância e profundidade, e a fase inteira lia como outro jogo.</para>
+        ///
+        /// <para><b>E resolve as portas pela raiz.</b> A colisão é gerada a partir das células de
+        /// piso: onde o corredor encosta na sala há piso, logo não há parede. As passagens
+        /// existem por construção, em vez de dependerem de eu calcular um vão — que foi
+        /// exatamente o cálculo que deixou o jogador lacrado no Z1.</para>
+        ///
+        /// <para>Mesma receita de <c>BuildSantuarioIsoFloor</c> e <c>MontarArenaDeTestes</c>.</para>
+        /// </summary>
+        private static void MontarChaoIsometrico(Transform raiz)
+        {
+            RemoverGeometriaTopDown(raiz);
+
+            var tilePiso = MontarArenaDeTestes.GarantirTileDoLosango();
+            var tileColisao = MontarArenaDeTestes.GarantirTileDeColisao();
+
+            var t = raiz.Find("Castelo_Grid");
+            var gridGo = t != null ? t.gameObject : new GameObject("Castelo_Grid", typeof(Grid));
+            if (t == null) gridGo.transform.SetParent(raiz, false);
+
+            var grid = gridGo.GetComponent<Grid>();
+            if (grid == null) grid = gridGo.AddComponent<Grid>();
+            grid.cellSize = new Vector3(1f, 0.5f, 1f);
+            grid.cellLayout = GridLayout.CellLayout.Isometric;
+
+            var piso = GarantirTilemapFilho(gridGo.transform, "Piso_Castelo", desenha: true);
+            piso.ClearAllTiles();
+
+            var celulas = new HashSet<Vector3Int>();
+
+            Losango(celulas, CelulaZ1, RaioSalaPequena);
+            Losango(celulas, CelulaZ2, RaioSalaGrande);
+            Losango(celulas, CelulaZ3, RaioSalaGrande);
+            Losango(celulas, CelulaZ5, RaioSalaGrande);
+
+            LigarSalas(celulas, CelulaZ1, RaioSalaPequena, CelulaZ2, RaioSalaGrande);
+            LigarSalas(celulas, CelulaZ2, RaioSalaGrande, CelulaZ3, RaioSalaGrande);
+            LigarSalas(celulas, CelulaZ3, RaioSalaGrande, CelulaZ5, RaioSalaGrande);
+
+            foreach (var c in celulas) piso.SetTile(c, tilePiso);
+
+            GerarColisao(gridGo.transform, celulas, tileColisao);
+
+            Debug.Log($"[Castelo] Chão isométrico: {celulas.Count} células de piso.");
+        }
+
+        /// <summary>Bloco quadrado de células em torno de (c,c) — losango 2:1 em mundo.</summary>
+        private static void Losango(HashSet<Vector3Int> destino, int centro, int raio)
+        {
+            for (int gx = centro - raio; gx <= centro + raio; gx++)
+                for (int gy = centro - raio; gy <= centro + raio; gy++)
+                    destino.Add(new Vector3Int(gx, gy, 0));
+        }
+
+        /// <summary>
+        /// Corredor que liga duas salas. Em mundo, <c>gx+gy</c> é o eixo Y (÷4) e <c>gx-gy</c> é
+        /// o eixo X (÷2): fixar <c>|gx-gy|</c> dá uma faixa reta e estreita subindo a fase.
+        /// </summary>
+        private static void LigarSalas(HashSet<Vector3Int> destino,
+                                        int centroA, int raioA, int centroB, int raioB)
+        {
+            int somaInicio = 2 * (centroA + raioA);
+            int somaFim = 2 * (centroB - raioB);
+
+            for (int soma = somaInicio; soma <= somaFim; soma++)
+                for (int dif = -MeiaLarguraDoCorredor; dif <= MeiaLarguraDoCorredor; dif++)
+                {
+                    // gx+gy = soma e gx-gy = dif só têm solução inteira com a mesma paridade.
+                    // Sem esta guarda o corredor sai furado em xadrez, e o anel de colisão
+                    // transforma cada furo numa pilastra invisível no meio da passagem.
+                    if (((soma + dif) & 1) != 0) continue;
+
+                    destino.Add(new Vector3Int((soma + dif) / 2, (soma - dif) / 2, 0));
+                }
+        }
+
+        /// <summary>
+        /// Anel de colisão derivado do piso: toda célula vizinha que <b>não</b> é piso vira
+        /// parede. As portas aparecem sozinhas onde o corredor encosta na sala.
+        /// </summary>
+        private static void GerarColisao(Transform raizDoGrid, HashSet<Vector3Int> piso,
+                                          TileBase tileColisao)
+        {
+            var paredes = new HashSet<Vector3Int>();
+
+            foreach (var c in piso)
+                for (int dx = -EspessuraDaColisao; dx <= EspessuraDaColisao; dx++)
+                    for (int dy = -EspessuraDaColisao; dy <= EspessuraDaColisao; dy++)
+                    {
+                        if (dx == 0 && dy == 0) continue;
+                        var n = new Vector3Int(c.x + dx, c.y + dy, c.z);
+                        if (!piso.Contains(n)) paredes.Add(n);
+                    }
+
+            var colisao = GarantirTilemapFilho(raizDoGrid, "Colisao", desenha: false);
+            colisao.ClearAllTiles();
+
+            int obstacle = LayerMask.NameToLayer("Obstacle");
+            if (obstacle >= 0) colisao.gameObject.layer = obstacle;
+
+            foreach (var w in paredes) colisao.SetTile(w, tileColisao);
+
+            if (colisao.GetComponent<TilemapCollider2D>() == null)
+                colisao.gameObject.AddComponent<TilemapCollider2D>();
+        }
+
+        private static Tilemap GarantirTilemapFilho(Transform raiz, string nome, bool desenha)
+        {
+            var t = raiz.Find(nome);
+            var go = t != null ? t.gameObject
+                               : new GameObject(nome, typeof(Tilemap), typeof(TilemapRenderer));
+            if (t == null) go.transform.SetParent(raiz, false);
+
+            var mapa = go.GetComponent<Tilemap>();
+            if (mapa == null) mapa = go.AddComponent<Tilemap>();
+
+            var render = go.GetComponent<TilemapRenderer>();
+            if (render == null) render = go.AddComponent<TilemapRenderer>();
+            render.enabled = desenha;
+            render.sortingOrder = -1000;
+
+            return mapa;
+        }
+
+        /// <summary>
+        /// Apaga o piso e as paredes retangulares da versão top-down. <b>Destrói em vez de
+        /// desativar:</b> deixados na cena, os colisores das paredes antigas continuariam
+        /// barrando o jogador por cima do chão novo, e o motivo seria invisível no Editor.
+        /// </summary>
+        private static void RemoverGeometriaTopDown(Transform raiz)
+        {
+            var condenados = new List<GameObject>();
+
+            foreach (var t in raiz.GetComponentsInChildren<Transform>(true))
+            {
+                if (t == raiz) continue;
+
+                string n = t.name;
+                if (n == "Piso" || n.StartsWith("Parede_") || n.StartsWith("Lateral_")
+                    || n.StartsWith("Corredor_"))
+                    condenados.Add(t.gameObject);
+            }
+
+            foreach (var go in condenados)
+                if (go != null) Object.DestroyImmediate(go);
+
+            if (condenados.Count > 0)
+                Debug.Log($"[Castelo] {condenados.Count} peça(s) da geometria top-down removida(s).");
+        }
+
+        /// <summary>Zona da sala: só o GameObject e a marcação — o chão é do Tilemap.</summary>
+        private static GameObject Sala(Transform raiz, string nome, Vector3 centro)
         {
             var t = raiz.Find(nome);
             var go = t != null ? t.gameObject : new GameObject(nome);
             if (t == null) go.transform.SetParent(raiz, false);
             go.transform.position = centro;
-
-            var piso = go.transform.Find("Piso")?.gameObject;
-            if (piso == null)
-            {
-                piso = new GameObject("Piso", typeof(SpriteRenderer));
-                piso.transform.SetParent(go.transform, false);
-            }
-
-            var sr = piso.GetComponent<SpriteRenderer>();
-            sr.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-            sr.drawMode = SpriteDrawMode.Sliced;
-            sr.size = tamanho;
-            sr.color = cor;
-            sr.sortingOrder = -1000;
-
-            Parede(go.transform, "Parede_Norte", new Vector3(0f, tamanho.y / 2f, 0f), new Vector2(tamanho.x, 0.5f));
-            Parede(go.transform, "Parede_Sul", new Vector3(0f, -tamanho.y / 2f, 0f), new Vector2(tamanho.x, 0.5f));
-            Parede(go.transform, "Parede_Leste", new Vector3(tamanho.x / 2f, 0f, 0f), new Vector2(0.5f, tamanho.y));
-            Parede(go.transform, "Parede_Oeste", new Vector3(-tamanho.x / 2f, 0f, 0f), new Vector2(0.5f, tamanho.y));
-
             return go;
         }
 
-        private static void Parede(Transform raiz, string nome, Vector3 pos, Vector2 tamanho)
-        {
-            var t = raiz.Find(nome);
-            var go = t != null ? t.gameObject : new GameObject(nome);
-            if (t == null) go.transform.SetParent(raiz, false);
-
-            go.transform.localPosition = pos;
-            go.layer = LayerMask.NameToLayer("Obstacle");
-
-            var col = go.GetComponent<BoxCollider2D>();
-            if (col == null) col = go.AddComponent<BoxCollider2D>();
-            col.size = tamanho;
-        }
-
         /// <summary>
-        /// Corredores entre as zonas: vãos estreitos que fazem o Castelo ser percorrido em
-        /// sequência, e não em campo aberto. Sem colisor — são só o piso do vão.
+        /// Põe no Z1 a <c>TravessiaDoCompanheiro</c> em <b>modo aposentadoria</b> e o posto onde
+        /// Yug-Neth fica.
+        ///
+        /// <para><b>A virada de papel:</b> ele atravessa para o Castelo com Damião, como faz em
+        /// toda cena — mas aqui chega e <b>deixa de ser companheiro</b>, virando o NPC que ensina
+        /// o artesanato (decisão do Vini, 2026-08-20). O artesanato em si é conteúdo pós-Vertical
+        /// Slice e <b>não</b> foi implementado; o que existe é a virada acontecer em jogo.</para>
+        ///
+        /// <para><b>Por que no Z1 e não mais adiante:</b> o Z1 é a área segura da fase — chegada,
+        /// Refúgio, nenhuma ameaça. É o único lugar do Castelo onde parar para conversar não
+        /// compete com o dreno de RM nem com uma patrulha.</para>
         /// </summary>
-        private static void MontarCorredores(Transform raiz)
+        private static void GarantirPostoDoArtesao(Transform raiz, Vector3 pos, TutorialHintUI caixa)
         {
-            Corredor(raiz, "Corredor_Z1_Z2", CentroZ1, CentroZ2, SalaPequena.y, SalaGrande.y);
-            Corredor(raiz, "Corredor_Z2_Z3", CentroZ2, CentroZ3, SalaGrande.y, SalaGrande.y);
-            Corredor(raiz, "Corredor_Z3_Z5", CentroZ3, CentroZ5, SalaGrande.y, SalaGrande.y);
+            var t = raiz.Find("Posto_Do_Artesao");
+            var posto = t != null ? t.gameObject : new GameObject("Posto_Do_Artesao");
+            if (t == null) posto.transform.SetParent(raiz, false);
+            posto.transform.position = pos;
+
+            var travessia = Object.FindAnyObjectByType<TravessiaDoCompanheiro>(
+                FindObjectsInactive.Include);
+
+            if (travessia == null)
+            {
+                var go = GameObject.Find("Travessia_DoCompanheiro")
+                         ?? new GameObject("Travessia_DoCompanheiro");
+                go.transform.SetParent(raiz, false);
+                travessia = go.GetComponent<TravessiaDoCompanheiro>();
+                if (travessia == null) travessia = go.AddComponent<TravessiaDoCompanheiro>();
+            }
+
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabYugNeth);
+            if (prefab == null)
+                Debug.LogWarning($"[Castelo] Prefab do Yug-Neth ausente em '{PrefabYugNeth}' — " +
+                                 "ele não vai aparecer no Castelo.");
+
+            var so = new SerializedObject(travessia);
+            so.FindProperty("prefabYugNeth").objectReferenceValue = prefab;
+            so.FindProperty("aposentarAoChegar").boolValue = true;
+            so.FindProperty("postoDeArtesao").objectReferenceValue = posto.transform;
+            so.FindProperty("caixaDeTexto").objectReferenceValue = caixa;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            Debug.Log("[Castelo] Yug-Neth entra no Castelo e se aposenta de companheiro (vira " +
+                      "o artesão). O artesanato em si é pós-VS e não foi implementado.");
         }
 
-        private static void Corredor(Transform raiz, string nome, Vector3 de, Vector3 para,
-                                      float alturaDe, float alturaPara)
-        {
-            float y0 = de.y + alturaDe / 2f;
-            float y1 = para.y - alturaPara / 2f;
+        // ── Peças ────────────────────────────────────────────────────────────
 
-            var t = raiz.Find(nome);
-            var go = t != null ? t.gameObject : new GameObject(nome, typeof(SpriteRenderer));
-            if (t == null) go.transform.SetParent(raiz, false);
-
-            go.transform.position = new Vector3(0f, (y0 + y1) / 2f, 0f);
-
-            var sr = go.GetComponent<SpriteRenderer>();
-            if (sr == null) sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-            sr.drawMode = SpriteDrawMode.Sliced;
-            sr.size = new Vector2(4f, Mathf.Abs(y1 - y0));
-            sr.color = MarmoreNegro;
-            sr.sortingOrder = -1000;
-        }
-
-        private static void MarcarZona(GameObject zona, string nome)
+        private static void MarcarZona(GameObject zona, string nome, Vector2 tamanho)
         {
             var marca = zona.GetComponent<CasteloDeCarcosaZone>();
             if (marca == null) marca = zona.AddComponent<CasteloDeCarcosaZone>();
@@ -351,7 +614,11 @@ namespace FavelaAmarela.EditorTools
             var col = zona.GetComponent<BoxCollider2D>();
             if (col == null) col = zona.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
-            col.size = SalaGrande;
+            // O tamanho REAL da sala. Em 2026-08-20 eu troquei a assinatura e as chamadas para
+            // receber 'tamanho' e esqueci o corpo, que seguiu usando SalaGrande — o parâmetro
+            // ficou sem uso e o Z1 seguiu com gatilho de sala grande. Parâmetro não usado não
+            // gera erro de compilação; só aparece lendo o corpo.
+            col.size = tamanho;
         }
 
         private static void Estatua(Transform raiz, string nome, Vector3 pos)
@@ -633,8 +900,12 @@ namespace FavelaAmarela.EditorTools
             painel.transform.SetParent(canvas.transform, false);
 
             var rt = painel.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.08f, 0.04f);
-            rt.anchorMax = new Vector2(0.92f, 0.28f);
+            // Ancorada ACIMA do rodapé: a barra de itens e a de ações ocupam de y=48 a y=180
+            // (de 1080), e a caixa ia de 0.04 a 0.28 — ou seja, POR CIMA das duas. Era isso o
+            // "os diálogos não se encaixam na UI" que o Vini relatou. Frações, e não pixels,
+            // para a caixa acompanhar o viewport em qualquer resolução.
+            rt.anchorMin = new Vector2(0.08f, 0.20f);
+            rt.anchorMax = new Vector2(0.92f, 0.44f);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
 
@@ -656,7 +927,9 @@ namespace FavelaAmarela.EditorTools
             // Unity 6: a fonte embutida é LegacyRuntime.ttf, e vem por Resources —
             // AssetDatabase.GetBuiltinExtraResource com "Arial.ttf" LANÇA exceção.
             texto.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            texto.fontSize = 20;
+            // ×3: a caixa vive no canvas de referência 1920×1080, e este número
+            // vinha da época de 640×360.
+            texto.fontSize = 60;
             texto.color = new Color(0.93f, 0.89f, 0.72f);
             texto.raycastTarget = false;
             texto.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -731,15 +1004,28 @@ namespace FavelaAmarela.EditorTools
         }
 
         /// <summary>
-        /// Sem esta ligação o Castelo existiria como cena solta, alcançável só pelo Editor — a
-        /// falha exata que o roadmap já registrou em outros pontos: a peça existe e nada leva
-        /// até ela.
+        /// <b>Remove</b> o atalho Santuário → Castelo.
+        ///
+        /// <para><b>Ele existiu por um motivo que acabou.</b> Foi criado em 2026-08-19 porque o
+        /// Castelo era uma cena solta, alcançável só pelo Editor — um portal direto era melhor
+        /// que nada. Com os Portões das Ruínas em cena (2026-08-20), o caminho verdadeiro passou
+        /// a existir: Deserto → Portões → Castelo, como o GDD sempre descreveu.</para>
+        ///
+        /// <para><b>Por que remover e não só deixar quieto:</b> o atalho pula o Byakhee, e o
+        /// Byakhee é a única fonte do Anel do Sinal Amarelo — uma das três relíquias que o rito
+        /// do Rei exige. Manter o atalho é manter um caminho que leva ao chefe final <b>sem o que
+        /// é preciso para vencê-lo</b>, e que não dá nenhum sinal disso ao jogador. Decisão do
+        /// Vini, 2026-08-20.</para>
+        ///
+        /// <para>A remoção vive aqui, e não numa ferramenta à parte, para ser <b>idempotente</b>:
+        /// esta ferramenta é quem criava o atalho, então rodá-la de novo tem que continuar
+        /// tirando — e não ressuscitar o que foi decidido remover.</para>
         /// </summary>
-        private static void LigarOPortalNoSantuario()
+        private static void RemoverOAtalhoDoSantuario()
         {
             if (!System.IO.File.Exists(CenaSantuario))
             {
-                Debug.LogWarning("[Castelo] Santuário ausente — nenhum portal foi ligado.");
+                Debug.LogWarning("[Castelo] Santuário ausente — nada a remover.");
                 return;
             }
 
@@ -748,34 +1034,23 @@ namespace FavelaAmarela.EditorTools
             var raiz = GameObject.Find("Santuario_Root")?.transform;
             var t = raiz != null ? raiz.Find("Portal_ParaOCastelo") : null;
 
-            var go = t != null ? t.gameObject : new GameObject("Portal_ParaOCastelo", typeof(SpriteRenderer));
-            if (t == null && raiz != null) go.transform.SetParent(raiz, false);
+            if (t == null)
+            {
+                Debug.Log("[Castelo] O atalho do Santuário já não existe.");
+                return;
+            }
 
-            go.transform.position = new Vector3(6.5f, 4.5f, 0f);
-
-            var sr = go.GetComponent<SpriteRenderer>();
-            if (sr == null) sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-            sr.drawMode = SpriteDrawMode.Sliced;
-            sr.size = new Vector2(2f, 3f);
-            sr.color = new Color(0.20f, 0.16f, 0.28f);
-
-            var col = go.GetComponent<BoxCollider2D>();
-            if (col == null) col = go.AddComponent<BoxCollider2D>();
-            col.isTrigger = true;
-            col.size = new Vector2(2f, 3f);
-
-            var portal = go.GetComponent<PortalDeCena>();
-            if (portal == null) portal = go.AddComponent<PortalDeCena>();
-
-            portal.DefinirCenaDestino("Castelo_Carcosa");
-            portal.DefinirChegada(IdChegadaNoCastelo);
-            EditorUtility.SetDirty(portal);
+            Object.DestroyImmediate(t.gameObject);
 
             EditorSceneManager.MarkSceneDirty(cena);
-            EditorSceneManager.SaveScene(cena);
+            if (!EditorSceneManager.SaveScene(cena))
+            {
+                Debug.LogError("[Castelo] Falha ao salvar o Santuário sem o atalho.");
+                return;
+            }
 
-            Debug.Log("[Castelo] Portal ligado no Santuário → Castelo_Carcosa.");
+            Debug.Log("[Castelo] Atalho Santuário → Castelo removido. O caminho agora é " +
+                      "Deserto → Portões das Ruínas → Castelo.");
         }
     }
 }

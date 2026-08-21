@@ -62,9 +62,25 @@ namespace FavelaAmarela.EditorTools
         /// <c>maxTextureSize</c> do topo do <c>.meta</c>, que continuou em 2048 — conferido no
         /// arquivo, não no log. A saída foi eliminar a causa: empacotar folhas que já cabem.</para>
         /// </param>
+        /// <param name="pivo">
+        /// Pivô das fatias, em fração do quadro. <c>null</c> (padrão) mantém o histórico:
+        /// <c>BottomCenter</c> em <c>(0,5, 0)</c>, que vale para arte cujo último pixel são os
+        /// pés.
+        ///
+        /// <para><b>Existe desde 2026-08-21</b>, e a razão importa. As folhas com elipse de
+        /// sombra têm o chão <b>acima</b> da base do quadro, então precisam de pivô próprio.
+        /// A primeira tentativa foi corrigir o pivô <i>depois</i>, num segundo
+        /// <c>SaveAndReimport</c> — e falhou <b>calada</b>: a Unity reaplicava o
+        /// <c>spriteAlignment</c> da textura por cima das fatias e devolvia tudo para
+        /// <c>alignment: 7</c>, pivô zero, sem erro nenhum. Funcionou uma vez e regrediu na
+        /// rodada seguinte, porque o resultado dependia de qual dos dois imports vencia.</para>
+        ///
+        /// <para>Duas escritas disputando o mesmo import é uma corrida. Passar o pivô <b>aqui</b>
+        /// faz uma escrita só, e o problema deixa de existir em vez de ser sequenciado em volta.</para>
+        /// </param>
         public static bool FatiarFolha(string caminho, string prefixo, int larguraDoQuadro,
                                        int alturaDoQuadro, IEnumerable<Faixa> faixas,
-                                       int tamanhoMaximo = 2048)
+                                       int tamanhoMaximo = 2048, Vector2? pivo = null)
         {
             var importer = AssetImporter.GetAtPath(caminho) as TextureImporter;
             if (importer == null)
@@ -95,6 +111,17 @@ namespace FavelaAmarela.EditorTools
                 importer.SetPlatformTextureSettings(ps);
             }
 
+            // O alignment das FATIAS não basta: no reimport a Unity reaplica o alignment da
+            // TEXTURA por cima de cada uma. Os dois níveis têm que concordar.
+            var alinhamento = pivo.HasValue ? SpriteAlignment.Custom : SpriteAlignment.BottomCenter;
+            var pivoEfetivo = pivo ?? new Vector2(0.5f, 0f);
+
+            var settings = new TextureImporterSettings();
+            importer.ReadTextureSettings(settings);
+            settings.spriteAlignment = (int)alinhamento;
+            settings.spritePivot = pivoEfetivo;
+            importer.SetTextureSettings(settings);
+
             var fatias = new List<SpriteMetaData>();
 
             foreach (var f in faixas)
@@ -108,8 +135,8 @@ namespace FavelaAmarela.EditorTools
                         name = $"{prefixo}_{f.Nome}_{i}",
                         // A Unity conta o eixo Y de baixo para cima; a folha é de uma linha só.
                         rect = new Rect(indice * larguraDoQuadro, 0, larguraDoQuadro, alturaDoQuadro),
-                        alignment = (int)SpriteAlignment.BottomCenter,
-                        pivot = new Vector2(0.5f, 0f),
+                        alignment = (int)alinhamento,
+                        pivot = pivoEfetivo,
                     });
                 }
             }
@@ -122,8 +149,30 @@ namespace FavelaAmarela.EditorTools
 
             importer.SaveAndReimport();
 
+            // Confere no que a Unity REGRAVOU. Um pivô recusado não gera erro — só volta para
+            // zero, e o personagem afunda no chão sem ninguém perceber.
+            var conferir = AssetImporter.GetAtPath(caminho) as TextureImporter;
+#pragma warning disable CS0618
+            var depois = conferir != null ? conferir.spritesheet : null;
+#pragma warning restore CS0618
+
+            if (depois == null || depois.Length == 0)
+            {
+                Debug.LogError($"[MontadorDeAnimacao] '{caminho}' ficou sem fatias no reimport.");
+                return false;
+            }
+
+            if (Mathf.Abs(depois[0].pivot.y - pivoEfetivo.y) > 0.0005f)
+            {
+                Debug.LogError($"[MontadorDeAnimacao] '{System.IO.Path.GetFileName(caminho)}': " +
+                               $"pedi pivô y={pivoEfetivo.y:0.000000} e a Unity gravou " +
+                               $"{depois[0].pivot.y:0.000000} (alignment {depois[0].alignment}).");
+                return false;
+            }
+
             Debug.Log($"[MontadorDeAnimacao] '{System.IO.Path.GetFileName(caminho)}' fatiada em " +
-                      $"{fatias.Count} sprite(s) de {larguraDoQuadro}×{alturaDoQuadro}.");
+                      $"{fatias.Count} sprite(s) de {larguraDoQuadro}×{alturaDoQuadro}, " +
+                      $"pivô y={depois[0].pivot.y:0.000000} conferido.");
             return true;
         }
 

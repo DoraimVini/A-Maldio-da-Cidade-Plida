@@ -47,6 +47,10 @@ namespace FavelaAmarela.Tests.EditMode
             PastaDeCenas + "Playtest_RuinasPalidas.unity",
             PastaDeCenas + "Santuario_Yhtill.unity",
             PastaDeCenas + "Cena_ArenaDeTestes.unity",
+            // Acrescentadas em 2026-08-20. A ausência delas escondia um defeito real: as duas
+            // cenas de chefe do Vertical Slice tinham DUAS das seis views do HUD.
+            PastaDeCenas + "Portoes_Das_Ruinas.unity",
+            PastaDeCenas + "Castelo_Carcosa.unity",
         };
 
         /// <summary>

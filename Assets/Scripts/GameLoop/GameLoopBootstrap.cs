@@ -66,6 +66,12 @@ namespace FavelaAmarela.Runtime.GameLoop
         private VitalidadeBridge _vitalidadeDamiao;
         private ResilienciaBridge _menteDamiao;
 
+        // Guardado, e não rebuscado depois: a barra do companheiro é ligada em InjetarNos-
+        // ComponentesFocados e também por evento em runtime, muito depois do Awake. Um
+        // FindAnyObjectByType a cada registro seria busca global fora de hot path, mas ainda
+        // assim redundante — o HUD já foi achado uma vez.
+        private HUDController _hud;
+
         private void Awake()
         {
             // 1. Lógica pura (Core). A cena de jogo sempre nasce jogando: quem mostra menu é a
@@ -89,6 +95,7 @@ namespace FavelaAmarela.Runtime.GameLoop
         private void InjetarNoMundo()
         {
             var hud = FindAnyObjectByType<HUDController>();
+            _hud = hud;
             if (hud != null)
                 hud.InjetarResiliencia(Resiliencia);
             else
@@ -118,6 +125,22 @@ namespace FavelaAmarela.Runtime.GameLoop
             var audioResiliencia = FindAnyObjectByType<AudioDeResiliencia>();
             if (audioResiliencia != null)
                 audioResiliencia.Bind(Resiliencia);
+
+            // Golpe e habilidade de arma. Os dois sons existiam em SomDoJogo e em SinteseDeSom,
+            // mas ninguém os disparava: atacar um chefe não produzia som nenhum. Era metade do
+            // "combate sem feel" relatado no playtest do Byakhee (a outra metade era o próprio
+            // Byakhee estar sem AudioDeCombate).
+            var audioDoJogador = FindAnyObjectByType<AudioDoJogador>();
+            if (audioDoJogador != null && player != null)
+            {
+                var maoParaOAudio = player.GetComponent<MaoFisicaBridge>();
+                if (maoParaOAudio != null) audioDoJogador.Bind(maoParaOAudio);
+            }
+            else if (audioDoJogador == null)
+            {
+                Debug.LogWarning("[GameLoopBootstrap] Nenhum AudioDoJogador na cena; os golpes " +
+                                 "de Damião saem mudos.", this);
+            }
 
             // Vitalidade corpórea de Damião. Quem observa o abate é o PlayerDeathController;
             // aqui só se resolve a referência.
@@ -254,7 +277,51 @@ namespace FavelaAmarela.Runtime.GameLoop
             // libertado. Ver CompanionManager.RegistrarYugNeth.
             var companheiro = GetComponent<CompanionManager>();
 
+            LigarBarraDoCompanheiro(companheiro);
+
             InjetarNosConsumidoresDaCena(cutscene, companheiro);
+        }
+
+        /// <summary>
+        /// Faz a barra do companheiro aparecer no HUD quando Yug-Neth é libertado.
+        ///
+        /// <para><b>Os dois caminhos são necessários.</b> Assinar o evento cobre a libertação
+        /// que acontece durante esta cena. Ligar na hora cobre o caso de o companheiro <b>já</b>
+        /// estar registrado quando o bootstrap roda — que é o que acontece ao trocar de cena
+        /// depois de libertá-lo, ou ao carregar um save. Só o evento deixaria a barra sumir na
+        /// primeira transição de cena depois da Tumba; só a ligação imediata nunca a mostraria
+        /// na cena em que ele é solto.</para>
+        /// </summary>
+        private void LigarBarraDoCompanheiro(CompanionManager companheiro)
+        {
+            if (companheiro == null || _hud == null) return;
+
+            companheiro.OnCompanheiroRegistrado += HandleCompanheiroRegistrado;
+            companheiro.OnCompanheiroAposentado += HandleCompanheiroAposentado;
+
+            if (companheiro.YugNeth != null) _hud.InjetarCompanheiro(companheiro.YugNeth);
+        }
+
+        // Método nomeado, não lambda: '-=' com um lambda diferente do usado no '+=' nunca
+        // desassina, e esse bug já existe em GerenciadorEfeitosPassivos.
+        private void HandleCompanheiroRegistrado(FavelaAmarela.Runtime.Enemies.YugNethAI yugNeth)
+        {
+            if (_hud != null) _hud.InjetarCompanheiro(yugNeth);
+        }
+
+        private void HandleCompanheiroAposentado()
+        {
+            if (_hud != null) _hud.RetirarCompanheiro();
+        }
+
+        private void OnDestroy()
+        {
+            var companheiro = GetComponent<CompanionManager>();
+            if (companheiro != null)
+            {
+                companheiro.OnCompanheiroRegistrado -= HandleCompanheiroRegistrado;
+                companheiro.OnCompanheiroAposentado -= HandleCompanheiroAposentado;
+            }
         }
 
         /// <summary>

@@ -28,6 +28,9 @@ namespace FavelaAmarela.Runtime.UI
             [Tooltip("Some/aparece conforme o slot tem item.")]
             public CanvasGroup grupo;
 
+            [Tooltip("Moldura da casa. Troca de arte conforme vazia ou ocupada. [ASSET]")]
+            public Image moldura;
+
             [Tooltip("Ícone do item. [ASSET]")]
             public Image icone;
 
@@ -52,6 +55,15 @@ namespace FavelaAmarela.Runtime.UI
 
         [Header("Aparência")]
         [Range(0f, 1f)]
+        [Header("Molduras (Dark Ages UI)")]
+        [Tooltip("Arte da casa vazia. [ASSET]")]
+        [SerializeField] private Sprite molduraVazia;
+
+        [Tooltip("Arte da casa ocupada — tom distinto, para o estado ser legível de relance. [ASSET]")]
+        [SerializeField] private Sprite molduraCheia;
+
+        [Tooltip("Opacidade da casa vazia. Com molduras de dois tons ligadas, deixe em 1: quem " +
+                 "comunica o estado passa a ser a arte, não o desbotamento.")]
         [SerializeField] private float opacidadeVazio = 0.25f;
 
         [Range(0f, 1f)]
@@ -188,6 +200,15 @@ namespace FavelaAmarela.Runtime.UI
 
             if (visual.grupo != null)
                 visual.grupo.alpha = cheio ? opacidadeCheio : opacidadeVazio;
+
+            // A moldura carrega o estado. Antes disso, a única pista de "tem item aqui" era o
+            // desbotamento do slot inteiro — que sumiria junto com a moldura e deixaria a grade
+            // ilegível. Dois tons distintos resolvem sem depender de alpha.
+            if (visual.moldura != null)
+            {
+                var arte = cheio ? molduraCheia : molduraVazia;
+                if (arte != null) visual.moldura.sprite = arte;
+            }
 
             if (visual.icone != null)
             {

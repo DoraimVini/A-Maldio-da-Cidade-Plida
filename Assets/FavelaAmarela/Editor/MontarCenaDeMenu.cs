@@ -77,7 +77,7 @@ namespace FavelaAmarela.EditorTools
             var raiz = Overlay(canvas.transform, "Menu", new Color(0.03f, 0.025f, 0.02f, 1f));
 
             Texto(raiz.transform, "Titulo", "CAMINHO PARA CARCOSA",
-                new Vector2(0.1f, 0.7f), new Vector2(0.9f, 0.82f), 44, TextAnchor.MiddleCenter, Amarelo);
+                new Vector2(0.1f, 0.7f), new Vector2(0.9f, 0.82f), 132, TextAnchor.MiddleCenter, Amarelo);
 
             var continuar = Botao(raiz.transform, "Botao_Continuar", "Continuar", 0.52f);
             var nova = Botao(raiz.transform, "Botao_NovaPartida", "Nova peregrinação", 0.42f);
@@ -101,7 +101,7 @@ namespace FavelaAmarela.EditorTools
             var painel = Overlay(pai, "Confirmacao", new Color(0.05f, 0.04f, 0.03f, 0.97f));
 
             Texto(painel.transform, "Aviso", "Isso apaga o progresso. Continuar?",
-                new Vector2(0.1f, 0.54f), new Vector2(0.9f, 0.64f), 22, TextAnchor.MiddleCenter, Amarelo);
+                new Vector2(0.1f, 0.54f), new Vector2(0.9f, 0.64f), 66, TextAnchor.MiddleCenter, Amarelo);
 
             var confirmar = Botao(painel.transform, "Botao_Confirmar", "Apagar e recomeçar", 0.44f);
             var cancelar = Botao(painel.transform, "Botao_Cancelar", "Voltar", 0.34f);
@@ -169,7 +169,7 @@ namespace FavelaAmarela.EditorTools
             img.type = Image.Type.Sliced;
             img.color = new Color(0.85f, 0.80f, 0.60f, 0.14f);
 
-            Texto(go.transform, "Rotulo", rotulo, Vector2.zero, Vector2.one, 22,
+            Texto(go.transform, "Rotulo", rotulo, Vector2.zero, Vector2.one, 66,
                 TextAnchor.MiddleCenter, Amarelo);
 
             return go.GetComponent<Button>();
@@ -177,6 +177,9 @@ namespace FavelaAmarela.EditorTools
 
         private static Text Texto(Transform pai, string nome, string conteudo,
             Vector2 ancoraMin, Vector2 ancoraMax, int tamanho, TextAnchor alinhamento, Color cor)
+            // Os tamanhos passados aqui foram multiplicados por 3 em 2026-08-20: o canvas do
+            // menu tem referencia 1920x1080 e estes numeros vinham da epoca de 640x360, entao
+            // as letras saiam a um terco do pretendido. Mesma correcao do BuildHUDCompleto.
         {
             var go = new GameObject(nome, typeof(Text));
             go.transform.SetParent(pai, false);

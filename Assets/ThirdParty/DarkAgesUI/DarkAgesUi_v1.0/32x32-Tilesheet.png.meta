@@ -401,11 +401,55 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: slot_vazio
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 274
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 12, y: 12, z: 12, w: 12}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2f9475cacc511d4148ff782fde0cd10
+      internalID: 205114220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot_cheio
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 274
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 12, y: 12, z: 12, w: 12}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee42cb4b25c9801aff95cece1982fbd0
+      internalID: -707622370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: cfd48c8d0dce27446b5bee2a09e36fc0
     internalID: 0
     vertices: []
     indices: 
@@ -486,6 +530,8 @@ TextureImporter:
       moldura_slot: -2426919387455327664
       painel_ornado: 1089723763042107428
       painel_pergaminho: -7308537856757825077
+      slot_cheio: -707622370
+      slot_vazio: 205114220
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

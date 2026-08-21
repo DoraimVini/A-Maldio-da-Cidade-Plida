@@ -31,11 +31,33 @@ namespace FavelaAmarela.EditorTools
         private const string Prefab = "Assets/FavelaAmarela/Art/Characters/Damiao/Player_Damiao.prefab";
         private const string Prefixo = "damiao";
 
-        /// <summary>Altura comum a todas as 9 tiras — o bbox vertical global usado no recorte.</summary>
-        private const int AlturaDoQuadro = 84;
+        /// <summary>
+        /// Altura comum às 9 tiras. <b>88, não 84</b> — corrigido em 2026-08-21.
+        ///
+        /// <para>Era 84 até o contorno e a elipse de sombra expandirem cada quadro em 2 px de
+        /// cada lado. A constante ficou para trás, e rodar esta ferramenta <b>fatiaria as
+        /// folhas erradas</b>, cortando 4 px de cada quadro.</para>
+        /// </summary>
+        private const int AlturaDoQuadro = 88;
 
-        /// <summary>Altura visual alvo, em unidades, igual à do sprite antigo (32×48 @ escala 0.5).</summary>
-        private const float AlturaVisualAlvo = 0.75f;
+        /// <summary>Margem em px sob os pés, ocupada pela elipse de sombra.</summary>
+        private const float MargemDaSombra = 2f;
+
+        /// <summary>
+        /// Altura alvo do quadro, em unidades de mundo. <b>2,20, não 0,75</b> — corrigido em
+        /// 2026-08-21.
+        ///
+        /// <para><b>Esta ferramenta era uma mina.</b> O 0,75 antigo era do sprite de 32×48, e
+        /// <c>EscalaDoDamiao</c> levou o Damião a 2,20 a pedido do Vini (ele era o menor do
+        /// elenco). Como as duas ferramentas escrevem o mesmo <c>localScale</c> e ninguém as
+        /// reconciliou, rodar esta <b>desfaria</b> a escala — devolvendo o Damião a 0,2857 sem
+        /// erro nenhum. Somado à altura de quadro errada e ao pivô zerado, eram três regressões
+        /// silenciosas numa execução só.</para>
+        ///
+        /// <para>O valor tem que continuar igual ao de <c>EscalaDoDamiao.AlturaAlvo</c>.
+        /// <c>AnimacaoDoDamiaoTests</c> guarda o resultado.</para>
+        /// </summary>
+        private const float AlturaVisualAlvo = 2.2f;
 
         private static readonly float EscalaNova = AlturaVisualAlvo / (AlturaDoQuadro / 32f);
 
@@ -72,7 +94,13 @@ namespace FavelaAmarela.EditorTools
                 string caminho = $"{Pasta}/Damiao_{t.Nome}.png";
 
                 var faixa = new[] { new MontadorDeAnimacao.Faixa(t.Nome, 0, t.Quadros, t.Loop) };
-                if (!MontadorDeAnimacao.FatiarFolha(caminho, Prefixo, t.Largura, AlturaDoQuadro, faixa))
+                // Pivô na linha do chão: a elipse de sombra ocupa MargemDaSombra px abaixo dos
+                // pés, então a base do quadro não é onde ele pisa. Vai junto da fatiagem —
+                // corrigir depois falhava calado (ver FatiarFolha).
+                var pivo = new Vector2(0.5f, MargemDaSombra / AlturaDoQuadro);
+
+                if (!MontadorDeAnimacao.FatiarFolha(caminho, Prefixo, t.Largura, AlturaDoQuadro,
+                                                    faixa, pivo: pivo))
                 {
                     resumo.Add($"{t.Nome}: falhou ao fatiar ({caminho})");
                     continue;
@@ -111,8 +139,6 @@ namespace FavelaAmarela.EditorTools
                         prop.GetArrayElementAtIndex(i).objectReferenceValue = par.Value[i];
                 }
                 so.ApplyModifiedPropertiesWithoutUndo();
-
-                AjustarEscalaPreservandoOColisor(raiz);
 
                 var sr = raiz.GetComponent<SpriteRenderer>();
                 if (sr != null && camposPreenchidos.TryGetValue("idle", out var idle) && idle.Count > 0)
@@ -185,22 +211,16 @@ namespace FavelaAmarela.EditorTools
         /// aos 5 prefabs de placeholder (Pedra de Poder, Esqueleto Invocado etc.) mais cedo
         /// nesta sessão: trocar arte não é hora de reequilibrar hitbox.
         /// </summary>
-        private static void AjustarEscalaPreservandoOColisor(GameObject raiz)
-        {
-            var box = raiz.GetComponent<BoxCollider2D>();
-            Vector2 volumeDeMundo = Vector2.zero;
-            bool temColisor = box != null;
+        // AjustarEscalaPreservandoOColisor foi REMOVIDO em 2026-08-21.
+        //
+        // Ele escrevia localScale e o tamanho do BoxCollider2D — os mesmos campos que
+        // EscalaDoDamiao e RevisarColisores escrevem, com fórmulas próprias e desatualizadas.
+        // Rodar esta ferramenta devolvia o Damião a 0,2857 (o tamanho de antes do Vini pedir
+        // que ele crescesse), sem erro nenhum. Dois donos para o mesmo campo é como um deles
+        // desfaz o outro em silêncio.
+        //
+        // Agora: escala é de EscalaDoDamiao, colisor é de RevisarColisores, e esta ferramenta
+        // cuida só de fatiar e ligar a animação.
 
-            if (temColisor)
-            {
-                Vector3 escalaAntiga = raiz.transform.localScale;
-                volumeDeMundo = new Vector2(box.size.x * escalaAntiga.x, box.size.y * escalaAntiga.y);
-            }
-
-            raiz.transform.localScale = new Vector3(EscalaNova, EscalaNova, 1f);
-
-            if (temColisor)
-                box.size = new Vector2(volumeDeMundo.x / EscalaNova, volumeDeMundo.y / EscalaNova);
-        }
     }
 }

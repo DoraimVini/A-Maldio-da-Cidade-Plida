@@ -26,11 +26,11 @@ perto dos bosses:
 
 | Buraco | Evidência | Por que importa |
 |---|---|---|
-| **Áudio: ausente** | Zero `AudioSource`/`AudioClip` no gameplay (só em `AberturaDesertoCinematica`). Zero arquivos de som no projeto. | O pilar do jogo é **furtividade sonora** — o Cultista caça por som, a tempestade abafa o ruído, a Esquiva faz barulho de propósito. **Hoje se joga um stealth sonoro sem ouvir nada:** o jogador não percebe que fez barulho nem que foi ouvido. |
+| ~~**Áudio: ausente**~~ **Áudio: existe e está ligado** ⚠️ **corrigido em 2026-08-20** | A linha anterior dizia "zero `AudioSource`/`AudioClip` no gameplay, zero arquivos de som" e concluía que *"hoje se joga um stealth sonoro sem ouvir nada"*. **Estava errada.** Existe uma camada de áudio **sintetizado** (`SinteseDeSom` gera as formas de onda em runtime, por isso zero arquivos `.wav` é o esperado, não um sintoma): `MixerDeAudio` está em **5 cenas**, e `AudioDeStealth` e `AudioDeResiliencia` também — as cinco de gameplay. Conferido por GUID no YAML. | **O pilar sonoro toca.** Sobram dois buracos reais, bem menores que o alegado: **(a)** `AudioDeCombate` está só no `Cultista.prefab` — Byakhee, Rei em Amarelo, Abdul, Espectro e Esqueleto **lutam em silêncio**; **(b)** `SomDoJogo` não está em lugar nenhum. |
 | **Persistência incompleta** | `InventoryManager.GetSaveData()` e `ProgressionManager.GetSaveData()` **nunca são chamados** — nada os liga ao `GerenciadorDeSave`. | Mochila, equipamento, nível de Exposição, Ecos e slots de Artefato **se perdem** ao recarregar. O `RefugioDeLuz` grava em disco, mas grava um save incompleto. |
 | **Fluxo de jogo** | Zero arquivos para menu, pause ou tela de morte. | Não dá para começar, pausar nem perder. Hoje só se entra pela cena aberta no Editor, e o Colapso não tem desfecho de tela. |
 | **Animação** | Nenhum `Animator` no gameplay (só cinemática e `ResilienciaBar`). | Tudo estático. O Abdul tem spritesheet fatiado em 28 frames usando **um frame só**. ⚠️ **Re-medido em 2026-08-19 — os dois números acima estavam errados e a conclusão muda; ver a linha abaixo.** |
-| **Animação — medição correta (2026-08-19)** | **7 clipes `.anim` no projeto inteiro, todos do Abdul, todos desligados.** Nenhum dos 3 chefes tem componente `Animator`. Todo personagem jogável desenha **um quadro parado**, com a folha animada fatiada ao lado: Damião usa `Damiao_Robe_Idle` (1 quadro) enquanto `damiao_spritesheet_cultist` tem **208 fatias**; Abdul tem **64** (não 28); Byakhee 26; Rei em Amarelo 138; Cultista e Espectro 16 cada. | **O Abdul está muito mais perto do fim do que este documento dizia:** além das 64 fatias, ele já tem os **7 clipes com keyframes reais** (idle/move/cast/summon/teleport/hurt/death), o **fonte Aseprite editável** e o `Abdul_AC.controller` **com os 7 estados**. O que falta nele é só a ligação: componente `Animator` no prefab, e no controller **0 transições, 0 parâmetros, nenhum estado default** — mais os gatilhos no `AbdulAlhazredAI`, que hoje **não chama o Animator uma vez sequer**. Os 5 estados da FSM (`Transe/Fase1/Fase2/Exausto/Derrotado`) são **fases de combate**, não estados de animação, então o mapa não é 1-para-1: `cast`/`summon`/`teleport`/`hurt` são ações dentro das fases. |
+| **Animação — remedição (2026-08-20)** | **Feita.** Os seis personagens animam. A linha anterior desta célula ("7 clipes `.anim` no projeto inteiro, todos do Abdul, todos desligados; nenhum dos 3 chefes tem `Animator`; todo personagem desenha um quadro parado") descrevia o estado de **antes** do trabalho de 19/08 e ficou obsoleta no mesmo dia. Conferido no YAML dos prefabs em 2026-08-20. | **Dois caminhos convivem, e isso é deliberado.** Byakhee, Cultista, Espectro e Damião usam `Animador*` — MonoBehaviours que leem a FSM e escrevem `SpriteRenderer.sprite` direto, **sem `AnimatorController`**. Os arrays estão populados: 27, 17, 9 e 39 sprites respectivamente. Rei em Amarelo e Abdul usam `Animator` de verdade (o do Rei tem 5 estados, 5 clipes e estado default, acionado por `animator.Play(...)` — por isso 0 parâmetros, e está certo assim). **Um guarda proíbe** Animator no Byakhee: quando os dois sistemas escreveram o mesmo `SpriteRenderer`, o `OnDanoSofrido` ficou duplamente assinado. Ver `AnimacaoDoByakheeTests`. |
 
 > ✅ **Escopo decidido em 2026-07-31:** o Vertical Slice são os **14 itens desta lista** —
 > a **Fase 1 completa** e a **última fase do jogo** (Castelo de Carcosa + Rei em Amarelo),
@@ -46,7 +46,7 @@ perto dos bosses:
 |---|---|---|---|
 | 1 | **Status Ailments** | ✅ **Pronto** | Sangramento por acúmulo (10 → estouro percentual) e Congelamento (3 acúmulos → trava o jogador). Ver [armas_da_tumba.md](systems/armas_da_tumba.md). |
 | 2 | **Sistema de Consumíveis** | ✅ **Fechado** (2026-08-12) | `InventoryManager` + `ItemDatabase` + `ItemDef`, `EquipmentInventory` com 7 slots, `BarraDeItens` na HUD (teclas 1–8) e `ConsumirItem` funcionando. **3 consumíveis autorados** (Água da Cacimba → corpo, Erva de Ancoragem → mente, Raiz de Yhtill → os dois) e **9 instâncias espalhadas no Deserto** via `Tools/FavelaAmarela/Montar consumíveis do Deserto`. Modelo: **finitos, não farmáveis**, com o anti-*soft-lock* no `RefugioDeLuz` (que agora cura 40% da Vitalidade além da RM cheia) em vez de moeda ou recarga. ⚠️ A anotação anterior dizia `grep "Tipo: 3" devolve zero` — era **factualmente errada**, os 3 já existiam. Ver [inventario_e_consumiveis.md](systems/inventario_e_consumiveis.md). |
-| 3 | **Companheiro (RC)** | ⚠️ **Parcial** | Seguir Damião ✅; incapacitação + reanimação num Refúgio ✅ (implementado 2026-07-31). **Falta:** barra no HUD. Ver nota abaixo. |
+| 3 | **Companheiro (RC)** | ✅ **Fechado** (2026-08-20) | Seguir Damião ✅; incapacitação + reanimação num Refúgio ✅ (2026-07-31); **barra no HUD ✅** (`CompanheiroBar`, na família `BarraAnimada<TFonte>`). A barra é ligada **por evento** (`CompanionManager.OnCompanheiroRegistrado`), não no bootstrap: Yug-Neth só vira companheiro quando libertado no meio do jogo, e perguntar no arranque devolveria `null`. Nasce **desativada** — uma barra vazia desde o menu anunciaria um recurso que o jogador ainda não tem. Guarda: `BarraDoCompanheiroTests`. |
 
 ### ⚠️ Conflito no item 1 — *Lentidão* vs. *Congelamento*
 A lista pede **"Lentidão (Congelamento do Boss)"**. O implementado é **trava total**
@@ -83,8 +83,8 @@ confirmar** — não é bug.
 | # | Item | Estado |
 |---|---|---|
 | 8 | **Quest do Santuário de Yhtill** (Cassilda + fragmentos) | ✅ **Jogável de ponta a ponta** (2026-08-02) — `CancaoIncompleta` + `RecitalDaCancao` (Core, 13 + 9 testes), `CassildaNPC` e `FragmentoDeYhtill` implementados; Cassilda agora é prefab (`Cassilda.prefab`) com todo o conteúdo textual, instanciada e ligada em cena; os 3 fragmentos carregam as 2 primeiras estrofes da Canção de Cassilda; entregar tudo abre um **recital sem punição** das 2 estrofes finais antes do Patuá; o primeiro encontro ganhou a ramificação A/B/C do roteiro do lore (cosmética, via `PainelDeEscolha`). Progresso atravessa as duas cenas via save; o recital e a escolha do primeiro encontro não são persistidos (decisão). **Falta:** só arte — sprites placeholder em Cassilda, fragmentos e piso. Ver [quest_cassilda.md](systems/quest_cassilda.md). |
-| 9 | **Boss Byakhee** | ⚠️ **Core, Runtime e prefab prontos** (2026-08-12) — `ByakheeFSM` (3 fases, 10 testes), `ByakheeAI`, `Ficha_Byakhee` e `Drop_Byakhee` com o Anel do Sinal Amarelo garantido. `Byakhee.prefab` com spritesheet animado real (26 frames, 6 animações nomeadas), ainda sem `Animator` (só o frame de idle é usado). **Falta:** ligar o `Animator`, a arena dos Portões em cena e a cena de abertura. Ver [systems/boss_byakhee.md](systems/boss_byakhee.md). |
-| 10 | **Transição de Fase** | ⚠️ **Parcial** — `PortalDeCena` e `TransicaoDeFaseTrigger` existem; os Portões em si não. |
+| 9 | **Boss Byakhee** | ✅ **Core, Runtime e prefab prontos** (2026-08-12) — `ByakheeFSM` (3 fases, 10 testes), `ByakheeAI`, `Ficha_Byakhee` e `Drop_Byakhee` com o Anel do Sinal Amarelo garantido — **a tabela existia e não estava ligada a nada** até 2026-08-19: o `DropAoAbater` só vivia no `Cultista.prefab`, então o Byakhee morria sem largar o Anel e o rito do Rei era impossível de fechar em jogo. Corrigido por `LigarDropDoByakhee` + guarda `ReliquiasDoRitoTests`. `Byakhee.prefab` com spritesheet animado real (26 frames, 6 animações nomeadas) e o `AnimadorDoByakhee` ligado e populado. **Arena em cena desde 2026-08-20** (`Portoes_Das_Ruinas.unity`, alcançável pelo marco do Deserto; luta por gatilho, Portões destrancados no abate e abertos por interação). **Falta:** só a cena de abertura (o grito antes da forma). O `AnimadorDoByakhee` **já está no prefab e populado** com os 27 sprites — a menção anterior a "ligar o `Animator`" estava obsoleta, e pior, apontava para o caminho errado: há um guarda que **proíbe** `Animator` neste prefab. (O papel de Yug-Neth como "chave dimensional" foi **descartado** em 2026-08-20 — no lugar, o fim da luta libera um **Poste de Luz**, que já reanima o companheiro, ancora a RM, cura e grava a partida.) Ver [systems/boss_byakhee.md](systems/boss_byakhee.md). |
+| 10 | **Transição de Fase** | ✅ **Fechado** (2026-08-20) — os Portões das Ruínas são a transição. Abater o Byakhee **destranca**; quem **abre** é o jogador, interagindo no portão (`PortaoDosPortoes`, um `IInteragivel`). Arte: Kenney "Dungeon Pack" 2.3, CC0. |
 
 ---
 
@@ -97,7 +97,7 @@ confirmar** — não é bug.
 
 | # | Item | Estado |
 |---|---|---|
-| 11 | **Blockout do Castelo** | ⚠️ **Greybox jogável** (2026-08-19) — `Castelo_Carcosa.unity` existe, está no Build Settings e é alcançável por um `PortalDeCena` no Santuário. Quatro zonas do caminho crítico montadas por `MontarCasteloCarcosa`: **Z1 Portões** (chegada + Refúgio), **Z2 Salão do Banquete** (6 nobres fossilizados como cobertura + 2 `CortesaoPalido` patrulhando), **Z3 Biblioteca** (3 Espelhos de Aldebaran com `PressaoPsiquicaZone` + 2 `EcoDeCarcosa`), **Z5 Trono** (Rei + 3 pontos focais). **Z4 Observatório fica de fora seguindo o design** — é dungeon opcional, aberta só com o Set Lendário 4/4. **O achado que destravou:** `PressaoPsiquicaZone`, `CortesaoPalido`, `EcoDeCarcosa`, `PontoFocalDeReliquia` e `DetectorDeCostas` já estavam **todos escritos e em cena nenhuma** — o Castelo era ligação, não sistema novo. **Falta:** vestir com arte (ver nota abaixo) e playtest. Guarda: `CasteloDeCarcosaTests` (4 testes). |
+| 11 | **Blockout do Castelo** | ✅ **Greybox jogável** (2026-08-19) — `Castelo_Carcosa.unity` existe, está no Build Settings e é alcançável pelos **Portões das Ruínas** — o atalho direto do Santuário, que existia só porque o Castelo era cena solta, foi **removido em 2026-08-20**: ele pulava o Byakhee, a única fonte do Anel do Sinal Amarelo, e levava ao Rei sem o que é preciso para vencê-lo. Quatro zonas do caminho crítico montadas por `MontarCasteloCarcosa`: **Z1 Portões** (chegada + Refúgio), **Z2 Salão do Banquete** (6 nobres fossilizados como cobertura + 2 `CortesaoPalido` patrulhando), **Z3 Biblioteca** (3 Espelhos de Aldebaran com `PressaoPsiquicaZone` + 2 `EcoDeCarcosa`), **Z5 Trono** (Rei + 3 pontos focais). **Z4 Observatório fica de fora seguindo o design** — é dungeon opcional, aberta só com o Set Lendário 4/4. **O achado que destravou:** `PressaoPsiquicaZone`, `CortesaoPalido`, `EcoDeCarcosa`, `PontoFocalDeReliquia` e `DetectorDeCostas` já estavam **todos escritos e em cena nenhuma** — o Castelo era ligação, não sistema novo. **Falta:** vestir com arte (ver nota abaixo) e playtest. Guarda: `CasteloDeCarcosaTests` (4 testes). |
 
 > **Nota de arte do Castelo (2026-08-19).** `Carcosa_Tiles.png` foi conferido e **não é interior
 > de palácio**, apesar do nome: são tiles isométricos de **deserto** (dunas douradas, rocha negra,
@@ -112,7 +112,7 @@ confirmar** — não é bug.
 > Coroa de Ossos está de fora porque não tem fonte jogável. A ferramenta lê os ids **do Rei**, não
 > de uma lista própria, então criou 3 pontos focais; o guarda segue o código, como manda o
 > `CLAUDE.md` §3.1 regra 4. Decidir se a Coroa entra no rito é chamada de design.
-| 12 | **Boss Rei em Amarelo** | ⚠️ **Core, Runtime e prefab prontos** (2026-08-12) — `ReiEmAmareloFSM` (ritual de relíquias + selamento em ciclos, 13 testes), `DetectorDeCostas` (geometria da Máscara Pálida, 7 testes), `ReiEmAmareloAI` e `PontoFocalDeReliquia`. `ReiEmAmarelo.prefab` com sprite emprestado (recorte do spritesheet "Necromancer" da Inbox — arquétipo certo, cores erradas). A Coroa de Ossos ainda não tem fonte jogável — contornado com o `CarcosaDebuggerWindow` (concede/invoca sob demanda, agora instanciando os prefabs reais dos dois chefes) e a `Cena_ArenaDeTestes` (cena de dev, fora do Build Settings). **Falta:** arte final (cores, Máscara Pálida), o Trono de Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos. Ver [systems/boss_rei_em_amarelo.md](systems/boss_rei_em_amarelo.md). |
+| 12 | **Boss Rei em Amarelo** | ✅ **Jogável de ponta a ponta** (2026-08-20) — **`OnVitoria` tinha zero assinantes até aqui**: o evento existia com o comentário "quem monta a cena decide o que fazer com isso" e ninguém decidia, então selar o Rei só repintava o sprite. Ligado à `SequenciaDeSelamento` (espelha a `SequenciaDeColapso`; a linha do desfecho é **provisória** e fica serializada, para trocar no Inspector). Guarda: `CasteloDeCarcosaTests.VencerORei_TemConsequencia`. Core, Runtime e prefab prontos desde 2026-08-12 — — `ReiEmAmareloFSM` (ritual de relíquias + selamento em ciclos, 13 testes), `DetectorDeCostas` (geometria da Máscara Pálida, 7 testes), `ReiEmAmareloAI` e `PontoFocalDeReliquia`. `ReiEmAmarelo.prefab` com sprite emprestado (recorte do spritesheet "Necromancer" da Inbox — arquétipo certo, cores erradas). A Coroa de Ossos ainda não tem fonte jogável — contornado com o `CarcosaDebuggerWindow` (concede/invoca sob demanda, agora instanciando os prefabs reais dos dois chefes) e a `Cena_ArenaDeTestes` (cena de dev, fora do Build Settings). **Falta:** arte final (cores, Máscara Pálida), o Trono de Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos. Ver [systems/boss_rei_em_amarelo.md](systems/boss_rei_em_amarelo.md). |
 
 ---
 
@@ -124,16 +124,29 @@ Templo do Povo-Serpente. Contado sobre o estado medido, sobram **cinco** itens �
 
 | ordem | item | o que falta | tamanho |
 |---|---|---|---|
-| 1 | 3 — Companheiro | barra do Yug-Neth no HUD | pequeno |
-| 2 | 9 — Byakhee | a **arena dos Portões em cena** (o chefe está pronto e animado) | médio |
-| 3 | 10 — Transição de Fase | os Portões em si — depende do 9 | pequeno |
-| 4 | 12 — Rei em Amarelo | **Trono de Aldebaran em cena** + fonte jogável da Coroa de Ossos | médio |
-| 5 | 11 — Blockout do Castelo | **a cena não existe** — só `CasteloDeCarcosaZone.cs` | **o maior** |
+| ~~1~~ | 3 — Companheiro | ✅ **feito 2026-08-20** — `CompanheiroBar` ligada por evento | — |
+| ~~2~~ | 9 — Byakhee | ✅ **feito 2026-08-20** — `Portoes_Das_Ruinas.unity` | — |
+| ~~3~~ | 10 — Transição de Fase | ✅ **feito 2026-08-20** — o portão interagível | — |
+| ~~4~~ | 12 — Rei em Amarelo | ✅ Trono em cena 2026-08-19. A Coroa de Ossos **não é exigida pelo rito** (o Rei pede 3 relíquias, não 4) — ela só faz falta para o Set Lendário 4/4, que abre a Z4 opcional, fora do VS | — |
+| ~~5~~ | 11 — Blockout do Castelo | ✅ **feito 2026-08-19** — `Castelo_Carcosa.unity` | — |
 
-> ⚠️ **O Build Settings tem só 4 cenas** (`Cena_Menu`, `Deserto_Hali`, `Playtest_RuinasPalidas`,
-> `Santuario_Yhtill`). Não há Castelo, e a `Cena_ArenaDeTestes` está fora de propósito (cena de
-> dev). Ou seja: **hoje o jogo compila sem o desfecho** — o item 11 é o que separa a build atual
-> da tese "abertura + desfecho" do VS.
+**A lista fechou.** As seis cenas do caminho estão no Build Settings e ligadas ponta a ponta
+(auditado em 2026-08-20 pelo casamento `chegarEm` × `PontoDeChegada`, que achou uma ligação
+muda e virou o guarda `NavegacaoEntreCenasTests`):
+
+```
+Cena_Menu → Deserto_Hali ⇄ Playtest_RuinasPalidas
+                         ⇄ Santuario_Yhtill
+                         → Portoes_Das_Ruinas → Castelo_Carcosa
+```
+
+O que separa isto de uma build entregue é **playtest**, não construção: nada do caminho crítico
+foi jogado de ponta a ponta por um humano ainda.
+
+> ✅ **O Build Settings tem as 6 cenas do caminho** (`Cena_Menu`, `Deserto_Hali`,
+> `Playtest_RuinasPalidas`, `Santuario_Yhtill`, `Portoes_Das_Ruinas`,
+> `Castelo_Carcosa`). O aviso anterior — "o jogo compila sem o desfecho" — deixou de
+> valer em 2026-08-19/20. `Cena_ArenaDeTestes` segue fora, de propósito: é cena de dev.
 
 ---
 

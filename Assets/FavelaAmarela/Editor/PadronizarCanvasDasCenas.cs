@@ -46,6 +46,11 @@ namespace FavelaAmarela.EditorTools
             "Assets/Scenes/Playtest_RuinasPalidas.unity",
             "Assets/Scenes/Santuario_Yhtill.unity",
             "Assets/Scenes/Cena_ArenaDeTestes.unity",
+            // Acrescentadas em 2026-08-20. Terceira lista de cenas do projeto que tinha
+            // parado antes do Castelo e dos Portões existirem — as outras duas eram a do
+            // BuildHUDCompleto e a do HudCompletoTests.
+            "Assets/Scenes/Portoes_Das_Ruinas.unity",
+            "Assets/Scenes/Castelo_Carcosa.unity",
         };
 
         /// <summary>Referência que o menu já usava — a única cena cuja UI estava correta.</summary>
@@ -93,23 +98,88 @@ namespace FavelaAmarela.EditorTools
                 var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
 
                 int scalers = PadronizarScalers();
+                int cameras = PadronizarCameras(caminho);
                 int paineis = 0, botoes = 0;
 
                 if (caminho.EndsWith("Cena_Menu.unity"))
                     (paineis, botoes) = AplicarMolduraNoMenu();
 
-                if (scalers > 0 || paineis > 0 || botoes > 0)
+                if (scalers > 0 || cameras > 0 || paineis > 0 || botoes > 0)
                 {
                     EditorSceneManager.MarkSceneDirty(cena);
                     EditorSceneManager.SaveScene(cena);
                 }
 
                 resumo.Add($"{System.IO.Path.GetFileNameWithoutExtension(caminho)}: " +
-                           $"{scalers} scaler(s), {paineis} painel(is), {botoes} botão(ões)");
+                           $"{scalers} scaler(s), {cameras} câmera(s), {paineis} painel(is), " +
+                           $"{botoes} botão(ões)");
             }
 
             AssetDatabase.SaveAssets();
             Debug.Log("[PadronizarCanvas] Concluído:\n  " + string.Join("\n  ", resumo));
+        }
+
+        // ── Escala do mundo (zoom da câmera) ───────────────────────
+
+        /// <summary>
+        /// Zoom padrão. <b>4,21875 não é número arbitrário:</b> a PPU do projeto é 32, então
+        /// <c>ortho × 2 × 32</c> é a altura da arte em pixels — aqui, 270 px, que cabem
+        /// <b>exatamente 4 vezes</b> nos 1080 do alvo. Ampliação inteira significa todo pixel de
+        /// arte com o mesmo tamanho na tela; qualquer outro valor mistura pixels de 3 e 4, e a
+        /// pixel art "brilha" ao mover.
+        ///
+        /// <para>O valor anterior era <c>6</c> — 384 px, ou <b>2,81×</b>. Não inteiro, e mais
+        /// distante: foi o "está tudo pequeno demais" que o Vini relatou. 4,21875 aproxima 42%.</para>
+        /// </summary>
+        private const float ZoomPadrao = 4.21875f;
+
+        /// <summary>
+        /// Zoom das arenas de chefe: <b>3×</b> inteiro (360 px). Mais aberto que o padrão de
+        /// propósito — a luta do Byakhee é aérea, com rasantes que atravessam a arena, e a 4× o
+        /// jogador perderia o chefe de vista no meio do mergulho.
+        /// </summary>
+        private const float ZoomDeArena = 5.625f;
+
+        private static bool EhArena(string caminho)
+            => caminho.EndsWith("Portoes_Das_Ruinas.unity")
+               || caminho.EndsWith("Cena_ArenaDeTestes.unity");
+
+        /// <summary>
+        /// Põe as câmeras da cena no zoom padrão. Mexe <b>só no zoom</b>: a escala do mapa em si
+        /// (tamanho das salas, distâncias) o Vini decidiu tratar fora do Vertical Slice.
+        /// </summary>
+        private static int PadronizarCameras(string caminho)
+        {
+            float alvo = EhArena(caminho) ? ZoomDeArena : ZoomPadrao;
+            int mexidas = 0;
+
+            foreach (var cam in Object.FindObjectsByType<Camera>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (!cam.orthographic) continue;
+                if (Mathf.Approximately(cam.orthographicSize, alvo)) continue;
+
+                cam.orthographicSize = alvo;
+                EditorUtility.SetDirty(cam);
+
+                // O controlador tem cópia própria do tamanho e a reimpõe no Awake: mudar só a
+                // Camera daria a impressão de resolver e voltaria ao antigo em Play.
+                var ctrl = cam.GetComponent<FavelaAmarela.CameraSystem.IsometricCameraController>();
+                if (ctrl != null)
+                {
+                    var so = new SerializedObject(ctrl);
+                    var prop = so.FindProperty("orthographicSize");
+                    if (prop != null)
+                    {
+                        prop.floatValue = alvo;
+                        so.ApplyModifiedPropertiesWithoutUndo();
+                    }
+                }
+
+                mexidas++;
+            }
+
+            return mexidas;
         }
 
         /// <summary>Aplica a mesma padronização dentro de um prefab que carrega Canvas próprio.</summary>

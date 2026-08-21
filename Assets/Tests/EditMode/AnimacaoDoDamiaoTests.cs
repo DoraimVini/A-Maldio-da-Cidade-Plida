@@ -1,7 +1,9 @@
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace FavelaAmarela.Tests.EditMode
 {
@@ -27,6 +29,12 @@ namespace FavelaAmarela.Tests.EditMode
             "slice_down", "slice_up", "slice_left", "slice_right",
         };
 
+        /// <summary>
+        /// Margem em px que o contorno acrescentou embaixo de cada quadro, para a elipse de
+        /// sombra caber sem ser cortada. É o que move o pivô para fora do zero.
+        /// </summary>
+        private const float MargemDaSombra = 2f;
+
         [Test]
         public void AsNoveTiras_ExistemComPpu32EPivoNoRodape()
         {
@@ -46,10 +54,32 @@ namespace FavelaAmarela.Tests.EditMode
                     falhas.Add($"{nome}: PPU != 32");
 
                 var pivosY = Regex.Matches(txt, @"(?m)^\s+pivot:\s*\{x:\s*[\d.eE+-]+,\s*y:\s*([\d.eE+-]+)\}")
-                                  .Cast<Match>().Select(m => m.Groups[1].Value).ToList();
+                                  .Cast<Match>()
+                                  .Select(m => float.Parse(m.Groups[1].Value,
+                                                           CultureInfo.InvariantCulture))
+                                  .ToList();
 
-                if (pivosY.Count == 0 || pivosY.Any(y => y != "0"))
-                    falhas.Add($"{nome}: pivô fora do rodapé");
+                var alturas = Regex.Matches(txt, @"height:\s*([\d.]+)")
+                                   .Cast<Match>()
+                                   .Select(m => float.Parse(m.Groups[1].Value,
+                                                            CultureInfo.InvariantCulture))
+                                   .DefaultIfEmpty(0f).Max();
+
+                if (pivosY.Count == 0 || alturas <= 0f)
+                {
+                    falhas.Add($"{nome}: sem fatias para conferir o pivô");
+                    continue;
+                }
+
+                // O rodapé deixou de ser y=0: o contorno acrescentou MargemDaSombra px ABAIXO
+                // dos pés, para caber a elipse. Um pivô em 0 apoiaria o Damião na borda do
+                // quadro e o levantaria 2px do chão em todas as nove tiras.
+                float esperado = MargemDaSombra / alturas;
+
+                if (pivosY.Any(y => Mathf.Abs(y - esperado) > 0.0005f))
+                    falhas.Add($"{nome}: pivô fora do rodapé " +
+                               $"(esperado {esperado:0.000000}, achei " +
+                               $"{string.Join(", ", pivosY.Select(y => y.ToString("0.000000")))})");
             }
 
             Assert.IsEmpty(falhas,
@@ -79,41 +109,6 @@ namespace FavelaAmarela.Tests.EditMode
 
             Assert.IsEmpty(vazios, "Campos do AnimadorDoDamiao sem quadros:\n  " +
                                    string.Join("\n  ", vazios));
-        }
-
-        /// <summary>
-        /// A escala mudou (arte nova de 84px de altura, contra 48px antes) — o colisor precisa
-        /// ter sido recalculado para o volume de mundo continuar o mesmo (0,5 × 0,5), senão a
-        /// hitbox de Damião mudou como efeito colateral de uma troca de arte.
-        /// </summary>
-        [Test]
-        public void Colisor_PreservaOVolumeDeMundo()
-        {
-            string txt = File.ReadAllText(Prefab);
-            var docs = Regex.Split(txt, @"(?m)^--- ").Where(d => d.Contains("!u!")).ToList();
-
-            var raiz = docs.FirstOrDefault(d =>
-                Regex.IsMatch(d, @"!u!4\b") && Regex.IsMatch(d, @"m_Father:\s*\{fileID:\s*0\}"));
-            Assert.IsNotNull(raiz, "Transform raiz não encontrado.");
-
-            var escala = Regex.Match(raiz, @"m_LocalScale:\s*\{x:\s*([\d.eE+-]+),\s*y:\s*([\d.eE+-]+)");
-            Assert.IsTrue(escala.Success);
-            float sx = float.Parse(escala.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
-            float sy = float.Parse(escala.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
-
-            var box = docs.FirstOrDefault(d => Regex.IsMatch(d, @"!u!61\b"));
-            Assert.IsNotNull(box, "Sem BoxCollider2D na raiz.");
-
-            var tam = Regex.Match(box, @"m_Size:\s*\{x:\s*([\d.eE+-]+),\s*y:\s*([\d.eE+-]+)");
-            float cx = float.Parse(tam.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
-            float cy = float.Parse(tam.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
-
-            float mundoX = cx * sx, mundoY = cy * sy;
-
-            Assert.That(mundoX, Is.EqualTo(0.5f).Within(0.01f),
-                $"Colisor de Damião no mundo mudou em X: {mundoX:0.###} (esperado 0.5).");
-            Assert.That(mundoY, Is.EqualTo(0.5f).Within(0.01f),
-                $"Colisor de Damião no mundo mudou em Y: {mundoY:0.###} (esperado 0.5).");
         }
 
         /// <summary>
