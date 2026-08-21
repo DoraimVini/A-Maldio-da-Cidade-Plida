@@ -59,6 +59,147 @@ namespace FavelaAmarela.EditorTools
 
             MontarHurtboxDoDamiao(camadaHurtboxDoJogador);
             MontarHitboxDoByakhee(camadaHurtboxDoJogador);
+
+            int camadaHurtboxDeInimigo = LayerMask.NameToLayer("EnemyHurtbox");
+            if (camadaHurtboxDeInimigo < 0)
+            {
+                Debug.LogError("[HitboxHurtbox] Camada 'EnemyHurtbox' não existe. " +
+                               "Inimigos ficam sem hurtbox.");
+                return;
+            }
+
+            foreach (var caminho in InimigosDanificaveis)
+                MontarHurtboxDeInimigo(caminho, camadaHurtboxDeInimigo);
+
+            ApontarGolpeDoJogadorParaAsHurtboxes();
+        }
+
+        /// <summary>
+        /// Todo prefab que implementa <c>IDanificavel</c> — direto ou via <c>EnemyBase</c>.
+        /// Sem hurtbox, o golpe do jogador só encontra o colisor de <b>movimento</b>, que desde
+        /// 2026-08-21 é a pegada no chão (0,60 × 0,30): acertar isso é acertar os pés.
+        /// </summary>
+        private static readonly string[] InimigosDanificaveis =
+        {
+            "Assets/FavelaAmarela/Art/Enemies/Byakhee.prefab",
+            "Assets/FavelaAmarela/Art/Enemies/Cultista.prefab",
+            "Assets/FavelaAmarela/Art/Enemies/Abdul_Alhazred.prefab",
+            "Assets/FavelaAmarela/Art/Enemies/EsqueletoInvocado.prefab",
+            "Assets/FavelaAmarela/Art/Enemies/PedraDePoder.prefab",
+        };
+
+        /// <summary>Fração da largura do sprite que a hurtbox cobre (tira a margem vazia).</summary>
+        private const float FatorLargura = 0.72f;
+
+        /// <summary>Fração da altura do sprite que a hurtbox cobre.</summary>
+        private const float FatorAltura = 0.86f;
+
+        /// <summary>
+        /// Deriva a hurtbox do <b>sprite desenhado</b>, não de um número chutado por inimigo.
+        /// <c>sprite.bounds</c> já vem em unidades locais (dividido pela PPU) e já considera o
+        /// pivô — então serve tanto para pivô no rodapé quanto no centro, sem caso especial.
+        /// </summary>
+        private static void MontarHurtboxDeInimigo(string caminho, int camada)
+        {
+            if (!File.Exists(caminho))
+            {
+                Debug.LogWarning($"[HitboxHurtbox] {Path.GetFileName(caminho)}: ausente, pulado.");
+                return;
+            }
+
+            var raiz = PrefabUtility.LoadPrefabContents(caminho);
+            if (raiz == null) return;
+
+            try
+            {
+                var sr = raiz.GetComponentInChildren<SpriteRenderer>(true);
+                if (sr == null || sr.sprite == null)
+                {
+                    Debug.LogWarning($"[HitboxHurtbox] {Path.GetFileName(caminho)}: sem sprite — " +
+                                     "não dá para derivar a hurtbox do corpo desenhado.");
+                    return;
+                }
+
+                var t = raiz.transform.Find("Hurtbox");
+                var go = t != null ? t.gameObject : new GameObject("Hurtbox");
+                if (t == null) go.transform.SetParent(raiz.transform, false);
+
+                go.layer = camada;
+                go.transform.localPosition = Vector3.zero;
+
+                var b = sr.sprite.bounds;
+
+                var caixa = go.GetComponent<BoxCollider2D>();
+                if (caixa == null) caixa = go.AddComponent<BoxCollider2D>();
+
+                caixa.isTrigger = true;
+                caixa.size = new Vector2(b.size.x * FatorLargura, b.size.y * FatorAltura);
+                caixa.offset = new Vector2(b.center.x, b.center.y);
+
+                if (go.GetComponent<Hurtbox>() == null) go.AddComponent<Hurtbox>();
+
+                PrefabUtility.SaveAsPrefabAsset(raiz, caminho, out bool salvou);
+
+                float escala = raiz.transform.localScale.x;
+                Debug.Log(salvou
+                    ? $"[HitboxHurtbox] {Path.GetFileName(caminho)}: hurtbox " +
+                      $"{caixa.size.x * escala:0.00}×{caixa.size.y * escala:0.00} un " +
+                      $"(sprite {b.size.x:0.00}×{b.size.y:0.00}, escala {escala:0.00})."
+                    : $"[HitboxHurtbox] {Path.GetFileName(caminho)}: SaveAsPrefabAsset recusou.");
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(raiz);
+            }
+        }
+
+        /// <summary>
+        /// Grava explicitamente no prefab do Damião a máscara <c>Enemy | EnemyHurtbox</c>. O
+        /// fallback em <c>MaoFisicaBridge.Awake</c> só age quando o campo está zerado — num
+        /// prefab que já tem "Enemy" salvo, ele nunca rodaria, e o golpe continuaria mirando
+        /// só a pegada dos pés.
+        /// </summary>
+        private static void ApontarGolpeDoJogadorParaAsHurtboxes()
+        {
+            int enemy = LayerMask.NameToLayer("Enemy");
+            int hurtbox = LayerMask.NameToLayer("EnemyHurtbox");
+            if (enemy < 0 || hurtbox < 0) return;
+
+            var raiz = PrefabUtility.LoadPrefabContents(PrefabDamiao);
+            if (raiz == null) return;
+
+            try
+            {
+                var mao = raiz.GetComponent<FavelaAmarela.Player.MaoFisicaBridge>();
+                if (mao == null)
+                {
+                    Debug.LogWarning("[HitboxHurtbox] Damião sem MaoFisicaBridge.");
+                    return;
+                }
+
+                int mascara = (1 << enemy) | (1 << hurtbox);
+
+                var so = new SerializedObject(mao);
+                var campo = so.FindProperty("camadaInimigos");
+                if (campo == null)
+                {
+                    Debug.LogWarning("[HitboxHurtbox] MaoFisicaBridge sem 'camadaInimigos'.");
+                    return;
+                }
+
+                campo.intValue = mascara;
+                so.ApplyModifiedPropertiesWithoutUndo();
+
+                PrefabUtility.SaveAsPrefabAsset(raiz, PrefabDamiao, out bool salvou);
+
+                Debug.Log(salvou
+                    ? $"[HitboxHurtbox] Golpe do Damião mira Enemy|EnemyHurtbox (máscara {mascara})."
+                    : "[HitboxHurtbox] Damião: SaveAsPrefabAsset recusou ao gravar a máscara.");
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(raiz);
+            }
         }
 
         private static void MontarHurtboxDoDamiao(int camada)

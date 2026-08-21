@@ -64,6 +64,21 @@ namespace FavelaAmarela.Player
         private readonly Collider2D[] _hitBuffer = new Collider2D[8];
         private ContactFilter2D _filtroInimigos;
 
+        /// <summary>
+        /// Alvos já feridos <b>neste</b> golpe. Existe porque a consulta devolve
+        /// <b>colisores</b>, não entidades: com a separação hitbox/hurtbox, um mesmo inimigo
+        /// aparece duas vezes (o colisor de movimento na camada <c>Enemy</c> e a hurtbox na
+        /// <c>EnemyHurtbox</c>) e levaria <b>dano dobrado</b>.
+        ///
+        /// <para>Não é defeito novo: qualquer inimigo com dois colisores na camada consultada
+        /// já era ferido duas vezes por golpe antes disto — só não havia nenhum, então nunca
+        /// apareceu.</para>
+        ///
+        /// <para><c>Clear()</c> não aloca, então reusar o conjunto respeita a Regra de Ouro 1.</para>
+        /// </summary>
+        private readonly System.Collections.Generic.HashSet<IDanificavel> _jaFeridos =
+            new System.Collections.Generic.HashSet<IDanificavel>();
+
         /// <summary>Direção e duração do ataque básico executado.</summary>
         public event Action<Vector2, float> OnAtaqueExecutado;
 
@@ -152,7 +167,10 @@ namespace FavelaAmarela.Player
         {
             // Fallback seguro: se "Camada Inimigos" ficou sem valor no Inspector, usa "Enemy".
             if (camadaInimigos.value == 0)
-                camadaInimigos = LayerMask.GetMask("Enemy");
+                // Inclui EnemyHurtbox: com a separação, o corpo atingível do inimigo é a
+                // hurtbox, não o colisor de movimento (que agora é só a pegada no chão,
+                // 0,60 × 0,30 — acertar só isso seria acertar os pés).
+                camadaInimigos = LayerMask.GetMask("Enemy", "EnemyHurtbox");
 
             _filtroInimigos = new ContactFilter2D();
             _filtroInimigos.useTriggers = true;
@@ -314,6 +332,7 @@ namespace FavelaAmarela.Player
             int total = Physics2D.OverlapCircle(centro, alcance * 0.5f, _filtroInimigos, _hitBuffer);
 
             int atingidos = 0;
+            _jaFeridos.Clear();
 
             for (int i = 0; i < total; i++)
             {
@@ -329,7 +348,10 @@ namespace FavelaAmarela.Player
                 // (sprite/hitbox separada) enquanto o script vive no objeto raiz — com
                 // GetComponent o golpe simplesmente não encontrava o alvo.
                 var alvo = _hitBuffer[i].GetComponentInParent<IDanificavel>();
-                if (alvo != null)
+
+                // Add devolve false se já estava no conjunto — um inimigo atingido pelo
+                // colisor de movimento E pela hurtbox no mesmo golpe é ferido uma vez só.
+                if (alvo != null && _jaFeridos.Add(alvo))
                 {
                     alvo.ReceberGolpe(resultado);
                     atingidos++;

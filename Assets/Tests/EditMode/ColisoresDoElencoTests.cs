@@ -56,7 +56,7 @@ namespace FavelaAmarela.Tests.EditMode
                 string yaml = File.ReadAllText(caminho);
                 float escala = EscalaDaRaiz(yaml);
 
-                var box = Documentos(yaml).FirstOrDefault(d => Regex.IsMatch(d, @"!u!61\b"));
+                var box = ColisorDeMovimento(yaml);
                 if (box == null) { falhas.Add($"{Nome(caminho)}: sem BoxCollider2D"); continue; }
 
                 var tam = Regex.Match(box, @"m_Size:\s*\{x:\s*([\d.eE+-]+),\s*y:\s*([\d.eE+-]+)");
@@ -116,6 +116,32 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.IsTrue(Regex.IsMatch(colisor, @"m_IsTrigger:\s*1"),
                 "O colisor do Byakhee não é trigger: ele vai empurrar o jogador pela arena e " +
                 "esbarrar nas paredes em vez de voar por cima delas.");
+        }
+
+        /// <summary>
+        /// O <c>BoxCollider2D</c> preso ao <b>GameObject raiz</b> — o colisor de <b>movimento</b>.
+        ///
+        /// <para><b>Por que não basta pegar o primeiro <c>!u!61</c> (2026-08-21):</b> desde que
+        /// os inimigos ganharam <c>Hurtbox</c>, cada prefab tem <b>dois</b> BoxCollider2D — a
+        /// pegada no chão, na raiz, e a área que recebe dano, num filho. Pegar o primeiro que
+        /// aparece no YAML devolve um ou outro conforme a ordem de serialização, e o guarda
+        /// passa a medir a coisa errada em silêncio.</para>
+        /// </summary>
+        private static string ColisorDeMovimento(string yaml)
+        {
+            var docs = Regex.Split(yaml, @"(?m)^--- ").Where(d => d.Contains("!u!")).ToList();
+
+            var transformRaiz = docs.FirstOrDefault(d =>
+                Regex.IsMatch(d, @"!u!4\b") && Regex.IsMatch(d, @"m_Father:\s*\{fileID:\s*0\}"));
+
+            if (transformRaiz == null) return null;
+
+            var go = Regex.Match(transformRaiz, @"m_GameObject:\s*\{fileID:\s*(-?\d+)\}");
+            if (!go.Success) return null;
+
+            return docs.FirstOrDefault(d =>
+                Regex.IsMatch(d, @"!u!61\b") &&
+                Regex.IsMatch(d, @"m_GameObject:\s*\{fileID:\s*" + go.Groups[1].Value + @"\}"));
         }
 
         private static IEnumerable<string> Documentos(string yaml)
