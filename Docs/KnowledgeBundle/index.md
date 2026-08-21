@@ -16,6 +16,7 @@ Este bundle OKF contém a base de conhecimento completa do projeto, organizada p
 ## Navegação do Catálogo
 
 - [Documento de Design Mestre (GDD)](GDD_Mestre.md) — Visão geral, pilares de design e HUD diegético do jogo
+- ⚠️ [**Divergências do GDD**](divergencias_do_gdd.md) — onde a implementação se afastou do GDD, e **por quê**. Leia junto com o GDD: ele guarda a intenção de design, este registro guarda a diferença. Ex.: Yug-Neth **deixou de ser** a chave dos Portões; a Resiliência Mental **deixou de ser** o único recurso
 - [Arquitetura](architecture/index.md) — Decisões arquiteturais, padrões e convenções estruturais
 - [Sistemas de Jogo](systems/index.md) — Regras de game design, mecânicas e fórmulas
 - [Scripts](scripts/index.md) — Documentação de implementação dos scripts C#

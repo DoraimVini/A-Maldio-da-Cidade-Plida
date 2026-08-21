@@ -6,6 +6,48 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-21 — Registro de divergências do GDD
+
+Criado **`divergencias_do_gdd.md`**, linkado do `index.md`. O GDD Mestre v1.3 nunca foi
+reconciliado com o que o jogo virou, e algumas divergências estavam **afirmadas como verdade**
+no documento — o pior tipo, porque quem lê confia.
+
+### O que o GDD ainda afirmava errado (seção A do novo doc)
+- **"Yug-Neth é a chave dos Portões das Ruínas"** (changelog v1.2) — descartado em 2026-08-20;
+  no lugar entrou o Poste de Luz, e ele virou o NPC de artesanato do Castelo. Uma "chave" que é
+  personagem vivo criava estado de falha sem saída.
+- **"RM é o único recurso ativo"** (§3.5) — hoje são três com barra própria (RM, Vitalidade,
+  Vigor), mais a RC do companheiro.
+- **"Chá Calmante"** (§3.5) — os consumíveis reais são Água da Cacimba, Erva de Ancoragem e
+  Raiz de Yhtill.
+- **"ondas circulares físicas na cena"** (§3.6) — a propagação sonora é um evento POCO
+  (`SoundBroadcastService`), sem objeto físico; foi o que tornou o stealth testável em EditMode.
+- **"Y-Sorting por eixo customizado"** (§3.7) — o projeto está em Transparency Sort Mode
+  `Default`; a ordem vem de `sortingOrder` explícito.
+
+### O que foi decidido depois e não estava em lugar nenhum (seção B)
+Tumba obrigatória por chave de save; atalho Santuário→Castelo removido; abater o Byakhee
+*destranca* mas quem *abre* é o jogador; tempestade não afeta a velocidade do jogador; luz é
+segurança (stealth invertido); Coroa de Ossos não é exigida pelo rito; título visível é
+"Caminho para Carcosa"; áudio é sintetizado (zero `.wav` é o esperado); progressão por nível
+fora do VS; cinemática adiada.
+
+### Padrões de física registrados (seção C)
+O §3.7 do GDD só dizia `gravityScale = 0`. A auditoria de 2026-08-21 fechou o resto do contrato
+— `FreezeRotation`, `Continuous`, `simulationMode = FixedUpdate`, `Interpolate`, e
+`Player` ✗ `Enemy` na matriz de colisão — além da pegada padrão 0,60 × 0,30 achatada 2:1 e do
+raciocínio sobre cápsula (cápsula *em pé* é forma de plataforma lateral; no isométrico o Y da
+tela é profundidade).
+
+### Direção não executada (seção D)
+HUD persistente via `Resources` + `DontDestroyOnLoad`, seguindo o padrão que já existe no
+projeto (`InventoryManager`, `GerenciadorDeSave`, `ProgressionBridge`). Detalhe no Bloco 6 do
+`plano_da_build.md`.
+
+**Regra de manutenção fixada no doc:** toda decisão que contrariar o GDD entra lá **no mesmo
+commit** que a implementa. Quando sair uma v1.4 do GDD, a seção A é absorvida por ele e
+esvaziada.
+
 ## 2026-08-20 — A Tumba vira obrigatória (trava de portal)
 
 Decisão do Vini: a Tumba de Alhazred passa a ser pré-requisito dos Portões das Ruínas. Motivo

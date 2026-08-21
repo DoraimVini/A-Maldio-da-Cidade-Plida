@@ -111,3 +111,117 @@ Registrado para não ser redescoberto como surpresa:
   chão" nem de "invoquei" para assinar. Exige evento novo.
 - **Coroa de Ossos sem fonte jogável** — não é exigida pelo rito (o Rei pede 3 relíquias),
   só pelo Set Lendário 4/4, que abre a Z4 opcional, fora do VS.
+
+---
+
+## Bloco 6 — Pós-build: o HUD deve ser **persistente**, não por cena
+
+**Não fazer antes do build de hoje sair.** É refatoração de arquitetura.
+
+### O problema, encontrado em 2026-08-21
+
+`BuildHUDCompleto.ObterOuCriarCanvas()` acha **qualquer** `HUDController` na cena e usa o
+`GameObject` dele como raiz — sem checar se aquele objeto é a raiz certa. Na prática o
+`HUDController` costuma estar dentro de **`HUD_ResilienciaBar.prefab`**, um prefab **nomeado por
+uma única barra**, e as outras nove peças (Vitalidade, Vigor, Companheiro, Ações, Artefatos,
+Itens, Painel de Inventário, Ficha, caixa de diálogo) são penduradas nele em tempo de Editor via
+C# — `new GameObject`, `AddComponent`, matemática de `RectTransform` na mão. Em cena onde nada é
+encontrado, a ferramenta cria uma raiz **diferente** (`HUD_Gameplay`, solta, não-prefab).
+
+Ou seja: **o HUD não tem uma forma única.** Tem duas, dependendo do histórico da cena. Essa
+ambiguidade causou diretamente um falso alarme grave nesta sessão — uma verificação por regex
+leu uma referência de prefab válida (`stripped`, apontando para dentro do
+`HUD_ResilienciaBar.prefab`) como corrompida, porque não havia forma canônica contra a qual
+comparar.
+
+### A direção certa (e por que mudou desde o primeiro rascunho)
+
+O primeiro rascunho deste bloco propunha "um prefab autoral instanciado em cada cena". Está
+**superado**. O problema de fundo não é o prefab — é o HUD ser **por cena**.
+
+O modo de falha mais repetido deste projeto é *"N lugares ficaram fora de sincronia"*. Já foram
+encontradas **seis** listas de cenas escritas à mão que envelheceram (`BuildHUDCompleto`,
+`HudCompletoTests`, `PadronizarCanvasDasCenas`, `LigarSistemasNovos`, `BootstrapDeCenaTests`, e
+a do próprio `CenasNaoFicamParaTrasTests`, que existe só para pegar as outras). Enquanto o HUD
+for por cena, ele **continua sendo mais uma dessas listas**, mesmo virando prefab: instância por
+cena aceita *override* por instância, e um ajuste feito numa cena diverge das outras quatro em
+silêncio.
+
+**O HUD não muda entre cenas.** Ele não tem por que nascer e morrer cinco vezes.
+
+### O padrão já existe neste projeto — não é arquitetura nova
+
+`CLAUDE.md` §2 manda seguir exemplo canônico em vez de inventar padrão. Este já está
+implementado e funcionando aqui:
+
+| | como nasce |
+|---|---|
+| `InventoryManager` | `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]` → `Resources.Load<GameObject>("InventoryManager")` → `DontDestroyOnLoad` + guarda de singleton |
+| `GerenciadorDeSave` | mesmo, criando o `GameObject` em código |
+| `ProgressionBridge` | mesmo (ver `CLAUDE.md` §1) |
+
+O HUD passa a ser o quarto: **`Assets/FavelaAmarela/Resources/HUD_Gameplay.prefab`**, contendo o
+`Canvas`, `CanvasScaler` (1920×1080, match 0.5), `GraphicRaycaster`, `HUDController` e as nove
+peças **já ligadas no Inspector**. Nasce uma vez, sobrevive às trocas de cena.
+
+### O que isso apaga
+
+- **`BuildHUDCompleto` deixa de existir.** Não encolhe — some, junto com a lista de cenas dele.
+  Não há mais o que ficar desatualizado.
+- **`MontarBarraDeItens` / `MontarPainelDeInventario` / `BuildPainelDeFicha` /
+  `MontarCaixaDeDialogo`** deixam de precisar do modo "montar na cena aberta": viram edição de
+  prefab.
+- **Um `PrefabInstance` por cena** deixa de ser uma coisa a verificar. O guarda vira: "o prefab
+  existe em `Resources/` e tem as nove peças ligadas" — um teste, não cinco.
+- **Zero divergência possível entre cenas**, porque não há cinco cópias.
+
+### O que isso custa (honesto)
+
+1. **Perde-se o preview no Editor.** Ao abrir `Deserto_Hali`, o HUD não aparece mais enquadrando
+   a tela — ele só existe em Play Mode. Para trabalho visual de UI isso se resolve abrindo o
+   prefab direto (que é *melhor* que hoje, onde é preciso rodar uma ferramenta batch para ver o
+   efeito de mudar uma constante em C#). Para posicionar inimigos ou pintar chão, não faz falta.
+2. **Precisa de guarda de duplicata.** `DontDestroyOnLoad` + recarregar a mesma cena = dois HUDs,
+   se o singleton não barrar. Copiar exatamente o guarda do `InventoryManager` (`if (Instance
+   == null) ... else Destroy(gameObject)`).
+3. **Precisa esconder no menu.** `Cena_Menu` não deve mostrar HUD. Resolve-se com o HUD ouvindo
+   `SceneManager.sceneLoaded` e se escondendo quando não há jogador/`GameLoopBootstrap` na cena.
+4. **Rebind por cena.** O `GameLoopBootstrap` já faz esse trabalho hoje (`InjetarMaoFisica`,
+   `InjetarCompanheiro`, `Bind` das barras); passa a rebindar um HUD que já existe em vez de um
+   recém-criado. É a mesma quantidade de trabalho, no mesmo lugar.
+
+### Alternativa, se o preview no Editor for inegociável
+
+Manter instância por cena, mas escrever um teste que falhe se **qualquer** instância tiver
+*override* (`m_Modifications` não-vazio nas propriedades de layout). Mantém o WYSIWYG e pega a
+divergência. É mais código de teste e não elimina a lista de cenas — por isso é a segunda opção,
+não a primeira.
+
+### Passos, em ordem
+
+1. Numa cena com HUD montado, extrair a raiz para
+   `Assets/FavelaAmarela/Resources/HUD_Gameplay.prefab`, com as nove peças dentro, ligadas no
+   Inspector.
+2. Dar ao `HUDController` o bootstrap `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]` +
+   `Resources.Load` + `DontDestroyOnLoad` + guarda de singleton, **copiando** o de
+   `InventoryManager`.
+3. Fazer o HUD se esconder quando a cena carregada não tem jogador (o menu).
+4. Ajustar `GameLoopBootstrap` para rebindar o HUD persistente a cada `sceneLoaded`.
+5. Remover as instâncias de HUD das 5 cenas e **apagar `BuildHUDCompleto`**.
+6. Substituir `HudCompletoTests` por um guarda do prefab (as nove peças ligadas), não das cenas.
+7. Suíte completa antes e depois.
+
+### Ganho imediato que isto destrava
+
+A **caixa de diálogo pequena demais** (relatada pelo Vini em 2026-08-21, ao escolher fala de NPC)
+hoje exige achar e corrigir a caixa em cinco cenas, ou rodar `MontarCaixaDeDialogo` e torcer.
+Com o HUD persistente, é **uma edição no prefab** — fonte e tamanho, vistos na hora, valendo para
+o jogo inteiro.
+
+### Onde isto entra na fila (recomendação)
+
+Depois do build, mas **provavelmente não antes de hitbox/hurtbox**. Este bloco é ganho de
+*manutenção e de velocidade de iteração* — melhora a vida de quem desenvolve. Hitbox/hurtbox é
+ganho de *sensação de combate* — melhora a vida de quem **joga**, que é o que decide se o jogo é
+divertido e retém jogador. Ordem sugerida: (1) build sai, (2) hitbox/hurtbox + caixa de diálogo,
+(3) este bloco, (4) Templo do Povo-Serpente.
