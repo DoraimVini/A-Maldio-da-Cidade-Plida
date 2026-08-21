@@ -44,8 +44,18 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Alcance do cone, em unidades.")]
         [SerializeField] private float alcanceDoGrito = 4f;
 
-        [Tooltip("Alcance das garras no pouso. Fora disso, o golpe não acerta.")]
+        [Tooltip("Alcance das garras no pouso. Fora disso, o golpe não acerta. " +
+                 "Usado só como reserva, se a hitbox não estiver ligada.")]
         [SerializeField] private float alcanceDasGarras = 1.5f;
+
+        [Tooltip("Área de acerto das garras. Sem ela o golpe volta a ser um teste " +
+                 "instantâneo de distância — impossível de esquivar no tempo.")]
+        [SerializeField] private FavelaAmarela.Runtime.Combat.Hitbox hitboxDasGarras;
+
+        [Tooltip("Quanto tempo as garras ficam perigosas, em segundos. É esta janela que " +
+                 "transforma a esquiva numa decisão de tempo em vez de um teste de posição.")]
+        [Min(0.02f)]
+        [SerializeField] private float janelaDasGarras = 0.25f;
 
         [Header("Cores de leitura (provisórias, até haver arte)")]
         [SerializeField] private Color corNoAr = new Color(0.35f, 0.30f, 0.45f);
@@ -253,11 +263,27 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             if (_jogador == null) return;
 
+            var golpe = new ArmaResult(true, 0f, 0f, false, 0f, danoDasGarras);
+
+            if (hitboxDasGarras != null)
+            {
+                // Baque de pouso: radial de propósito (sem direção), porque o corpo inteiro
+                // desaba. O que faz a diferença aqui é a JANELA — antes isto era um teste de
+                // distância de um quadro só, então não havia como esquivar no tempo, apenas
+                // estar longe naquele instante exato. Ver Hitbox para o porquê completo.
+                hitboxDasGarras.Armar(golpe, janelaDasGarras);
+                return;
+            }
+
+            Debug.LogError($"[ByakheeAI] '{name}' está sem hitboxDasGarras — o golpe caiu para " +
+                           "o teste instantâneo de distância, que não é esquivável no tempo. " +
+                           "Rode 'Tools/FavelaAmarela/Combate: montar hitbox e hurtbox'.", this);
+
             float distancia = Vector2.Distance(transform.position, _jogador.position);
             if (distancia > alcanceDasGarras) return;
 
             var alvo = _jogador.GetComponent<IDanificavel>();
-            alvo?.ReceberGolpe(new ArmaResult(true, 0f, 0f, false, 0f, danoDasGarras));
+            alvo?.ReceberGolpe(golpe);
         }
 
         /// <summary>Cone de pressão sonora: fere a mente, não o corpo.</summary>
