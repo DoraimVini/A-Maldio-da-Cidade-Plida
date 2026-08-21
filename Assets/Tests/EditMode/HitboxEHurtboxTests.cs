@@ -34,6 +34,9 @@ namespace FavelaAmarela.Tests.EditMode
 
         private const string PrefabByakhee = "Assets/FavelaAmarela/Art/Enemies/Byakhee.prefab";
 
+        /// <summary>Quebra de linha. Constante para não depender de escape ao gerar código.</summary>
+        private static readonly string NovaLinha = System.Environment.NewLine;
+
         private const string TagManager = "ProjectSettings/TagManager.asset";
 
         [Test]
@@ -150,6 +153,58 @@ namespace FavelaAmarela.Tests.EditMode
 
             Assert.IsEmpty(faltando,
                 "Camadas de combate ausentes no TagManager: " + string.Join(", ", faltando));
+        }
+
+        /// <summary>
+        /// <b>O guarda do contrato novo.</b> A hurtbox deixou de ser montada prefab a prefab
+        /// (lista escrita à mão no Editor) e passou a se construir sozinha em runtime, via
+        /// <c>Hurtbox.GarantirPara</c>, chamada do <c>Awake</c> de quem implementa
+        /// <c>IDanificavel</c>.
+        ///
+        /// <para>Este teste existe porque a mudança troca <i>onde</i> a coisa pode quebrar: não
+        /// há mais lista para envelhecer, mas passa a haver a possibilidade de alguém escrever
+        /// um <c>IDanificavel</c> novo e esquecer a chamada. Aqui é onde isso aparece.</para>
+        ///
+        /// <para><c>EnemyBase</c> cobre a família de inimigos por herança — um inimigo novo que
+        /// herde dele já vem servido. Os outros quatro implementam <c>IDanificavel</c> direto e
+        /// precisam da chamada explícita.</para>
+        /// </summary>
+        [Test]
+        public void TodoDanificavel_GaranteHurtboxNoAwake()
+        {
+            var esperados = new Dictionary<string, string>
+            {
+                ["Assets/Scripts/Enemies/EnemyBase.cs"] = "EnemyHurtbox",
+                ["Assets/Scripts/Enemies/AbdulAlhazredAI.cs"] = "EnemyHurtbox",
+                ["Assets/Scripts/Enemies/EsqueletoInvocado.cs"] = "EnemyHurtbox",
+                ["Assets/Scripts/Enemies/PedraDePoder.cs"] = "EnemyHurtbox",
+                ["Assets/Scripts/Combat/VitalidadeBridge.cs"] = "PlayerHurtbox",
+            };
+
+            var falhas = new List<string>();
+
+            foreach (var par in esperados)
+            {
+                if (!File.Exists(par.Key)) { falhas.Add($"{par.Key}: ausente"); continue; }
+
+                string codigo = File.ReadAllText(par.Key);
+
+                if (!codigo.Contains("Hurtbox.GarantirPara"))
+                {
+                    falhas.Add($"{Path.GetFileName(par.Key)}: não chama Hurtbox.GarantirPara — " +
+                               "este danificável nasce sem área atingível, e o golpe do jogador " +
+                               "só o encontra pela pegada dos pés.");
+                    continue;
+                }
+
+                if (!codigo.Contains($"\"{par.Value}\""))
+                    falhas.Add($"{Path.GetFileName(par.Key)}: chama GarantirPara mas não com a " +
+                               $"camada '{par.Value}'.");
+            }
+
+            Assert.IsEmpty(falhas,
+                "Danificáveis sem garantia de hurtbox:" + NovaLinha + "  " +
+                string.Join(NovaLinha + "  ", falhas));
         }
 
         // ── auxiliares ────────────────────────────────────────────────────────

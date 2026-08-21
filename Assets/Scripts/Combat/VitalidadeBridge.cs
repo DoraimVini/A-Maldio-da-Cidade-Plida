@@ -67,7 +67,14 @@ namespace FavelaAmarela.Runtime.Combat
         /// </summary>
         public bool IgnorarDano { get; set; }
 
-        private void Awake() => GarantirInicializacao();
+        private void Awake()
+        {
+            GarantirInicializacao();
+
+            // O Damião também precisa de área atingível própria: o colisor da raiz é a
+            // pegada no chão (0,60 × 0,30), estreita demais para representar o corpo.
+            Hurtbox.GarantirPara(gameObject, "PlayerHurtbox");
+        }
 
         /// <summary>
         /// Cria a ficha e a <see cref="Vitalidade"/> uma única vez, sob demanda.

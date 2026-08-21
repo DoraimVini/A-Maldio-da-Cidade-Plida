@@ -217,6 +217,11 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            // Área atingível derivada do sprite — Abdul implementa IDanificavel direto, sem EnemyBase.
+            // A garantia vive aqui, no código, e não numa lista de prefabs: listas
+            // escritas à mão são o modo de falha mais repetido deste projeto.
+            FavelaAmarela.Runtime.Combat.Hurtbox.GarantirPara(gameObject, "EnemyHurtbox");
+
             _spriteRenderer = GetComponent<SpriteRenderer>();
 
             if (animator == null) animator = GetComponent<Animator>();
