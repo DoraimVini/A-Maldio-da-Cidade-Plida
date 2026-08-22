@@ -32,6 +32,12 @@ namespace FavelaAmarela.EditorTools
             "Assets/Scenes/Santuario_Yhtill.unity",
             "Assets/Scenes/Cena_ArenaDeTestes.unity",
             "Assets/Scenes/Cena_Menu.unity",
+            // Acrescentadas em 2026-08-22. Sem elas, as duas cenas mais novas — e as duas
+            // lutas de chefe do Vertical Slice — ficavam com a interface no retângulo chapado
+            // da Unity enquanto o resto do jogo tinha a moldura do Dark Ages UI. OITAVA lista
+            // de cenas escrita à mão a ficar para trás neste projeto.
+            "Assets/Scenes/Portoes_Das_Ruinas.unity",
+            "Assets/Scenes/Castelo_Carcosa.unity",
         };
 
         /// <summary>
