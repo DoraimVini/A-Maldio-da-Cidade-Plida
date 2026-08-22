@@ -246,7 +246,7 @@ namespace FavelaAmarela.EditorTools
             // Unity 6: a fonte embutida é LegacyRuntime.ttf, e vem por Resources —
             // AssetDatabase.GetBuiltinExtraResource com "Arial.ttf" LANÇA exceção.
             texto.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            texto.fontSize = 20;
+            texto.fontSize = 60;
             texto.color = new Color(0.93f, 0.89f, 0.72f);
             texto.raycastTarget = false;
             texto.horizontalOverflow = HorizontalWrapMode.Wrap;

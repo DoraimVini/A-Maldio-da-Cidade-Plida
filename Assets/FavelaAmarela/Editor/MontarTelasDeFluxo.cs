@@ -212,7 +212,7 @@ namespace FavelaAmarela.EditorTools
             // Enciclopédia e "Voltar ao menu principal". Botão morto ensina o jogador a
             // desconfiar da interface — entram quando existirem de verdade.
             Texto(tela.transform, "Dica", "Esc para continuar",
-                new Vector2(0.1f, 0.3f), new Vector2(0.9f, 0.36f), 14, TextAnchor.MiddleCenter, AmareloFraco);
+                new Vector2(0.1f, 0.3f), new Vector2(0.9f, 0.36f), 42, TextAnchor.MiddleCenter, AmareloFraco);
 
             var comp = tela.AddComponent<MenuDePause>();
             var so = new SerializedObject(comp);
@@ -250,7 +250,7 @@ namespace FavelaAmarela.EditorTools
             grupo.blocksRaycasts = true;
 
             var texto = Texto(painel.transform, "Frase", "",
-                new Vector2(0.12f, 0.4f), new Vector2(0.88f, 0.6f), 22, TextAnchor.MiddleCenter, Amarelo);
+                new Vector2(0.12f, 0.4f), new Vector2(0.88f, 0.6f), 66, TextAnchor.MiddleCenter, Amarelo);
 
             // As saídas da morte. Morrer NÃO devolve ao menu principal (decisão do Vini,
             // 2026-08-11): o padrão é despertar no último Refúgio, e a tela-título é apenas
@@ -334,7 +334,7 @@ namespace FavelaAmarela.EditorTools
             img.color = new Color(0.85f, 0.80f, 0.60f, 0.14f);
 
             Texto(go.transform, "Rotulo", rotulo,
-                Vector2.zero, Vector2.one, 16, TextAnchor.MiddleCenter, Amarelo);
+                Vector2.zero, Vector2.one, 48, TextAnchor.MiddleCenter, Amarelo);
 
             return go.GetComponent<Button>();
         }

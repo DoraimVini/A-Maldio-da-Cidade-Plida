@@ -158,7 +158,7 @@ namespace FavelaAmarela.EditorTools
 
             var texto = textoGO.AddComponent<Text>();
             texto.font = ObterFontePadrao();
-            texto.fontSize = 13;
+            texto.fontSize = 39;
             texto.color = new Color(0.93f, 0.90f, 0.75f);
             texto.alignment = TextAnchor.UpperLeft;
             texto.horizontalOverflow = HorizontalWrapMode.Wrap;

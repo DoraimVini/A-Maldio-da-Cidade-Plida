@@ -252,7 +252,7 @@ namespace FavelaAmarela.EditorTools
 
             var texto = textoGO.AddComponent<Text>();
             texto.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            texto.fontSize = 16;
+            texto.fontSize = 48;
             texto.color = new Color(0.93f, 0.90f, 0.75f);
             texto.alignment = TextAnchor.MiddleLeft;
             texto.horizontalOverflow = HorizontalWrapMode.Wrap;

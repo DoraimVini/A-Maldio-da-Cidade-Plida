@@ -170,7 +170,7 @@ namespace FavelaAmarela.EditorTools
             var num = goNum.GetComponent<Text>();
             num.font = fonte;
             num.text = (indice + 1).ToString();
-            num.fontSize = 12;
+            num.fontSize = 36;
             num.alignment = TextAnchor.LowerLeft;
             num.color = new Color(0.9f, 0.86f, 0.65f, 0.55f);
             num.raycastTarget = false;
@@ -198,7 +198,7 @@ namespace FavelaAmarela.EditorTools
             rtQtd.offsetMax = Vector2.zero;
             var qtd = goQtd.GetComponent<Text>();
             qtd.font = fonte;
-            qtd.fontSize = 13;
+            qtd.fontSize = 39;
             qtd.alignment = TextAnchor.LowerRight;
             qtd.color = new Color(0.95f, 0.92f, 0.78f, 0.95f);
             qtd.raycastTarget = false;

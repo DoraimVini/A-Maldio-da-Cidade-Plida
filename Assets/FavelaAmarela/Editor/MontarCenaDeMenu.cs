@@ -77,11 +77,13 @@ namespace FavelaAmarela.EditorTools
             var raiz = Overlay(canvas.transform, "Menu", new Color(0.03f, 0.025f, 0.02f, 1f));
 
             Texto(raiz.transform, "Titulo", "CAMINHO PARA CARCOSA",
-                new Vector2(0.1f, 0.7f), new Vector2(0.9f, 0.82f), 132, TextAnchor.MiddleCenter, Amarelo);
+                // 0,70..0,87 => 183 px. A 132 pt a linha ocupa ~152 px; com 0,82 (129,6 px)
+                // o titulo do jogo era truncado e nao aparecia.
+                new Vector2(0.1f, 0.70f), new Vector2(0.9f, 0.87f), 132, TextAnchor.MiddleCenter, Amarelo);
 
-            var continuar = Botao(raiz.transform, "Botao_Continuar", "Continuar", 0.52f);
-            var nova = Botao(raiz.transform, "Botao_NovaPartida", "Nova peregrinação", 0.42f);
-            var sair = Botao(raiz.transform, "Botao_Sair", "Sair", 0.32f);
+            var continuar = Botao(raiz.transform, "Botao_Continuar", "Continuar", 0.55f);
+            var nova = Botao(raiz.transform, "Botao_NovaPartida", "Nova peregrinação", 0.43f);
+            var sair = Botao(raiz.transform, "Botao_Sair", "Sair", 0.31f);
 
             var confirmacao = MontarConfirmacao(canvas.transform);
 
@@ -101,10 +103,10 @@ namespace FavelaAmarela.EditorTools
             var painel = Overlay(pai, "Confirmacao", new Color(0.05f, 0.04f, 0.03f, 0.97f));
 
             Texto(painel.transform, "Aviso", "Isso apaga o progresso. Continuar?",
-                new Vector2(0.1f, 0.54f), new Vector2(0.9f, 0.64f), 66, TextAnchor.MiddleCenter, Amarelo);
+                new Vector2(0.1f, 0.56f), new Vector2(0.9f, 0.70f), 66, TextAnchor.MiddleCenter, Amarelo);
 
             var confirmar = Botao(painel.transform, "Botao_Confirmar", "Apagar e recomeçar", 0.44f);
-            var cancelar = Botao(painel.transform, "Botao_Cancelar", "Voltar", 0.34f);
+            var cancelar = Botao(painel.transform, "Botao_Cancelar", "Voltar", 0.32f);
 
             painel.SetActive(false);
             return (painel, confirmar, cancelar);
@@ -158,9 +160,21 @@ namespace FavelaAmarela.EditorTools
             var go = new GameObject(nome, typeof(Image), typeof(Button));
             go.transform.SetParent(pai, false);
 
+            // Geometria recalculada em 2026-08-21 a partir da resolucao de referencia do
+            // canvas (1920 x 1080), e nao por tentativa e erro.
+            //
+            // ALTURA: meia-altura 0,046 => 0,092 x 1080 = 99 px. Uma linha de 66 pt ocupa
+            // ~76 px, entao sobram ~23 px de folga. Antes era 0,035 => 75,6 px, MENOR que a
+            // propria linha -- e com VerticalOverflow em Truncate a Unity simplesmente
+            // ESCONDIA o texto. Foi por isso que os botoes apareciam vazios.
+            //
+            // LARGURA: 0,30..0,70 => 768 px. O rotulo mais longo ("Nova peregrinacao", 17
+            // caracteres a ~33 px cada) mede ~560 px. Antes era 0,36..0,64 => 537 px, estreito
+            // demais: o texto quebrava em duas linhas, dobrava para ~152 px de altura e era
+            // truncado de novo.
             var rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0.36f, alturaCentro - 0.035f);
-            rt.anchorMax = new Vector2(0.64f, alturaCentro + 0.035f);
+            rt.anchorMin = new Vector2(0.30f, alturaCentro - 0.046f);
+            rt.anchorMax = new Vector2(0.70f, alturaCentro + 0.046f);
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
 
@@ -197,6 +211,14 @@ namespace FavelaAmarela.EditorTools
             texto.alignment = alinhamento;
             texto.color = cor;
             texto.raycastTarget = false;
+
+            // Rede de seguranca: com VerticalOverflow em Truncate (o padrao), texto que nao
+            // cabe na caixa e simplesmente ESCONDIDO -- sem erro, sem aviso, sem nada. Foi
+            // assim que o titulo e os cinco botoes do menu ficaram vazios depois que as fontes
+            // triplicaram e as caixas nao acompanharam. Em Overflow o texto vaza para fora e
+            // fica FEIO, que e infinitamente melhor que ficar invisivel: feio se ve e se
+            // conserta, invisivel passa para a build.
+            texto.verticalOverflow = VerticalWrapMode.Overflow;
 
             return texto;
         }

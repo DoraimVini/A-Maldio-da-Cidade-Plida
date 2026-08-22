@@ -109,7 +109,7 @@ namespace FavelaAmarela.EditorTools
             Esticar(textoGO);
             var texto = textoGO.AddComponent<Text>();
             texto.font = ObterFontePadrao();
-            texto.fontSize = 14;
+            texto.fontSize = 42;
             texto.color = Color.white;
             texto.alignment = TextAnchor.MiddleCenter;
             texto.text = "E — Interagir";
@@ -144,7 +144,7 @@ namespace FavelaAmarela.EditorTools
             Esticar(textoGO);
             var texto = textoGO.AddComponent<Text>();
             texto.font = ObterFontePadrao();
-            texto.fontSize = 16;
+            texto.fontSize = 48;
             texto.color = new Color(0.93f, 0.90f, 0.75f);
             texto.alignment = TextAnchor.MiddleLeft;
             texto.horizontalOverflow = HorizontalWrapMode.Wrap;
