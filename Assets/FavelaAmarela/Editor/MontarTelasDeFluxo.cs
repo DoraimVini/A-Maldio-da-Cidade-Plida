@@ -33,6 +33,12 @@ namespace FavelaAmarela.EditorTools
             "Assets/Scenes/Deserto_Hali.unity",
             "Assets/Scenes/Playtest_RuinasPalidas.unity",
             "Assets/Scenes/Santuario_Yhtill.unity",
+            // Acrescentadas em 2026-08-22. Sem elas, as DUAS lutas de chefe do Vertical Slice
+            // ficavam sem menu de pause e sem tela de Colapso: na arena do Byakhee e no Trono
+            // do Rei em Amarelo o jogador não conseguia pausar, e morrer não levava a lugar
+            // nenhum. SÉTIMA lista de cenas deste projeto a ficar para trás das cenas novas.
+            "Assets/Scenes/Portoes_Das_Ruinas.unity",
+            "Assets/Scenes/Castelo_Carcosa.unity",
         };
 
         private static readonly Color Amarelo = new Color(0.92f, 0.86f, 0.55f, 0.92f);

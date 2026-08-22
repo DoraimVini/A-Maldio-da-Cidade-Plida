@@ -52,8 +52,20 @@ namespace FavelaAmarela.EditorTools
 
             AjustarBuildSettings();
 
+            // Encadeado de propósito (2026-08-22). Este montador constrói os botões com o
+            // sprite EMBUTIDO da Unity; quem depois troca pela moldura do Dark Ages UI é o
+            // AplicarCaraDaInterface. Sem esta chamada, toda reexecução daqui devolvia o menu
+            // aos retângulos chapados — foi o que aconteceu hoje, e quem pegou foi o guarda
+            // CenaMenu_UsaAMolduraDoDarkAgesUI, não o log (que reportou sucesso).
+            //
+            // Mesmo padrão que o BuildHUDCompleto já usa para o PainelDeFicha e a caixa de
+            // diálogo: a dependência vira estrutural em vez de virar um passo que alguém
+            // precisa lembrar de repetir.
+            AplicarCaraDaInterface.Aplicar();
+
             Debug.Log($"[CenaDeMenu] Pronto. '{CaminhoDaCena}' criada e posta no índice 0 do " +
-                      "build; a SampleScene saiu. O jogo agora abre no menu.");
+                      "build; a SampleScene saiu. O jogo agora abre no menu. " +
+                      "Cara da interface reaplicada em seguida.");
         }
 
         private static void Montar()

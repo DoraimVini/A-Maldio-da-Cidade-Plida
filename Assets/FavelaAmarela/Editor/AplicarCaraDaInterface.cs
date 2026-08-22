@@ -43,6 +43,13 @@ namespace FavelaAmarela.EditorTools
         {
             "PainelDeFicha", "PainelDeInventario", "PainelDeEscolha", "Painel_Escolha",
             "Janela", "Painel", "Tela_Pause", "Tela_Colapso", "CaixaDeDialogo",
+
+            // Painéis do menu principal, acrescentados em 2026-08-22. Eles CARREGAVAM a
+            // moldura do Dark Ages UI mas não estavam nesta lista — ou seja, a arte tinha sido
+            // posta à mão e não era reprodutível. Sobreviveu só enquanto ninguém remontou o
+            // menu; ao remontar, voltou ao retângulo chapado da Unity e o guarda
+            // CenaMenu_UsaAMolduraDoDarkAgesUI acusou. Agora a aplicação é repetível.
+            "Menu", "Confirmacao",
         };
 
         /// <summary>
