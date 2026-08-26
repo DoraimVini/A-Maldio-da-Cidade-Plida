@@ -27,6 +27,14 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Tooltip("Sequência de morte (dissolução + frase) tocada ao entrar em Colapso. [CENA]")]
         [SerializeField] private SequenciaDeColapso sequenciaColapso;
 
+        /// <summary>
+        /// Recebe a sequência de Colapso do <c>GameLoopBootstrap</c>. Mesmo motivo do
+        /// <c>GameStatePresenter.DefinirTelaPause</c>: a tela vive no prefab persistente do HUD,
+        /// então a ligação não pode ser serializada na cena.
+        /// </summary>
+        public void DefinirSequenciaColapso(SequenciaDeColapso sequencia)
+            => sequenciaColapso = sequencia;
+
         private GameLoopStateMachine _maquina;
         private ResilienciaMental _resiliencia;
         private VitalidadeBridge _vitalidade;

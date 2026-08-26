@@ -67,6 +67,12 @@ namespace FavelaAmarela.Runtime.GameLoop
 
         private void Awake()
         {
+            // A caixa de diálogo vive no prefab persistente do HUD desde 2026-08-22.
+            // O campo do Inspector continua valendo para quem quiser uma própria;
+            // vazio, cai para a global — senão esta referência viraria nula ao
+            // migrar a caixa para fora da cena.
+            if (caixaDeTexto == null) caixaDeTexto = FavelaAmarela.Runtime.UI.TutorialHintUI.Instancia;
+
             var col = GetComponent<Collider2D>();
             if (!col.isTrigger)
                 Debug.LogError($"[RefugioDeLuz] '{name}' precisa de um Collider2D marcado " +

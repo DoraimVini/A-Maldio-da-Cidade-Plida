@@ -27,6 +27,15 @@ namespace FavelaAmarela.Dungeons
     [AddComponentMenu("Favela Amarela/Dungeons/Porta de Aklo")]
     public sealed class PortaDeAklo : MonoBehaviour, IInteragivel
     {
+
+        private void Awake()
+        {
+            // A caixa de diálogo vive no prefab persistente do HUD desde 2026-08-22.
+            // O campo do Inspector continua valendo para quem quiser uma própria;
+            // vazio, cai para a global — senão esta referência viraria nula ao
+            // migrar a caixa para fora da cena.
+            if (caixaDeTexto == null) caixaDeTexto = FavelaAmarela.Runtime.UI.TutorialHintUI.Instancia;
+        }
         [Header("Selo")]
         [Tooltip("Id do ItemDef exigido para romper o selo. Preenchido pelo TemploSerpenteSetup. [ASSET]")]
         [SerializeField] private string idItemNecessario = "necronomicon";

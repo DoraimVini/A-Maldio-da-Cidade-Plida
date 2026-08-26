@@ -13,6 +13,32 @@ namespace FavelaAmarela.Runtime.UI
     [AddComponentMenu("Favela Amarela/UI/Tutorial Hint UI")]
     public sealed class TutorialHintUI : MonoBehaviour
     {
+
+        /// <summary>
+        /// A caixa de diálogo viva. Existe uma só: ela mora no prefab persistente do HUD e
+        /// sobrevive às trocas de cena.
+        ///
+        /// <para><b>Por que virou global (2026-08-22):</b> nove componentes espalhados pelas
+        /// cenas — portal trancado, travessia do Yug-Neth, baú da Tumba, Abdul, Refúgio... —
+        /// referenciavam a caixa por campo serializado. Com ela migrando para um prefab que vive
+        /// fora da cena, toda essa referência virou nula de uma vez, e o jogador esbarraria em
+        /// portais e NPCs sem receber uma linha sequer.</para>
+        ///
+        /// <para>Cada consumidor mantém seu campo do Inspector — quem quiser uma caixa própria
+        /// ainda pode — mas cai para esta instância quando o campo está vazio. É o mesmo
+        /// contrato de <c>InventoryManager.Instance</c> e <c>HUDController.Instancia</c>.</para>
+        /// </summary>
+        public static TutorialHintUI Instancia { get; private set; }
+
+        private void OnEnable()
+        {
+            if (Instancia == null) Instancia = this;
+        }
+
+        private void OnDisable()
+        {
+            if (Instancia == this) Instancia = null;
+        }
         [Tooltip("CanvasGroup que envolve o texto da dica. [ASSET]")]
         [SerializeField] private CanvasGroup grupo;
         [Tooltip("Texto que exibe a mensagem da dica. [ASSET]")]

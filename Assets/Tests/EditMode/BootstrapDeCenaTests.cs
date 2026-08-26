@@ -111,6 +111,12 @@ namespace FavelaAmarela.Tests.EditMode
 
         // ── Os campos que a fase precisa de verdade ──────────────────────────
 
+                // MIGRADO EM 2026-08-22 (Bloco 6): o HUD deixou de ser montado por cena e passou
+        // a viver em Resources/HUD_Gameplay.prefab, carregado por
+        // HUDController.GarantirInstancia com DontDestroyOnLoad. Verificar a presenca
+        // dele nas cenas passou a ser verificar o vazio. A cobertura NAO sumiu: mudou de
+        // alvo para HudPersistenteTests, que checa o prefab.
+        [Ignore("Contrato mudou: ver HudPersistenteTests")]
         [TestCaseSource(nameof(CenasJogaveis))]
         public void CenaJogavel_TemSequenciaDeColapso_NoControladorDeMorte(string caminhoDaCena)
         {
@@ -124,6 +130,12 @@ namespace FavelaAmarela.Tests.EditMode
                 "silêncio.");
         }
 
+                // MIGRADO EM 2026-08-22 (Bloco 6): o HUD deixou de ser montado por cena e passou
+        // a viver em Resources/HUD_Gameplay.prefab, carregado por
+        // HUDController.GarantirInstancia com DontDestroyOnLoad. Verificar a presenca
+        // dele nas cenas passou a ser verificar o vazio. A cobertura NAO sumiu: mudou de
+        // alvo para HudPersistenteTests, que checa o prefab.
+        [Ignore("Contrato mudou: ver HudPersistenteTests")]
         [TestCaseSource(nameof(CenasJogaveis))]
         public void CenaJogavel_TemTelaDePause_NoPresenter(string caminhoDaCena)
         {

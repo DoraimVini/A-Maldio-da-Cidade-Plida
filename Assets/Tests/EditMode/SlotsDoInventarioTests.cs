@@ -65,6 +65,12 @@ namespace FavelaAmarela.Tests.EditMode
                 "a tela mostrar dois inventários sobrepostos.\n  " + string.Join("\n  ", falhas));
         }
 
+                // MIGRADO EM 2026-08-22 (Bloco 6): o HUD deixou de ser montado por cena e passou
+        // a viver em Resources/HUD_Gameplay.prefab, carregado por
+        // HUDController.GarantirInstancia com DontDestroyOnLoad. Verificar a presenca
+        // dele nas cenas passou a ser verificar o vazio. A cobertura NAO sumiu: mudou de
+        // alvo para HudPersistenteTests, que checa o prefab.
+        [Ignore("Contrato mudou: ver HudPersistenteTests")]
         [Test]
         public void TodaCena_TemOsSlotsDoInventarioPreenchidos()
         {

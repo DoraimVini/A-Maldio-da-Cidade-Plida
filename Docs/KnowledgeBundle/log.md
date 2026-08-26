@@ -6,6 +6,46 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-26 — HUD persistente: um prefab, cinco cenas a menos para sincronizar
+
+**Bloco 6 do plano da build.** O HUD deixou de ser remontado por cena e passou a nascer uma
+vez, em `Resources/HUD_Gameplay.prefab`, sobrevivendo às trocas de cena — mesmo padrão já usado
+por `InventoryManager`, `GerenciadorDeSave` e `ProgressionBridge`.
+
+**Motivo.** Enquanto o HUD era montado por cena, ele era mais uma das listas escritas à mão que
+envelhecem neste projeto, e instância por cena ainda aceita *override* — um ajuste feito numa
+cena divergia das outras quatro em silêncio.
+
+### Runtime
+- `HUDController`: `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]` → `Resources.Load` →
+  `DontDestroyOnLoad`, guarda de singleton, `Ocultar()`/`Revelar()` e re-ocultação a cada
+  `sceneLoaded` (senão o HUD apareceria por cima do menu principal).
+- `GameLoopBootstrap`: revela o HUD e liga as telas de fluxo **em runtime** — referência
+  serializada na cena não pode apontar para objeto que vive fora dela.
+- `GameStatePresenter.DefinirTelaPause` e `PlayerDeathController.DefinirSequenciaColapso`: novos.
+- `TutorialHintUI.Instancia`: instância global. A caixa de diálogo migrou para o prefab, o que
+  **nulou nove referências serializadas** em cena — 8 consumidores (`PortaDeAklo`,
+  `AbdulAlhazredAI`, `NagarajaAI`, `BauDaTumba`, `PortalDeCena`, `RefugioDeLuz`,
+  `TravessiaDoCompanheiro`, `TutorialHintTrigger`) ganharam fallback em `Awake`.
+
+### Editor
+- `ExtrairHudPersistente` (novo): monta o prefab reusando `BuildHUDCompleto` + as telas de fluxo.
+- `LimparHudDasCenas`: **lista de cenas derivada da pasta**, não escrita à mão.
+
+### O defeito que o guarda pegou
+A primeira versão de `LimparHudDasCenas` listava 5 cenas à mão e esquecia `Cena_ArenaDeTestes` —
+a **nona** lista de cenas a ficar para trás neste projeto. Não era cosmético: a cópia esquecida
+se autodestruiria em runtime pela guarda de singleton, levando junto tudo que estivesse
+pendurado nela. Foi exatamente assim que `Tela_Pause` e `Tela_Colapso` se perderam em 4 cenas
+durante esta mesma migração (recuperadas por `git checkout`). Varrer a pasta fecha a classe
+inteira do problema. A varredura achou 2 cenas que a lista à mão não via.
+
+### Testes
+- `HudPersistenteTests` (novo, 7 testes): o contrato agora mora num lugar só.
+- 20 asserções por cena aposentadas com `[Ignore]` **e nota apontando o substituto** —
+  o alvo mudou, a cobertura não sumiu: verificar a ausência do HUD nas cenas seria verificar o vazio.
+- Suíte: **677 testes, 657 passando, 0 falhas, 20 aposentados**.
+
 ## 2026-08-21 — Registro de divergências do GDD
 
 Criado **`divergencias_do_gdd.md`**, linkado do `index.md`. O GDD Mestre v1.3 nunca foi

@@ -25,6 +25,15 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Tooltip("Ligada em Pausado. [CENA]")]
         [SerializeField] private GameObject telaPause;
 
+        /// <summary>
+        /// Recebe o overlay de pause do <c>GameLoopBootstrap</c>.
+        ///
+        /// <para>Existe porque a tela migrou para o prefab persistente do HUD em 2026-08-22:
+        /// uma referência serializada na cena apontaria para um objeto que vive fora dela, e a
+        /// Unity não resolve isso. A entrega passou a ser em runtime.</para>
+        /// </summary>
+        public void DefinirTelaPause(GameObject tela) => telaPause = tela;
+
         // Não há `telaTransicaoDeFase` nem `gameplayRoot` aqui de propósito. O `GameManager`
         // antigo tinha os dois, e ambos estavam em `fileID: 0` nas cinco cenas — eram da cena
         // antiga, de antes dela virar a Tumba, e não têm mais uso no jogo (confirmado pelo Vini

@@ -96,16 +96,7 @@ namespace FavelaAmarela.EditorTools
 
             GarantirInfraDeClique(canvas);
 
-            Destruir("Tela_Pause");
-            Destruir("Tela_Colapso");
-
-            // O menu principal saiu daqui em 2026-08-11: virou cena própria (`Cena_Menu`).
-            // Como overlay, ele obrigava a carregar o Deserto inteiro só para cobri-lo com uma
-            // tela preta. Restos de execuções antigas são removidos.
-            Destruir("Tela_Menu");
-
-            var pause = MontarPause(canvas.transform);
-            var (colapso, sequencia) = MontarColapso(canvas.transform);
+            var (pause, sequencia) = MontarNoCanvas(canvas.transform);
 
             // Os dois campos migraram para componentes diferentes na Fase 2 (2026-08-14):
             // telaPause vive no GameStatePresenter (quem a liga/desliga) e sequenciaColapso no
@@ -145,6 +136,32 @@ namespace FavelaAmarela.EditorTools
             // não há mais overlay precisando esconder o mundo.
 
             return true;
+        }
+
+        /// <summary>
+        /// Constrói as telas de fluxo sob o Canvas dado e devolve as duas referências, <b>sem
+        /// ligar nada em componentes de cena</b>.
+        ///
+        /// <para>Separado de <see cref="Montar"/> em 2026-08-22 para que o prefab persistente do
+        /// HUD possa conter estas telas. A ligação (<c>GameStatePresenter.telaPause</c> e
+        /// <c>PlayerDeathController.sequenciaColapso</c>) deixa de ser serializada e passa a ser
+        /// feita em runtime pelo <c>GameLoopBootstrap</c> — mesmo caminho pelo qual as barras do
+        /// HUD já recebem suas fontes.</para>
+        /// </summary>
+        public static (GameObject pause, SequenciaDeColapso colapso) MontarNoCanvas(Transform pai)
+        {
+            Destruir("Tela_Pause");
+            Destruir("Tela_Colapso");
+
+            // O menu principal saiu daqui em 2026-08-11: virou cena própria (`Cena_Menu`).
+            // Como overlay, ele obrigava a carregar o Deserto inteiro só para cobri-lo com uma
+            // tela preta. Restos de execuções antigas são removidos.
+            Destruir("Tela_Menu");
+
+            var pause = MontarPause(pai);
+            var (colapso, sequencia) = MontarColapso(pai);
+
+            return (pause, sequencia);
         }
 
         /// <summary>

@@ -40,6 +40,39 @@ namespace FavelaAmarela.Runtime.UI
                  "quando ele é libertado no meio do jogo.")]
         [SerializeField] private CompanheiroBar companheiroBar;
 
+        [Header("Telas de fluxo (vivem no prefab persistente)")]
+        [Tooltip("Overlay do menu de pause. Quem o liga/desliga é o GameStatePresenter, " +
+                 "que recebe esta referência do GameLoopBootstrap em runtime.")]
+        [SerializeField] private GameObject telaPause;
+
+        [Tooltip("Sequência de Colapso (tela de morte). Entregue ao PlayerDeathController " +
+                 "pelo GameLoopBootstrap em runtime.")]
+        [SerializeField] private FavelaAmarela.Runtime.GameLoop.SequenciaDeColapso sequenciaColapso;
+
+        /// <summary>
+        /// Overlay de pause. Vive no prefab persistente, então <b>não</b> pode ser ligado por
+        /// serialização a um componente de cena — o <c>GameLoopBootstrap</c> o entrega ao
+        /// <c>GameStatePresenter</c> a cada cena carregada.
+        /// </summary>
+        public GameObject TelaPause => telaPause;
+
+        /// <summary>
+        /// Sequência de Colapso. Mesmo motivo da <see cref="TelaPause"/>: a ligação é feita em
+        /// runtime, não gravada na cena.
+        /// </summary>
+        public FavelaAmarela.Runtime.GameLoop.SequenciaDeColapso SequenciaColapso => sequenciaColapso;
+
+        /// <summary>
+        /// Entrega as telas de fluxo. Usado pelo montador do prefab; em runtime elas já vêm
+        /// serializadas de dentro do próprio prefab.
+        /// </summary>
+        public void DefinirTelasDeFluxo(GameObject pause,
+                                        FavelaAmarela.Runtime.GameLoop.SequenciaDeColapso colapso)
+        {
+            telaPause = pause;
+            sequenciaColapso = colapso;
+        }
+
         [Header("Config inicial (usado se nenhuma fonte for injetada de fora)")]
         [Tooltip("Resiliência máxima inicial de Damião.")]
         [SerializeField] private float resilienciaMax = 100f;
@@ -57,8 +90,63 @@ namespace FavelaAmarela.Runtime.UI
         /// <summary>Vitalidade corpórea corrente. Null até o GameManager injetar.</summary>
         public Vitalidade Vitalidade => _vitalidade;
 
+        /// <summary>
+        /// A instância viva do HUD. Existe uma só, criada antes da primeira cena e mantida
+        /// entre elas.
+        /// </summary>
+        public static HUDController Instancia { get; private set; }
+
+        /// <summary>
+        /// Cria o HUD <b>uma vez</b>, antes de qualquer cena carregar, a partir de
+        /// <c>Resources/HUD_Gameplay</c>.
+        ///
+        /// <para><b>Por que persistente (Bloco 6):</b> o HUD não muda entre cenas e não tinha
+        /// por que nascer cinco vezes. Enquanto era montado por cena, ele era mais uma das
+        /// listas de cenas escritas à mão que envelhecem neste projeto — já foram <b>oito</b> —
+        /// e instância por cena ainda aceita <i>override</i>, então um ajuste numa cena
+        /// divergia das outras em silêncio.</para>
+        ///
+        /// <para>Mesmo padrão de <c>InventoryManager</c>, <c>GerenciadorDeSave</c> e
+        /// <c>ProgressionBridge</c>, que já fazem isto aqui. Não é arquitetura nova.</para>
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void GarantirInstancia()
+        {
+            if (Instancia != null) return;
+
+            var prefab = Resources.Load<GameObject>("HUD_Gameplay");
+            if (prefab == null)
+            {
+                Debug.LogError("[HUDController] 'Resources/HUD_Gameplay' não encontrado — o " +
+                               "jogo roda sem HUD nenhum. Conserto: " +
+                               "'Tools/FavelaAmarela/HUD: extrair para prefab persistente'.");
+                return;
+            }
+
+            var obj = Instantiate(prefab);
+            obj.name = prefab.name;   // sem o "(Clone)"
+            DontDestroyOnLoad(obj);
+        }
+
         private void Awake()
         {
+            // Guarda de duplicata: recarregar uma cena com DontDestroyOnLoad ativo criaria um
+            // segundo HUD por cima do primeiro. Mesmo guarda do InventoryManager.
+            if (Instancia != null && Instancia != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instancia = this;
+
+            _canvas = GetComponent<Canvas>();
+
+            // Some a cada troca de cena e só reaparece quando um GameLoopBootstrap o reivindica
+            // (ver Revelar). É isso que mantém o HUD fora do menu principal sem precisar de uma
+            // lista de "cenas que têm HUD" — mais uma lista para envelhecer.
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += HandleCenaCarregada;
+
             // Se ninguém injetou uma fonte externa até aqui, cria uma local.
             // Facilita testar a cena de HUD isolada, sem o sistema de entidade.
             if (_resiliencia == null)
@@ -69,6 +157,40 @@ namespace FavelaAmarela.Runtime.UI
 
             if (resilienciaBar != null)
                 resilienciaBar.Bind(_resiliencia);
+        }
+
+        private Canvas _canvas;
+
+        private void OnDestroy()
+        {
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= HandleCenaCarregada;
+            if (Instancia == this) Instancia = null;
+        }
+
+        private void HandleCenaCarregada(UnityEngine.SceneManagement.Scene cena,
+                                         UnityEngine.SceneManagement.LoadSceneMode modo)
+            => Ocultar();
+
+        /// <summary>
+        /// Esconde o HUD. Chamado a cada troca de cena: o padrão é <b>invisível</b>, e quem
+        /// mostra é o bootstrap da cena de jogo.
+        ///
+        /// <para>Desliga o <c>Canvas</c>, não o <c>GameObject</c>: desativar o objeto pararia o
+        /// <c>Update</c> das views e o próprio <c>SceneManager.sceneLoaded</c> deste
+        /// componente, e o HUD nunca mais voltaria.</para>
+        /// </summary>
+        public void Ocultar()
+        {
+            if (_canvas != null) _canvas.enabled = false;
+        }
+
+        /// <summary>
+        /// Mostra o HUD. Chamado pelo <c>GameLoopBootstrap</c> depois de ligar as fontes —
+        /// então ele só aparece onde há mundo de jogo, e nunca no menu principal.
+        /// </summary>
+        public void Revelar()
+        {
+            if (_canvas != null) _canvas.enabled = true;
         }
 
         /// <summary>

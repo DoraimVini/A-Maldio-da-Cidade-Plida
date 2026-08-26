@@ -65,11 +65,16 @@ namespace FavelaAmarela.Tests.EditMode
 
             Assert.IsTrue(bloco.Success, "Portal para os Portões não encontrado.");
 
-            var caixa = Regex.Match(bloco.Value, @"caixaDeTexto:\s*\{fileID:\s*(-?\d+)");
+            // A caixa de diálogo migrou para o prefab persistente do HUD em 2026-08-22,
+            // então a referência serializada na cena é legitimamente nula. O que precisa estar
+            // garantido agora é o caminho de runtime: PortalDeCena cai para
+            // TutorialHintUI.Instancia quando o campo do Inspector está vazio.
+            string codigoDoPortal = File.ReadAllText("Assets/Scripts/GameLoop/PortalDeCena.cs");
 
-            Assert.IsTrue(caixa.Success && caixa.Groups[1].Value != "0",
-                "O portal está trancado mas sem caixa de texto ligada: o jogador esbarraria " +
-                "numa parede invisível sem explicação nenhuma. Uma trava sem aviso lê como bug.");
+            StringAssert.Contains("TutorialHintUI.Instancia", codigoDoPortal,
+                "O portal não tem como alcançar a caixa de diálogo: o campo do Inspector está " +
+                "vazio (a caixa vive no HUD persistente) e não há fallback para a instância " +
+                "global. O jogador esbarraria numa parede invisível sem explicação.");
 
             var linha = Regex.Match(bloco.Value, @"linhaSeTrancado:[ 	]*([^\r\n]*)");
 

@@ -73,7 +73,9 @@ namespace FavelaAmarela.Tests.EditMode
 
             foreach (var nome in new[] { "Os_Portoes", "Batente", "Gatilho_DaArena",
                                           "Passagem_ParaOCastelo", "Centro_DaArena",
-                                          "Refugio_DosPortoes", "CaixaDeDialogo" })
+                                          // CaixaDeDialogo saiu da cena em 2026-08-22:
+                                          // vive no prefab persistente do HUD.
+                                          "Refugio_DosPortoes" })
             {
                 if (!Regex.IsMatch(txt, $@"(?m)^\s+m_Name:\s*{nome}\s*$"))
                     falhas.Add($"objeto '{nome}' ausente");

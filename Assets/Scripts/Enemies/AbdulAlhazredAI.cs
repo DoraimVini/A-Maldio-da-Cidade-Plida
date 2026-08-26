@@ -217,6 +217,12 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            // A caixa de diálogo vive no prefab persistente do HUD desde 2026-08-22.
+            // O campo do Inspector continua valendo para quem quiser uma própria;
+            // vazio, cai para a global — senão esta referência viraria nula ao
+            // migrar a caixa para fora da cena.
+            if (caixaDeDialogo == null) caixaDeDialogo = FavelaAmarela.Runtime.UI.TutorialHintUI.Instancia;
+
             // Área atingível derivada do sprite — Abdul implementa IDanificavel direto, sem EnemyBase.
             // A garantia vive aqui, no código, e não numa lista de prefabs: listas
             // escritas à mão são o modo de falha mais repetido deste projeto.

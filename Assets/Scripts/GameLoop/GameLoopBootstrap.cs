@@ -90,12 +90,49 @@ namespace FavelaAmarela.Runtime.GameLoop
         }
 
         /// <summary>
+        /// Entrega ao <c>GameStatePresenter</c> e ao <c>PlayerDeathController</c> as telas de
+        /// fluxo que hoje vivem no <b>prefab persistente</b> do HUD.
+        ///
+        /// <para><b>Por que em runtime e não serializado (2026-08-22):</b> antes,
+        /// <c>MontarTelasDeFluxo</c> gravava essas duas referências direto na cena. Com as telas
+        /// dentro de um prefab que sobrevive às trocas de cena, uma referência serializada
+        /// apontaria para um objeto de outra cena — que a Unity não consegue resolver. A ligação
+        /// passa a acontecer aqui, no mesmo lugar e pelo mesmo caminho por onde as barras do HUD
+        /// já recebem suas fontes.</para>
+        /// </summary>
+        private void LigarTelasDeFluxo(HUDController hud)
+        {
+            var presenter = GetComponent<GameStatePresenter>();
+            if (presenter != null && hud.TelaPause != null)
+                presenter.DefinirTelaPause(hud.TelaPause);
+            else if (hud.TelaPause == null)
+                Debug.LogWarning("[GameLoopBootstrap] O HUD persistente não traz Tela_Pause — " +
+                                 "Esc não vai abrir nada.", this);
+
+            var morte = GetComponent<PlayerDeathController>();
+            if (morte != null && hud.SequenciaColapso != null)
+                morte.DefinirSequenciaColapso(hud.SequenciaColapso);
+            else if (hud.SequenciaColapso == null)
+                Debug.LogWarning("[GameLoopBootstrap] O HUD persistente não traz a sequência de " +
+                                 "Colapso — morrer não mostra tela nenhuma.", this);
+        }
+
+        /// <summary>
         /// Acha os adaptadores da cena e entrega a cada um o POCO de que ele depende.
         /// </summary>
         private void InjetarNoMundo()
         {
             var hud = FindAnyObjectByType<HUDController>();
             _hud = hud;
+
+            // O HUD agora é persistente (DontDestroyOnLoad) e nasce OCULTO a cada troca de
+            // cena. Quem o revela é esta linha — então ele aparece exatamente onde há um
+            // bootstrap de mundo, e nunca no menu principal. Sem lista de cenas envolvida.
+            if (hud != null)
+            {
+                hud.Revelar();
+                LigarTelasDeFluxo(hud);
+            }
             if (hud != null)
                 hud.InjetarResiliencia(Resiliencia);
             else

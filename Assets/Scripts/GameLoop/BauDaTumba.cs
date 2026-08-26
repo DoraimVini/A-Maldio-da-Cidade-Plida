@@ -27,6 +27,15 @@ namespace FavelaAmarela.Runtime.GameLoop
     [AddComponentMenu("Favela Amarela/GameLoop/Baú da Tumba")]
     public sealed class BauDaTumba : MonoBehaviour, IInteragivel
     {
+
+        private void Awake()
+        {
+            // A caixa de diálogo vive no prefab persistente do HUD desde 2026-08-22.
+            // O campo do Inspector continua valendo para quem quiser uma própria;
+            // vazio, cai para a global — senão esta referência viraria nula ao
+            // migrar a caixa para fora da cena.
+            if (hintUI == null) hintUI = FavelaAmarela.Runtime.UI.TutorialHintUI.Instancia;
+        }
         [Header("Sorteio")]
         [Tooltip("Se marcado, sempre entrega a arma escolhida abaixo (para testar uma build específica).")]
         [SerializeField] private bool forcarArma = false;

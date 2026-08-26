@@ -105,7 +105,10 @@ namespace FavelaAmarela.Tests.EditMode
                 "companheiro e seguiria Damião até o Trono.");
 
             var falhas = new List<string>();
-            foreach (var campo in new[] { "prefabYugNeth", "postoDeArtesao", "caixaDeTexto" })
+            // "caixaDeTexto" saiu desta lista em 2026-08-22: a caixa vive no prefab
+            // persistente do HUD, e TravessiaDoCompanheiro cai para
+            // TutorialHintUI.Instancia quando o campo está vazio.
+            foreach (var campo in new[] { "prefabYugNeth", "postoDeArtesao" })
             {
                 var m = Regex.Match(doc.Value, $@"(?m)^\s*{campo}:\s*\{{fileID:\s*(-?\d+)");
 
