@@ -146,7 +146,7 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 78
+        width: 82
         height: 88
       alignment: 9
       pivot: {x: 0.5, y: 0.022727273}
@@ -166,9 +166,9 @@ TextureImporter:
       name: damiao_slice_right_1
       rect:
         serializedVersion: 2
-        x: 78
+        x: 82
         y: 0
-        width: 78
+        width: 82
         height: 88
       alignment: 9
       pivot: {x: 0.5, y: 0.022727273}
@@ -188,9 +188,9 @@ TextureImporter:
       name: damiao_slice_right_2
       rect:
         serializedVersion: 2
-        x: 156
+        x: 164
         y: 0
-        width: 78
+        width: 82
         height: 88
       alignment: 9
       pivot: {x: 0.5, y: 0.022727273}

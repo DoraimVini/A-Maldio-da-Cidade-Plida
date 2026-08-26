@@ -149,7 +149,7 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 34
+        width: 38
         height: 88
       alignment: 9
       pivot: {x: 0.5, y: 0.022727273}
@@ -169,9 +169,9 @@ TextureImporter:
       name: damiao_idle_1
       rect:
         serializedVersion: 2
-        x: 34
+        x: 38
         y: 0
-        width: 34
+        width: 38
         height: 88
       alignment: 9
       pivot: {x: 0.5, y: 0.022727273}
@@ -191,9 +191,9 @@ TextureImporter:
       name: damiao_idle_2
       rect:
         serializedVersion: 2
-        x: 68
+        x: 76
         y: 0
-        width: 34
+        width: 38
         height: 88
       alignment: 9
       pivot: {x: 0.5, y: 0.022727273}
@@ -213,9 +213,9 @@ TextureImporter:
       name: damiao_idle_3
       rect:
         serializedVersion: 2
-        x: 102
+        x: 114
         y: 0
-        width: 34
+        width: 38
         height: 88
       alignment: 9
       pivot: {x: 0.5, y: 0.022727273}

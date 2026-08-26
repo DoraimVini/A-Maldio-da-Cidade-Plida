@@ -808,6 +808,109 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1001 &104511023
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 15.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -8.39
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 104511026}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &104511024 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 104511023}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &104511025 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 104511023}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &104511026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 104511025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &104802008
 GameObject:
   m_ObjectHideFlags: 0
@@ -1892,6 +1995,109 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 204605216}
   m_CullTransparentMesh: 1
+--- !u!1001 &226359214
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.92
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -4.28
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 226359217}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &226359215 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 226359214}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &226359216 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 226359214}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &226359217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226359216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &227033393
 GameObject:
   m_ObjectHideFlags: 0
@@ -2020,6 +2226,109 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &249962314
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -13.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 13.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 249962317}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &249962315 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 249962314}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &249962316 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 249962314}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &249962317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249962316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &255202092
 GameObject:
   m_ObjectHideFlags: 0
@@ -5180,17 +5489,17 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1960750838}
+  - {fileID: 1687740866}
+  - {fileID: 104511024}
+  - {fileID: 1993957305}
+  - {fileID: 1224414627}
+  - {fileID: 226359215}
+  - {fileID: 1639064617}
   - {fileID: 1473040149}
-  - {fileID: 1760247955}
-  - {fileID: 2118978900}
-  - {fileID: 1468303382}
-  - {fileID: 1535935122}
-  - {fileID: 724021995}
-  - {fileID: 2019174234}
+  - {fileID: 249962315}
+  - {fileID: 2022156436}
   - {fileID: 1882166625}
-  - {fileID: 929621618}
-  - {fileID: 630117389}
-  - {fileID: 959854958}
   - {fileID: 577547674}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5273,89 +5582,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 626252971}
   m_CullTransparentMesh: 1
---- !u!1001 &630117388
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_LesteTemploSerpente_2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 16.63838
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.27620953
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 630117391}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &630117389 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 630117388}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &630117390 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 630117388}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &630117391
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 630117390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: 04356ca0ea4f42ae923af508a47c1aaf
 --- !u!1 &644441238
 GameObject:
   m_ObjectHideFlags: 0
@@ -6236,89 +6462,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 723970842}
   m_CullTransparentMesh: 1
---- !u!1001 &724021994
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_DesertoCentral_1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -2.8166194
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1.6955222
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 724021997}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &724021995 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 724021994}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &724021996 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 724021994}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &724021997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 724021996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: bf56ac339f814a6292c3831dba5ad984
 --- !u!1 &753250843
 GameObject:
   m_ObjectHideFlags: 0
@@ -7086,7 +7229,7 @@ Transform:
   m_GameObject: {fileID: 871030566}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.79, y: -4.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7349,89 +7492,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 927340946}
   m_CullTransparentMesh: 1
---- !u!1001 &929621617
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_LesteTemploSerpente_1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 15.553373
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1.4988601
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 929621620}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &929621618 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 929621617}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &929621619 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 929621617}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &929621620
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 929621619}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: 02b1b020d1ae4ee28437cc215f2a70d8
 --- !u!1 &929668997
 GameObject:
   m_ObjectHideFlags: 0
@@ -7607,89 +7667,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1001 &959854957
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_LesteTemploSerpente_3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 16.818819
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.59980905
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 959854960}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &959854958 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 959854957}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &959854959 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 959854957}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &959854960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 959854959}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: d5a499c0ed6c4b17b21594e2597bded4
 --- !u!1 &982710060
 GameObject:
   m_ObjectHideFlags: 0
@@ -9682,6 +9659,109 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8794055300915269734, guid: 49c4f983dce7b5949ae8dc6113737890, type: 3}
   m_PrefabInstance: {fileID: 1207614780}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1224414626
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.39
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 12.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1224414629}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &1224414627 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1224414626}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1224414628 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1224414626}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1224414629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1224414628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &1237777064
 GameObject:
   m_ObjectHideFlags: 0
@@ -11875,89 +11955,6 @@ MonoBehaviour:
   botaoRetomar: {fileID: 61633233}
   rotuloRetomar: {fileID: 461881663}
   botaoMenu: {fileID: 95149225}
---- !u!1001 &1468303381
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_PortoesDasRuinas_0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 5.9616976
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 12.015646
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1468303384}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &1468303382 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 1468303381}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1468303383 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 1468303381}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1468303384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1468303383}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: 26c6a02fa5a2429a9b3aaacfea2e2486
 --- !u!1 &1468573817
 GameObject:
   m_ObjectHideFlags: 0
@@ -12061,12 +12058,20 @@ PrefabInstance:
       value: Cultista_Setor_TumbaDeAlhazred_0
       objectReference: {fileID: 0}
     - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -17.186857
+      value: -17.4653
       objectReference: {fileID: 0}
     - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.6275485
+      value: 3.6501
       objectReference: {fileID: 0}
     - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -12099,6 +12104,18 @@ PrefabInstance:
     - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12647,89 +12664,6 @@ Transform:
   - {fileID: 1339703994}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1535935121
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_DesertoCentral_0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 2.0435026
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.8703613
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1535935124}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &1535935122 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 1535935121}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1535935123 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 1535935121}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1535935124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1535935123}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: 910b192d94554dc69d6410fc3fa630dd
 --- !u!1 &1546344895
 GameObject:
   m_ObjectHideFlags: 0
@@ -13595,7 +13529,7 @@ Transform:
   m_GameObject: {fileID: 1609430206}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.5243975, y: 12.750793, z: 0}
+  m_LocalPosition: {x: -4.49, y: 13.85, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13936,6 +13870,109 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1001 &1639064616
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 11.73
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.61
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1639064619}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &1639064617 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1639064616}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1639064618 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1639064616}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1639064619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639064618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &1643935939
 GameObject:
   m_ObjectHideFlags: 0
@@ -14214,6 +14251,109 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1683604334}
   m_CullTransparentMesh: 1
+--- !u!1001 &1687740865
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 18.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1687740868}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &1687740866 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1687740865}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1687740867 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1687740865}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1687740868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1687740867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &1702972111
 GameObject:
   m_ObjectHideFlags: 0
@@ -14913,89 +15053,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1001 &1760247954
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_TumbaDeAlhazred_1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -16.69936
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -1.6464176
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1760247957}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &1760247955 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 1760247954}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1760247956 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 1760247954}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1760247957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1760247956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: 4cfdc643646d4a269252ed977a311c04
 --- !u!1 &1766916464
 GameObject:
   m_ObjectHideFlags: 0
@@ -74571,6 +74628,109 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1960750837
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.89
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.78
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1960750840}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &1960750838 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1960750837}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1960750839 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1960750837}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1960750840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960750839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &1970841077
 GameObject:
   m_ObjectHideFlags: 0
@@ -74725,6 +74885,109 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1987018254}
   m_CullTransparentMesh: 1
+--- !u!1001 &1993957304
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 612049369}
+    m_Modifications:
+    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Name
+      value: Cultista_Setor_TumbaDeAlhazred_0 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 9.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1993957307}
+  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+--- !u!4 &1993957305 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1993957304}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1993957306 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+  m_PrefabInstance: {fileID: 1993957304}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1993957307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993957306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &2009808025
 GameObject:
   m_ObjectHideFlags: 0
@@ -74875,7 +75138,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2017561023}
   m_CullTransparentMesh: 1
---- !u!1001 &2019174233
+--- !u!1001 &2022156435
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -74885,15 +75148,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_Name
-      value: Cultista_Setor_DesertoCentral_2
+      value: Cultista_Setor_TumbaDeAlhazred_0 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6303561
+      objectReference: {fileID: 0}
+    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8042227
       objectReference: {fileID: 0}
     - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.3586938
+      value: -15.95
       objectReference: {fileID: 0}
     - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.38821
+      value: -1.42
       objectReference: {fileID: 0}
     - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -74927,37 +75198,49 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.x
+      value: 1.0020967
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.3112497
+      objectReference: {fileID: 0}
+    - target: {fileID: 6674794584612863424, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.12134877
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2019174236}
+      addedObject: {fileID: 2022156438}
   m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &2019174234 stripped
+--- !u!4 &2022156436 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 2019174233}
+  m_PrefabInstance: {fileID: 2022156435}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2019174235 stripped
+--- !u!1 &2022156437 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 2019174233}
+  m_PrefabInstance: {fileID: 2022156435}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2019174236
+--- !u!114 &2022156438
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2019174235}
+  m_GameObject: {fileID: 2022156437}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: ff0d2456cb114f69b16de90c7a6530ac
+  chaveDePersistencia: dabedf14e2a145cfa6ef6326e0a9c8e4
 --- !u!1 &2028470338
 GameObject:
   m_ObjectHideFlags: 0
@@ -75655,89 +75938,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1001 &2118978899
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 612049369}
-    m_Modifications:
-    - target: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_Name
-      value: Cultista_Setor_SantuarioDeYhtill_0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -15.699609
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 13.100077
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2118978902}
-  m_SourcePrefab: {fileID: 100100000, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
---- !u!4 &2118978900 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2290442817582334513, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 2118978899}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2118978901 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1290442817582334512, guid: 3dcf798b53bd44ee9983ecad7e6e0ee9, type: 3}
-  m_PrefabInstance: {fileID: 2118978899}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2118978902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2118978901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6935613fc882efc40be8d4affb880378, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Persistencia.ObjetoPersistente
-  chaveDePersistencia: 1a08af6c5c2e4138b563da0b1e5a586d
 --- !u!1 &2146140475
 GameObject:
   m_ObjectHideFlags: 0

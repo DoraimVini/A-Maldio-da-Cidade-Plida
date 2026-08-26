@@ -66,21 +66,20 @@ namespace FavelaAmarela.EditorTools
             public string Nome;      // sufixo do arquivo e da fatia: damiao_<Nome>_<n>
             public string Campo;     // campo do AnimadorDoDamiao a preencher
             public int Quadros;
-            public int Largura;
             public bool Loop;
         }
 
         private static readonly Tira[] Tiras =
         {
-            new Tira { Nome = "idle",        Campo = "idle",           Quadros = 4, Largura = 34, Loop = true  },
-            new Tira { Nome = "run_down",     Campo = "correrBaixo",    Quadros = 5, Largura = 36, Loop = true  },
-            new Tira { Nome = "run_up",       Campo = "correrCima",     Quadros = 5, Largura = 36, Loop = true  },
-            new Tira { Nome = "run_left",     Campo = "correrEsquerda", Quadros = 6, Largura = 50, Loop = true  },
-            new Tira { Nome = "run_right",    Campo = "correrDireita",  Quadros = 6, Largura = 50, Loop = true  },
-            new Tira { Nome = "slice_down",   Campo = "golpeBaixo",     Quadros = 3, Largura = 74, Loop = false },
-            new Tira { Nome = "slice_up",     Campo = "golpeCima",      Quadros = 3, Largura = 74, Loop = false },
-            new Tira { Nome = "slice_left",   Campo = "golpeEsquerda",  Quadros = 3, Largura = 78, Loop = false },
-            new Tira { Nome = "slice_right",  Campo = "golpeDireita",   Quadros = 3, Largura = 78, Loop = false },
+            new Tira { Nome = "idle",        Campo = "idle",           Quadros = 4, Loop = true  },
+            new Tira { Nome = "run_down",     Campo = "correrBaixo",    Quadros = 5, Loop = true  },
+            new Tira { Nome = "run_up",       Campo = "correrCima",     Quadros = 5, Loop = true  },
+            new Tira { Nome = "run_left",     Campo = "correrEsquerda", Quadros = 6, Loop = true  },
+            new Tira { Nome = "run_right",    Campo = "correrDireita",  Quadros = 6, Loop = true  },
+            new Tira { Nome = "slice_down",   Campo = "golpeBaixo",     Quadros = 3, Loop = false },
+            new Tira { Nome = "slice_up",     Campo = "golpeCima",      Quadros = 3, Loop = false },
+            new Tira { Nome = "slice_left",   Campo = "golpeEsquerda",  Quadros = 3, Loop = false },
+            new Tira { Nome = "slice_right",  Campo = "golpeDireita",   Quadros = 3, Loop = false },
         };
 
         [MenuItem("Tools/FavelaAmarela/Montar Animação do Damião")]
@@ -97,9 +96,33 @@ namespace FavelaAmarela.EditorTools
                 // Pivô na linha do chão: a elipse de sombra ocupa MargemDaSombra px abaixo dos
                 // pés, então a base do quadro não é onde ele pisa. Vai junto da fatiagem —
                 // corrigir depois falhava calado (ver FatiarFolha).
-                var pivo = new Vector2(0.5f, MargemDaSombra / AlturaDoQuadro);
+                var pivo = new Vector2(0.5f, MargemDaSombra / (float)AlturaDoQuadro);
 
-                if (!MontadorDeAnimacao.FatiarFolha(caminho, Prefixo, t.Largura, AlturaDoQuadro,
+                // Medidas DERIVADAS da textura, nunca escritas a mao. Ate 2026-08-22 a
+                // largura de cada tira era uma constante nesta classe, e ficou 4 px curta
+                // quando o contorno expandiu os quadros em 2 px de cada lado. Rodar a
+                // ferramenta com a constante velha refatiava TODOS os quadros desalinhados --
+                // o sprite do Damiao aparecia cortado, e nada no console acusava.
+                //
+                // Largura do quadro = largura da folha / numero de quadros. Se a arte mudar de
+                // tamanho, a conta acompanha sozinha.
+                var textura = AssetDatabase.LoadAssetAtPath<Texture2D>(caminho);
+                if (textura == null)
+                {
+                    resumo.Add($"{t.Nome}: textura nao carregou ({caminho})");
+                    continue;
+                }
+
+                if (textura.width % t.Quadros != 0)
+                {
+                    resumo.Add($"{t.Nome}: largura {textura.width} nao divide em {t.Quadros} " +
+                               "quadros inteiros -- a folha nao bate com a contagem de quadros");
+                    continue;
+                }
+
+                int larguraDoQuadro = textura.width / t.Quadros;
+
+                if (!MontadorDeAnimacao.FatiarFolha(caminho, Prefixo, larguraDoQuadro, textura.height,
                                                     faixa, pivo: pivo))
                 {
                     resumo.Add($"{t.Nome}: falhou ao fatiar ({caminho})");
@@ -114,7 +137,7 @@ namespace FavelaAmarela.EditorTools
                 }
 
                 camposPreenchidos[t.Campo] = sprites;
-                resumo.Add($"{t.Campo}: {sprites.Count} quadro(s) de {t.Largura}×{AlturaDoQuadro}");
+                resumo.Add($"{t.Campo}: {sprites.Count} quadro(s) de {larguraDoQuadro}×{textura.height}");
             }
 
             var raiz = PrefabUtility.LoadPrefabContents(Prefab);

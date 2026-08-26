@@ -35,6 +35,77 @@ namespace FavelaAmarela.Tests.EditMode
         /// </summary>
         private const float MargemDaSombra = 2f;
 
+        /// <summary>
+        /// As fatias precisam <b>ladrilhar a folha exatamente</b>: numero de quadros vezes a
+        /// largura de cada um tem de dar a largura do PNG, e a altura da fatia tem de ser a
+        /// altura do PNG.
+        ///
+        /// <para><b>Por que existe (2026-08-22):</b> o Vini relatou "o sprite do Damiao
+        /// quebrou". A causa foi minha: quando o contorno expandiu cada quadro em 2 px de cada
+        /// lado, eu corrigi a <i>altura</i> no montador (84 para 88) e deixei as <i>larguras</i>
+        /// com os valores antigos — todas 4 px curtas. Rodar a ferramenta refatiou os nove
+        /// conjuntos desalinhados, cortando pedaco de cada quadro. <b>Nada no console
+        /// acusou</b>: a Unity aceita fatias que nao cobrem a textura toda.</para>
+        ///
+        /// <para>O montador passou a derivar largura e altura da propria textura, entao o
+        /// numero nao pode mais envelhecer. Este guarda existe para o caso de alguem voltar a
+        /// escreve-lo a mao.</para>
+        /// </summary>
+        [Test]
+        public void AsFatias_LadrilhamAFolhaExatamente()
+        {
+            var falhas = new System.Collections.Generic.List<string>();
+
+            foreach (var nome in Tiras)
+            {
+                string png = $"{Pasta}/Damiao_{nome}.png";
+                string meta = png + ".meta";
+
+                if (!File.Exists(png) || !File.Exists(meta)) { falhas.Add($"{nome}: ausente"); continue; }
+
+                string txt = File.ReadAllText(meta);
+
+                var larguras = Regex.Matches(txt, @"width:\s*(\d+)")
+                    .Cast<Match>().Select(m => int.Parse(m.Groups[1].Value)).ToList();
+                var alturas = Regex.Matches(txt, @"height:\s*(\d+)")
+                    .Cast<Match>().Select(m => int.Parse(m.Groups[1].Value)).ToList();
+
+                int quadros = Regex.Matches(txt, @"(?m)^\s+name:\s*damiao_").Count;
+
+                if (quadros == 0 || larguras.Count == 0) { falhas.Add($"{nome}: sem fatias"); continue; }
+
+                var largurasUnicas = larguras.Distinct().ToList();
+                if (largurasUnicas.Count != 1)
+                {
+                    falhas.Add($"{nome}: larguras de fatia divergentes ({string.Join(", ", largurasUnicas)})");
+                    continue;
+                }
+
+                // Le o tamanho real do PNG pelo cabecalho IHDR, sem depender da UnityEngine.
+                var bytes = File.ReadAllBytes(png);
+                int larguraPng = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+                int alturaPng = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+
+                int somaDasFatias = largurasUnicas[0] * quadros;
+
+                if (somaDasFatias != larguraPng)
+                    falhas.Add($"{nome}: {quadros} x {largurasUnicas[0]} = {somaDasFatias} px, " +
+                               $"mas a folha tem {larguraPng} px — os quadros saem cortados");
+
+                var alturasUnicas = alturas.Distinct().ToList();
+                if (alturasUnicas.Count == 1 && alturasUnicas[0] != alturaPng)
+                    falhas.Add($"{nome}: fatia com {alturasUnicas[0]} px de altura, " +
+                               $"folha com {alturaPng} px");
+            }
+
+            Assert.IsEmpty(falhas,
+                "Fatias que nao ladrilham a folha:" + NovaLinha + "  " +
+                string.Join(NovaLinha + "  ", falhas) + NovaLinha + NovaLinha +
+                "Conserto: 'Tools/FavelaAmarela/Montar Animacao do Damiao'.");
+        }
+
+        private static readonly string NovaLinha = System.Environment.NewLine;
+
         [Test]
         public void AsNoveTiras_ExistemComPpu32EPivoNoRodape()
         {
