@@ -78,11 +78,22 @@ namespace FavelaAmarela.Runtime.Itens
                     continue;
                 }
 
-                Materializar(def, sorteados[i].Quantidade);
+                // O item que cai é um EXEMPLAR: base + grau + afixos rolados. Sem esta linha,
+                // o gerador existiria e não estaria ligado a nada -- o modo de falha que este
+                // repositório já catalogou nove vezes.
+                var exemplar = _gerador.Gerar(def, sorteados[i].Grau, tabela.NivelDoItem,
+                                              CatalogoDeAfixos.Todos, _fonte);
+
+                if (exemplar != null) exemplar.Quantidade = sorteados[i].Quantidade;
+
+                Materializar(def, exemplar, sorteados[i].Quantidade);
             }
         }
 
-        private void Materializar(ItemDef def, int quantidade)
+        /// <summary>Gera o exemplar rolado. POCO sem estado — uma instância basta.</summary>
+        private readonly GeradorDeItem _gerador = new GeradorDeItem();
+
+        private void Materializar(ItemDef def, ItemInstance exemplar, int quantidade)
         {
             Vector3 posicao = transform.position + Deslocamento();
 
@@ -91,7 +102,8 @@ namespace FavelaAmarela.Runtime.Itens
                 : MontarColetavelMinimo(def, posicao);
 
             // Espólio de inimigo nasce sem chave de save: quem persiste é o abate do inimigo.
-            coletavel.Configurar(def, quantidade);
+            if (exemplar != null) coletavel.Configurar(exemplar, def);
+            else coletavel.Configurar(def, quantidade);
             coletavel.name = $"Drop_{def.Nome}";
 
             var sr = coletavel.GetComponent<SpriteRenderer>();

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b72544fb874cc8438b0fcd3821cc1e5, type: 3}
+  m_Name: afixo_do_sinal
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.AfixoDef
+  Id: afixo_do_sinal
+  Tipo: 1
+  Rotulo: do Sinal
+  Stat: 4
+  ValorMin: 2
+  ValorMax: 6
+  NivelMinimoDoItem: 3
+  Peso: 0.6
+  SlotsPermitidos: 
+  GrupoDeExclusao: trauma_anomalia

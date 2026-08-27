@@ -21,7 +21,16 @@ namespace FavelaAmarela.Inventario
         [SerializeField] private int tetoDeItens = 2;
 
         /// <summary>Máximo de itens que esta fonte entrega numa única resolução.</summary>
+        [Tooltip("Nível DOS ITENS que esta tabela larga. Governa que afixos podem cair. " +
+                 "É do item, não do jogador: comparar com o nível do jogador faria uma zona " +
+                 "inicial dropar tier máximo assim que ele subisse.")]
+        [Min(1)]
+        [SerializeField] private int nivelDoItem = 1;
+
         public int TetoDeItens => tetoDeItens;
+
+        /// <summary>Nível dos itens desta tabela — o gate do pool de afixos.</summary>
+        public int NivelDoItem => nivelDoItem < 1 ? 1 : nivelDoItem;
 
         /// <summary>
         /// Converte as entradas autoradas em candidatos do Core, trocando a referência de

@@ -90,12 +90,13 @@ namespace FavelaAmarela.Core.Loot
             {
                 acumulado += elegiveis[i].Chance;
                 if (alvo < acumulado)
-                    return new ItemSorteado(elegiveis[i].ItemDefId, Quantidade(elegiveis[i], fonte));
+                    return new ItemSorteado(elegiveis[i].ItemDefId, Quantidade(elegiveis[i], fonte),
+                                            elegiveis[i].Grau);
             }
 
             // Só alcançável por imprecisão de ponto flutuante no limite superior.
             var ultimo = elegiveis[elegiveis.Count - 1];
-            return new ItemSorteado(ultimo.ItemDefId, Quantidade(ultimo, fonte));
+            return new ItemSorteado(ultimo.ItemDefId, Quantidade(ultimo, fonte), ultimo.Grau);
         }
 
         private static void AdicionarSePossivel(CandidatoDeDrop c, List<ItemSorteado> resultado,
@@ -105,7 +106,7 @@ namespace FavelaAmarela.Core.Loot
             if (AtingiuTeto(resultado.Count, tetoDeItens)) return;
             if (!jaCaiu.Add(c.ItemDefId)) return;
 
-            resultado.Add(new ItemSorteado(c.ItemDefId, Quantidade(c, fonte)));
+            resultado.Add(new ItemSorteado(c.ItemDefId, Quantidade(c, fonte), c.Grau));
         }
 
         private static bool AtingiuTeto(int quantosJaCairam, int tetoDeItens)

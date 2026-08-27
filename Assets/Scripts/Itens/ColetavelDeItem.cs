@@ -79,9 +79,35 @@ namespace FavelaAmarela.Runtime.Itens
         /// Chave de save. Vazia — o padrão para espólio de inimigo — faz o item reaparecer
         /// a cada carga de cena, já que o abate do inimigo é quem persiste.
         /// </param>
+        /// <summary>
+        /// O exemplar rolado que este coletável carrega, quando há um. Nulo em pickup autorado.
+        /// </summary>
+        private FavelaAmarela.Inventario.ItemInstance _exemplar;
+
+        /// <summary>
+        /// Configura o coletável com um <b>exemplar já rolado</b> — grau, nível e afixos
+        /// inclusos.
+        ///
+        /// <para>Existe desde 2026-08-27, com o sistema de afixos: sem ela, o espólio caía
+        /// com os modificadores rolados e <b>os perdia na coleta</b>, porque a entrega montava
+        /// um <c>ItemInstance</c> novo só com id e quantidade. O jogador veria o item bom no
+        /// chão e pegaria um item comum, sem nada acusando.</para>
+        /// </summary>
+        public void Configurar(FavelaAmarela.Inventario.ItemInstance exemplar,
+                               FavelaAmarela.Inventario.ItemDef itemDef, string chave = "")
+        {
+            Configurar(itemDef, exemplar != null ? exemplar.Quantidade : 1, chave);
+            _exemplar = exemplar;
+        }
+
         public void Configurar(FavelaAmarela.Inventario.ItemDef itemDef, int quantos = 1, string chave = "")
         {
             item = itemDef;
+
+            // Sem exemplar rolado, a coleta monta um item simples -- é o caminho de todo
+            // pickup autorado à mão no mundo (consumíveis do Deserto, relíquias). Só o espólio
+            // de inimigo chega aqui com afixos.
+            _exemplar = null;
             quantidade = quantos < 1 ? 1 : quantos;
             chaveDeSave = chave;
 
@@ -125,7 +151,13 @@ namespace FavelaAmarela.Runtime.Itens
                 return;
             }
 
-            bool coube = invManager.Main.Add(new FavelaAmarela.Inventario.ItemInstance(item.Id, quantidade));
+            // Entrega o EXEMPLAR quando há um: montar um ItemInstance novo aqui descartaria
+            // grau, nível e afixos rolados -- o item bom no chão viraria item comum na mochila.
+            var aEntregar = _exemplar != null
+                ? _exemplar.Clone()
+                : new FavelaAmarela.Inventario.ItemInstance(item.Id, quantidade);
+
+            bool coube = invManager.Main.Add(aEntregar);
             if (!coube)
             {
                 // Nada coube: o item fica no chão. Perder relíquia por inventário cheio
