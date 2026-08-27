@@ -165,6 +165,62 @@ namespace FavelaAmarela.Tests.EditMode
                 ". Conserto: 'Tools/FavelaAmarela/HUD: limpar cópias das cenas'.");
         }
 
+        /// <summary>
+        /// <b>O guarda que faltava, e cuja falta manteve o HUD invisível desde a migração.</b>
+        ///
+        /// <para>O <c>GameLoopBootstrap</c> revela o HUD no <c>Awake</c> dele. Mas
+        /// <c>SceneManager.sceneLoaded</c> dispara <b>depois de todos os Awake</b>, e o handler
+        /// do <c>HUDController</c> chamava <c>Ocultar()</c> incondicionalmente. Resultado: o HUD
+        /// era revelado e ocultado em seguida, em <b>toda</b> carga de cena — e nunca apareceu
+        /// em jogo.</para>
+        ///
+        /// <para><b>Por que os testes desta suíte não pegaram.</b> Eles verificavam que
+        /// <c>Revelar()</c> existe, que é chamado, e que o prefab tem as referências ligadas.
+        /// Todos passavam. Nenhum verificava a <b>ordem</b> em que as duas coisas acontecem —
+        /// medir presença em vez de correção, que é o erro que este repositório mais produz, e
+        /// que eu cometi de novo aqui.</para>
+        ///
+        /// <para>Play Mode resolveria isso de verdade; em EditMode o que dá para travar é o
+        /// <b>contrato</b>: o handler de carga não pode ocultar sem antes perguntar se alguém
+        /// reivindicou a cena.</para>
+        /// </summary>
+        [Test]
+        public void OHandlerDeCena_NaoDesfazOQueOBootstrapAcabouDeFazer()
+        {
+            string hud = File.ReadAllText("Assets/Scripts/UI/HUDController.cs");
+
+            int inicio = hud.IndexOf("private void HandleCenaCarregada",
+                                     System.StringComparison.Ordinal);
+            Assert.Greater(inicio, -1, "O handler de carga de cena sumiu do HUDController.");
+
+            // Só o corpo do handler: o resto do arquivo tem Ocultar() legitimamente.
+            int fim = hud.IndexOf("public void Ocultar", inicio, System.StringComparison.Ordinal);
+            if (fim < 0) fim = hud.Length;
+            string corpo = hud.Substring(inicio, fim - inicio);
+
+            StringAssert.Contains("_reivindicadoNestaCena", corpo,
+                "O handler de sceneLoaded voltou a ocultar o HUD sem perguntar se o bootstrap " +
+                "desta cena já o reivindicou. Como sceneLoaded dispara DEPOIS dos Awake, isso " +
+                "desfaz o Revelar() do GameLoopBootstrap e o HUD nunca aparece.");
+        }
+
+        /// <summary>
+        /// A reivindicação precisa ser zerada ao sair da cena, senão o HUD, uma vez revelado,
+        /// nunca mais se esconde — e reaparece por cima do menu principal.
+        /// </summary>
+        [Test]
+        public void AReivindicacao_EZeradaAoTrocarDeCena()
+        {
+            string hud = File.ReadAllText("Assets/Scripts/UI/HUDController.cs");
+
+            StringAssert.Contains("sceneUnloaded += HandleCenaDescarregada", hud,
+                "Sem assinar sceneUnloaded, a reivindicação nunca é zerada: o HUD apareceria " +
+                "por cima do menu principal depois da primeira cena de jogo.");
+
+            StringAssert.Contains("sceneUnloaded -= HandleCenaDescarregada", hud,
+                "Assinatura sem cancelamento vaza — o HUDController é DontDestroyOnLoad.");
+        }
+
         private static string GuidDoScript(string nome)
         {
             var meta = Directory.GetFiles("Assets/Scripts", nome + ".cs.meta",

@@ -209,7 +209,25 @@ namespace FavelaAmarela.Player
 
         private void GarantirHitbox()
         {
-            _hitbox = Hitbox.GarantirPara(gameObject, "Hitbox_MaoFisica", camadaInimigos,
+            // A camada da hurtbox é FORÇADA na máscara, e isso não é cinto e suspensório.
+            //
+            // A Hitbox só acerta quem tem `Hurtbox`, e a hurtbox é um GameObject FILHO na
+            // camada EnemyHurtbox. Uma máscara sem ela encontra o colisor de MOVIMENTO do
+            // inimigo (camada Enemy, na raiz) e depois procura a hurtbox com
+            // GetComponentInParent -- que sobe, nunca desce. Resultado: acha o colisor,
+            // não acha hurtbox, e o golpe passa branco SEM ERRO NENHUM.
+            //
+            // Foi exatamente o que aconteceu (2026-08-27): a cena da Tumba tinha um override
+            // antigo de `camadaInimigos` para só a camada Enemy. Era inofensivo enquanto o
+            // golpe resolvia por `GetComponentInParent<IDanificavel>()`, que acha o EnemyBase
+            // na raiz. A migração para Hitbox transformou esse override velho em "nada é
+            // atingível na Tumba" -- e, por tabela, "o Abdul nunca troca de fase, então nunca
+            // invoca as Pedras de Poder".
+            //
+            // Forçar aqui torna o valor do Inspector incapaz de quebrar o combate.
+            LayerMask mascara = camadaInimigos | LayerMask.GetMask("EnemyHurtbox");
+
+            _hitbox = Hitbox.GarantirPara(gameObject, "Hitbox_MaoFisica", mascara,
                                           RaioAtual, AlcanceAtual, pouparAliados: true);
         }
 

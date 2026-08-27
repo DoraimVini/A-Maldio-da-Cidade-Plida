@@ -146,6 +146,7 @@ namespace FavelaAmarela.Runtime.UI
             // (ver Revelar). É isso que mantém o HUD fora do menu principal sem precisar de uma
             // lista de "cenas que têm HUD" — mais uma lista para envelhecer.
             UnityEngine.SceneManagement.SceneManager.sceneLoaded += HandleCenaCarregada;
+            UnityEngine.SceneManagement.SceneManager.sceneUnloaded += HandleCenaDescarregada;
 
             // Se ninguém injetou uma fonte externa até aqui, cria uma local.
             // Facilita testar a cena de HUD isolada, sem o sistema de entidade.
@@ -164,12 +165,45 @@ namespace FavelaAmarela.Runtime.UI
         private void OnDestroy()
         {
             UnityEngine.SceneManagement.SceneManager.sceneLoaded -= HandleCenaCarregada;
+            UnityEngine.SceneManagement.SceneManager.sceneUnloaded -= HandleCenaDescarregada;
             if (Instancia == this) Instancia = null;
         }
 
+        /// <summary>
+        /// Se o <c>GameLoopBootstrap</c> desta cena já reivindicou o HUD.
+        ///
+        /// <para><b>O bug que este campo conserta (2026-08-27).</b> O handler de carga chamava
+        /// <c>Ocultar()</c> <b>incondicionalmente</b>, e o <c>GameLoopBootstrap</c> chamava
+        /// <c>Revelar()</c> no <c>Awake</c> dele. Só que <c>sceneLoaded</c> dispara <b>depois de
+        /// todos os Awake</b> — então o HUD era revelado e ocultado em seguida, em <b>toda</b>
+        /// carga de cena. <b>O HUD nunca apareceu desde a migração para prefab persistente.</b></para>
+        ///
+        /// <para>Os testes daquela migração verificavam que <c>Revelar()</c> existia e era
+        /// chamado. Nenhum verificava a <b>ordem</b> — medir presença em vez de correção, que é
+        /// o erro que este repositório mais produz.</para>
+        /// </summary>
+        private bool _reivindicadoNestaCena;
+
+        /// <summary>
+        /// Zera a reivindicação ao sair de uma cena. Numa carga <c>Single</c> a ordem é
+        /// <c>sceneUnloaded</c> → <c>Awake</c> da cena nova → <c>sceneLoaded</c>, então quando o
+        /// handler de carga roda o campo já reflete a cena que está entrando.
+        /// </summary>
+        private void HandleCenaDescarregada(UnityEngine.SceneManagement.Scene cena)
+            => _reivindicadoNestaCena = false;
+
+        /// <summary>
+        /// Oculta o HUD <b>só</b> se ninguém o reivindicou nesta cena. É o que o mantém fora do
+        /// menu principal — uma cena sem <c>GameLoopBootstrap</c> — sem precisar de uma lista
+        /// de "cenas que têm HUD", que seria mais uma lista para envelhecer.
+        /// </summary>
         private void HandleCenaCarregada(UnityEngine.SceneManagement.Scene cena,
                                          UnityEngine.SceneManagement.LoadSceneMode modo)
-            => Ocultar();
+        {
+            if (_reivindicadoNestaCena) return;
+
+            Ocultar();
+        }
 
         /// <summary>
         /// Esconde o HUD. Chamado a cada troca de cena: o padrão é <b>invisível</b>, e quem
@@ -190,6 +224,10 @@ namespace FavelaAmarela.Runtime.UI
         /// </summary>
         public void Revelar()
         {
+            // Reivindica a cena ANTES de mostrar: o handler de sceneLoaded roda depois dos
+            // Awake e leria este campo para decidir se desfaz.
+            _reivindicadoNestaCena = true;
+
             if (_canvas != null) _canvas.enabled = true;
         }
 

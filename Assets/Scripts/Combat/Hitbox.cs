@@ -171,6 +171,7 @@ namespace FavelaAmarela.Runtime.Combat
             _fimDaJanela = Time.time + Mathf.Max(0f, duracaoAtiva);
             _ativa = true;
             _jaAtingidos.Clear();
+            _jaReclamouDeAlvoSurdo = false;
 
             if (direcao.sqrMagnitude > 0.0001f)
             {
@@ -199,6 +200,12 @@ namespace FavelaAmarela.Runtime.Combat
             Consultar();
         }
 
+        /// <summary>
+        /// Já reclamou de "achei colisor e não achei hurtbox" nesta ativação? Uma reclamação
+        /// por golpe, não uma por <c>FixedUpdate</c> — a janela roda várias vezes.
+        /// </summary>
+        private bool _jaReclamouDeAlvoSurdo;
+
         private void Consultar()
         {
             int total = Physics2D.OverlapCircle(Centro, raio, _filtro, _buffer);
@@ -207,7 +214,31 @@ namespace FavelaAmarela.Runtime.Combat
             {
                 var hurtbox = _buffer[i].GetComponent<Hurtbox>();
                 if (hurtbox == null) hurtbox = _buffer[i].GetComponentInParent<Hurtbox>();
-                if (hurtbox == null) continue;
+
+                if (hurtbox == null)
+                {
+                    // ESTE é o diagnóstico que faltava em 2026-08-27, e a falta dele custou
+                    // uma noite inteira de trabalho parecer sadia enquanto a Tumba estava
+                    // intocável. A consulta ACHOU um colisor na camada alvo e não achou
+                    // hurtbox nenhuma nele nem acima dele -- quase sempre porque a máscara
+                    // inclui a camada do colisor de MOVIMENTO (Enemy) mas não a da hurtbox
+                    // (EnemyHurtbox), que é um objeto FILHO.
+                    //
+                    // Sem isto, o golpe passa branco em silêncio, que é indistinguível de
+                    // "errei a mira".
+                    if (!_jaReclamouDeAlvoSurdo)
+                    {
+                        _jaReclamouDeAlvoSurdo = true;
+                        Debug.LogError(
+                            $"[Hitbox] '{name}' acertou o colisor '{_buffer[i].name}' " +
+                            $"(camada '{LayerMask.LayerToName(_buffer[i].gameObject.layer)}') " +
+                            "e não achou Hurtbox nele nem acima dele — o golpe passou branco. " +
+                            "Quase sempre é máscara de camada sem a camada da hurtbox: ela " +
+                            "vive num objeto FILHO, e a busca sobe, não desce.", this);
+                    }
+
+                    continue;
+                }
 
                 // Não se fere a si mesmo: a hurtbox do próprio dono está na mesma hierarquia.
                 if (hurtbox.transform.IsChildOf(transform.root)) continue;
