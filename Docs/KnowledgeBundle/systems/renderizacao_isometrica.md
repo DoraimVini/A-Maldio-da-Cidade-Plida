@@ -8,7 +8,9 @@ timestamp: 2026-07-17T18:00:00Z
 
 # Renderização Isométrica (Profundidade e Oclusão)
 
-O jogo **não** usa isométrico 3D nem Tilemap isométrico (losango). É um "fake iso": câmera ortográfica com `Quaternion.identity`, mundo no plano XY, e a sensação de profundidade vem de **Y-sorting** + do remapeamento de input (`PlayerMovement.ConvertToIsometric`). Ver skill `favela-isometric-standards`.
+O jogo **não** usa isométrico 3D nem Tilemap isométrico (losango). É um "fake iso": câmera ortográfica com `Quaternion.identity`, mundo no plano XY, e a sensação de profundidade vem de **Y-sorting** + do remapeamento de input (`Core.Player.BaseIsometrica.ParaMundo`, chamada por `PlayerMovement`). Ver skill `favela-isometric-standards` e [Física 2D](fisica_2d.md).
+
+> **Atualização de 2026-08-27.** O remapeamento era `PlayerMovement.ConvertToIsometric`, `private static` dentro do `MonoBehaviour` e portanto intestável; virou POCO. E o `Transparency Sort Mode` do projeto está em **Custom Axis (0,1,0)** — o eixo é o **desempate** do `sortingOrder`, não um concorrente dele, e é necessário porque `round(-y*10)` é `int` e empata a cada 0,1 unidade (3,2 px a PPU 32).
 
 ## Y-sorting: estático + dinâmico
 

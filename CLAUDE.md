@@ -171,7 +171,7 @@ Leia os arquivos lá antes de cometer erros arquiteturais clássicos da Unity.
 - Isométrico 2D via `Rigidbody2D` com `gravityScale = 0` sempre (ver skill `favela-isometric-standards`).
 - Movimentação real do projeto usa `Rigidbody2D.linearVelocity` atribuído em `FixedUpdate` (não `MovePosition`) — siga essa convenção existente em `PlayerMovement.cs`.
 - `CollisionDetectionMode2D.Continuous` para atores que se movem.
-- A câmera fica sempre com rotação `Quaternion.identity` (sem tilt) — a "sensação" isométrica vem do Y-sorting (`sortingOrder` por `-worldCenter.y`, ver `LevelBlockoutGenerator`) e do remapeamento de input em `PlayerMovement.ConvertToIsometric`, não de uma câmera 3D inclinada. Ver skill `favela-isometric-standards`.
+- A câmera fica sempre com rotação `Quaternion.identity` (sem tilt) — a "sensação" isométrica vem do Y-sorting (`sortingOrder` por `-worldCenter.y`, ver `LevelBlockoutGenerator`) e do remapeamento de input em `BaseIsometrica.ParaMundo`, não de uma câmera 3D inclinada. Ver skill `favela-isometric-standards`.
 - Qualquer alteração em física, câmera, prefab de sala ou Rigidbody de inimigo/player deve respeitar as constantes fixas da skill `favela-isometric-standards` (gravityScale 0, câmera sem rotação, PPU 32, Y-sorting por Custom Axis).
 
 ## 6. Terminologia diegética

@@ -25,13 +25,13 @@ description: Enforces the strict 2D isometric grid rules for Favela Amarela rend
 ### Modelo de física do jogo (resumo, para não ser redescoberto)
 - Corpos: `Rigidbody2D` **Dynamic**, `gravityScale 0`, `FreezeRotation`, `Continuous`.
 - Movimento: `linearVelocity` atribuída em `FixedUpdate` (`PlayerMovement`) — **não** `MovePosition`, **não** `AddForce`. Unity 6 renomeou `velocity` → `linearVelocity`.
-- A sensação isométrica vem do remapeamento de input (`PlayerMovement.ConvertToIsometric`), **não** de câmera inclinada nem de física 3D.
+- A sensação isométrica vem do remapeamento de input (`Core.Player.BaseIsometrica.ParaMundo`, chamada por `PlayerMovement`), **não** de câmera inclinada nem de física 3D. *(Era `BaseIsometrica.ParaMundo`, `private static` dentro do MonoBehaviour e portanto intestável; extraída para POCO em 2026-08-27.)*
 - Profundidade é `sortingOrder = -y*10` (`DynamicYSort`), **não** eixo Z nem física.
 - Dano de inimigo é resolvido por `Vector2.Distance` + `IDanificavel`, **não** por sobreposição de colisor. O colisor do jogador governa só o que barra movimento.
 
 2. **Camera Projection**:
    - Camera must be Orthographic.
-   - Rotation MUST stay `Quaternion.identity` (no tilt on any axis). This project does NOT use a physically-tilted 3D dimetric camera — `LevelBlockoutGenerator` places walls/floors as flat `SpriteRenderer`/`BoxCollider2D` on the XY plane and fakes depth purely via Y-sorting (`sortingOrder = -worldCenter.y * 10`). The "isometric feel" comes from `PlayerMovement.ConvertToIsometric` remapping input direction, not from camera rotation. Tilting the camera (e.g. 26.57° on X, the classic 3D-dimetric-diorama trick) breaks the Y-sort depth illusion and visually desyncs colliders from sprites — do not reintroduce it. (`PrefabMigrationTool.cs`'s "cenário A" / `Quaternion.identity` is the correct reference implementation; `PlaytestSceneSetup.cs` previously diverged from it and was fixed to match.)
+   - Rotation MUST stay `Quaternion.identity` (no tilt on any axis). This project does NOT use a physically-tilted 3D dimetric camera — `LevelBlockoutGenerator` places walls/floors as flat `SpriteRenderer`/`BoxCollider2D` on the XY plane and fakes depth purely via Y-sorting (`sortingOrder = -worldCenter.y * 10`). The "isometric feel" comes from `BaseIsometrica.ParaMundo` remapping input direction, not from camera rotation. Tilting the camera (e.g. 26.57° on X, the classic 3D-dimetric-diorama trick) breaks the Y-sort depth illusion and visually desyncs colliders from sprites — do not reintroduce it. (`PrefabMigrationTool.cs`'s "cenário A" / `Quaternion.identity` is the correct reference implementation; `PlaytestSceneSetup.cs` previously diverged from it and was fixed to match.)
 
 3. **Tilemap & Cell Size**:
    - Level geometry is generated procedurally as plain XY `Vector2` positions (`LevelBlockoutPlanner` + `LevelBlockoutGenerator`), NOT tiles.

@@ -6,6 +6,109 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-27 (noite) — Revisão completa de física 2D (`develop_items`)
+
+Pedida pelo Vini depois de um playtest em que "tudo parecia meio fora". **Não era uma coisa:
+eram nove**, e sete tinham a mesma forma — *a peça existe, não dá erro, e a checagem não
+acontece*. Suíte: 772 → **807 testes**, 0 falhas.
+
+Documento novo: [`systems/fisica_2d.md`](systems/fisica_2d.md) — o modelo de física num lugar só.
+
+### Fase 1 — Os dois espaços de direção (a causa raiz)
+
+`ConvertToIsometric` estava **correta** e casava com o Grid 2:1 das cenas. O problema é que
+**só o movimento a usava**: `LookDirection`, o ataque, a habilidade e a esquiva recebiam o
+**input cru**. Como as diagonais do teclado produzem as cardinais da tela num iso 2:1, e a arte
+do Damião é top-down cardinal calibrada para tela, **6 dos 8 inputs mostravam o sprite errado**
+— só A e D acertavam por coincidência.
+
+- Extraída para `Core/Player/BaseIsometrica.ParaMundo` (era `private static` dentro de um
+  `MonoBehaviour`, portanto intestável). A base 0,5 virou parâmetro: ela **é** o `cellSize.y` do
+  Grid, e o manual da 6.4 diz que é o `Cell Size` que define a projeção (`(1, 0.5, 1)` =
+  **dimétrico**; isométrico verdadeiro seria 0,57735).
+- `HandleEsquivaActivated` **parou** de converter — teria aplicado a conversão duas vezes.
+- Guarda: `EspacoDeDirecaoTests`, com a tabela dos 8 inputs como oráculo.
+
+### Fase 2 — Combate: perguntar a coisa certa
+
+- **Máscara do golpe = só `EnemyHurtbox`.** Incluir `Enemy` responde a outra pergunta e traz o
+  colisor da raiz, que não tem `Hurtbox` — fazia **todo golpe que conectava** emitir um
+  `LogError`.
+- **`EsquivaBridge` parou de mutar a matriz global.** `Physics2D.IgnoreLayerCollision` é global
+  e por par de camada; ao restaurar para `false` ele **sobrescrevia o Project Settings**, e
+  depois da primeira esquiva da partida os inimigos passavam a empurrar o Damião
+  permanentemente, em todas as cenas. Os i-frames agora desligam o colisor da hurtbox —
+  `excludeLayers` não serviria, porque afeta contatos e **não** queries.
+- `PlayerHitbox(11)` e `EnemyHitbox(12)` removidas do TagManager: a `Hitbox` não tem colisor, e
+  camada só existe para pôr num colisor.
+
+### Fase 3 — Furtividade: o pilar estava desligado
+
+`EnemyPerception.HandleSomEmitido` comparava a distância **apenas** com o próprio `raioAudicao`
+e **descartava** o `RaioEfetivo` do som. Agachado (2,0) e correndo (8,5) eram ouvidos
+**exatamente igual**: Modo Furtivo, corrida e o abafamento da tempestade não tinham efeito
+nenhum em jogo. E o código certo já existia, testado, em `CultistaFSM` — que só é instanciada
+em teste. **Um POCO testado e morto.**
+
+Piso de ruído de 1,2 acrescentado: sem ele, tempestade cheia levava o Furtivo a 0,8, menos que
+a pegada do próprio Cultista. *É botão de balanceamento; o playtest decide.*
+
+Também: **quatro cenas sem `AudioListener`**, incluindo `Deserto_Hali`, que é a Fase 1 do
+Vertical Slice — tudo tocava e **nada era ouvido**. A Unity vinha avisando a cada som.
+
+### Fase 4 — Higiene: a máscara vazia
+
+`LayerMask` em zero não dá erro, não loga, e faz a checagem **nunca acontecer**. Três casos,
+todos com o mesmo sintoma: *"atravessa parede"*.
+
+### Fase 5 — Colisão de cenário: 2 622 formas → 10 contornos
+
+`CompositeCollider2D` em todas as paredes de tilemap. Já tinha sido tentado em 2026-08-13 e
+abandonado com `MissingComponentException` — a exigência de `Rigidbody2D` é real, e o cuidado
+que faltava é que o corpo criado junto nasce **Dynamic com `gravityScale 1`**. Parede Dynamic é
+parede que o Damião empurra.
+
+Junto: a **parede fora da camada** (quatro ferramentas constroem o mesmo tilemap; três punham em
+`Obstacle` e a da Arena nunca setou camada nenhuma), um **tilemap vazio** com colisor trigger
+que nunca podia disparar, e o **detector de interação** varrendo as 32 camadas com buffer de 8
+slots — perto de um baú com inimigos em volta, o baú era o que sobrava de fora.
+
+### Fase 6.5 — Câmera: sete ferramentas, sete zooms
+
+Cada ferramenta com o seu `orthographicSize` escrito à mão (4,21875, 5,625, 7, 6, 6, 6, 8); a
+cena ficava com o de quem rodou por último. Os **Portões em 7** (2,41×, ampliação fracionária —
+o "cintilar" da pixel art) e a **Arena em perspectiva**, que escapava do padronizador porque ele
+começava com `if (!cam.orthographic) continue;`.
+
+A conta virou `Core/Rendering/EscalaDePixel`, e todas as câmeras de jogo ganharam
+**`PixelPerfectCamera`** — o pacote já era dependência do projeto e tinha zero componentes em
+cena.
+
+### Fase 6 — Correção de rumo: a ordenação já estava certa
+
+O plano trazia uma fase inteira para decidir se trocava para Custom Axis. **Já estava**
+(`m_TransparencySortMode: 3`, eixo `(0,1,0)`) desde o commit `92410413`. A premissa veio de uma
+afirmação obsoleta na skill `favela-isometric-standards`, corrigida. E os dois mecanismos **não
+competem**: a doc diz que o eixo só entra *"when other, higher priority, criterias fail to
+distinguish the render order"* — ele é o **desempate** do `sortingOrder`, e é necessário porque
+`round(-y*10)` é `int` e empata a cada 3,2 px.
+
+### Ferramentas e guardas novos
+
+- `Tools/FavelaAmarela/Física: consolidar a colisão dos tilemaps`
+- `Tools/FavelaAmarela/Áudio: garantir um AudioListener por cena`
+- `Tools/FavelaAmarela/Física: marcar corpos impregnados`
+- Guardas: `EspacoDeDirecaoTests`, `GolpeAlcancaAHurtboxTests`, `HigieneDeFisicaTests`,
+  `FurtividadeTests`, `ColisaoDeCenarioTests`, `InteragivelAlcancavelTests`,
+  `CameraPixelPerfectTests`, `OrdenacaoIsometricaTests`
+
+### Falta olho
+
+A colisão de parede mudou de geometria e o enquadramento dos Portões e da Arena mudou
+(7 → 5,625 e perspectiva 5 → ortográfica 5,625). Nenhum teste EditMode substitui o playtest.
+
+---
+
 ## 2026-08-27 — Itemização a dado, afixos rolados e física de impacto (`develop_items`)
 
 Trabalho de uma noite inteira em `develop_items`, com a build do edital preservada e

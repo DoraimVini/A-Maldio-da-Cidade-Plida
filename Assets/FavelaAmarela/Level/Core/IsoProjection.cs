@@ -9,7 +9,7 @@ namespace FavelaAmarela.Level.Core
     /// GameObject/Transform, testável em NUnit EditMode.
     ///
     /// Eixos: grid-X projeta em <c>(Unit, Unit/2)</c> e grid-Y em <c>(-Unit, Unit/2)</c>
-    /// — exatamente os eixos 2:1 que <c>PlayerMovement.ConvertToIsometric</c> já usa pro
+    /// — exatamente os eixos 2:1 que <c>Core.Player.BaseIsometrica.ParaMundo</c> já usa pro
     /// movimento (input D→(1,0.5), W→(-1,0.5)) e a mesma razão do Tilemap isométrico
     /// (<c>cellSize (1, 0.5)</c>). Por isso o jogador anda naturalmente ao longo das
     /// arestas do losango depois que a geometria do nível é projetada por aqui.

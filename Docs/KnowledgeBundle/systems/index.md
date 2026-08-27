@@ -44,6 +44,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Construção de Dungeons (Templo da Serpente)](construcao_de_dungeons.md) — Hierarquia, Colliders e Template de Dungeons Isométricas
 - [Chão em Tilemap Isométrico de Losango 2:1](tilemap_isometrico_losango.md) — Receita real de Grid+Tilemap isométrico (confirmada na cena), colisão de borda automática e a matemática do tamanho do losango
 - [Persistência (Save)](../architecture/persistencia.md) — Chaves de persistência (GUID imutável), Save Manager central, JSON e degradação graciosa
+- [Física 2D — espaços de coordenada, camadas e colisão](fisica_2d.md) — **[NOVO 2026-08-27]** O modelo de física num lugar só: os dois espaços de direção e a tabela dos 8 inputs, a taxonomia de camadas, quando usar matriz × excludeLayers × ContactFilter2D, a colisão de cenário por CompositeCollider2D, câmera pixel-perfect, e a classe de defeito que domina o projeto
 - [Renderização Isométrica](renderizacao_isometrica.md) — Profundidade por Y-sort dinâmico + oclusão dither (silhueta atrás de paredes altas)
 - [Sistema de Vigor (Estamina)](vigor_estamina.md) — Consumo tático na corrida e esquiva, penalidade por exaustão
 - [Labirinto de Carcosa (Progressão)](progressao_labirinto_carcosa.md) — XP narrativo, Árvore de Símbolo Amarelo, Pontos de Eco e Santuários. **§5 registra a divergência: zero nós autorados e o manager nunca instanciado.** §6 mapeia a proposta de 2026-08-14 (Lucidez, Sinal, 3 eixos) ao que já existe
