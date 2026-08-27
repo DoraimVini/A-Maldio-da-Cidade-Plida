@@ -89,6 +89,65 @@ namespace FavelaAmarela.Inventario
         }
 
         /// <summary>
+        /// O nome que o jogador lê: <b>prefixos + nome da base + sufixos</b>.
+        ///
+        /// <para>Ex.: <i>"Cravado Estilete de Irem do Sinal"</i>. É a convenção de D2 e PoE, e
+        /// existe por um motivo funcional, não estético: o nome é a <b>primeira</b> informação
+        /// sobre o item, e muitas vezes a única que o jogador lê antes de decidir se pega. Sem
+        /// isso, dois exemplares com rolagens completamente diferentes aparecem idênticos.</para>
+        ///
+        /// <para>Um afixo cujo <c>AfixoDef</c> sumiu do projeto perde o rótulo mas <b>mantém o
+        /// efeito</b> — o valor está gravado no save, e tirá-lo puniria o jogador por uma
+        /// decisão de autoria.</para>
+        /// </summary>
+        public string NomeExibido()
+        {
+            string nomeBase = Def != null ? Def.Nome : ItemDefId;
+
+            if (Afixos == null || Afixos.Count == 0) return nomeBase;
+
+            string prefixos = "";
+            string sufixos = "";
+
+            foreach (var a in Afixos)
+            {
+                if (a == null) continue;
+
+                var def = CatalogoDeAfixos.PorId(a.AfixoId);
+                if (def == null || string.IsNullOrWhiteSpace(def.Rotulo)) continue;
+
+                if (def.Tipo == TipoDeAfixo.Prefixo) prefixos += def.Rotulo + " ";
+                else sufixos += " " + def.Rotulo;
+            }
+
+            return (prefixos + nomeBase + sufixos).Trim();
+        }
+
+        /// <summary>
+        /// As linhas de modificador, para tooltip e ficha — <c>"+13 Vitalidade"</c>.
+        ///
+        /// <para>Sem elas, um sistema de afixos <b>piora</b> o jogo: o jogador acumula itens
+        /// que não consegue comparar, e a mochila de 12 posições vira um problema sem virar uma
+        /// decisão.</para>
+        /// </summary>
+        public IReadOnlyList<string> LinhasDeAfixo()
+        {
+            var linhas = new List<string>();
+            if (Afixos == null) return linhas;
+
+            foreach (var a in Afixos)
+            {
+                if (a == null) continue;
+
+                string sinal = a.Valor >= 0f ? "+" : "";
+                linhas.Add($"{sinal}{a.Valor:0.##} {NomesDeAtributo.De(a.Stat)}");
+            }
+
+            return linhas;
+        }
+
+
+        /// <summary>
         /// Todos os modificadores que este exemplar concede: os <b>implícitos</b> da base
         /// (autorados no <c>ItemDef</c>) mais os <b>afixos rolados</b> desta instância.
         ///

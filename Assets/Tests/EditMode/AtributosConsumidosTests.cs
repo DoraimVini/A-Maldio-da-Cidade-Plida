@@ -121,7 +121,13 @@ namespace FavelaAmarela.Tests.EditMode
                          SearchOption.AllDirectories))
             {
                 var nome = Path.GetFileName(arquivo);
-                if (nome == "ItemEnums.cs" || nome == "PainelDeFicha.cs") continue;
+                // NomesDeAtributo.cs entrou aqui em 2026-08-27, pelo mesmo motivo dos
+                // outros dois: ele NOMEIA atributos, não os consome. Citar um StatType
+                // para escrever o rótulo dele não é ler o bônus e aplicá-lo -- sem esta
+                // exclusão, a tabela de tradução faria os 4 atributos decorativos
+                // parecerem implementados.
+                if (nome == "ItemEnums.cs" || nome == "PainelDeFicha.cs" ||
+                    nome == "NomesDeAtributo.cs") continue;
 
                 string texto = File.ReadAllText(arquivo);
                 foreach (var stat in declarados)

@@ -29,6 +29,23 @@ namespace FavelaAmarela.Inventario
         }
 
         /// <summary>
+        /// Acha um afixo pelo <c>Id</c> gravado no save. Devolve <c>null</c> quando o afixo foi
+        /// removido do projeto depois de já ter caído num item — caso em que o item continua
+        /// com o modificador (o VALOR está no save), só perde o rótulo no nome. É a degradação
+        /// certa: tirar o efeito puniria o jogador por uma decisão de autoria.
+        /// </summary>
+        public static AfixoDef PorId(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+
+            var todos = Todos;
+            for (int i = 0; i < todos.Count; i++)
+                if (todos[i] != null && todos[i].Id == id) return todos[i];
+
+            return null;
+        }
+
+        /// <summary>
         /// Relê o disco. Chamado sozinho na primeira consulta; público para o Item Creator
         /// poder atualizar o pool depois de criar um afixo, sem reiniciar o Play Mode.
         /// </summary>
