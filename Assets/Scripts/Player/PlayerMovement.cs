@@ -262,8 +262,11 @@ namespace FavelaAmarela.Player
         {
             // Esquiva é movimento físico comum: colide com paredes normalmente,
             // diferente do Salto (que fica intangível). Nenhuma troca de layer aqui.
-            Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
-            esquivaVelocity = finalDirection * (stealthState.Speed * speedMultiplier);
+            //
+            // `direction` JÁ VEM EM ESPAÇO DE MUNDO desde 2026-08-27 (ver ReadInput). Converter
+            // aqui de novo aplicaria a base isométrica DUAS VEZES e a esquiva sairia num ângulo
+            // que não existe em lugar nenhum do jogo -- 26,6° virariam 53,2°.
+            esquivaVelocity = direction.normalized * (stealthState.Speed * speedMultiplier);
 
             // A Esquiva é um movimento brusco — precisa fazer barulho mesmo em modo
             // Furtivo, senão Furtivo+Esquiva vira um "apagão sonoro" que reseta o
@@ -310,30 +313,46 @@ namespace FavelaAmarela.Player
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
             isMoving = inputDirection.sqrMagnitude > 0.01f;
-            
+
+            // A direção de MUNDO, calculada uma vez e usada por tudo que não é movimento.
+            //
+            // Até 2026-08-27 só o movimento convertia para o espaço isométrico; LookDirection e
+            // as três ações abaixo recebiam o input CRU. O corpo ia para um lado e a mira, o
+            // sprite e toda geometria de "costas" apontavam para outro -- 26,6° de desvio na
+            // horizontal e 63,4° na vertical. O Vini viu isso jogando como "as 8 direções...
+            // tudo parece meio fora".
+            //
+            // Não era sistema quebrado: eram dois espaços de coordenada que ninguém reconciliou.
+            Vector2 direcaoNoMundo = useIsometricGridAlignment
+                ? BaseIsometrica.ParaMundo(inputDirection)
+                : inputDirection.normalized;
+
             if (isMoving)
             {
-                LookDirection = inputDirection.normalized;
+                // LookDirection é "para onde o personagem ENCARA no mundo". Todo consumidor dela
+                // é geometria de mundo: o bucket de sprite (AnimadorDoDamiao), o cone de costas
+                // da Máscara Pálida (ReiEmAmareloAI), o Eco de Carcosa e a Pressão Psíquica.
+                LookDirection = direcaoNoMundo;
             }
 
             // Trigger Esquiva
             if (dodgeAction != null && dodgeAction.WasPressedThisFrame() && esquivaBridge != null)
             {
-                esquivaBridge.TryActivateEsquiva(inputDirection);
+                esquivaBridge.TryActivateEsquiva(direcaoNoMundo);
                 if (!_fsm.EstaLivre) return; // Esquiva pegou
             }
 
             // Trigger Ataque (Mão Física)
             if (attackAction != null && attackAction.WasPressedThisFrame() && maoFisicaBridge != null)
             {
-                maoFisicaBridge.TryAtacar(inputDirection);
+                maoFisicaBridge.TryAtacar(direcaoNoMundo);
                 if (!_fsm.EstaLivre) return; // Ataque pegou
             }
 
             // Trigger Habilidade da Arma (botão separado do ataque básico)
             if (habilidadeArmaAction != null && habilidadeArmaAction.WasPressedThisFrame() && maoFisicaBridge != null)
             {
-                maoFisicaBridge.TryUsarHabilidade(inputDirection);
+                maoFisicaBridge.TryUsarHabilidade(direcaoNoMundo);
                 if (!_fsm.EstaLivre) return; // Habilidade pegou
             }
 
@@ -390,10 +409,12 @@ namespace FavelaAmarela.Player
                 return;
             }
 
-            Vector2 movement = inputDirection.normalized;
-
-            if (useIsometricGridAlignment)
-                movement = ConvertToIsometric(movement);
+            // Mesma conversão que o resto do frame já fez, pela MESMA função. Ter duas
+            // implementações da base isométrica no mesmo arquivo era o convite para elas
+            // divergirem -- e foi assim que movimento e mira acabaram em espaços diferentes.
+            Vector2 movement = useIsometricGridAlignment
+                ? BaseIsometrica.ParaMundo(inputDirection)
+                : inputDirection.normalized;
 
             rb.linearVelocity = movement * stealthState.Speed;
 
@@ -416,12 +437,10 @@ namespace FavelaAmarela.Player
         /// <summary>
         /// Converts screen-space WASD input to isometric world-space direction.
         /// </summary>
-        private static Vector2 ConvertToIsometric(Vector2 input)
-        {
-            float isoX = input.x - input.y;
-            float isoY = (input.x + input.y) * 0.5f;
-            return new Vector2(isoX, isoY).normalized;
-        }
+        // ConvertToIsometric saiu daqui em 2026-08-27. Virou Core.Player.BaseIsometrica,
+        // que é POCO testável e recebe a altura da célula do Grid como PARÂMETRO -- porque a
+        // doc da Unity 6.4 diz que esse número É o cellSize.y do Grid, e um literal aqui seria
+        // mais uma constante para divergir do mundo desenhado.
 
         private void OnDrawGizmos()
         {

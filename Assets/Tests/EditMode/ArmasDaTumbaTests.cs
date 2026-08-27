@@ -182,8 +182,15 @@ namespace FavelaAmarela.Tests.EditMode
         public void MaoVazia_NaoTemHabilidade()
         {
             // Sem arma não há habilidade em botão separado — contrato explícito.
-            Assert.IsFalse(new MaoVazia() is IArmaComHabilidade,
-                "MaoVazia não deve implementar IArmaComHabilidade.");
+            //
+            // Compara TIPOS, não uma instância. A forma antiga (`new MaoVazia() is
+            // IArmaComHabilidade`) o compilador resolvia estaticamente e avisava com CS0184:
+            // ele já sabia a resposta, ou seja, era um teste que NÃO PODIA FALHAR. Com
+            // IsAssignableFrom a checagem acontece em runtime e volta a valer alguma coisa —
+            // se alguém fizer MaoVazia implementar a interface, este teste acusa.
+            Assert.IsFalse(typeof(IArmaComHabilidade).IsAssignableFrom(typeof(MaoVazia)),
+                "MaoVazia não deve implementar IArmaComHabilidade: desarmado é um ESTADO do " +
+                "jogo, não uma arma com habilidade em botão separado.");
         }
 
         // ── Cooldowns ────────────────────────────────────────────────────────
