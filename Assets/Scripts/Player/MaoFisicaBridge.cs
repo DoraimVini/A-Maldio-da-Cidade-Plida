@@ -106,14 +106,22 @@ namespace FavelaAmarela.Player
             get
             {
                 if (_armaEquipada == null || _cooldownHabilidadeAtual <= 0f) return 1f;
-                float decorrido = Time.time - _lastAbilityUseTime;
+
+                // O mesmo desconto do Foco entra aqui. Sem isto, o anel de recarga da UI
+                // encheria mais devagar que a habilidade libera -- o jogador veria "não está
+                // pronta" e a habilidade sairia, ou o contrário, e concluiria que o botão falha.
+                float decorrido = (Time.time - _lastAbilityUseTime) /
+                                  (1f - MaoSecundaria.DescontoDeRecarga());
+
                 return Mathf.Clamp01(decorrido / _cooldownHabilidadeAtual);
             }
         }
 
         /// <summary>Se a habilidade da arma está pronta para uso (cooldown completo).</summary>
         public bool HabilidadePronta =>
-            _armaEquipada != null && _armaEquipada.CanActivateHabilidade(Time.time - _lastAbilityUseTime);
+            _armaEquipada != null &&
+            _armaEquipada.CanActivateHabilidade(
+                (Time.time - _lastAbilityUseTime) / (1f - MaoSecundaria.DescontoDeRecarga()));
 
         /// <summary>true enquanto a FSM do jogador estiver Atacando (fonte única de verdade).</summary>
         public bool IsAtacando => _fsm != null && _fsm.CurrentState == PlayerState.Atacando;
@@ -349,7 +357,15 @@ namespace FavelaAmarela.Player
             if (_armaEquipada == null) return;
             if (direcao == Vector2.zero) return;
             if (_fsm == null || !_fsm.EstaLivre) return;
-            if (!_armaEquipada.CanActivateHabilidade(Time.time - _lastAbilityUseTime)) return;
+            // O FOCO na Mão Secundária desconta recarga. É o lado "conjurar mais" da escolha
+            // que o slot passou a oferecer em 2026-08-27 -- o outro lado é o escudo, que apara
+            // golpe. Aplicado ao TEMPO DECORRIDO em vez de ao cooldown da arma: assim a arma
+            // continua sendo a fonte da verdade do próprio número, e o foco é um multiplicador
+            // por cima, legível em qualquer arma.
+            float decorrido = (Time.time - _lastAbilityUseTime) /
+                              (1f - MaoSecundaria.DescontoDeRecarga());
+
+            if (!_armaEquipada.CanActivateHabilidade(decorrido)) return;
 
             var resultado = _armaEquipada.ExecuteHabilidade().ComBonus(
                 BonusPassivo(StatType.TraumaFisico),

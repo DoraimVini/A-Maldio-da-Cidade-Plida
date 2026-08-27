@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using FavelaAmarela.Inventario;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
 
@@ -190,6 +191,19 @@ namespace FavelaAmarela.Runtime.Combat
         /// fere a Vitalidade. É por aqui que entra o golpe corpo-a-corpo do Cultista.
         /// </summary>
         /// <param name="danoBruto">Dano antes da defesa (ex.: <c>Ataque</c> da ficha do agressor).</param>
+        /// <summary>
+        /// Sorte do bloqueio. Injetável na prática — trocá-la é como se testa o escudo sem
+        /// depender de aleatoriedade real.
+        /// </summary>
+        private readonly FavelaAmarela.Core.Loot.IFonteDeAleatoriedade _sorteDoBloqueio =
+            new FavelaAmarela.Runtime.Itens.FonteDeAleatoriedadeUnity();
+
+        /// <summary>
+        /// Disparado quando a Mão Secundária apara um golpe. Existe para o áudio e a UI terem
+        /// onde se pendurar — um bloqueio que não é visto nem ouvido é indistinguível de sorte.
+        /// </summary>
+        public event System.Action OnGolpeAparado;
+
         public void ReceberDanoFisico(float danoBruto)
         {
             if (IgnorarDano) return;
@@ -197,7 +211,18 @@ namespace FavelaAmarela.Runtime.Combat
             GarantirInicializacao(); // dano nunca some por causa de ordem de Awake
             if (_vitalidade.EstaAbatido) return;
 
-            float danoFinal = MitigacaoDeDano.Aplicar(danoBruto, _atributosFinais.Defesa);
+            // O escudo age ANTES da Defesa: ele apara o golpe, e o que passa é que precisa
+            // ser mitigado. Na ordem inversa, um escudo forte contra um golpe fraco daria
+            // números negativos que a mitigação teria de tratar.
+            var bloqueio = Bloqueio.Tentar(danoBruto,
+                                           MaoSecundaria.ChanceDeBloqueio(),
+                                           MaoSecundaria.ReducaoAoBloquear(),
+                                           _sorteDoBloqueio);
+
+            float danoFinal = MitigacaoDeDano.Aplicar(bloqueio.DanoFinal, _atributosFinais.Defesa);
+
+            if (bloqueio.Bloqueou) OnGolpeAparado?.Invoke();
+
             if (danoFinal <= 0f) return;
 
             _vitalidade.Ferir(danoFinal);

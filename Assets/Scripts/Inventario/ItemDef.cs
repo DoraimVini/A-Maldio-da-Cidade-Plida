@@ -42,6 +42,20 @@ namespace FavelaAmarela.Inventario
                  "enquanto estiver equipada. Ignorado em itens que não são armas.")]
         public Empunhadura Empunhadura = Empunhadura.UmaMao;
 
+        [Header("Mão Secundária")]
+        [Tooltip("O que este item faz na Mão Secundária. Ignorado em qualquer outro slot.")]
+        public FuncaoDeMaoSecundaria Funcao = FuncaoDeMaoSecundaria.Nenhuma;
+
+        [Tooltip("ESCUDO: chance de aparar um golpe (0–1, com teto de 0,6 no Bloqueio). " +
+                 "FOCO: fração de recarga descontada da habilidade da arma (0–1).")]
+        [Range(0f, 1f)]
+        public float PotenciaDaMaoSecundaria;
+
+        [Tooltip("ESCUDO: fração do dano aparada quando o bloqueio acontece (0–1). " +
+                 "Ignorado no Foco.")]
+        [Range(0f, 1f)]
+        public float ReducaoAoBloquear = 0.5f;
+
         [Header("Atributos Fixos")]
         [Tooltip("Lista de modificadores que este item concede (quando equipado).")]
         public List<ModificadorFixo> Modificadores = new List<ModificadorFixo>();

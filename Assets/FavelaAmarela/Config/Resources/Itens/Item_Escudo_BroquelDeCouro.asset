@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254c99bc08b9e1f41bd77fea72f06c9f, type: 3}
+  m_Name: Item_Escudo_BroquelDeCouro
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
+  Id: broquel_couro_ressecado
+  Nome: Broquel de Couro Ressecado
+  Icone: {fileID: 21300000, guid: b020372dd863f1e4e9fb1191c0d5a3b1, type: 3}
+  Descricao: "Couro que j\xE1 foi de alguma coisa viva. Apara o que consegue."
+  Tipo: 1
+  SlotEquipamento: 7
+  EmpilhamentoMaximo: 1
+  ArmaFisica: 0
+  Base: {fileID: 0}
+  Empunhadura: 0
+  Funcao: 1
+  PotenciaDaMaoSecundaria: 0.2
+  ReducaoAoBloquear: 0.5
+  Modificadores:
+  - Stat: 7
+    Valor: 2
