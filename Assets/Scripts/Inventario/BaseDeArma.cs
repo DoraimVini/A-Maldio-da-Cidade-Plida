@@ -1,5 +1,6 @@
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
+using FavelaAmarela.Core.Factories;
 
 namespace FavelaAmarela.Inventario
 {
@@ -50,9 +51,29 @@ namespace FavelaAmarela.Inventario
         public Empunhadura Empunhadura = Empunhadura.UmaMao;
 
         [Header("Comportamento")]
-        [Tooltip("Qual POCO de combate esta família constrói. Vira referência a HabilidadeDef " +
-                 "na Fase 3 do plano de itemização.")]
+        [Tooltip("A habilidade desta arma, montada por EFEITOS no Inspector. [ASSET] " +
+                 "Preenchido = arma a dado. Vazio = cai no arquétipo abaixo (caminho legado).")]
+        public HabilidadeDef Habilidade;
+
+        [Tooltip("Caminho LEGADO: qual classe C# construir quando não há HabilidadeDef. " +
+                 "Existe para as armas ainda não migradas continuarem funcionando.")]
         public TipoArmaFisica Arquetipo = TipoArmaFisica.MaoVazia;
+
+        /// <summary>
+        /// Constrói o POCO de combate desta arma. <b>É o único lugar que decide</b> entre a
+        /// arma a dado e a classe C# legada — ter essa escolha espalhada seria criar mais uma
+        /// divergência para manter à mão.
+        /// </summary>
+        /// <returns>
+        /// A arma, ou <c>null</c> quando nem habilidade nem arquétipo resolvem — que é o mesmo
+        /// que estar desarmado, e é o comportamento que a bridge já sabe tratar.
+        /// </returns>
+        public IArmaComHabilidade ConstruirArma()
+        {
+            if (Habilidade != null) return Habilidade.Construir();
+
+            return WeaponFactory.Criar(Arquetipo);
+        }
 
         /// <summary>
         /// Geometria padrão para quem não tem base ligada — os mesmos números que viviam

@@ -285,6 +285,24 @@ namespace FavelaAmarela.Player
             // continuaria com a mesma pegada -- que era o estado até 2026-08-27.
             AplicarBase(slot.Def.Base);
 
+            // Arma a DADO tem prioridade: a família sabe montar a si mesma (por HabilidadeDef
+            // ou, quando ela está vazia, pelo arquétipo legado). Só quando não há família é que
+            // se cai no enum do item.
+            if (slot.Def.Base != null)
+            {
+                var construida = slot.Def.Base.ConstruirArma();
+                if (construida != null)
+                {
+                    EquiparArma(construida);
+
+                    // O save ainda viaja por TipoArmaFisica; colapsar esse canal para o
+                    // ItemDef.Id é a Fase 4. Enquanto isso, manter o identificador é o que faz
+                    // a arma sobreviver à troca de cena.
+                    _idDaArmaEquipada = slot.Def.ArmaFisica;
+                    return;
+                }
+            }
+
             // Sobrecarga com o identificador: só ela deixa o save reequipar depois da troca de cena.
             EquiparArma(slot.Def.ArmaFisica);
         }
