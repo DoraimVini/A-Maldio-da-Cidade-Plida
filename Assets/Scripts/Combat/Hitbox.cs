@@ -143,6 +143,21 @@ namespace FavelaAmarela.Runtime.Combat
                 if (!_jaAtingidos.Add(hurtbox)) continue;
 
                 hurtbox.Receber(_resultado);
+
+                // Corpo, do lado de quem APANHA. Este é o caminho pelo qual o inimigo acerta
+                // o jogador (hoje só as garras do Byakhee); o caminho oposto -- o golpe do
+                // Damião -- é resolvido em MaoFisicaBridge.ResolverGolpe. São os dois únicos
+                // pontos onde um golpe aterrissa, e por isso os dois únicos que precisam
+                // conhecer a repulsão: nenhum dos 9 arquivos de IA foi tocado.
+                //
+                // A direção sai do CENTRO da hitbox para o alvo, e não da direção do golpe:
+                // quem está na borda do círculo tem de ser jogado para fora, não para o lado.
+                var empurrao = RepulsaoDeImpacto.GarantirPara(hurtbox);
+                if (empurrao != null)
+                    empurrao.Empurrar((Vector2)hurtbox.transform.position - Centro,
+                                      _resultado.ForcaRepulsao);
+
+                HitStop.Bater(_resultado.Dano);
             }
         }
 

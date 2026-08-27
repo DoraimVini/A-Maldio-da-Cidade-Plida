@@ -270,26 +270,34 @@ namespace FavelaAmarela.Player
             if (direcao == Vector2.zero) return;
             if (_fsm == null || !_fsm.EstaLivre) return;
 
-            ArmaResult resultado;
-
             // A arma equipada é a fonte da verdade do golpe — a WeaponFactory já a
             // reconstruiu a partir do slot do inventário (ver VerificarSlotDeArma), então
             // não há por que reler o inventário a cada ataque.
-            if (_armaEquipada != null)
-            {
-                resultado = _armaEquipada.Execute().ComBonus(
+            IArma arma = _armaEquipada != null ? (IArma)_armaEquipada : _maoVazia;
+
+            // A CADÊNCIA É PERGUNTADA À ARMA, e antes de executar. Dois defeitos consertados
+            // aqui em 2026-08-27:
+            //
+            // 1. `IArma.CanActivate` NÃO ERA CHAMADO POR NINGUÉM. O gate usava
+            //    `resultado.DurationSeconds`, então o `cooldownBasico` de toda arma era dado
+            //    morto -- autorar uma arma pesada de cadência lenta não fazia efeito nenhum.
+            //    Os POCOs sempre tiveram o contrato testado (`ArmasDaTumbaTests`); era a
+            //    bridge que não o consultava. Consequência de jogo: as três armas batiam
+            //    praticamente na mesma velocidade, e o Alfanje (0,7 s) não pesava mais que o
+            //    Estilete (0,3 s).
+            //
+            // 2. `Execute()` rodava ANTES do gate, ou seja, a arma executava mesmo quando o
+            //    ataque era recusado. Inofensivo enquanto as armas são sem estado; vira bug
+            //    silencioso no instante em que uma habilidade contar cargas.
+            if (!arma.CanActivate(Time.time - _lastUseTime)) return;
+
+            ArmaResult resultado = _armaEquipada != null
+                ? _armaEquipada.Execute().ComBonus(
                     BonusPassivo(StatType.TraumaFisico),
-                    BonusPassivo(StatType.TraumaAnomalia));
-            }
-            else
-            {
+                    BonusPassivo(StatType.TraumaAnomalia))
                 // Gesto de mão vazia: dano 0 por design — bônus passivos não se aplicam,
                 // senão desarmado passaria a matar.
-                resultado = _maoVazia.Execute();
-            }
-
-            // Fallback para cooldown baseado no ultimo ataque
-            if (Time.time - _lastUseTime < resultado.DurationSeconds) return;
+                : _maoVazia.Execute();
 
             if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
 
@@ -354,9 +362,28 @@ namespace FavelaAmarela.Player
                 if (alvo != null && _jaFeridos.Add(alvo))
                 {
                     alvo.ReceberGolpe(resultado);
+
+                    // Corpo, não só aritmética. Até 2026-08-27 o golpe terminava aqui: o dano
+                    // era subtraído e nada no mundo se mexia. `ForcaRepulsao` existia no
+                    // ArmaResult, o Alfanje preenchia com 6, e NINGUÉM lia -- a arma cuja
+                    // identidade de design é "força bruta e espaço" não abria espaço nenhum.
+                    // A direção sai do jogador para o alvo, e não da direção do input, senão
+                    // um inimigo na borda do círculo voaria de lado.
+                    var empurrao = RepulsaoDeImpacto.GarantirPara(_hitBuffer[i]);
+                    if (empurrao != null)
+                    {
+                        Vector2 paraOAlvo =
+                            (Vector2)_hitBuffer[i].transform.position - (Vector2)transform.position;
+                        empurrao.Empurrar(paraOAlvo, resultado.ForcaRepulsao);
+                    }
+
                     atingidos++;
                 }
             }
+
+            // Um só congelamento por golpe, mesmo acertando vários -- senão um golpe em área
+            // pararia o mundo N vezes mais que um golpe simples.
+            if (atingidos > 0) HitStop.Bater(resultado.Dano);
 
             if (logarGolpes)
             {
@@ -367,10 +394,28 @@ namespace FavelaAmarela.Player
             }
         }
 
+        /// <summary>
+        /// Desenha <b>o volume que o golpe realmente consulta</b>.
+        ///
+        /// <para>Até 2026-08-27 este gizmo mentia: desenhava um círculo de raio <c>alcance</c>
+        /// centrado no jogador, enquanto <see cref="ResolverGolpe"/> consulta um círculo de raio
+        /// <c>alcance/2</c> deslocado <c>alcance/2</c> à frente. Ou seja, a área desenhada tinha
+        /// <b>quatro vezes</b> a do teste real e ficava no lugar errado — calibrar alcance
+        /// olhando para ela levava à conclusão oposta da verdadeira.</para>
+        ///
+        /// <para>Sem direção de input no Editor, desenha para a direita e marca o centro do
+        /// jogador, para a assimetria ficar evidente.</para>
+        /// </summary>
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = new Color(0.8f, 0.2f, 0.2f, 0.4f);
-            Gizmos.DrawWireSphere(transform.position, alcance);
+            Vector2 frente = transform.right;
+            Vector2 centro = (Vector2)transform.position + frente * (alcance * 0.5f);
+
+            Gizmos.color = new Color(0.8f, 0.2f, 0.2f, 0.9f);
+            Gizmos.DrawWireSphere(centro, alcance * 0.5f);
+
+            Gizmos.color = new Color(0.8f, 0.8f, 0.2f, 0.5f);
+            Gizmos.DrawLine(transform.position, centro);
         }
     }
 }

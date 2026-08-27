@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7413081680683689236}
   - component: {fileID: 3718683135698572325}
   - component: {fileID: 7274526852814612185}
+  - component: {fileID: 7420087792121602580}
   m_Layer: 6
   m_Name: CoisaDoCemiterio
   m_TagString: Untagged
@@ -199,3 +200,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.DynamicYSort
   fator: 10
   offsetPes: 0
+--- !u!114 &7420087792121602580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8530644607433014112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 0.6

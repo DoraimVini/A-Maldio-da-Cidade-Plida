@@ -63117,6 +63117,7 @@ GameObject:
   - component: {fileID: 1616806562}
   - component: {fileID: 1616806561}
   - component: {fileID: 1616806560}
+  - component: {fileID: 1616806564}
   m_Layer: 0
   m_Name: Cortesao_Palido_0
   m_TagString: Untagged
@@ -63295,6 +63296,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1616806564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616806558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 0.45
 --- !u!1 &1705262443
 GameObject:
   m_ObjectHideFlags: 0
@@ -63717,6 +63731,7 @@ GameObject:
   - component: {fileID: 1952111493}
   - component: {fileID: 1952111492}
   - component: {fileID: 1952111491}
+  - component: {fileID: 1952111495}
   m_Layer: 0
   m_Name: Cortesao_Palido_1
   m_TagString: Untagged
@@ -63895,6 +63910,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1952111495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952111489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 0.45
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

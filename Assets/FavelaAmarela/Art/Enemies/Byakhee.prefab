@@ -159,6 +159,7 @@ GameObject:
   - component: {fileID: 4383678035820145529}
   - component: {fileID: 8963580533039878870}
   - component: {fileID: 7018458313242706803}
+  - component: {fileID: 3420742979077037208}
   m_Layer: 6
   m_Name: Byakhee
   m_TagString: Untagged
@@ -437,3 +438,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03db3837762a1e440b4c8896e33f276e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Audio.AudioDeCombate
+--- !u!114 &3420742979077037208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5445350593436559665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 0.75

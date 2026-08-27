@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 4695545914089126774}
   - component: {fileID: 4727924443773620933}
   - component: {fileID: 1537815508846015432}
+  - component: {fileID: 574957450421472710}
   m_Layer: 6
   m_Name: Cultista
   m_TagString: Untagged
@@ -367,6 +368,19 @@ MonoBehaviour:
   - {fileID: 9211146236915512317, guid: 33e5ba6bb14e2cb4fb5f49b6cfec6cdf, type: 3}
   - {fileID: 3993599605470242577, guid: 33e5ba6bb14e2cb4fb5f49b6cfec6cdf, type: 3}
   quadrosPorSegundo: 6
+--- !u!114 &574957450421472710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 0.15
 --- !u!1 &1450925050463748554
 GameObject:
   m_ObjectHideFlags: 0

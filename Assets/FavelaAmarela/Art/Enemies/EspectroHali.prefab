@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5903542959564898073}
   - component: {fileID: 5903542959564898080}
   - component: {fileID: 1533339138125788716}
+  - component: {fileID: 2293051127369639815}
   m_Layer: 6
   m_Name: EspectroHali
   m_TagString: Untagged
@@ -222,3 +223,16 @@ MonoBehaviour:
   - {fileID: 6927245828185313299, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
   - {fileID: 1057120856260277735, guid: 617606f52c8a48a5bedcb54ccb9566f1, type: 3}
   quadrosPorSegundo: 6
+--- !u!114 &2293051127369639815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890151004144615060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 0.9
