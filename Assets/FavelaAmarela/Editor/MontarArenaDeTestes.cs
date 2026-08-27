@@ -288,7 +288,12 @@ namespace FavelaAmarela.EditorTools
         {
             var camGo = new GameObject("Main Camera", typeof(Camera), typeof(IsometricCameraController));
             camGo.tag = "MainCamera";
-            camGo.transform.rotation = Quaternion.identity; // sem tilt — ver favela-isometric-standards
+
+            // A Arena é ARENA: 3x. Antes esta ferramenta não dizia NADA sobre a câmera, e a cena
+            // ficou com o default de Camera nova -- projeção em PERSPECTIVA, tamanho 5, z = 0.
+            // O padronizador de cenas também não a consertava: ele PULAVA câmera não-ortográfica.
+            PadraoDeCamera.Aplicar(camGo.GetComponent<Camera>(),
+                                   PadraoDeCamera.AmpliacaoDe(CaminhoDaCena));
 
             if (damiao != null)
                 camGo.GetComponent<IsometricCameraController>().SetTarget(damiao.transform);

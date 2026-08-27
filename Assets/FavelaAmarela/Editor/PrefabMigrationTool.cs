@@ -8,6 +8,7 @@ using FavelaAmarela.Runtime.GameLoop;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.Enemies;
 using FavelaAmarela.CameraSystem;
+using FavelaAmarela.EditorTools;
 
 namespace FavelaAmarela.Editor
 {
@@ -242,16 +243,18 @@ namespace FavelaAmarela.Editor
             var camGo = new GameObject("Main Camera");
             camGo.tag = "MainCamera";
             var cam = camGo.AddComponent<Camera>();
-            cam.orthographic = true;
-            cam.orthographicSize = 8f;
+            // Zoom, projeção, rotação e PixelPerfectCamera vêm de UM lugar (PadraoDeCamera).
+            // Cada ferramenta tinha o seu número escrito à mão e a cena ficava com o de
+            // quem rodasse por último.
+            PadraoDeCamera.Aplicar(cam, FavelaAmarela.Core.Rendering.EscalaDePixel.AmpliacaoPadrao);
             cam.backgroundColor = new Color(0.05f, 0.04f, 0.06f, 1f); // Escuro de Carcosa
             cam.clearFlags = CameraClearFlags.SolidColor;
             camGo.transform.position = new Vector3(0, 0, -10);
-            camGo.transform.rotation = Quaternion.identity; // SEM rotação — cenário A
 
             var isoCam = camGo.AddComponent<IsometricCameraController>();
             isoCam.SetTarget(playerInstance.transform);
-            Debug.Log("[Migração] Main Camera criada: Ortho, Size 8, sem rotação, fundo escuro.");
+            Debug.Log($"[Migração] Main Camera criada: Ortho {cam.orthographicSize}, sem rotação, " +
+                      "fundo escuro, PixelPerfectCamera.");
 
             // ── 5. HUD ────────────────────────────────────────────────────────
             const string hudPrefabPath = "Assets/FavelaAmarela/Art/UI/HUD_ResilienciaBar.prefab";

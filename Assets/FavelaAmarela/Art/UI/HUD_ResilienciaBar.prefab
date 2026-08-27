@@ -406,6 +406,8 @@ MonoBehaviour:
   barraDeItens: {fileID: 0}
   barraDeArtefatos: {fileID: 0}
   companheiroBar: {fileID: 0}
+  telaPause: {fileID: 0}
+  sequenciaColapso: {fileID: 0}
   resilienciaMax: 100
   fracaoThresholdPanico: 0.25
 --- !u!1 &7210133132011883742

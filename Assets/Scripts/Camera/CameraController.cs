@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.U2D;
 
 namespace FavelaAmarela.CameraSystem
 {
@@ -29,6 +30,7 @@ namespace FavelaAmarela.CameraSystem
 
         private Vector3 velocity = Vector3.zero;
         private UnityEngine.Camera cam;
+        private PixelPerfectCamera _pixelPerfect;
 
         // --- Shake state ---
         private float shakeTimeRemaining;
@@ -45,7 +47,19 @@ namespace FavelaAmarela.CameraSystem
 
             // Force orthographic projection for 2D isometric
             cam.orthographic = true;
-            cam.orthographicSize = orthographicSize;
+
+            // ── Quem manda no zoom (2026-08-27) ───────────────────────────────
+            // Com um PixelPerfectCamera presente, o TAMANHO É DELE: ele recalcula
+            // orthographicSize a cada OnPreCull a partir da resolução de referência e da tela
+            // real. Escrever aqui não muda nada em jogo e mente no Inspector — o número que
+            // este componente mostra deixaria de ser o número que se vê.
+            //
+            // A própria doc do pacote descreve esse conflito na seção do Cinemachine: dois
+            // sistemas disputando orthographicSize "would cause them to fight for control over
+            // the Camera and likely produce unwanted results".
+            _pixelPerfect = GetComponent<PixelPerfectCamera>();
+
+            if (_pixelPerfect == null) cam.orthographicSize = orthographicSize;
 
             if (target == null)
                 Debug.LogWarning("[IsometricCameraController] No target assigned. Camera will not follow.", this);
@@ -89,11 +103,27 @@ namespace FavelaAmarela.CameraSystem
         }
 
         /// <summary>
-        /// Updates the orthographic size at runtime (e.g., for zoom effects during Salto Dimensional).
+        /// Muda o zoom em tempo de execução (a ideia original era o efeito do Salto Dimensional).
+        ///
+        /// <para><b>Não faz efeito com o <c>PixelPerfectCamera</c> ligado</b>, e o aviso é
+        /// deliberado: o componente reescreve <c>orthographicSize</c> a cada quadro, então um
+        /// zoom por aqui seria desfeito no mesmo frame e o efeito simplesmente não aconteceria —
+        /// sem erro nenhum. Quando o Salto Dimensional for ganhar zoom de verdade, o caminho é a
+        /// resolução de referência do <c>PixelPerfectCamera</c>, não este método. Hoje ele não
+        /// tem um único chamador em produção.</para>
         /// </summary>
         public void SetZoom(float newSize)
         {
             orthographicSize = Mathf.Max(1f, newSize);
+
+            if (_pixelPerfect != null)
+            {
+                Debug.LogWarning($"[IsometricCameraController] SetZoom({newSize}) ignorado: o " +
+                                 "PixelPerfectCamera reescreve o tamanho a cada quadro. Mude a " +
+                                 "resolução de referência dele em vez disso.", this);
+                return;
+            }
+
             if (cam != null) cam.orthographicSize = orthographicSize;
         }
 

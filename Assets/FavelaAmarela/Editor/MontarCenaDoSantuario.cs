@@ -115,8 +115,10 @@ namespace FavelaAmarela.EditorTools
                 cam = go.GetComponent<Camera>();
             }
 
-            cam.orthographic = true;
-            cam.orthographicSize = 6f;
+            // Zoom, projeção, rotação e PixelPerfectCamera vêm de UM lugar (PadraoDeCamera).
+            // Cada ferramenta tinha o seu número escrito à mão e a cena ficava com o de
+            // quem rodasse por último.
+            PadraoDeCamera.Aplicar(cam, PadraoDeCamera.AmpliacaoDe(CenaSantuario));
             cam.backgroundColor = new Color(0.10f, 0.09f, 0.07f);  // interior: mais escuro que o deserto
             cam.transform.position = new Vector3(0f, 0f, -10f);
 
@@ -127,7 +129,6 @@ namespace FavelaAmarela.EditorTools
             {
                 var so = new SerializedObject(ctrl);
                 so.FindProperty("target").objectReferenceValue = jogador.transform;
-                so.FindProperty("orthographicSize").floatValue = 6f;
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
         }

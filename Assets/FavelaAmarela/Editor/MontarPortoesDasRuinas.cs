@@ -710,10 +710,14 @@ namespace FavelaAmarela.EditorTools
                 cam = go.GetComponent<UnityEngine.Camera>();
             }
 
-            cam.orthographic = true;
-            cam.orthographicSize = 7f; // um pouco mais aberta que o Castelo: a luta é aérea
+            // Zoom, projeção, rotação e PixelPerfectCamera vêm de UM lugar (PadraoDeCamera).
+            // Cada ferramenta tinha o seu número escrito à mão e a cena ficava com o de
+            // quem rodasse por último.
+            // Os Portões são ARENA: 3x em vez de 4x, porque a luta do Byakhee é aérea e a 4x
+            // o jogador perde o chefe de vista no meio do rasante. O 7 que estava aqui não era
+            // ampliacao inteira de nada -- 1080 / (7 x 2 x 32) = 2,41x.
+            PadraoDeCamera.Aplicar(cam, PadraoDeCamera.AmpliacaoDe(CenaPortoes));
             cam.backgroundColor = new Color(0.07f, 0.06f, 0.08f);
-            cam.transform.rotation = Quaternion.identity; // sem tilt — favela-isometric-standards
             cam.transform.position = new Vector3(0f, 0f, -10f);
 
             var ctrl = cam.GetComponent<IsometricCameraController>();
@@ -723,7 +727,6 @@ namespace FavelaAmarela.EditorTools
             {
                 var so = new SerializedObject(ctrl);
                 so.FindProperty("target").objectReferenceValue = jogador.transform;
-                so.FindProperty("orthographicSize").floatValue = 7f;
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
         }

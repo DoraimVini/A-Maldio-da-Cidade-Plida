@@ -47,8 +47,10 @@ namespace FavelaAmarela.EditorTools
             var camGO = new GameObject("Main Camera", typeof(Camera), typeof(IsometricCameraController));
             camGO.tag = "MainCamera";
             var cam = camGO.GetComponent<Camera>();
-            cam.orthographic = true;
-            cam.orthographicSize = 6f; // ~6 tiles de raio (level_design_deserto_hali.md §1.3)
+            // Zoom, projeção, rotação e PixelPerfectCamera vêm de UM lugar (PadraoDeCamera).
+            // Cada ferramenta tinha o seu número escrito à mão e a cena ficava com o de
+            // quem rodasse por último.
+            PadraoDeCamera.Aplicar(cam, PadraoDeCamera.AmpliacaoDe(ScenePath));
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.48f, 0.42f, 0.23f, 1f); // céu amarelo-ocre (#7A6A3A aprox.)
             camGO.transform.position = new Vector3(cfg.EntradaOffset.x, cfg.EntradaOffset.y, -10f);
@@ -87,7 +89,6 @@ namespace FavelaAmarela.EditorTools
             {
                 var so = new SerializedObject(camGO.GetComponent<IsometricCameraController>());
                 so.FindProperty("target").objectReferenceValue = player.transform;
-                so.FindProperty("orthographicSize").floatValue = 6f;
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
 

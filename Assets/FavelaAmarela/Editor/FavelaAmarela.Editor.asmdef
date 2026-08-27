@@ -6,9 +6,12 @@
         "FavelaAmarela.Runtime",
         "FavelaAmarela.Level",
         "Unity.InputSystem",
-        "Unity.2D.Sprite.Editor"
+        "Unity.2D.Sprite.Editor",
+        "Unity.2D.PixelPerfect"
     ],
-    "includePlatforms": ["Editor"],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

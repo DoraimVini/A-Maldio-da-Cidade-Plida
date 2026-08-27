@@ -825,8 +825,10 @@ namespace FavelaAmarela.EditorTools
                 cam = go.GetComponent<UnityEngine.Camera>();
             }
 
-            cam.orthographic = true;
-            cam.orthographicSize = 6f;
+            // Zoom, projeção, rotação e PixelPerfectCamera vêm de UM lugar (PadraoDeCamera).
+            // Cada ferramenta tinha o seu número escrito à mão e a cena ficava com o de
+            // quem rodasse por último.
+            PadraoDeCamera.Aplicar(cam, PadraoDeCamera.AmpliacaoDe(CenaCastelo));
             // Mais escuro que o Santuário: o Castelo é claustrofóbico (design §1.2).
             cam.backgroundColor = new Color(0.04f, 0.03f, 0.05f);
             cam.transform.position = new Vector3(0f, CentroZ1.y, -10f);
@@ -838,7 +840,6 @@ namespace FavelaAmarela.EditorTools
             {
                 var so = new SerializedObject(ctrl);
                 so.FindProperty("target").objectReferenceValue = jogador.transform;
-                so.FindProperty("orthographicSize").floatValue = 6f;
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
         }

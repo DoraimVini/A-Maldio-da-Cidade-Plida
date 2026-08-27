@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -39,19 +40,19 @@ namespace FavelaAmarela.EditorTools
     /// </summary>
     public static class PadronizarCanvasDasCenas
     {
-        private static readonly string[] Cenas =
-        {
-            "Assets/Scenes/Cena_Menu.unity",
-            "Assets/Scenes/Deserto_Hali.unity",
-            "Assets/Scenes/Playtest_RuinasPalidas.unity",
-            "Assets/Scenes/Santuario_Yhtill.unity",
-            "Assets/Scenes/Cena_ArenaDeTestes.unity",
-            // Acrescentadas em 2026-08-20. Terceira lista de cenas do projeto que tinha
-            // parado antes do Castelo e dos Portões existirem — as outras duas eram a do
-            // BuildHUDCompleto e a do HudCompletoTests.
-            "Assets/Scenes/Portoes_Das_Ruinas.unity",
-            "Assets/Scenes/Castelo_Carcosa.unity",
-        };
+        /// <summary>
+        /// As cenas saem do <b>disco</b>, não de uma lista.
+        ///
+        /// <para>Aqui havia um array escrito à mão que o próprio comentário dele já denunciava:
+        /// <i>"Acrescentadas em 2026-08-20. Terceira lista de cenas do projeto que tinha parado
+        /// antes do Castelo e dos Portões existirem"</i>. Uma lista que envelheceu, foi
+        /// remendada, e ficou lista. Cena nova agora entra sozinha.</para>
+        /// </summary>
+        private static IEnumerable<string> Cenas() =>
+            System.IO.Directory
+                .GetFiles("Assets/Scenes", "*.unity", System.IO.SearchOption.AllDirectories)
+                .Select(c => c.Replace(System.IO.Path.DirectorySeparatorChar, '/'))
+                .OrderBy(c => c);
 
         /// <summary>Referência que o menu já usava — a única cena cuja UI estava correta.</summary>
         private static readonly Vector2 ResolucaoDeReferencia = new Vector2(1920f, 1080f);
@@ -87,7 +88,7 @@ namespace FavelaAmarela.EditorTools
             foreach (var caminho in PrefabsComCanvas)
                 resumo.Add(PadronizarPrefab(caminho));
 
-            foreach (var caminho in Cenas)
+            foreach (var caminho in Cenas())
             {
                 if (!System.IO.File.Exists(caminho))
                 {
@@ -122,61 +123,31 @@ namespace FavelaAmarela.EditorTools
         // ── Escala do mundo (zoom da câmera) ───────────────────────
 
         /// <summary>
-        /// Zoom padrão. <b>4,21875 não é número arbitrário:</b> a PPU do projeto é 32, então
-        /// <c>ortho × 2 × 32</c> é a altura da arte em pixels — aqui, 270 px, que cabem
-        /// <b>exatamente 4 vezes</b> nos 1080 do alvo. Ampliação inteira significa todo pixel de
-        /// arte com o mesmo tamanho na tela; qualquer outro valor mistura pixels de 3 e 4, e a
-        /// pixel art "brilha" ao mover.
+        /// Põe as câmeras da cena no padrão do jogo. Mexe <b>só na câmera</b>: a escala do mapa
+        /// em si (tamanho das salas, distâncias) o Vini decidiu tratar fora do Vertical Slice.
         ///
-        /// <para>O valor anterior era <c>6</c> — 384 px, ou <b>2,81×</b>. Não inteiro, e mais
-        /// distante: foi o "está tudo pequeno demais" que o Vini relatou. 4,21875 aproxima 42%.</para>
-        /// </summary>
-        private const float ZoomPadrao = 4.21875f;
-
-        /// <summary>
-        /// Zoom das arenas de chefe: <b>3×</b> inteiro (360 px). Mais aberto que o padrão de
-        /// propósito — a luta do Byakhee é aérea, com rasantes que atravessam a arena, e a 4× o
-        /// jogador perderia o chefe de vista no meio do mergulho.
-        /// </summary>
-        private const float ZoomDeArena = 5.625f;
-
-        private static bool EhArena(string caminho)
-            => caminho.EndsWith("Portoes_Das_Ruinas.unity")
-               || caminho.EndsWith("Cena_ArenaDeTestes.unity");
-
-        /// <summary>
-        /// Põe as câmeras da cena no zoom padrão. Mexe <b>só no zoom</b>: a escala do mapa em si
-        /// (tamanho das salas, distâncias) o Vini decidiu tratar fora do Vertical Slice.
+        /// <para>O zoom, a projeção, a rotação e o <c>PixelPerfectCamera</c> saem todos de
+        /// <see cref="PadraoDeCamera"/>. As constantes que moravam aqui (4,21875 e 5,625) viraram
+        /// <c>EscalaDePixel.TamanhoOrtografico</c> — eram a única cópia certa entre sete, e
+        /// mesmo assim uma <c>if (!cam.orthographic) continue;</c> impedia a ferramenta de
+        /// tocar na única cena que estava em perspectiva.</para>
         /// </summary>
         private static int PadronizarCameras(string caminho)
         {
-            float alvo = EhArena(caminho) ? ZoomDeArena : ZoomPadrao;
+            int ampliacao = PadraoDeCamera.AmpliacaoDe(caminho);
             int mexidas = 0;
 
             foreach (var cam in Object.FindObjectsByType<Camera>(
                          FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
-                if (!cam.orthographic) continue;
-                if (Mathf.Approximately(cam.orthographicSize, alvo)) continue;
+                // Só a câmera de JOGO, e a marca disso é ela seguir o Damião. A do menu não
+                // enquadra mundo nenhum: dar a ela uma resolução de referência de pixel art
+                // mexeria no layout da UI para resolver um problema que ela não tem. É uma
+                // regra derivada, não outra lista de cenas.
+                if (cam.GetComponent<FavelaAmarela.CameraSystem.IsometricCameraController>() == null)
+                    continue;
 
-                cam.orthographicSize = alvo;
-                EditorUtility.SetDirty(cam);
-
-                // O controlador tem cópia própria do tamanho e a reimpõe no Awake: mudar só a
-                // Camera daria a impressão de resolver e voltaria ao antigo em Play.
-                var ctrl = cam.GetComponent<FavelaAmarela.CameraSystem.IsometricCameraController>();
-                if (ctrl != null)
-                {
-                    var so = new SerializedObject(ctrl);
-                    var prop = so.FindProperty("orthographicSize");
-                    if (prop != null)
-                    {
-                        prop.floatValue = alvo;
-                        so.ApplyModifiedPropertiesWithoutUndo();
-                    }
-                }
-
-                mexidas++;
+                if (PadraoDeCamera.Aplicar(cam, ampliacao).Count > 0) mexidas++;
             }
 
             return mexidas;

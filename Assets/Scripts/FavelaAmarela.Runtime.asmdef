@@ -3,7 +3,8 @@
     "rootNamespace": "FavelaAmarela",
     "references": [
         "Unity.InputSystem",
-        "FavelaAmarela.Core"
+        "FavelaAmarela.Core",
+        "Unity.2D.PixelPerfect"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
