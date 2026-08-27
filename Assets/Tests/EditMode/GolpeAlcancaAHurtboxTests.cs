@@ -168,10 +168,22 @@ namespace FavelaAmarela.Tests.EditMode
         /// <c>PedraDePoder</c>, <c>VitalidadeBridge</c>). É exatamente o tipo de coisa que a
         /// próxima classe esquece.</para>
         ///
-        /// <para>Nota do levantamento de 2026-08-27: <c>CoisaDoCemiterio</c>,
-        /// <c>EspectroHali</c> e <c>ReiEmAmarelo</c> <b>não</b> aparecem aqui porque não
-        /// implementam <c>IDanificavel</c> — nunca foram feríveis pelo golpe do jogador. Não é
-        /// regressão da máscara; é desenho a confirmar com o Vini.</para>
+        /// <para><b>Os três que não aparecem aqui, e por quê (verificado em 2026-08-27).</b>
+        /// <c>CoisaDoCemiterio</c>, <c>EspectroHali</c> e <c>ReiEmAmarelo</c> não implementam
+        /// <c>IDanificavel</c>, então o golpe do jogador nunca os feriu — e isso <b>não</b> é
+        /// regressão da máscara estreita, é decisão de design escrita no próprio código:</para>
+        ///
+        /// <list type="bullet">
+        ///   <item><c>ReiEmAmareloAI</c>: <i>"Sem EnemyBase, sem Vitalidade, sem IDanificavel —
+        ///   de propósito. O design é explícito: 'não há barra de vida'. Este não é um inimigo
+        ///   que se ataca; é um rito que se sobrevive."</i> Ele é <b>selado por relíquia</b>, e
+        ///   travar uma relíquia é o equivalente ficcional de acertá-lo.</item>
+        ///   <item><c>CoisaDoCemiterioAI</c>: mata por contato, não por troca de golpes.</item>
+        ///   <item><c>EspectroAI</c>: dirigido por cutscene, não é unidade de combate.</item>
+        /// </list>
+        ///
+        /// <para>Fica registrado aqui porque a ausência deles nesta lista é a primeira coisa que
+        /// parece defeito quando se lê este teste.</para>
         /// </summary>
         [Test]
         public void TodoDanificavel_GaranteASuaHurtbox()
