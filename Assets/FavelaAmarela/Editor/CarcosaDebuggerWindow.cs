@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using FavelaAmarela.Core.Artefatos;
@@ -37,12 +38,24 @@ namespace FavelaAmarela.EditorTools
             ("coroa_de_ossos", "Coroa de Ossos"),
         };
 
-        private static readonly (string Id, string Nome)[] Armas =
+        /// <summary>
+        /// As armas do catálogo, <b>lidas do disco</b>.
+        ///
+        /// <para>Era um array de GUIDs escritos à mão — a <b>quarta</b> lista de armas do
+        /// projeto, depois do enum <c>TipoArmaFisica</c>, do dicionário da fábrica e do
+        /// <c>ArmaDeTeste</c> da bridge (as três outras saíram na Fase 4). Uma arma nova criada
+        /// pela forja não aparecia aqui até alguém editar este array.</para>
+        /// </summary>
+        private static (string Id, string Nome)[] Armas()
         {
-            ("4a3de7951b884046a800dc2b14b4acca", "Cravo de Aklo"),
-            ("c360f6eeb0b14b5ba40c9ddd16161367", "Estilete de Irem"),
-            ("a56ffb4e4c154feea0cf7b0cd72c8537", "Alfanje de Alhazred"),
-        };
+            var itens = Resources.LoadAll<ItemDef>("");
+            if (itens == null) return new (string, string)[0];
+
+            return itens.Where(d => d != null && d.Tipo == ItemType.Arma)
+                        .OrderBy(d => d.Nome)
+                        .Select(d => (d.Id, string.IsNullOrWhiteSpace(d.Nome) ? d.name : d.Nome))
+                        .ToArray();
+        }
 
         private Vector2 _scroll;
 
@@ -62,18 +75,40 @@ namespace FavelaAmarela.EditorTools
             EditorApplication.update -= Repaint;
         }
 
+        /// <summary>As duas metades da janela. Só uma delas exige Play Mode.</summary>
+        private enum Aba { Partida, Forja }
+
+        private Aba _aba = Aba.Partida;
+
         private void OnGUI()
+        {
+            // A FORJA funciona fora do Play Mode, e isso não é detalhe: criar item é AUTORIA,
+            // e autoria acontece com o jogo parado. Antes desta separação a janela inteira
+            // recusava trabalhar fora do Play Mode, porque toda ela dependia dos singletons.
+            _aba = (Aba)GUILayout.Toolbar((int)_aba,
+                new[] { "Partida (Play Mode)", "Forja de Itens" });
+
+            GUILayout.Space(6);
+
+            _scroll = EditorGUILayout.BeginScrollView(_scroll);
+
+            if (_aba == Aba.Forja) DesenharForja();
+            else DesenharPartida();
+
+            EditorGUILayout.EndScrollView();
+        }
+
+        private void DesenharPartida()
         {
             if (!EditorApplication.isPlaying)
             {
                 EditorGUILayout.HelpBox(
-                    "Entre em Play Mode para usar o debugger — ele depende dos singletons " +
-                    "de cena (GameManager, InventoryManager) e do Player.",
+                    "Entre em Play Mode para usar esta aba — ela depende dos singletons " +
+                    "de cena (GameManager, InventoryManager) e do Player. " +
+                    "A aba Forja funciona com o jogo parado.",
                     MessageType.Info);
                 return;
             }
-
-            _scroll = EditorGUILayout.BeginScrollView(_scroll);
 
             DesenharSecaoArtefatos();
             GUILayout.Space(8);
@@ -84,8 +119,188 @@ namespace FavelaAmarela.EditorTools
             DesenharSecaoChefes();
             GUILayout.Space(8);
             DesenharEstadoAoVivo();
+        }
 
-            EditorGUILayout.EndScrollView();
+        // -- Forja de Itens ---------------------------------------------------
+        //
+        // A referencia que o Vini deu foi o Pokesav: nao um cheat de "god mode", mas um EDITOR
+        // que cria o item com os atributos que voce quiser e o injeta no jogo. A diferenca
+        // importante e que o Pokesav escrevia no arquivo de save, e esta forja escreve ASSET.
+        //
+        // Escrever asset nao e detalhe de implementacao -- e a diferenca entre funcionar e
+        // corromper. Um ItemDef criado so em memoria (via ItemDatabase.Registrar) some no
+        // reload, porque o banco reconstroi o cache so de Resources.LoadAll. E como o save
+        // guarda IDs, um encostao num RefugioDeLuz -- que grava em disco sozinho -- deixaria a
+        // partida referenciando um item que nao existe mais. Pior: BaseInventory.CanAdd recusa
+        // Def nulo SEM LOG NENHUM, entao o item sumiria da mochila em silencio.
+
+        /// <summary>Onde o item precisa nascer para existir em runtime.</summary>
+        private const string PastaDosItens = "Assets/FavelaAmarela/Config/Resources/Itens";
+
+        private readonly ReceitaDeItem _receita = new ReceitaDeItem();
+        private Sprite _icone;
+        private bool _idManual;
+
+        private void DesenharForja()
+        {
+            EditorGUILayout.LabelField("Forja de Itens", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox(
+                "Cria um ItemDef de verdade em " + PastaDosItens + ".\n" +
+                "Fora de Resources o item nao existe em runtime; em memoria, ele some no " +
+                "reload e leva o save junto.", MessageType.None);
+
+            GUILayout.Space(4);
+
+            EditorGUI.BeginChangeCheck();
+            _receita.Nome = EditorGUILayout.TextField("Nome (visivel)", _receita.Nome);
+            if (EditorGUI.EndChangeCheck() && !_idManual)
+                _receita.Id = ReceitaDeItem.SugerirId(_receita.Nome);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUI.BeginChangeCheck();
+                _receita.Id = EditorGUILayout.TextField("Id (catalogo/save)", _receita.Id);
+                if (EditorGUI.EndChangeCheck()) _idManual = true;
+
+                if (GUILayout.Button("auto", GUILayout.Width(48)))
+                {
+                    _receita.Id = ReceitaDeItem.SugerirId(_receita.Nome);
+                    _idManual = false;
+                    GUI.FocusControl(null);
+                }
+            }
+
+            _icone = (Sprite)EditorGUILayout.ObjectField("Icone", _icone, typeof(Sprite), false);
+            _receita.TemIcone = _icone != null;
+
+            GUILayout.Space(4);
+
+            _receita.Tipo = (ItemType)EditorGUILayout.EnumPopup("Tipo", _receita.Tipo);
+            _receita.Slot = (EquipmentSlot)EditorGUILayout.EnumPopup("Slot", _receita.Slot);
+            _receita.EmpilhamentoMaximo =
+                EditorGUILayout.IntField("Empilhamento max.", _receita.EmpilhamentoMaximo);
+
+            if (_receita.Tipo == ItemType.Arma)
+                _receita.Empunhadura =
+                    (Empunhadura)EditorGUILayout.EnumPopup("Empunhadura", _receita.Empunhadura);
+
+            GUILayout.Space(6);
+            DesenharModificadores();
+            GUILayout.Space(6);
+            DesenharValidacaoECriacao();
+        }
+
+        private void DesenharModificadores()
+        {
+            EditorGUILayout.LabelField("Modificadores implicitos", EditorStyles.boldLabel);
+
+            for (int i = 0; i < _receita.Modificadores.Count; i++)
+            {
+                var mod = _receita.Modificadores[i];
+
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    mod.Stat = (StatType)EditorGUILayout.EnumPopup(mod.Stat);
+                    mod.Valor = EditorGUILayout.FloatField(mod.Valor, GUILayout.Width(70));
+
+                    if (GUILayout.Button("-", GUILayout.Width(24)))
+                    {
+                        _receita.Modificadores.RemoveAt(i);
+                        return;
+                    }
+                }
+
+                _receita.Modificadores[i] = mod;
+
+                // O aviso vem POR LINHA, na hora, e nao so na validacao final: quem esta
+                // autorando precisa saber que aquele atributo nao faz nada ANTES de terminar
+                // de montar o item em cima dele.
+                if (ReceitaDeItem.AtributosSemEfeito.Contains(mod.Stat))
+                    EditorGUILayout.HelpBox(
+                        "'" + NomesDeAtributo.De(mod.Stat) + "' NAO TEM EFEITO no jogo -- " +
+                        "nenhum sistema le este atributo. O jogador leria o numero e nao " +
+                        "receberia nada.", MessageType.Error);
+            }
+
+            if (GUILayout.Button("+ Modificador"))
+                _receita.Modificadores.Add(new ModificadorFixo(StatType.VitMaxima, 1f));
+        }
+
+        private void DesenharValidacaoECriacao()
+        {
+            var existentes = Resources.LoadAll<ItemDef>("")
+                                      .Where(d => d != null)
+                                      .Select(d => d.Id)
+                                      .ToList();
+
+            var problemas = _receita.Problemas(existentes);
+
+            foreach (var p in problemas) EditorGUILayout.HelpBox(p, MessageType.Error);
+            foreach (var a in _receita.Avisos()) EditorGUILayout.HelpBox(a, MessageType.Warning);
+
+            using (new EditorGUI.DisabledScope(problemas.Count > 0))
+            {
+                if (GUILayout.Button("Forjar item", GUILayout.Height(28)))
+                    Forjar();
+            }
+
+            if (problemas.Count > 0)
+                EditorGUILayout.LabelField(problemas.Count + " problema(s) impedem a criacao.",
+                                           EditorStyles.miniLabel);
+        }
+
+        /// <summary>
+        /// Escreve o asset. Segue o padrao de <c>GeradorDeReliquias</c>: garante a pasta,
+        /// carrega antes de criar (para nao perder o GUID de um asset ja existente), e fecha
+        /// com <c>SetDirty</c> + <c>SaveAssetIfDirty</c>.
+        /// </summary>
+        private void Forjar()
+        {
+            if (!AssetDatabase.IsValidFolder(PastaDosItens))
+            {
+                Debug.LogError("[Forja] Pasta '" + PastaDosItens + "' nao existe.");
+                return;
+            }
+
+            string arquivo = "Item_" + _receita.Id;
+            string caminho = PastaDosItens + "/" + arquivo + ".asset";
+
+            if (System.IO.File.Exists(caminho) &&
+                !EditorUtility.DisplayDialog("Item ja existe",
+                    "'" + arquivo + "' ja existe em " + PastaDosItens + ".\n\nSobrescrever?",
+                    "Sim, sobrescrever", "Cancelar"))
+                return;
+
+            var def = AssetDatabase.LoadAssetAtPath<ItemDef>(caminho);
+            bool existia = def != null;
+
+            if (!existia)
+            {
+                def = ScriptableObject.CreateInstance<ItemDef>();
+                AssetDatabase.CreateAsset(def, caminho);
+            }
+
+            def.Id = _receita.Id;
+            def.Nome = _receita.Nome;
+            def.Icone = _icone;
+            def.Tipo = _receita.Tipo;
+            def.SlotEquipamento = _receita.Slot;
+            def.EmpilhamentoMaximo = _receita.EmpilhamentoMaximo;
+            def.Empunhadura = _receita.Empunhadura;
+            def.Modificadores = new List<ModificadorFixo>(_receita.Modificadores);
+
+            EditorUtility.SetDirty(def);
+            AssetDatabase.SaveAssetIfDirty(def);
+            AssetDatabase.Refresh();
+
+            // O catalogo em runtime e um cache: sem recarregar, o item novo so apareceria no
+            // proximo Play Mode.
+            CatalogoDeAfixos.Recarregar();
+
+            Debug.Log("[Forja] '" + _receita.Nome + "' " + (existia ? "atualizado" : "criado") +
+                      " em " + caminho + ". Id: " + _receita.Id, def);
+
+            EditorGUIUtility.PingObject(def);
         }
 
         // ── Artefatos ─────────────────────────────────────────────────────────
@@ -236,7 +451,7 @@ namespace FavelaAmarela.EditorTools
             var inv = InventoryManager.Instance;
             using (new EditorGUI.DisabledScope(inv == null))
             {
-                foreach (var (id, nome) in Armas)
+                foreach (var (id, nome) in Armas())
                 {
                     if (GUILayout.Button($"Conceder e equipar: {nome}"))
                         ConcederArma(inv, id, nome);

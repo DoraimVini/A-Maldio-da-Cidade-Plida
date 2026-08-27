@@ -16,6 +16,41 @@ namespace FavelaAmarela.Inventario
     /// </summary>
     public static class NomesDeAtributo
     {
+        /// <summary>
+        /// Os atributos <b>sem consumidor no jogo</b>. Autorar um item ou afixo em cima de um
+        /// deles produz algo que <b>mente</b>: o jogador lê o número, ocupa o slot e não recebe
+        /// nada.
+        ///
+        /// <para><c>DefesaAnomalia</c> é o pior caso — o <c>PainelDeFicha</c> <b>exibe</b> a
+        /// linha e o combate não aplica. <c>RCMaxima</c> e <c>Velocidade</c> não têm uma única
+        /// menção em <c>Assets/Scripts</c>; <c>Furtividade</c> é autorada no Anel do Sinal
+        /// Amarelo e nenhum sistema de stealth a lê.</para>
+        ///
+        /// <para><b>Mora aqui, e não em três lugares.</b> Ela estava duplicada na validação da
+        /// forja, no guarda do pool de afixos e implicitamente no <c>PainelDeFicha</c> — três
+        /// cópias que divergiriam na primeira vez que alguém implementasse um dos quatro. A
+        /// fonte da verdade sobre o que é consumido continua sendo
+        /// <c>PainelDeFicha.AtributoConsomeBonus</c>, cruzada com o código por
+        /// <c>AtributosConsumidosTests</c>; esta é a lista do lado de quem AUTORA.</para>
+        /// </summary>
+        public static readonly System.Collections.Generic.IReadOnlyList<StatType> SemEfeito =
+            new[]
+            {
+                StatType.RCMaxima,
+                StatType.Velocidade,
+                StatType.Furtividade,
+                StatType.DefesaAnomalia,
+            };
+
+        /// <summary>Se este atributo não faz nada em jogo.</summary>
+        public static bool NaoTemEfeito(StatType stat)
+        {
+            for (int i = 0; i < SemEfeito.Count; i++)
+                if (SemEfeito[i] == stat) return true;
+
+            return false;
+        }
+
         /// <summary>Nome diegético do atributo.</summary>
         public static string De(StatType stat) => stat switch
         {

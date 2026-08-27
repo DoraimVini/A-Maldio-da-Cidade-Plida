@@ -27,18 +27,11 @@ namespace FavelaAmarela.Tests.EditMode
         private const string Pasta = "Assets/FavelaAmarela/Config/Resources/Afixos";
 
         /// <summary>
-        /// Os <c>StatType</c> sem consumidor no jogo. A fonte da verdade sobre isto é
-        /// <c>PainelDeFicha.AtributoConsomeBonus</c>, cruzada com o código por
-        /// <c>AtributosConsumidosTests</c> — esta lista é o espelho dela do lado do loot.
+        /// Os atributos sem consumidor no jogo — lidos de <c>NomesDeAtributo.SemEfeito</c>, o
+        /// único lugar que os declara. Uma cópia aqui divergiria no dia em que um deles fosse
+        /// implementado, e o guarda passaria a barrar um afixo perfeitamente válido.
         /// </summary>
-        private static readonly HashSet<StatType> Decorativos = new HashSet<StatType>
-        {
-            StatType.RCMaxima,       // Resiliência do Companheiro nunca foi ligada
-            StatType.Velocidade,     // zero menções em Assets/Scripts
-            StatType.Furtividade,    // autorado no Anel, mas nenhum sistema de stealth lê
-            StatType.DefesaAnomalia, // exibido na ficha, NÃO aplicado no combate — o pior caso
-            StatType.RMMaxima,       // só funciona como consumível, não como passiva
-        };
+        private static bool EhDecorativo(StatType stat) => NomesDeAtributo.NaoTemEfeito(stat);
 
         private static AfixoDef[] Todos() =>
             Directory.Exists(Pasta)
@@ -66,7 +59,7 @@ namespace FavelaAmarela.Tests.EditMode
         public void NenhumAfixo_RolaUmAtributoSemEfeito()
         {
             var mentirosos = Todos()
-                .Where(a => Decorativos.Contains(a.Stat))
+                .Where(a => EhDecorativo(a.Stat))
                 .Select(a => $"{a.name} rola {a.Stat}")
                 .ToList();
 
