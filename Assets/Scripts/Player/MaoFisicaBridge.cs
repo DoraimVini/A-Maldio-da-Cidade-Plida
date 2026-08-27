@@ -51,6 +51,21 @@ namespace FavelaAmarela.Player
 
         private IArmaComHabilidade _armaEquipada;
 
+        /// <summary>
+        /// A <b>família</b> da arma empunhada — alcance, raio e janela do golpe. Nula quando o
+        /// item não tem base ligada (armas ainda não migradas) ou quando Damião está desarmado;
+        /// nesses casos vale a geometria padrão, idêntica à de antes da migração.
+        /// </summary>
+        private BaseDeArma _baseDaArma;
+
+        /// <summary>
+        /// A área que causa dano. Antes de 2026-08-27 o golpe do jogador era uma consulta
+        /// instantânea que falava direto com <c>IDanificavel</c>, <b>pulando a Hurtbox</b> —
+        /// enquanto os inimigos usavam <c>Hitbox</c> com janela ativa. Eram dois modelos de
+        /// dano no mesmo jogo, e só um deles permitia esquivar no tempo certo.
+        /// </summary>
+        private Hitbox _hitbox;
+
         // Identificador serializável da arma empunhada. A instância de IArmaComHabilidade
         // não sobrevive a uma troca de cena; o enum sim, e a fábrica reconstrói a arma.
         private TipoArmaFisica? _idDaArmaEquipada;
@@ -59,25 +74,10 @@ namespace FavelaAmarela.Player
         private float _lastAbilityUseTime = -999f;
         private PlayerStateMachine _fsm;
 
-        // Buffer pré-alocado + filtro para resolver o golpe sem alocar lixo por golpe
-        // (Regra de Ouro 1). 8 slots cobrem o alcance melee.
-        private readonly Collider2D[] _hitBuffer = new Collider2D[8];
-        private ContactFilter2D _filtroInimigos;
-
-        /// <summary>
-        /// Alvos já feridos <b>neste</b> golpe. Existe porque a consulta devolve
-        /// <b>colisores</b>, não entidades: com a separação hitbox/hurtbox, um mesmo inimigo
-        /// aparece duas vezes (o colisor de movimento na camada <c>Enemy</c> e a hurtbox na
-        /// <c>EnemyHurtbox</c>) e levaria <b>dano dobrado</b>.
-        ///
-        /// <para>Não é defeito novo: qualquer inimigo com dois colisores na camada consultada
-        /// já era ferido duas vezes por golpe antes disto — só não havia nenhum, então nunca
-        /// apareceu.</para>
-        ///
-        /// <para><c>Clear()</c> não aloca, então reusar o conjunto respeita a Regra de Ouro 1.</para>
-        /// </summary>
-        private readonly System.Collections.Generic.HashSet<IDanificavel> _jaFeridos =
-            new System.Collections.Generic.HashSet<IDanificavel>();
+        // O buffer, o ContactFilter2D e o HashSet<IDanificavel> que viviam aqui saíram em
+        // 2026-08-27: a resolução do golpe passou para a Hitbox, que tem os seus próprios
+        // (e de-duplica por Hurtbox, não por IDanificavel). Manter cópias mortas aqui seria
+        // a mesma podridão que este repositório já catalogou nove vezes.
 
         /// <summary>Direção e duração do ataque básico executado.</summary>
         public event Action<Vector2, float> OnAtaqueExecutado;
@@ -172,12 +172,45 @@ namespace FavelaAmarela.Player
                 // 0,60 × 0,30 — acertar só isso seria acertar os pés).
                 camadaInimigos = LayerMask.GetMask("Enemy", "EnemyHurtbox");
 
-            _filtroInimigos = new ContactFilter2D();
-            _filtroInimigos.useTriggers = true;
-            _filtroInimigos.SetLayerMask(camadaInimigos);
+            GarantirHitbox();
 
             var armaTeste = CriarArmaDeTeste(armaInicialParaTeste);
             if (armaTeste != null) EquiparArma(armaTeste);
+        }
+
+        // ── Geometria do golpe, vinda da arma ─────────────────────────────────
+
+        /// <summary>Alcance da arma empunhada, ou o padrão quando não há base ligada.</summary>
+        private float AlcanceAtual => _baseDaArma != null ? _baseDaArma.Alcance : alcance;
+
+        /// <summary>Raio da área atingida.</summary>
+        private float RaioAtual =>
+            _baseDaArma != null ? _baseDaArma.Raio : BaseDeArma.RaioPadrao;
+
+        /// <summary>Quanto tempo a área fica ativa.</summary>
+        private float JanelaAtual =>
+            _baseDaArma != null ? _baseDaArma.JanelaAtiva : BaseDeArma.JanelaPadrao;
+
+        /// <summary>
+        /// Cria (ou reconfigura) a hitbox com a geometria da arma atual. Chamada de novo a cada
+        /// troca de arma: é o que faz um estilete e um alfanje terem pegadas diferentes.
+        ///
+        /// <para><c>pouparAliados: true</c> preserva a proteção que a consulta antiga fazia à
+        /// mão — Yug-Neth e companheiros futuros nunca são atingidos pelo golpe do jogador. A
+        /// taxonomia de layers do projeto é fechada, então quem protege é o marcador
+        /// <c>Aliado</c>, não uma camada própria.</para>
+        /// </summary>
+        /// <summary>Troca a família da arma e reconfigura a área do golpe.</summary>
+        private void AplicarBase(BaseDeArma nova)
+        {
+            _baseDaArma = nova;
+            GarantirHitbox();
+        }
+
+        private void GarantirHitbox()
+        {
+            _hitbox = Hitbox.GarantirPara(gameObject, "Hitbox_MaoFisica", camadaInimigos,
+                                          RaioAtual, AlcanceAtual, pouparAliados: true);
         }
 
         /// <summary>
@@ -240,11 +273,17 @@ namespace FavelaAmarela.Player
             // Slot esvaziado (desequipou): Damião volta a lutar de mão vazia.
             if (slot == null || slot.Def == null)
             {
+                AplicarBase(null);
                 EquiparArma(TipoArmaFisica.MaoVazia);
                 return;
             }
 
             if (slot.Def.Tipo != ItemType.Arma) return;
+
+            // A FAMÍLIA vem junto com a arma: é ela que muda alcance, raio e janela do golpe.
+            // Sem esta linha, trocar de arma trocaria só os números de dano e o golpe
+            // continuaria com a mesma pegada -- que era o estado até 2026-08-27.
+            AplicarBase(slot.Def.Base);
 
             // Sobrecarga com o identificador: só ela deixa o save reequipar depois da troca de cena.
             EquiparArma(slot.Def.ArmaFisica);
@@ -334,63 +373,42 @@ namespace FavelaAmarela.Player
         private static float BonusPassivo(StatType atributo)
             => GerenciadorEfeitosPassivos.Instance?.GetBonus(atributo) ?? 0f;
 
+        /// <summary>
+        /// Arma a área do golpe. <b>Não resolve dano aqui</b> — quem resolve é a
+        /// <see cref="Hitbox"/>, durante a janela ativa.
+        ///
+        /// <para><b>O que mudou em 2026-08-27.</b> Este método fazia um
+        /// <c>Physics2D.OverlapCircle</c> instantâneo e chamava <c>IDanificavel.ReceberGolpe</c>
+        /// direto, <b>pulando a Hurtbox</b> — enquanto o Byakhee já usava <c>Hitbox</c> com
+        /// janela ativa. Eram <b>dois modelos de dano no mesmo jogo</b>, e só o do inimigo
+        /// permitia esquivar no tempo certo: contra o Damião, o golpe era um teste de posição
+        /// num quadro, sem nada para ler nem quando reagir.</para>
+        ///
+        /// <para>Agora os dois lados usam a mesma peça. A de-duplicação por alvo, a proteção
+        /// aos aliados, a repulsão e o hit-stop passaram todos a viver na <c>Hitbox</c> — um
+        /// lugar só, em vez de dois que divergem.</para>
+        /// </summary>
         private void ResolverGolpe(Vector2 direcao, ArmaResult resultado)
         {
-            Vector2 centro = (Vector2)transform.position + direcao.normalized * (alcance * 0.5f);
-            int total = Physics2D.OverlapCircle(centro, alcance * 0.5f, _filtroInimigos, _hitBuffer);
+            if (_hitbox == null) GarantirHitbox();
 
-            int atingidos = 0;
-            _jaFeridos.Clear();
-
-            for (int i = 0; i < total; i++)
+            if (_hitbox == null)
             {
-                // Aliados (Yug-Neth e companheiros futuros) nunca são atingidos pelo golpe
-                // do jogador — nem por acidente no meio de uma luta. Checado ANTES do
-                // IDanificavel porque um aliado normalmente também é danificável: o que o
-                // protege é este marcador, não a ausência de vitalidade. Ver `Aliado`.
-                if (_hitBuffer[i].GetComponentInParent<Aliado>() != null) continue;
-
-                // Mira qualquer IDanificavel (Cultista, Aparição Primordial/boss...), não
-                // mais só o CultistaAI — é isto que permite as armas atingirem o Abdul.
-                // GetComponentInParent, e não GetComponent: o colisor pode estar num filho
-                // (sprite/hitbox separada) enquanto o script vive no objeto raiz — com
-                // GetComponent o golpe simplesmente não encontrava o alvo.
-                var alvo = _hitBuffer[i].GetComponentInParent<IDanificavel>();
-
-                // Add devolve false se já estava no conjunto — um inimigo atingido pelo
-                // colisor de movimento E pela hurtbox no mesmo golpe é ferido uma vez só.
-                if (alvo != null && _jaFeridos.Add(alvo))
-                {
-                    alvo.ReceberGolpe(resultado);
-
-                    // Corpo, não só aritmética. Até 2026-08-27 o golpe terminava aqui: o dano
-                    // era subtraído e nada no mundo se mexia. `ForcaRepulsao` existia no
-                    // ArmaResult, o Alfanje preenchia com 6, e NINGUÉM lia -- a arma cuja
-                    // identidade de design é "força bruta e espaço" não abria espaço nenhum.
-                    // A direção sai do jogador para o alvo, e não da direção do input, senão
-                    // um inimigo na borda do círculo voaria de lado.
-                    var empurrao = RepulsaoDeImpacto.GarantirPara(_hitBuffer[i]);
-                    if (empurrao != null)
-                    {
-                        Vector2 paraOAlvo =
-                            (Vector2)_hitBuffer[i].transform.position - (Vector2)transform.position;
-                        empurrao.Empurrar(paraOAlvo, resultado.ForcaRepulsao);
-                    }
-
-                    atingidos++;
-                }
+                Debug.LogError("[MaoFisicaBridge] Sem hitbox: o golpe não pode acertar nada.", this);
+                return;
             }
 
-            // Um só congelamento por golpe, mesmo acertando vários -- senão um golpe em área
-            // pararia o mundo N vezes mais que um golpe simples.
-            if (atingidos > 0) HitStop.Bater(resultado.Dano);
+            _hitbox.Armar(resultado, JanelaAtual, direcao);
 
             if (logarGolpes)
             {
                 string arma = _armaEquipada != null ? _armaEquipada.NomeDaArma : "DESARMADO (mão vazia)";
-                Debug.Log($"[Golpe] arma={arma} dano={resultado.Dano:0.##} " +
+                string familia = _baseDaArma != null ? _baseDaArma.NomeDaFamilia : "geometria padrão";
+
+                Debug.Log($"[Golpe] arma={arma} familia={familia} dano={resultado.Dano:0.##} " +
                           $"trauma={resultado.TraumaAnomalia:0.##} " +
-                          $"colisores={total} alvosAtingidos={atingidos}", this);
+                          $"alcance={AlcanceAtual:0.##} raio={RaioAtual:0.##} " +
+                          $"janela={JanelaAtual:0.###}s", this);
             }
         }
 

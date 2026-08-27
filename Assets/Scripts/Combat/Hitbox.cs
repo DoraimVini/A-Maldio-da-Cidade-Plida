@@ -56,6 +56,10 @@ namespace FavelaAmarela.Runtime.Combat
                  "(PlayerHurtbox para inimigos, EnemyHurtbox para o jogador).")]
         [SerializeField] private LayerMask camadasAlvo;
 
+        [Tooltip("Golpe do jogador: nunca acerta quem carrega o marcador Aliado. " +
+                 "Golpe de inimigo: DESLIGADO — o Byakhee pode e deve derrubar o companheiro.")]
+        [SerializeField] private bool pouparAliados;
+
         // Buffer reusado: alocar por golpe seria lixo em hot path (Regra de Ouro 1).
         private readonly Collider2D[] _buffer = new Collider2D[16];
         private readonly HashSet<Hurtbox> _jaAtingidos = new HashSet<Hurtbox>();
@@ -71,16 +75,76 @@ namespace FavelaAmarela.Runtime.Combat
         /// <summary>Centro da área em coordenadas de mundo.</summary>
         public Vector2 Centro => (Vector2)transform.position + deslocamento;
 
-        private void Awake()
+        private void Awake() => ReconstruirFiltro();
+
+        private void ReconstruirFiltro()
         {
             _filtro = new ContactFilter2D();
             // Hurtboxes são triggers, então sem isto a consulta não acharia nenhuma.
             _filtro.useTriggers = true;
             _filtro.SetLayerMask(camadasAlvo);
+        }
 
-            if (camadasAlvo.value == 0)
-                Debug.LogError($"[Hitbox] '{name}' está sem camada alvo — este golpe não pode " +
-                               "acertar nada.", this);
+        /// <summary>
+        /// Define a geometria do golpe a partir de dado — o alcance, o raio e a camada que
+        /// esta hitbox pode acertar.
+        ///
+        /// <para>Existe porque a geometria deixou de ser propriedade do <b>ator</b> e passou a
+        /// ser propriedade da <b>arma</b> (ver <c>BaseDeArma</c>). Antes de 2026-08-27 havia um
+        /// <c>alcance = 1.2f</c> no <c>MaoFisicaBridge</c> valendo para todas as armas, e por
+        /// isso um estilete e um alfanje tinham a mesma pegada.</para>
+        /// </summary>
+        /// <param name="raioDoGolpe">Raio da área atingida.</param>
+        /// <param name="distanciaAFrente">Do corpo até o centro da área.</param>
+        /// <param name="camadas">Camadas de hurtbox que este golpe alcança.</param>
+        public void Configurar(float raioDoGolpe, float distanciaAFrente, LayerMask camadas)
+        {
+            raio = Mathf.Max(0.05f, raioDoGolpe);
+
+            // Preserva a direção corrente e troca só a distância: `Armar` gira o deslocamento
+            // mantendo a magnitude, então uma magnitude zero aqui faria a direção do golpe ser
+            // ignorada para sempre — e o golpe sairia sempre em cima do próprio ator.
+            Vector2 direcao = deslocamento.sqrMagnitude > 0.0001f
+                ? deslocamento.normalized
+                : Vector2.right;
+
+            deslocamento = direcao * Mathf.Max(0.01f, distanciaAFrente);
+
+            camadasAlvo = camadas;
+            ReconstruirFiltro();
+        }
+
+        /// <summary>
+        /// Acha (ou cria) a hitbox de um ator, já configurada.
+        ///
+        /// <para>Nasce <b>inativa</b> e só é ligada depois de configurada — mesmo padrão de
+        /// <c>CarcosaDebuggerWindow.CriarCorpoDoChefe</c> —, para nenhum <c>Awake</c> rodar
+        /// antes de a camada alvo existir.</para>
+        /// </summary>
+        public static Hitbox GarantirPara(GameObject dono, string nome, LayerMask camadas,
+                                          float raioDoGolpe, float distanciaAFrente,
+                                          bool pouparAliados = false)
+        {
+            if (dono == null) return null;
+
+            foreach (var existente in dono.GetComponentsInChildren<Hitbox>(true))
+            {
+                if (existente.gameObject.name != nome) continue;
+                existente.pouparAliados = pouparAliados;
+                existente.Configurar(raioDoGolpe, distanciaAFrente, camadas);
+                return existente;
+            }
+
+            var go = new GameObject(nome);
+            go.SetActive(false);
+            go.transform.SetParent(dono.transform, false);
+
+            var hitbox = go.AddComponent<Hitbox>();
+            hitbox.pouparAliados = pouparAliados;
+            hitbox.Configurar(raioDoGolpe, distanciaAFrente, camadas);
+
+            go.SetActive(true);
+            return hitbox;
         }
 
         /// <summary>
@@ -95,6 +159,14 @@ namespace FavelaAmarela.Runtime.Combat
         /// </param>
         public void Armar(ArmaResult resultado, float duracaoAtiva, Vector2 direcao = default)
         {
+            // A checagem mora AQUI, e não no Awake, desde 2026-08-27: uma hitbox construída em
+            // runtime é configurada depois de existir, então reclamar no Awake acusaria toda
+            // hitbox nova por um estado que dura microssegundos. Aqui a reclamação é verdadeira:
+            // é o instante em que um golpe sai sem poder acertar nada.
+            if (camadasAlvo.value == 0)
+                Debug.LogError($"[Hitbox] '{name}' foi armada sem camada alvo — este golpe não " +
+                               "pode acertar nada.", this);
+
             _resultado = resultado;
             _fimDaJanela = Time.time + Mathf.Max(0f, duracaoAtiva);
             _ativa = true;
@@ -139,6 +211,13 @@ namespace FavelaAmarela.Runtime.Combat
 
                 // Não se fere a si mesmo: a hurtbox do próprio dono está na mesma hierarquia.
                 if (hurtbox.transform.IsChildOf(transform.root)) continue;
+
+                // Aliados (Yug-Neth e companheiros futuros) nunca são atingidos pelo golpe do
+                // jogador -- nem por acidente no meio de uma luta. A taxonomia de layers do
+                // projeto é um conjunto fechado, então quem protege é este MARCADOR, não uma
+                // camada própria (ver YugNethAI). A regra é do golpe e não da hitbox: o Byakhee
+                // pode e deve derrubar o companheiro.
+                if (pouparAliados && hurtbox.GetComponentInParent<Aliado>() != null) continue;
 
                 if (!_jaAtingidos.Add(hurtbox)) continue;
 

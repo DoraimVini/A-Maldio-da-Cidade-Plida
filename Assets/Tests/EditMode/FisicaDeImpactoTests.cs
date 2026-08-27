@@ -82,25 +82,28 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// Os dois — e apenas os dois — pontos onde um golpe aterrissa têm de aplicar repulsão:
-        /// o golpe do Damião e o golpe que acerta alguém pela <c>Hitbox</c>.
+        /// A repulsão tem <b>um dono só</b>: a <c>Hitbox</c>.
+        ///
+        /// <para>A primeira versão deste guarda exigia que <c>MaoFisicaBridge</c> e
+        /// <c>Hitbox</c> lessem <c>ForcaRepulsao</c> — porque, quando ele foi escrito, o jogador
+        /// resolvia o golpe por conta própria e o inimigo pela <c>Hitbox</c>. Eram <b>dois
+        /// modelos de dano no mesmo jogo</b>. A unificação da Fase 2 acabou com isso, e o
+        /// guarda foi atualizado junto: exigir dois leitores agora seria exigir de volta a
+        /// duplicação que a fase removeu.</para>
         /// </summary>
         [Test]
-        public void OsDoisCaminhosDeGolpe_AplicamRepulsao()
+        public void ARepulsao_TemUmDonoSo()
         {
-            var faltando = new List<string>();
+            StringAssert.Contains("ForcaRepulsao", Ler(HitboxArquivo),
+                "A Hitbox parou de ler ForcaRepulsao — ela é o único lugar onde um golpe " +
+                "aterrissa, então o empurrão volta a ser dado morto, que era o estado até " +
+                "2026-08-27: o Alfanje preenchia o campo com 6 e não empurrava nada.");
 
-            string bridge = Ler(Bridge);
-            if (!bridge.Contains("ForcaRepulsao"))
-                faltando.Add("MaoFisicaBridge não lê ForcaRepulsao — o golpe do Damião não empurra");
-
-            string hitbox = Ler(HitboxArquivo);
-            if (!hitbox.Contains("ForcaRepulsao"))
-                faltando.Add("Hitbox não lê ForcaRepulsao — o golpe do inimigo não empurra");
-
-            Assert.IsEmpty(faltando,
-                "ForcaRepulsao voltou a ser dado morto:" + Environment.NewLine + "  " +
-                string.Join(Environment.NewLine + "  ", faltando));
+            // A bridge NÃO deve reimplementar: se voltar a ler o campo, é sinal de que alguém
+            // recriou o caminho paralelo de dano.
+            StringAssert.DoesNotContain("resultado.ForcaRepulsao", Ler(Bridge),
+                "A MaoFisicaBridge voltou a aplicar repulsão por conta própria. O golpe do " +
+                "jogador passa pela Hitbox desde a Fase 2 — duas cópias divergem.");
         }
 
         /// <summary>
