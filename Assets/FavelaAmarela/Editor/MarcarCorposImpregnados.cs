@@ -22,10 +22,15 @@ namespace FavelaAmarela.EditorTools
     /// dar a leitura descrita em cada linha da tabela; são botões para o Vini girar, e a ficção
     /// é que manda a ordem relativa (um Cultista sempre cede mais que um Eco).</para>
     ///
-    /// <para><b>Quem não tem <c>Rigidbody2D</c> fica de fora, de propósito.</b> Rei em Amarelo,
-    /// Abdul e Pedra de Poder não têm corpo físico nenhum — já são inamovíveis por construção,
-    /// e a ficção concorda com a técnica. Marcar não mudaria nada e daria a falsa impressão de
-    /// estar configurado.</para>
+    /// <para><b>Quem não tem <c>Rigidbody2D</c> É marcado também</b> — com resistência 1,00.
+    /// Rei em Amarelo, Abdul, Pedra de Poder e o Eco de Carcosa não têm corpo físico: já são
+    /// inamovíveis por construção, e a ficção concorda com a técnica.</para>
+    ///
+    /// <para>A versão anterior os <b>pulava</b>, argumentando que "marcar não mudaria nada".
+    /// Estava certa sobre o efeito e errada sobre o registro: olhando o prefab, <i>"não cede
+    /// porque falta um componente"</i> e <i>"não cede porque decidimos assim"</i> são
+    /// indistinguíveis. Marcar torna a imobilidade uma <b>decisão legível</b> em vez de um
+    /// acidente — e guardável por teste.</para>
     /// </summary>
     public static class MarcarCorposImpregnados
     {
@@ -41,6 +46,18 @@ namespace FavelaAmarela.EditorTools
             ("CoisaDoCemiterio", 0.60f, "caça pesada e ancorada, cambaleia pouco"),
             ("Byakhee",          0.75f, "criatura de fora, mas ainda presa a este plano"),
             ("EspectroHali",     0.90f, "quase não é corpo — o golpe atravessa mais do que empurra"),
+
+            // Os três sem Rigidbody2D. Marcá-los NÃO muda comportamento — sem corpo físico,
+            // RepulsaoDeImpacto.GarantirPara já devolve null e eles nunca cedem. O que muda é
+            // que a imobilidade deixa de ser ACIDENTE (a ausência de um componente) e vira
+            // DECISÃO registrada no dado, guardada por teste.
+            //
+            // A versão anterior desta tabela os pulava explicitamente. Estava certa sobre o
+            // efeito e errada sobre o registro: "não faz nada porque falta uma peça" e "não faz
+            // nada porque decidimos assim" são indistinguíveis olhando o prefab.
+            ("Abdul_Alhazred",   1.00f, "o feiticeiro está ancorado pelo próprio ritual"),
+            ("ReiEmAmarelo",     1.00f, "não está AQUI para ser empurrado"),
+            ("PedraDePoder",     1.00f, "âncora de pedra: é o cenário que a segura, não o contrário"),
         };
 
         /// <summary>
@@ -75,9 +92,10 @@ namespace FavelaAmarela.EditorTools
 
             try
             {
-                // Sem corpo físico não há o que empurrar. Marcar seria decoração.
-                if (raiz.GetComponentInChildren<Rigidbody2D>(true) == null)
-                    return $"{nome}: sem Rigidbody2D — já é inamovível, não marcado";
+                // Sem Rigidbody2D o ator já é inamovível na prática. Marcamos assim mesmo,
+                // com resistência 1,00, para a imobilidade ser LEGÍVEL no prefab em vez de
+                // deduzida da ausência de um componente.
+                bool semCorpo = raiz.GetComponentInChildren<Rigidbody2D>(true) == null;
 
                 var corpo = raiz.GetComponent<CorpoImpregnado>();
                 bool novo = corpo == null;
@@ -89,7 +107,8 @@ namespace FavelaAmarela.EditorTools
 
                 PrefabUtility.SaveAsPrefabAsset(raiz, caminho);
 
-                return $"{nome}: {resistencia:0.00} ({(novo ? "novo" : "atualizado")}) — {leitura}";
+                string nota = semCorpo ? " [sem Rigidbody2D: inamovível por construção]" : "";
+                return $"{nome}: {resistencia:0.00} ({(novo ? "novo" : "atualizado")}) — {leitura}{nota}";
             }
             finally
             {
@@ -142,7 +161,9 @@ namespace FavelaAmarela.EditorTools
             {
                 if (alvo == null) continue;
 
-                if (alvo.GetComponentInChildren<Rigidbody2D>(true) == null) { semCorpo++; continue; }
+                // Marcado mesmo sem corpo físico, pelo mesmo motivo dos prefabs: registrar a
+                // imobilidade em vez de deduzi-la da ausência de um componente.
+                if (alvo.GetComponentInChildren<Rigidbody2D>(true) == null) semCorpo++;
 
                 var corpo = alvo.GetComponent<CorpoImpregnado>();
                 if (corpo == null) corpo = alvo.gameObject.AddComponent<CorpoImpregnado>();
@@ -156,7 +177,7 @@ namespace FavelaAmarela.EditorTools
 
             if (alvos.Length == 0) resumo.Add($"{rotulo}: nenhum na cena");
             else resumo.Add($"{rotulo}: {marcados} marcado(s) em {resistencia:0.00}" +
-                            (semCorpo > 0 ? $", {semCorpo} sem Rigidbody2D" : "") +
+                            (semCorpo > 0 ? $", {semCorpo} sem Rigidbody2D (inamovível por construção)" : "") +
                             $" — {leitura}");
 
             return marcados;

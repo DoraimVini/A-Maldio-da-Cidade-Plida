@@ -185,7 +185,7 @@ MonoBehaviour:
   danoAnomalo: 25
   camadasQueBloqueiam:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
 --- !u!114 &-1261405043309762596
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -45004,6 +45004,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1200183799}
   - component: {fileID: 1200183800}
+  - component: {fileID: 1200183801}
   m_Layer: 0
   m_Name: Eco_De_Carcosa_0
   m_TagString: Untagged
@@ -45040,6 +45041,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EcoDeCarcosa
   tempoMaximoImovel: 5
   taxaDrenoRMPorSegundo: 3
+--- !u!114 &1200183801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1200183798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 1
 --- !u!1 &1220352571
 GameObject:
   m_ObjectHideFlags: 0
@@ -63160,7 +63174,7 @@ MonoBehaviour:
   anguloVisao: 90
   layerObstaculos:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   pontosDePatrulha:
   - {fileID: 1846048089}
   - {fileID: 1585571499}
@@ -63682,6 +63696,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1931631046}
   - component: {fileID: 1931631047}
+  - component: {fileID: 1931631048}
   m_Layer: 0
   m_Name: Eco_De_Carcosa_1
   m_TagString: Untagged
@@ -63718,6 +63733,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EcoDeCarcosa
   tempoMaximoImovel: 5
   taxaDrenoRMPorSegundo: 3
+--- !u!114 &1931631048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1931631045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9254661a799d64db315ed26dce7a9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
+  resistenciaAImpulso: 1
 --- !u!1 &1952111489
 GameObject:
   m_ObjectHideFlags: 0
@@ -63774,7 +63802,7 @@ MonoBehaviour:
   anguloVisao: 90
   layerObstaculos:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 512
   pontosDePatrulha:
   - {fileID: 1720523446}
   - {fileID: 1039247636}
