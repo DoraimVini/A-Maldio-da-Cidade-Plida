@@ -52,19 +52,51 @@ conjunto fechado.
 
 ## A regra que segura o escopo
 
-> **O sorteio escolhe *qual* `ItemDef` cai. Ele nunca gera atributos.**
+> ⚠️ **REVOGADA EM 2026-08-27.** A regra abaixo vigorou de 10/08 a 27/08 e está preservada por
+> honestidade histórica. A regra em vigor é a da seção seguinte.
 
-Essa única regra é o que impede o sistema de virar Path of Exile — a preocupação explícita do
-Vini no `CLAUDE.md` §1. Consequências diretas:
+> ~~**O sorteio escolhe *qual* `ItemDef` cai. Ele nunca gera atributos.**~~
 
-- Todo item continua **autorado à mão** e determinístico, preservando a invariante que o
-  `ItemDef` já documenta: *"Todos os status são fixos e determinísticos"*.
-- Não existe afixo aleatório, nem rolagem de atributo, nem "mesma espada com números
-  diferentes". Duas cópias do mesmo item são idênticas.
-- O `ItemInstance` continua guardando só `ItemDefId` + quantidade — **nenhuma mudança** na
-  serialização de save.
-- Um item novo é um asset novo, não uma nova combinação emergente. O catálogo cresce no ritmo
-  que o time autora, e não explode sozinho.
+**Por que caiu.** O Vini apontou o furo que ela criava: sem geração, **uma arma de nível máximo
+entrega exatamente os mesmos status de uma arma de nível 1**. A regra protegia contra explosão
+de build, mas ao custo de não haver curva de poder nenhuma — e de a segunda cópia de um item
+nunca interessar, que é o loop de loot mais fraco que um ARPG pode ter. A escolha dele foi
+**base + afixos rolados**, o modelo de D2/PoE.
+
+## A regra em vigor (2026-08-27)
+
+> **O gerador nunca inventa um afixo. Ele escolhe de um pool autorado e rola dentro de uma
+> faixa autorada.**
+
+É uma invariante mais fraca que a anterior, mas continua sendo um teto real: o conteúdo é
+autorado, o que varia é o *valor* dentro de limites que uma pessoa escreveu. Consequências
+diretas:
+
+- **O `ItemDef` passa a ser a BASE**, não o item acabado: slot, ícone, `Tipo`, `Empunhadura`,
+  tags, modificadores implícitos, nível do item, e o moveset quando for arma.
+- **Grau e afixos vivem na `ItemInstance`**, por instância. Duas cópias da mesma base **não**
+  são mais idênticas.
+- O `ItemInstance` ganha `Grau`, `NivelDoItem` e `List<AfixoRolado>` — **e o save muda para
+  v2**, gravando os **valores rolados**, nunca a semente. Semente re-rolaria todo item já
+  dropado assim que um `AfixoDef` fosse editado.
+- **`.Def` continua existindo e apontando para a base**, então as 45 chamadas a `.Def` no
+  código seguem válidas. É como o D2 funciona: o item tem registro-base, e os mods são da
+  instância.
+- **Itens únicos continuam autorados à mão** — as 3 armas da Tumba e as relíquias são base +
+  modificadores fixos, exatamente o que D2 e PoE chamam de *unique*.
+- Toda aleatoriedade passa por `IFonteDeAleatoriedade`, que **já existe e já é fakeada nos
+  testes** — o gerador é determinístico sob teste.
+
+### O que isso cobra, e que antes não cobrava
+
+- **Conceder Exposição no mundo virou pré-requisito.** O pool é filtrado por nível do item; com
+  `ProgressionBridge.AdicionarExposicao` nunca chamado, o nível fica em 1 e o gerador entrega
+  sempre o piso.
+- **Os cinco `StatType` decorativos viraram defeito ativo.** Um afixo que role `Furtividade` ou
+  `DefesaAnomalia` produz um item que mente para o jogador — `DefesaAnomalia` é exibida na
+  ficha e não é aplicada no combate. Ou implementar, ou proibir em pool.
+- **Nível do item ≠ nível do jogador.** O gate hoje compara com o nível do *jogador*; num
+  sistema de afixos isso faz uma zona inicial dropar tier máximo assim que o jogador sobe.
 
 O que o jogador percebe como "raridade" é **quão difícil é o item cair**, não quão bem ele
 rolou.
