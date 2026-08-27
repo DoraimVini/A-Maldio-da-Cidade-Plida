@@ -69,16 +69,57 @@ namespace FavelaAmarela.Player
             StartCoroutine(EsquivaIFramesCoroutine(result.DurationSeconds));
         }
 
+        /// <summary>
+        /// Quadros de invencibilidade da Esquiva: a <b>hurtbox</b> do Damião sai do ar pela
+        /// duração do movimento.
+        ///
+        /// <para><b>Dois defeitos consertados aqui em 2026-08-27, e o segundo é o grave.</b></para>
+        ///
+        /// <para><b>1. Não havia invencibilidade nenhuma.</b> A versão anterior desligava a
+        /// colisão entre as camadas <c>Player</c> e <c>Enemy</c>. Mas <b>o jogador não leva
+        /// dano por colisão</b> — o projeto inteiro tem <b>zero</b> <c>OnCollisionEnter2D</c>.
+        /// O dano chega por <c>Hitbox</c> → <c>Hurtbox</c>, que é uma <b>query</b>
+        /// (<c>Physics2D.OverlapCircle</c>), e query não olha a matriz de colisão. A corrotina
+        /// prometia i-frames no nome e não entregava nada.</para>
+        ///
+        /// <para><b>2. Ela CORROMPIA a matriz global.</b> O Project Settings já tem
+        /// <c>Player × Enemy</c> <b>desligado</b>. Então o <c>IgnoreLayerCollision(..., true)</c>
+        /// era no-op, e o <c>false</c> do fim <b>LIGAVA</b> uma colisão que o asset mandava
+        /// desligar — permanentemente, em todas as cenas, até o próximo carregamento de domínio.
+        /// Depois da primeira esquiva da partida, inimigos passavam a empurrar o Damião para
+        /// sempre.</para>
+        ///
+        /// <para><b>Por que desligar o colisor e não usar <c>excludeLayers</c>:</b> a doc da
+        /// 6.4 é explícita que <c>excludeLayers</c> decide <i>"if a <b>contact</b> ... should
+        /// happen"</i>. Contato não é query. Para sumir de um <c>OverlapCircle</c>, o colisor
+        /// precisa estar desligado — e é isso que dá i-frame de verdade contra o caminho de
+        /// dano que este jogo realmente usa.</para>
+        ///
+        /// <para>O <c>try/finally</c> não é zelo excessivo: sem ele, uma troca de cena ou uma
+        /// morte no meio da esquiva deixaria o Damião <b>permanentemente invulnerável</b> — a
+        /// versão espelhada do bug que acabou de ser consertado.</para>
+        /// </summary>
         private IEnumerator EsquivaIFramesCoroutine(float duration)
         {
-            int playerLayer = LayerMask.NameToLayer("Player");
-            int enemyLayer = LayerMask.NameToLayer("Enemy");
+            var hurtbox = GetComponentInChildren<FavelaAmarela.Runtime.Combat.Hurtbox>(true);
+            var colisor = hurtbox != null ? hurtbox.GetComponent<Collider2D>() : null;
 
-            if (playerLayer != -1 && enemyLayer != -1)
+            if (colisor == null)
             {
-                Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
+                Debug.LogError("[EsquivaBridge] Damião não tem Hurtbox com colisor — a Esquiva " +
+                               "não concede invencibilidade nenhuma.", this);
+                yield break;
+            }
+
+            colisor.enabled = false;
+
+            try
+            {
                 yield return new WaitForSeconds(duration);
-                Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
+            }
+            finally
+            {
+                if (colisor != null) colisor.enabled = true;
             }
         }
     }

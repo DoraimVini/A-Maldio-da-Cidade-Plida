@@ -257,7 +257,7 @@ MonoBehaviour:
   alcance: 1.2
   camadaInimigos:
     serializedVersion: 2
-    m_Bits: 16448
+    m_Bits: 16384
   logarGolpes: 1
 --- !u!114 &7750164519107673059
 MonoBehaviour:

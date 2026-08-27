@@ -157,10 +157,18 @@ Write-Host ""
 foreach ($t in $results.SelectNodes("//test-case[@result='Failed']")) {
     Write-Host "    $($t.fullname)" -ForegroundColor Red
 
-    if ($t.failure.message) {
-        # Só as três primeiras linhas da mensagem: as asserções deste projeto explicam a
-        # consequência em jogo, e o parágrafo inteiro afogaria a lista quando há várias.
-        $msg = ($t.failure.message -split "`r?`n" | Where-Object { $_.Trim() -ne "" } | Select-Object -First 3)
+    # .InnerText, e nao .message direto: no formato NUnit3 a mensagem vem dentro de um
+    # CDATA, entao a propriedade devolve um XmlElement -- e o Write-Host imprimia
+    # "System.Xml.XmlElement" no lugar do diagnostico. Aconteceu em 2026-08-27, e uma
+    # ferramenta de QA que esconde o motivo da falha e pior que nao ter ferramenta.
+    $texto = $null
+    if ($t.failure -and $t.failure.message) { $texto = $t.failure.message.InnerText }
+    if ([string]::IsNullOrWhiteSpace($texto) -and $t.failure) { $texto = $t.failure.InnerText }
+
+    if (-not [string]::IsNullOrWhiteSpace($texto)) {
+        # So as tres primeiras linhas: as assercoes deste projeto explicam a consequencia em
+        # jogo, e o paragrafo inteiro afogaria a lista quando ha varias falhas.
+        $msg = ($texto -split "`r?`n" | Where-Object { $_.Trim() -ne "" } | Select-Object -First 3)
         foreach ($m in $msg) { Write-Host "      $($m.Trim())" }
     }
     Write-Host ""

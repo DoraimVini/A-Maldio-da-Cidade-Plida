@@ -16955,7 +16955,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3485682494645962060, guid: 4358c838d54b30c44809872563c21742, type: 3}
       propertyPath: camadaInimigos.m_Bits
-      value: 16448
+      value: 16384
       objectReference: {fileID: 0}
     - target: {fileID: 4178979482112250840, guid: 4358c838d54b30c44809872563c21742, type: 3}
       propertyPath: m_LocalScale.x

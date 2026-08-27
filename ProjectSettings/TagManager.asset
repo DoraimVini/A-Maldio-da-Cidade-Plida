@@ -19,8 +19,8 @@ TagManager:
   - Player
   - Obstacle
   - Pickup
-  - PlayerHitbox
-  - EnemyHitbox
+  - 
+  - 
   - PlayerHurtbox
   - EnemyHurtbox
   - 

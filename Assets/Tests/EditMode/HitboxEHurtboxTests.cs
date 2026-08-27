@@ -139,20 +139,52 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// As quatro camadas de combate precisam continuar existindo com estes nomes — os
+        /// As camadas de <b>hurtbox</b> precisam continuar existindo com estes nomes — os
         /// componentes as resolvem por <c>LayerMask.NameToLayer</c>, que devolve -1 em silêncio
         /// se alguém as renomear.
+        ///
+        /// <para><b>Eram quatro, e passaram a ser duas em 2026-08-27.</b>
+        /// <c>PlayerHitbox</c> (11) e <c>EnemyHitbox</c> (12) foram esvaziadas do
+        /// <c>TagManager</c>, e a razão é de desenho: <b>a <c>Hitbox</c> deste projeto não tem
+        /// colisor</b>. Ela resolve o golpe por <c>Physics2D.OverlapCircle</c>, e uma camada só
+        /// existe para ser posta num colisor. Sem colisor, não havia onde aplicá-las — ficaram
+        /// declaradas e mortas desde 2026-08-21.</para>
+        ///
+        /// <para>Foram <b>esvaziadas</b>, não removidas: a lista de camadas é posicional, e
+        /// apagar as linhas deslocaria <c>PlayerHurtbox</c> e <c>EnemyHurtbox</c> de 13/14 para
+        /// 11/12 — todo <c>m_Layer: 14</c> gravado em prefab e cena apontaria para o vazio, e
+        /// as hurtboxes sumiriam do jogo.</para>
+        ///
+        /// <para>Se um dia a hitbox virar trigger de verdade, os slots estão livres e a decisão
+        /// está registrada aqui.</para>
         /// </summary>
         [Test]
-        public void AsQuatroCamadasDeCombate_Existem()
+        public void AsCamadasDeHurtbox_Existem()
         {
             var faltando = new List<string>();
 
-            foreach (var nome in new[] { "PlayerHitbox", "EnemyHitbox", "PlayerHurtbox", "EnemyHurtbox" })
+            foreach (var nome in new[] { "PlayerHurtbox", "EnemyHurtbox" })
                 if (CamadaPorNome(nome) < 0) faltando.Add(nome);
 
             Assert.IsEmpty(faltando,
-                "Camadas de combate ausentes no TagManager: " + string.Join(", ", faltando));
+                "Camadas de hurtbox ausentes no TagManager: " + string.Join(", ", faltando) +
+                ". Sem elas, Hurtbox.GarantirPara não tem onde pôr a hurtbox e nenhum ator " +
+                "fica atingível.");
+        }
+
+        /// <summary>
+        /// Os índices 13 e 14 são contrato: estão gravados em cada prefab (<c>m_Layer</c>) e em
+        /// cada máscara de golpe (<c>1 &lt;&lt; 14 = 16384</c>). Reordenar a lista de camadas
+        /// os quebraria em silêncio.
+        /// </summary>
+        [Test]
+        public void OsIndicesDasHurtboxes_NaoMudaram()
+        {
+            Assert.AreEqual(13, CamadaPorNome("PlayerHurtbox"),
+                "PlayerHurtbox saiu do índice 13 — os prefabs gravam o índice, não o nome.");
+
+            Assert.AreEqual(14, CamadaPorNome("EnemyHurtbox"),
+                "EnemyHurtbox saiu do índice 14 — as máscaras de golpe gravam 16384 = 1<<14.");
         }
 
         /// <summary>

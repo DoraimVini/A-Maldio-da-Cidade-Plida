@@ -43,6 +43,12 @@ namespace FavelaAmarela.Player
         /// </summary>
         private const int SlotDeArma = 0;
 
+        /// <summary>
+        /// A camada onde vivem as hurtboxes de inimigo. É o que o golpe do jogador procura —
+        /// e a única coisa que ele deve procurar.
+        /// </summary>
+        private const string CamadaDeHurtboxAlvo = "EnemyHurtbox";
+
         // Golpe desarmado: POCO com dano 0 (a regra vive no Core, ver MaoVazia).
         // Instanciado uma vez — nunca por golpe (Regra de Ouro 1).
         private readonly IArma _maoVazia = new MaoVazia();
@@ -170,10 +176,9 @@ namespace FavelaAmarela.Player
         {
             // Fallback seguro: se "Camada Inimigos" ficou sem valor no Inspector, usa "Enemy".
             if (camadaInimigos.value == 0)
-                // Inclui EnemyHurtbox: com a separação, o corpo atingível do inimigo é a
-                // hurtbox, não o colisor de movimento (que agora é só a pegada no chão,
-                // 0,60 × 0,30 — acertar só isso seria acertar os pés).
-                camadaInimigos = LayerMask.GetMask("Enemy", "EnemyHurtbox");
+                // SÓ a hurtbox. Incluir `Enemy` traria o colisor de movimento -- a pegada no
+                // chão, 0,60 × 0,30 -- que não é o corpo atingível e não carrega Hurtbox.
+                camadaInimigos = LayerMask.GetMask(CamadaDeHurtboxAlvo);
 
             GarantirHitbox();
         }
@@ -209,23 +214,24 @@ namespace FavelaAmarela.Player
 
         private void GarantirHitbox()
         {
-            // A camada da hurtbox é FORÇADA na máscara, e isso não é cinto e suspensório.
+            // A máscara do golpe é SÓ a camada de hurtbox, e a razão é de semântica, não de
+            // otimização.
             //
-            // A Hitbox só acerta quem tem `Hurtbox`, e a hurtbox é um GameObject FILHO na
-            // camada EnemyHurtbox. Uma máscara sem ela encontra o colisor de MOVIMENTO do
-            // inimigo (camada Enemy, na raiz) e depois procura a hurtbox com
-            // GetComponentInParent -- que sobe, nunca desce. Resultado: acha o colisor,
-            // não acha hurtbox, e o golpe passa branco SEM ERRO NENHUM.
+            // A Hitbox pergunta "o que pode ser FERIDO?". A resposta é hurtbox. Incluir a
+            // camada `Enemy` respondia a outra pergunta -- "o que É um inimigo?" -- e trazia o
+            // colisor de MOVIMENTO na raiz do ator. Como a hurtbox é um objeto FILHO, a busca
+            // por `GetComponentInParent<Hurtbox>()` não a encontrava a partir da raiz, e cada
+            // acerto caía no ramo de erro: em 2026-08-27 TODO golpe que conectava emitia um
+            // LogError. O diagnóstico, escrito para um caso raro, virou ruído constante.
             //
-            // Foi exatamente o que aconteceu (2026-08-27): a cena da Tumba tinha um override
-            // antigo de `camadaInimigos` para só a camada Enemy. Era inofensivo enquanto o
-            // golpe resolvia por `GetComponentInParent<IDanificavel>()`, que acha o EnemyBase
-            // na raiz. A migração para Hitbox transformou esse override velho em "nada é
-            // atingível na Tumba" -- e, por tabela, "o Abdul nunca troca de fase, então nunca
-            // invoca as Pedras de Poder".
+            // Reduzir a máscara resolve pela CAUSA: a query passa a encontrar exatamente o que
+            // ela procura, e o ramo de erro volta a significar o que foi escrito para
+            // significar -- "acertei algo que não pode ser ferido".
             //
-            // Forçar aqui torna o valor do Inspector incapaz de quebrar o combate.
-            LayerMask mascara = camadaInimigos | LayerMask.GetMask("EnemyHurtbox");
+            // `camadaInimigos` continua servindo de override do Inspector, mas a camada de
+            // hurtbox é forçada: uma máscara sem ela não pode funcionar, e um override velho
+            // numa cena já tornou a Tumba inteira intocável uma vez.
+            LayerMask mascara = camadaInimigos | LayerMask.GetMask(CamadaDeHurtboxAlvo);
 
             _hitbox = Hitbox.GarantirPara(gameObject, "Hitbox_MaoFisica", mascara,
                                           RaioAtual, AlcanceAtual, pouparAliados: true);

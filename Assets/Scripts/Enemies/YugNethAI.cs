@@ -152,11 +152,21 @@ namespace FavelaAmarela.Runtime.Enemies
         /// Faz o corpo de Yug-Neth deixar de barrar fisicamente um outro colisor — na
         /// prática, o de Damião. Chamado pelo <c>GameManager</c> no bootstrap.
         ///
-        /// <para><b>Por que não resolver por layer:</b> ele está na camada <c>Enemy</c>, e a
-        /// taxonomia de layers do projeto é um conjunto fechado — criar uma camada "Aliado"
-        /// mudaria a matriz de colisão de todo mundo. Ignorar o par de colisores atinge
-        /// exatamente o problema (ele parar de te empurrar) sem efeito colateral: ele
-        /// continua colidindo com paredes, então segue Damião sem atravessar o cenário.</para>
+        /// <para><b>O comentário anterior aqui estava errado desde 2026-08-11</b>, e valia a
+        /// pena corrigir em vez de apagar: ele dizia que Yug-Neth <i>"está na camada Enemy"</i>
+        /// e que criar uma camada "Aliado" mudaria a matriz de todo mundo. A camada
+        /// <c>Aliados</c> (7) <b>foi criada</b> naquela data e o prefab está nela desde então —
+        /// o argumento se referia a um mundo que deixou de existir.</para>
+        ///
+        /// <para><b>Por que continua sendo por par de colisores, e não por camada:</b> a matriz
+        /// tem <c>Aliados × Player</c> LIGADO de propósito, porque um aliado deve barrar o
+        /// cenário e ser barrado por ele. O que não se quer é ele empurrar o Damião — um caso
+        /// específico entre dois objetos, não entre duas categorias.</para>
+        ///
+        /// <para><b>A alternativa documentada</b> seria <c>Collider2D.excludeLayers</c>, que é
+        /// per-instância e não precisa reagir a colisores criados depois. Fica registrada como
+        /// melhoria: <c>IgnoreCollision</c> resolve só os colisores que existiam no momento da
+        /// chamada, então um colisor acrescentado ao Damião mais tarde voltaria a empurrá-lo.</para>
         /// </summary>
         public void IgnorarColisaoCom(Collider2D outro)
         {

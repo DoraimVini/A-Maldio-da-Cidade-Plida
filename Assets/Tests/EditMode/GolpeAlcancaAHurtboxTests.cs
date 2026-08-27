@@ -77,6 +77,46 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
+        /// A máscara também não pode incluir a camada do <b>colisor de movimento</b>.
+        ///
+        /// <para>A Hitbox pergunta "o que pode ser ferido?" e a resposta é hurtbox. Incluir
+        /// <c>Enemy</c> responde a outra pergunta — "o que É um inimigo?" — e traz o colisor da
+        /// raiz, que não carrega <c>Hurtbox</c>. Em 2026-08-27 isso fez <b>todo golpe que
+        /// conectava</b> emitir um <c>LogError</c>: o diagnóstico, escrito para um caso raro,
+        /// virou ruído constante e teria escondido o caso real.</para>
+        /// </summary>
+        [Test]
+        public void AMascaraDoGolpe_NaoIncluiOColisorDeMovimento()
+        {
+            int camadaEnemy = LayerMask.NameToLayer("Enemy");
+            Assert.AreNotEqual(-1, camadaEnemy, "A camada 'Enemy' sumiu do projeto.");
+
+            int bitEnemy = 1 << camadaEnemy;
+            var comExcesso = new List<string>();
+
+            foreach (var caminho in Arquivos())
+            {
+                string txt = File.ReadAllText(caminho);
+
+                foreach (int bits in MascarasEm(txt))
+                {
+                    if (bits == 0) continue;
+
+                    if ((bits & bitEnemy) != 0)
+                        comExcesso.Add($"{Path.GetFileName(caminho)}: m_Bits {bits} inclui " +
+                                       $"Enemy ({camadaEnemy})");
+                }
+            }
+
+            Assert.IsEmpty(comExcesso,
+                "Máscara(s) de golpe incluindo a camada do colisor de movimento:" +
+                Environment.NewLine + "  " +
+                string.Join(Environment.NewLine + "  ", comExcesso) + Environment.NewLine +
+                "A query passa a encontrar o colisor da raiz, que não tem Hurtbox — e todo " +
+                "acerto volta a emitir LogError.");
+        }
+
+        /// <summary>
         /// Cinto e suspensório de propósito: mesmo que uma máscara errada volte a ser autorada,
         /// o código força a camada da hurtbox. O valor do Inspector não pode ser capaz de
         /// quebrar o combate.
@@ -86,9 +126,18 @@ namespace FavelaAmarela.Tests.EditMode
         {
             string bridge = File.ReadAllText("Assets/Scripts/Player/MaoFisicaBridge.cs");
 
-            StringAssert.Contains("LayerMask.GetMask(\"EnemyHurtbox\")", bridge,
+            // Casa a CONSTANTE e o uso dela, não um literal solto. A primeira versão deste
+            // guarda exigia a string "EnemyHurtbox" escrita na chamada — e falhou no momento
+            // em que o código MELHOROU, extraindo a camada para uma constante nomeada. Guarda
+            // que reprova refatoração correta é guarda que ensina a não refatorar.
+            StringAssert.Contains("CamadaDeHurtboxAlvo = \"EnemyHurtbox\"", bridge,
+                "A constante da camada de hurtbox mudou de nome ou de valor. Ela é o que o " +
+                "golpe procura, e a única coisa que ele deve procurar.");
+
+            StringAssert.Contains("LayerMask.GetMask(CamadaDeHurtboxAlvo)", bridge,
                 "A MaoFisicaBridge parou de forçar a camada da hurtbox na máscara. Um override " +
-                "esquecido numa cena volta a poder tornar um mapa inteiro intocável.");
+                "esquecido numa cena volta a poder tornar um mapa inteiro intocável — foi " +
+                "exatamente assim que a Tumba ficou sem nada atingível.");
         }
 
         /// <summary>
