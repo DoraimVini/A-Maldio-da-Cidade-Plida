@@ -80,10 +80,32 @@ namespace FavelaAmarela.Player
         /// pontuais (ex.: o pulso da Esquiva), que não passam pelo fluxo contínuo
         /// de "está se movendo neste frame".
         /// </summary>
+        /// <summary>
+        /// Piso do ruído de um ator em movimento. Quem se mexe <b>nunca é literalmente
+        /// inaudível</b>.
+        ///
+        /// <para><b>Por que existe (2026-08-27).</b> Só passou a importar quando os inimigos
+        /// começaram a de fato usar o raio do som — antes disso o abafamento não tinha efeito
+        /// nenhum. Com a percepção ligada, tempestade cheia levava o Furtivo (2,0) para
+        /// <b>0,8</b>: menos que a própria pegada do Cultista, ou seja, seria preciso encostar
+        /// nele para ser ouvido.</para>
+        ///
+        /// <para>Não é um número de design inventado por cima da mecânica — é a mesma classe de
+        /// limite que o <c>Clamp01</c> logo abaixo já aplica. A tempestade deve ajudar muito;
+        /// não deve conceder invisibilidade. <b>Quanto exatamente, é botão do Vini.</b></para>
+        /// </summary>
+        public const float PisoDeRuidoEmMovimento = 1.2f;
+
         public static float AplicarAbafamentoTempestade(float raioBase, float stormIntensity)
         {
             float dampening = 1.0f - Mathf.Clamp01(stormIntensity * FatorAbafamentoTempestade);
-            return raioBase * dampening;
+            float abafado = raioBase * dampening;
+
+            // Parado não faz barulho, e o piso não pode inventar ruído do nada: ele só impede
+            // que um ruído REAL seja abafado até a irrelevância.
+            if (raioBase <= 0f) return 0f;
+
+            return Mathf.Max(abafado, PisoDeRuidoEmMovimento);
         }
     }
 

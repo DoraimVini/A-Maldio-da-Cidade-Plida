@@ -118,14 +118,41 @@ namespace FavelaAmarela.Tests
             Assert.AreEqual(expected, noise, 0.001f);
         }
 
+        /// <summary>
+        /// O <c>Clamp01</c> continua sendo o que este teste verifica — o nome dele sempre foi
+        /// esse. O que mudou em 2026-08-27 foi o <b>observável</b>.
+        ///
+        /// <para>Ele afirmava que ruído com tempestade extrema é <b>zero</b>. Passou a existir
+        /// um piso (<c>PisoDeRuidoEmMovimento</c>): quem se move nunca é <i>literalmente</i>
+        /// inaudível.</para>
+        ///
+        /// <para><b>Por que a mudança, e o que ela realmente muda.</b> O piso só morde num
+        /// caso do jogo real: agachado com tempestade cheia, que ia de 0,8 para 1,2. E 0,8 é
+        /// <b>menor que a pegada do próprio Cultista</b> (0,70 × 0,35) — num jogo cuja
+        /// percepção é 100% sonora, o inimigo virava mobília. Andando (2,2) e correndo (3,4)
+        /// na mesma tempestade não são afetados.</para>
+        ///
+        /// <para>Isso só passou a importar quando a percepção começou a de fato usar o raio do
+        /// som: antes, o abafamento não tinha efeito nenhum em produção. <b>É ajuste de
+        /// calibragem e precisa de playtest</b> — se a intenção de design for que a tempestade
+        /// conceda invisibilidade total, o piso vira 0 e este teste volta ao que era.</para>
+        /// </summary>
         [Test]
         public void NoiseEmission_StormIntensityAboveOne_ClampedToMax()
         {
             state.SetMode(MovementMode.Sneaking);
-            // Storm intensity above 1.0 should be clamped via Clamp01(2.0 * 0.6) = Clamp01(1.2) = 1.0
-            // Dampening = 1.0 - 1.0 = 0.0
-            float noise = state.GetCurrentNoiseEmission(isMoving: true, stormIntensity: 2.0f);
-            Assert.AreEqual(0f, noise, 0.001f);
+
+            // Clamp01(2.0 * 0.6) = Clamp01(1.2) = 1.0 → dampening 0. Sem o clamp, uma
+            // intensidade absurda daria dampening NEGATIVO e o ruído cresceria com a tempestade.
+            float extremo = state.GetCurrentNoiseEmission(isMoving: true, stormIntensity: 2.0f);
+            float absurdo = state.GetCurrentNoiseEmission(isMoving: true, stormIntensity: 50f);
+
+            Assert.AreEqual(extremo, absurdo, 0.001f,
+                "O ruído tem de PARAR de cair depois do clamp — é isto que este teste guarda.");
+
+            Assert.AreEqual(PlayerStealthState.PisoDeRuidoEmMovimento, extremo, 0.001f,
+                "Abafamento total leva ao PISO, não a zero: quem se move nunca é literalmente " +
+                "inaudível.");
         }
 
         // --- Mode switching ---

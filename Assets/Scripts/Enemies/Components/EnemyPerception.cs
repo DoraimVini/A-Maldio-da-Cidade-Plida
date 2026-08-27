@@ -93,9 +93,38 @@ namespace FavelaAmarela.Runtime.Enemies
             }
         }
 
+        /// <summary>
+        /// Ouve um ruído — comparando a distância com o <b>alcance do próprio som</b>, e não só
+        /// com a acuidade deste inimigo.
+        ///
+        /// <para><b>O defeito que isto conserta é o maior do jogo (2026-08-27).</b> A versão
+        /// anterior comparava a distância <b>apenas</b> com <c>raioAudicao</c> (10 no Cultista)
+        /// e <b>descartava <c>som.RaioEfetivo</c></b>. Consequência: agachado (raio 2,0) e
+        /// correndo (8,5) eram ouvidos <b>exatamente igual</b>. Modo Furtivo, corrida e o
+        /// abafamento da tempestade não tinham efeito nenhum em produção.</para>
+        ///
+        /// <para>Num jogo cuja percepção é 100% sonora, isso significa que <b>a furtividade —
+        /// o pilar do jogo — nunca funcionou</b>.</para>
+        ///
+        /// <para><b>E o código certo já existia, testado.</b>
+        /// <c>CultistaFSM.ReceberEstimuloSonoro</c> compara com <c>raioEfetivo</c> desde
+        /// sempre — mas ela só é instanciada em teste. O caminho vivo é
+        /// <c>CultistaAI</c> + <c>EnemyPerception</c>, que é este. Um POCO testado e morto: o
+        /// modo de falha da casa, na sua forma mais cara.</para>
+        ///
+        /// <para><b>Por que o mínimo dos dois:</b> o som carrega até o raio dele, mas nenhum
+        /// inimigo ouve além da própria acuidade. Hoje <c>raioAudicao</c> (10) é maior que o
+        /// ruído mais alto do jogo (8,5), então o teto não morde — ele existe como botão de
+        /// "este aqui é surdo", não como limitador ativo.</para>
+        /// </summary>
         private void HandleSomEmitido(SomEmitido som)
         {
-            if (Vector2.Distance(transform.position, som.Origem) > raioAudicao) return;
+            if (som.RaioEfetivo <= 0f) return;
+
+            float alcance = Mathf.Min(som.RaioEfetivo, raioAudicao);
+
+            if (Vector2.Distance(transform.position, som.Origem) > alcance) return;
+
             _tempoDesdeUltimoSom = 0f;
             _ultimaOrigemConhecida = som.Origem;
         }
