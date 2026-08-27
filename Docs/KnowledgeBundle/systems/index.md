@@ -19,7 +19,9 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Ficha de Atributos e Matemática do Combate](ficha_de_atributos.md) — Os 5 atributos de toda unidade, fórmula de mitigação e balanceamento
 - [Atributos, Níveis e Build](atributos_e_build.md) — **[CONSOLIDADO 2026-08-14]** Documento de discussão: os dois vocabulários de atributo que coexistem, os números reais das 5 fichas e das 3 armas, a curva de 12 níveis, e as 6 perguntas abertas de design
 - [As Três Armas da Tumba](armas_da_tumba.md) — Cravo/Estilete/Alfanje: básico + habilidade, e o sangramento por acúmulo
-- [Loot e Drop](loot_e_drop.md) — **[MOTOR IMPLEMENTADO]** Sorteio testável, tabelas de drop por arquétipo, tiers liberados por nível de Exposição e a regra que impede explosão de build
+- [Loot e Drop](loot_e_drop.md) — **[BASE + AFIXOS ROLADOS, 2026-08-27]** A invariante "o sorteio nunca gera atributos" foi **revogada** (sem geração, arma de nível máximo = arma de nível 1). Agora: base autorada + grau + afixos rolados de pool autorado
+- [Habilidades de Item](habilidades_de_item.md) — **[IMPLEMENTADO 2026-08-27]** Efeitos como dado: arma nova deixou de custar uma classe C#
+- [Armas à Distância](armas_a_distancia.md) — **[REGISTRO, PÓS-VS]** Arcos, bestas e armas de fogo. Nada decidido, nada implementado; não começar sem pedido explícito
 - [Artefatos](artefatos.md) — **[IMPLEMENTADO]** Os 4 slots, passiva + habilidade por Artefato, a barra F1–F4 e a regra de que só vale o que está equipado
 - [Análise do Inventário](inventario_analise.md) — **[AUDITORIA 2026-08-14]** O que está de fato ligado, os 7 atributos que não fazem nada, o bug que apaga a ficha ao trocar equipamento, e a ordem de correção sugerida
 - [Áudio](audio.md) — **[IMPLEMENTADO, sem clipes]** Mixer com pool, banco autorável e síntese de andaime. Torna audível o ruído que Damião emite — o pilar que era invisível

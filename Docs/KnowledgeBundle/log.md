@@ -91,8 +91,24 @@ arma do Debugger. Eram **quatro listas paralelas de armas** obrigadas a concorda
 - **A contrapartida do grau Impregnado.** `loot_e_drop.md` registra que "o que o grau alto cobra"
   é decisão em aberto do Vini; inventar seria decidir design por conta própria.
 - **Tooltip de item na UI.** `NomeExibido` e `LinhasDeAfixo` existem e estão testados, mas a UI
-  do inventário ainda mostra só ícone e quantidade.
-- **Mão Secundária no combate** (escudo/foco) — decidida, ainda não implementada.
+  do inventário ainda mostra só ícone e quantidade. **É a maior pendência:** sem ele, o jogador
+  não consegue comparar dois drops, e a mochila de 12 posições vira um problema sem virar uma
+  decisão.
+- **Arte da Mão Secundária.** O Broquel e o Estilhaço **emprestam ícone** — não existe arte de
+  escudo nem de foco no projeto. E 20%/50% de bloqueio e 25% de desconto são ponto de partida
+  conservador, não balanceamento jogado.
+- **Playtest.** Nada desta noite foi jogado. O caminho crítico do Vertical Slice **também
+  continua sem nunca ter sido jogado por um humano**, e isso não mudou.
+
+### Fase 6 — Mão Secundária (feita)
+
+O slot existia e servia só de regra de empunhadura. Agora Escudo apara golpe e Foco desconta
+recarga. **Bloqueio é chance, não botão**, e a escolha é deliberada: num isométrico com câmera
+afastada, segurar para aparar exige ler direção e tempo de um alvo que o jogador mal distingue —
+é mecânica de câmera baixa atrás do ombro. O D2 resolveu igual: o escudo é um atributo. Teto de
+60% na chance, senão empilhar bônus daria imunidade. O desconto do Foco teve de entrar em
+**três** lugares (gate, `HabilidadePronta` e a barra da UI); só nos dois primeiros, o anel
+encheria mais devagar que a habilidade libera e o jogador concluiria que o botão falha.
 
 ## 2026-08-26 — HUD persistente: um prefab, cinco cenas a menos para sincronizar
 
