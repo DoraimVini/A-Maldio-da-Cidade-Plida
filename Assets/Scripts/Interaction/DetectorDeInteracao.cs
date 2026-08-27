@@ -24,8 +24,24 @@ namespace FavelaAmarela.Runtime.Interaction
         [Tooltip("Distância máxima para usar um objeto (unidades de mundo).")]
         [SerializeField] private float alcance = 1.5f;
 
-        [Tooltip("Camadas onde procurar objetos interagíveis. Vazio = todas.")]
+        [Tooltip("Camadas onde procurar objetos interagíveis. Vazio = só a Default.")]
         [SerializeField] private LayerMask camadasInteragiveis;
+
+        /// <summary>
+        /// Onde os interagíveis do jogo realmente moram, <b>medido</b> nas cenas e prefabs em
+        /// 2026-08-27: 20 na <c>Default</c> (baú, coletáveis, fragmentos, pontos focais,
+        /// Cassilda), 1 na <c>Obstacle</c> (<c>Os_Portoes</c>, que é parede e porta ao mesmo
+        /// tempo) e 1 na <c>Enemy</c> (o <b>Abdul</b>, com quem se conversa antes de lutar).
+        ///
+        /// <para>Esta lista é o fallback de quando o Inspector não diz nada — e é o caso hoje:
+        /// o <c>Player_Damiao.prefab</c> tem a máscara em zero. Ela é escrita à mão de
+        /// propósito, e por isso vem com guarda: <c>InteragivelAlcancavelTests</c> varre toda
+        /// cena e todo prefab atrás de quem implementa <c>IInteragivel</c> e reprova se algum
+        /// estiver numa camada de fora. Sem esse teste, um NPC novo em outra camada ficaria
+        /// <b>mudo em jogo sem uma linha no console</b>.</para>
+        /// </summary>
+        public static readonly string[] CamadasPadraoDeInteragiveis =
+            { "Default", "Obstacle", "Enemy" };
 
         // Buffers pré-alocados: o detector roda a cada frame e não pode gerar lixo
         // (Regra de Ouro 1). 8 slots cobrem folgadamente os alvos ao alcance.
@@ -39,6 +55,7 @@ namespace FavelaAmarela.Runtime.Interaction
         private InputAction _acaoInteragir;
         private IInteragivel _alvoAtual;
         private bool _bloqueado;
+        private bool _jaAvisouDeLotacao;
 
         /// <summary>
         /// Enquanto <c>true</c>, ignora o botão de interação por completo. Ligado por
@@ -85,9 +102,19 @@ namespace FavelaAmarela.Runtime.Interaction
 
             _filtro = new ContactFilter2D();
             _filtro.useTriggers = true;
-            // Sem máscara definida no Inspector, procura em todas as camadas: é melhor
-            // achar demais (o filtro real é ter IInteragivel) do que não achar nada.
-            if (camadasInteragiveis.value != 0) _filtro.SetLayerMask(camadasInteragiveis);
+
+            // ── Por que NÃO é mais "todas as camadas" (2026-08-27) ────────────
+            // A versão anterior argumentava que "é melhor achar demais do que não achar nada,
+            // porque o filtro real é ter IInteragivel". O raciocínio ignora que o buffer tem
+            // TAMANHO FIXO: Physics2D.OverlapCircle preenche 8 slots e DESCARTA o resto, em
+            // ordem arbitrária. Varrendo todas as camadas, os dois colisores do próprio Damião
+            // (corpo + hurtbox) entram sempre, cada inimigo perto gasta mais dois, a parede
+            // gasta um, e o gatilho de setor gasta outro. Perto de um baú com dois inimigos por
+            // perto, o baú é o que sobra de fora -- e o "E" simplesmente não faz nada, sem uma
+            // linha no console.
+            _filtro.SetLayerMask(camadasInteragiveis.value != 0
+                ? camadasInteragiveis
+                : (LayerMask)LayerMask.GetMask(CamadasPadraoDeInteragiveis));
 
             var playerInput = GetComponent<PlayerInput>();
             if (playerInput != null)
@@ -127,6 +154,18 @@ namespace FavelaAmarela.Runtime.Interaction
         private void AtualizarAlvo()
         {
             int total = Physics2D.OverlapCircle(transform.position, alcance, _filtro, _hits);
+
+            // Buffer cheio significa que a Unity ENCHEU e parou — o que ficou de fora não é
+            // reportado de nenhuma forma. Sem este aviso, o sintoma em jogo é "às vezes o E não
+            // funciona", que é indistinguível de estar longe demais.
+            if (total >= MaxCandidatos && !_jaAvisouDeLotacao)
+            {
+                _jaAvisouDeLotacao = true;
+                Debug.LogWarning($"[DetectorDeInteracao] {MaxCandidatos} colisores ao alcance: o " +
+                                 "buffer encheu e alvos podem estar sendo descartados em silêncio. " +
+                                 "Confira a máscara 'camadasInteragiveis' ou aumente MaxCandidatos.",
+                                 this);
+            }
 
             int quantidade = 0;
             Vector2 minhaPosicao = transform.position;

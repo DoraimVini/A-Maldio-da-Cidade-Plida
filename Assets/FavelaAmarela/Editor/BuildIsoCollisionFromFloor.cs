@@ -76,18 +76,21 @@ namespace FavelaAmarela.EditorTools
             var colTilemap = colGO.GetComponent<Tilemap>();
 
             // 4. Física: TilemapCollider2D estático — a colisão segue a forma das células
-            //    (colliderType Grid = losango iso por célula, contíguo na borda). Sem
-            //    Rigidbody/CompositeCollider2D de propósito: o Composite (bordas mescladas)
-            //    exige Rigidbody e deu MissingComponentException; fica como polish futuro.
-            if (colGO.GetComponent<TilemapCollider2D>() == null) colGO.AddComponent<TilemapCollider2D>();
-
-            int obstacle = LayerMask.NameToLayer("Obstacle");
-            if (obstacle >= 0) colGO.layer = obstacle;
-            else Debug.LogWarning("[IsoCollision] Layer 'Obstacle' não existe; colisão ficará na Default.");
+            //    (colliderType Grid = losango iso por célula, contíguo na borda). As células
+            //    são mescladas num CompositeCollider2D no passo 6 -- o "polish futuro" que este
+            //    comentário prometia em 2026-08-13 e que ficou parado porque o Composite exige
+            //    um Rigidbody2D (e o cria Dynamic, o que faria a parede ser empurrável).
+            var colisor = colGO.GetComponent<TilemapCollider2D>();
+            if (colisor == null) colisor = colGO.AddComponent<TilemapCollider2D>();
 
             // 5. Pinta o tile de colisão nas células de borda + gera a geometria.
             foreach (var w in wallCells)
                 colTilemap.SetTile(w, collisionTile);
+
+            // 6. Camada, corpo estático e CompositeCollider2D. O "polish futuro" prometido no
+            //    comentário do passo 4 (o Composite exige Rigidbody2D) está feito: ele existe,
+            //    e o Rigidbody2D nasce Static para a parede não ser empurrável.
+            ConsolidarColisaoDosTilemaps.Padronizar(colisor);
 
             // 6. Desativa o blockout (paredes top-down + chãos-placeholder redundantes).
             //    SetActive(false) em vez de deletar: reversível se algo sair errado.

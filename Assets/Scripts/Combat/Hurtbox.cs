@@ -107,9 +107,13 @@ namespace FavelaAmarela.Runtime.Combat
             var sr = dono.GetComponentInChildren<SpriteRenderer>(true);
             if (sr == null || sr.sprite == null)
             {
-                Debug.LogWarning($"[Hurtbox] '{dono.name}' não tem sprite — sem corpo desenhado " +
-                                 "não dá para derivar a área atingível. Fica sem hurtbox; o " +
-                                 "golpe ainda o encontra pelo colisor de movimento.", dono);
+                // Era LogWarning com a ressalva "o golpe ainda o encontra pelo colisor de
+                // movimento". Deixou de ser verdade em 2026-08-27, quando a máscara do golpe
+                // foi reduzida à camada de hurtbox: sem hurtbox, ele fica INTOCÁVEL.
+                Debug.LogError($"[Hurtbox] '{dono.name}' não tem sprite — sem corpo desenhado não " +
+                               "dá para derivar a área atingível, e ele fica SEM HURTBOX. Como o " +
+                               "golpe do jogador só consulta a camada de hurtbox, isso o torna " +
+                               "impossível de acertar.", dono);
                 return null;
             }
 

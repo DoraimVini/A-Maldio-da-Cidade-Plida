@@ -223,7 +223,7 @@ namespace FavelaAmarela.EditorTools
                     if (!dentroDoPiso) colisao.SetTile(new Vector3Int(gx, gy, 0), tileColisao);
                 }
 
-            colGO.AddComponent<TilemapCollider2D>();
+            ConsolidarColisaoDosTilemaps.Padronizar(colGO.AddComponent<TilemapCollider2D>());
         }
 
         // ── Peças da arena ───────────────────────────────────────────────────

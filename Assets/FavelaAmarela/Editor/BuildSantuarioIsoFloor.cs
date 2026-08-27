@@ -206,15 +206,16 @@ namespace FavelaAmarela.EditorTools
             var colGO = new GameObject("Colisao", typeof(Tilemap));
             colGO.transform.SetParent(grid.transform, false);
 
-            if (colGO.GetComponent<TilemapCollider2D>() == null) colGO.AddComponent<TilemapCollider2D>();
-
-            int obstacle = LayerMask.NameToLayer("Obstacle");
-            if (obstacle >= 0) colGO.layer = obstacle;
-            else Debug.LogWarning("[SantuarioIsoFloor] Layer 'Obstacle' não existe; colisão ficará na Default.");
+            var colisor = colGO.GetComponent<TilemapCollider2D>();
+            if (colisor == null) colisor = colGO.AddComponent<TilemapCollider2D>();
 
             var colTilemap = colGO.GetComponent<Tilemap>();
             foreach (var w in wallCells)
                 colTilemap.SetTile(w, tileColisao);
+
+            // Depois de pintar: o Composite mescla o que EXISTE, e a extrusão só vale para
+            // célula já posta. Camada, corpo estático e composite vêm de um lugar só.
+            ConsolidarColisaoDosTilemaps.Padronizar(colisor);
         }
 
         // ── Aposentar o piso/paredes antigas (reversível) ────────────────────────

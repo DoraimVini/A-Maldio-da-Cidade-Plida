@@ -158,7 +158,10 @@ namespace FavelaAmarela.EditorTools
                     if (!dentroDoPiso) colisao.SetTile(new Vector3Int(gx, gy, 0), tileColisao);
                 }
 
-            colGO.AddComponent<TilemapCollider2D>();
+            // A camada, o corpo estático e o CompositeCollider2D saem de UM lugar só. Foi
+            // esta linha que, por anos, criou a parede da Arena SEM CAMADA -- e os Portões
+            // herdaram o mesmo trecho copiado. Ver ConsolidarColisaoDosTilemaps.
+            ConsolidarColisaoDosTilemaps.Padronizar(colGO.AddComponent<TilemapCollider2D>());
         }
 
         /// <summary>

@@ -488,13 +488,12 @@ namespace FavelaAmarela.EditorTools
             var colisao = GarantirTilemapFilho(raizDoGrid, "Colisao", desenha: false);
             colisao.ClearAllTiles();
 
-            int obstacle = LayerMask.NameToLayer("Obstacle");
-            if (obstacle >= 0) colisao.gameObject.layer = obstacle;
-
             foreach (var w in paredes) colisao.SetTile(w, tileColisao);
 
-            if (colisao.GetComponent<TilemapCollider2D>() == null)
-                colisao.gameObject.AddComponent<TilemapCollider2D>();
+            var colisor = colisao.GetComponent<TilemapCollider2D>();
+            if (colisor == null) colisor = colisao.gameObject.AddComponent<TilemapCollider2D>();
+
+            ConsolidarColisaoDosTilemaps.Padronizar(colisor);
         }
 
         private static Tilemap GarantirTilemapFilho(Transform raiz, string nome, bool desenha)
