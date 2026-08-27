@@ -1,4 +1,5 @@
 using UnityEngine;
+using FavelaAmarela.Runtime.Progression;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Persistencia;
@@ -168,6 +169,12 @@ namespace FavelaAmarela.Runtime.Enemies
             if (args.EntrouEmColapso) Abater();
         }
 
+        [Header("Progressão")]
+        [Tooltip("Exposição concedida ao ser abatido. É o que faz o nível do jogador subir — " +
+                 "e, por consequência, o que libera tiers de afixo no loot.")]
+        [Min(0)]
+        [SerializeField] private int exposicaoAoAbater = 1;
+
         private void Abater()
         {
             if (_jaAbatido) return;
@@ -175,8 +182,39 @@ namespace FavelaAmarela.Runtime.Enemies
 
             var chave = ChavesDeSave.ChaveDeAbatido(_persistencia?.Chave);
             if (chave != null) GerenciadorDeSave.MarcarAconteceu(chave);
+
+            ConcederExposicao();
+
             OnAbatido?.Invoke();
             Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// Concede Exposição ao jogador.
+        ///
+        /// <para><b>Por que isto passou a existir (2026-08-27).</b>
+        /// <c>ProgressionBridge.AdicionarExposicao</c> e <c>Progressao.AdicionarExposicao</c>
+        /// existiam, estavam testados e <b>não eram chamados por nenhum código de gameplay</b>.
+        /// O nível ficava travado em 1 para sempre — o que era aceitável enquanto o loot só
+        /// entregava itens autorados (o <c>CLAUDE.md</c> registrava isso como esperado no
+        /// Vertical Slice, não bug).</para>
+        ///
+        /// <para><b>Com afixos por nível do item, isso virou bloqueante:</b> o pool é filtrado
+        /// por nível, então sem ninguém concedendo Exposição o gerador entregaria <i>sempre</i>
+        /// o piso, e o sistema inteiro seria invisível em jogo.</para>
+        ///
+        /// <para>Mora aqui, e não num componente à parte, de propósito: <c>EnemyBase</c> é a
+        /// raiz de todo inimigo comum, então inimigo novo concede Exposição <b>de graça</b>.
+        /// Um componente separado seria mais uma lista de prefabs para manter à mão — o modo
+        /// de falha que este repositório já catalogou nove vezes.</para>
+        /// </summary>
+        private void ConcederExposicao()
+        {
+            if (exposicaoAoAbater <= 0) return;
+
+            // Ainda não há ProgressionBridge em cena nenhuma no arranque de algumas cenas de
+            // teste; abater sem progressão não pode derrubar a partida.
+            ProgressionBridge.Instancia?.AdicionarExposicao(exposicaoAoAbater);
         }
 
         private void OnDestroy()

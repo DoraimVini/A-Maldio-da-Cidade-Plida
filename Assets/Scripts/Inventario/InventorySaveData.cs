@@ -1,45 +1,111 @@
 // Assets/Scripts/Inventario/InventorySaveData.cs
 using System;
+using System.Collections.Generic;
+using FavelaAmarela.Core.Loot;
 
 namespace FavelaAmarela.Inventario
 {
+    /// <summary>
+    /// Um slot gravado. A partir da v2 carrega o que <b>este exemplar</b> rolou, não só qual
+    /// item ele é.
+    /// </summary>
     [Serializable]
     public class ItemSlotData
     {
+        /// <summary>Id do <c>ItemDef</c> que serve de BASE. Continua sendo a chave do catálogo.</summary>
         public string itemDefId;
+
+        /// <summary>Quantos.</summary>
         public int quantity;
 
-        public ItemSlotData(string id, int qtd)
+        /// <summary>v2: quanto de Carcosa entrou neste exemplar.</summary>
+        public GrauDeImpregnacao grau = GrauDeImpregnacao.Inerte;
+
+        /// <summary>v2: nível do item, que governou o pool de afixos.</summary>
+        public int nivelDoItem = 1;
+
+        /// <summary>
+        /// v2: os afixos com os <b>valores já rolados</b>.
+        ///
+        /// <para><b>Valores, nunca semente.</b> Gravar a semente e re-rolar na carga seria
+        /// menor, e erraria feio: bastaria alguém editar um <c>AfixoDef</c> para toda arma já
+        /// dropada mudar sozinha — o jogador veria o item da mochila dele ficar diferente sem
+        /// ter feito nada. D2 e PoE gravam os mods pelo mesmo motivo.</para>
+        /// </summary>
+        public List<AfixoRolado> afixos = new List<AfixoRolado>();
+
+        /// <summary>Construtor sem argumentos exigido por <c>JsonUtility</c>.</summary>
+        public ItemSlotData() { }
+
+        /// <summary>Grava um exemplar inteiro.</summary>
+        public ItemSlotData(ItemInstance item)
         {
-            itemDefId = id;
-            quantity = qtd;
+            if (item == null) return;
+
+            itemDefId = item.ItemDefId;
+            quantity = item.Quantidade;
+            grau = item.Grau;
+            nivelDoItem = item.NivelDoItem;
+
+            if (item.Afixos != null)
+                foreach (var a in item.Afixos)
+                    if (a != null) afixos.Add(new AfixoRolado(a.AfixoId, a.Stat, a.Valor));
+        }
+
+        /// <summary>
+        /// Reconstrói o exemplar. Um save v1 chega aqui com <c>grau</c> Inerte, nível 1 e sem
+        /// afixos — que é exatamente o que os itens da v1 eram, então a leitura antiga
+        /// continua correta sem caminho especial.
+        /// </summary>
+        public ItemInstance ParaInstancia()
+        {
+            if (string.IsNullOrEmpty(itemDefId)) return null;
+
+            var item = new ItemInstance(itemDefId, quantity)
+            {
+                Grau = grau,
+                NivelDoItem = nivelDoItem < 1 ? 1 : nivelDoItem,
+            };
+
+            if (afixos != null)
+                foreach (var a in afixos)
+                    if (a != null) item.Afixos.Add(new AfixoRolado(a.AfixoId, a.Stat, a.Valor));
+
+            return item;
         }
     }
 
+    /// <summary>
+    /// O inventário inteiro, gravado.
+    ///
+    /// <para><b>Histórico de versões:</b> 0 = anatomia de 6 slots; 1 = 7 slots, com Mão
+    /// Secundária; <b>2 = grau, nível do item e afixos rolados por exemplar</b>
+    /// (2026-08-27).</para>
+    ///
+    /// <para><b>A v1 continua legível, e de graça.</b> <c>JsonUtility</c> deixa nos valores
+    /// padrão os campos que não existem no JSON antigo — e os padrões escolhidos
+    /// (<c>Inerte</c>, nível 1, sem afixos) descrevem com exatidão o que um item da v1 era.
+    /// Não há caminho de migração para escrever nem para manter.</para>
+    /// </summary>
     [Serializable]
     public class InventorySaveData
     {
-        /// <summary>
-        /// Versão corrente do formato. Suba isto sempre que a anatomia ou o significado dos
-        /// índices mudar, e registre a mudança na tabela abaixo.
-        ///
-        /// <list type="bullet">
-        ///   <item><b>0</b> — saves sem o campo (anteriores a 2026-08-12): anatomia de 6 slots,
-        ///   sem Mão Secundária. O campo desserializa como 0 justamente por ausência.</item>
-        ///   <item><b>1</b> — anatomia de 7 slots, com <c>EquipmentSlot.MaoSecundaria</c> no fim.</item>
-        /// </list>
-        /// </summary>
-        public const int VersaoAtual = 1;
+        /// <summary>Versão do formato gravado.</summary>
+        public const int VersaoAtual = 2;
 
-        /// <summary>
-        /// Versão do formato deste save. Zero significa "save antigo, anterior ao campo" —
-        /// é o valor que a desserialização produz quando a chave não existe no JSON.
-        /// </summary>
+        /// <summary>Versão com que ESTE save foi escrito.</summary>
         public int saveVersion = VersaoAtual;
 
+        /// <summary>Mochila.</summary>
         public ItemSlotData[] mainSlotData;
+
+        /// <summary>Corpo.</summary>
         public ItemSlotData[] equipSlotData;
 
+        /// <summary>Construtor sem argumentos exigido por <c>JsonUtility</c>.</summary>
+        public InventorySaveData() { }
+
+        /// <summary>Fotografa mochila e equipamento.</summary>
         public InventorySaveData(MainInventory main, EquipmentInventory equip)
         {
             saveVersion = VersaoAtual;
@@ -48,16 +114,14 @@ namespace FavelaAmarela.Inventario
             for (int i = 0; i < main.Capacidade; i++)
             {
                 var item = main.GetSlot(i);
-                if (item != null)
-                    mainSlotData[i] = new ItemSlotData(item.ItemDefId, item.Quantidade);
+                if (item != null) mainSlotData[i] = new ItemSlotData(item);
             }
 
             equipSlotData = new ItemSlotData[equip.Capacidade];
             for (int i = 0; i < equip.Capacidade; i++)
             {
                 var item = equip.GetSlot(i);
-                if (item != null)
-                    equipSlotData[i] = new ItemSlotData(item.ItemDefId, item.Quantidade);
+                if (item != null) equipSlotData[i] = new ItemSlotData(item);
             }
         }
     }

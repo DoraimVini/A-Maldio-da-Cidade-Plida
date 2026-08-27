@@ -64,6 +64,15 @@ namespace FavelaAmarela.Player
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.Equipment.OnEquipmentChanged += NotificarMudanca;
+
+                // TAMBÉM OnSlotChanged do equipamento (acrescentado em 2026-08-27). Em operação
+                // normal os dois disparam juntos, mas `BaseInventory.LimparTudo()` dispara
+                // SÓ OnSlotChanged -- e é ele que `InventoryManager.RestaurarEquipamento` chama
+                // no caminho de load. Com o equipamento salvo VAZIO, nenhum Equip roda depois,
+                // OnEquipmentChanged nunca vem, e os bônus da partida anterior ficavam grudados
+                // no jogador.
+                InventoryManager.Instance.Equipment.OnSlotChanged += HandleSlotDaMochilaMudou;
+
                 InventoryManager.Instance.Main.OnSlotChanged += HandleSlotDaMochilaMudou;
             }
             if (ProgressionBridge.Instancia != null)
@@ -84,6 +93,7 @@ namespace FavelaAmarela.Player
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.Equipment.OnEquipmentChanged -= NotificarMudanca;
+                InventoryManager.Instance.Equipment.OnSlotChanged -= HandleSlotDaMochilaMudou;
                 InventoryManager.Instance.Main.OnSlotChanged -= HandleSlotDaMochilaMudou;
             }
             if (ProgressionBridge.Instancia != null)
@@ -125,44 +135,62 @@ namespace FavelaAmarela.Player
         /// Agrega o bônus total para um determinado status (soma todos os multiplicadores e bônus fixos).
         /// Fontes: Equipamentos, Itens Passivos na Mochila, e Ecos Desbloqueados.
         /// </summary>
+        // ── Cache ─────────────────────────────────────────────────────────────
+        //
+        // Até 2026-08-27 GetBonus recalculava TUDO a cada chamada: 7 slots de equipamento +
+        // 12 da mochila + 4 artefatos + os Ecos, com um foreach por lista de modificadores --
+        // 2× por quadro só no Update acima, mais 2× por golpe na MaoFisicaBridge. Não alocava
+        // lixo, mas era trabalho repetido em hot path, que a Regra de Ouro 1 proíbe.
+        //
+        // Com afixos por instância o custo cresce (ModificadoresEfetivos concatena base +
+        // rolados), então o cache deixou de ser otimização e virou requisito. A invalidação é
+        // por EVENTO -- os mesmos quatro que já disparavam NotificarMudanca --, nunca por
+        // tempo: cache com prazo é cache que mente durante o prazo.
+
+        private readonly Dictionary<StatType, float> _cache = new Dictionary<StatType, float>();
+        private bool _cacheValido;
+
+        /// <summary>
+        /// Bônus agregado de um atributo, somando equipamento, relíquias na mochila, Artefatos
+        /// e Ecos.
+        /// </summary>
         public float GetBonus(StatType statType)
         {
-            float total = 0f;
+            if (!_cacheValido) Recalcular();
 
-            // 1. Equipamentos
-            if (InventoryManager.Instance != null && InventoryManager.Instance.Equipment != null)
+            return _cache.TryGetValue(statType, out float valor) ? valor : 0f;
+        }
+
+        /// <summary>
+        /// Varre as quatro fontes UMA vez e preenche o cache inteiro. Varrer por atributo
+        /// (como antes) repetia a mesma varredura para cada <c>StatType</c> consultado.
+        /// </summary>
+        private void Recalcular()
+        {
+            _cache.Clear();
+
+            var inv = InventoryManager.Instance;
+
+            if (inv != null)
             {
-                for (int i = 0; i < InventoryManager.Instance.Equipment.Capacidade; i++)
-                {
-                    var slot = InventoryManager.Instance.Equipment.GetSlot(i);
-                    if (slot != null && slot.Def != null && slot.Def.Modificadores != null)
-                    {
-                        foreach (var mod in slot.Def.Modificadores)
-                        {
-                            if (mod.Stat == statType) total += mod.Valor;
-                        }
-                    }
-                }
+                // 1. Equipamento — agora pelos modificadores EFETIVOS da instância: os
+                //    implícitos da base MAIS os afixos que este exemplar rolou. Ler
+                //    `slot.Def.Modificadores` aqui perderia tudo que foi rolado, e o sistema
+                //    de afixos seria invisível em jogo.
+                if (inv.Equipment != null)
+                    for (int i = 0; i < inv.Equipment.Capacidade; i++)
+                        Somar(inv.Equipment.GetSlot(i));
 
-                // 2. Itens Chave na Mochila (ex: Necronomicon)
-                // Uma heurística comum: iteramos a mochila procurando relíquias puramente passivas.
-                for (int i = 0; i < InventoryManager.Instance.Main.Capacidade; i++)
-                {
-                    var slot = InventoryManager.Instance.Main.GetSlot(i);
-                    if (slot != null && slot.Def != null && slot.Def.Tipo == ItemType.Chave)
+                // 2. Relíquias puramente passivas na mochila (ex.: Necronomicon).
+                if (inv.Main != null)
+                    for (int i = 0; i < inv.Main.Capacidade; i++)
                     {
-                        if (slot.Def.Modificadores != null)
-                        {
-                            foreach (var mod in slot.Def.Modificadores)
-                            {
-                                if (mod.Stat == statType) total += mod.Valor;
-                            }
-                        }
+                        var slot = inv.Main.GetSlot(i);
+                        if (slot?.Def != null && slot.Def.Tipo == ItemType.Chave) Somar(slot);
                     }
-                }
             }
 
-            // 3. Artefatos equipados (só valem enquanto ocupam um dos 4 slots)
+            // 3. Artefatos equipados (só valem enquanto ocupam um dos 4 slots).
             if (_artefatos != null)
             {
                 for (int i = 0; i < FavelaAmarela.Core.Artefatos.InventarioDeArtefatos.TotalDeSlots; i++)
@@ -170,29 +198,34 @@ namespace FavelaAmarela.Player
                     var def = _artefatos.DefNoSlot(i);
                     if (def?.Passivas == null) continue;
 
-                    foreach (var mod in def.Passivas)
-                    {
-                        if (mod.Stat == statType) total += mod.Valor;
-                    }
+                    foreach (var mod in def.Passivas) Acumular(mod);
                 }
             }
 
-            // 4. Ecos da Memória
+            // 4. Ecos da Memória.
             if (ProgressionBridge.Instancia != null)
             {
                 foreach (var eco in ProgressionBridge.Instancia.EcosDesbloqueados())
                 {
-                    if (eco.Modificadores != null)
-                    {
-                        foreach (var mod in eco.Modificadores)
-                        {
-                            if (mod.Stat == statType) total += mod.Valor;
-                        }
-                    }
+                    if (eco.Modificadores == null) continue;
+                    foreach (var mod in eco.Modificadores) Acumular(mod);
                 }
             }
 
-            return total;
+            _cacheValido = true;
+        }
+
+        private void Somar(ItemInstance slot)
+        {
+            if (slot?.Def == null) return;
+
+            foreach (var mod in slot.ModificadoresEfetivos()) Acumular(mod);
+        }
+
+        private void Acumular(ModificadorFixo mod)
+        {
+            _cache.TryGetValue(mod.Stat, out float atual);
+            _cache[mod.Stat] = atual + mod.Valor;
         }
     }
 }

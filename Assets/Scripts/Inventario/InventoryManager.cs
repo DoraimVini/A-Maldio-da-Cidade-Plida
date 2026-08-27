@@ -250,7 +250,10 @@ namespace FavelaAmarela.Inventario
                 var slot = data.mainSlotData[i];
                 if (slot == null || string.IsNullOrEmpty(slot.itemDefId)) continue;
 
-                mochila.AddAt(new ItemInstance(slot.itemDefId, slot.quantity), i);
+                // ParaInstancia() traz grau, nível do item e afixos rolados junto --
+                // reconstruir só id+quantidade descartaria tudo que o exemplar rolou, e
+                // o jogador veria a arma dele perder os modificadores ao recarregar.
+                mochila.AddAt(slot.ParaInstancia(), i);
             }
 
             return mochila;
@@ -290,7 +293,7 @@ namespace FavelaAmarela.Inventario
                 var slot = data.equipSlotData[i];
                 if (slot == null || string.IsNullOrEmpty(slot.itemDefId)) continue;
 
-                RestaurarUmEquipamento(equipamento, new ItemInstance(slot.itemDefId, slot.quantity), i);
+                RestaurarUmEquipamento(equipamento, slot.ParaInstancia(), i);
             }
 
             return equipamento;

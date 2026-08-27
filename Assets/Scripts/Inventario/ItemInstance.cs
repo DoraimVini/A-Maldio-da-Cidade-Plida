@@ -1,6 +1,8 @@
 // Assets/Scripts/Inventario/ItemInstance.cs
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using FavelaAmarela.Core.Loot;
 
 namespace FavelaAmarela.Inventario
 {
@@ -14,6 +16,26 @@ namespace FavelaAmarela.Inventario
     {
         public string ItemDefId;
         public int Quantidade;
+
+        /// <summary>
+        /// Quanto de Carcosa entrou NESTE exemplar. Decide quantos afixos ele carrega
+        /// (ver <see cref="RegrasDeGrau"/>).
+        /// </summary>
+        public GrauDeImpregnacao Grau = GrauDeImpregnacao.Inerte;
+
+        /// <summary>
+        /// Nível <b>do item</b>, derivado da fonte do drop. Governa que afixos podiam cair.
+        /// Não confundir com o nível do jogador: comparar com ele faria uma zona inicial
+        /// dropar tier máximo assim que o jogador subisse.
+        /// </summary>
+        public int NivelDoItem = 1;
+
+        /// <summary>
+        /// Os afixos que ESTE exemplar recebeu, com os valores já rolados. É o que faz duas
+        /// cópias da mesma base deixarem de ser idênticas — e o que dá sentido a olhar um
+        /// drop e perguntar "essa é melhor que a minha?".
+        /// </summary>
+        public List<AfixoRolado> Afixos = new List<AfixoRolado>();
 
         public ItemInstance(string itemDefId, int quantidade = 1)
         {
@@ -47,10 +69,49 @@ namespace FavelaAmarela.Inventario
 
         /// <summary>
         /// Cria uma cópia profunda (útil para transferências entre inventários).
+        ///
+        /// <para>Os afixos são <b>copiados</b>, não compartilhados: dois exemplares que
+        /// dividissem a mesma lista mudariam juntos ao primeiro que fosse alterado.</para>
         /// </summary>
         public ItemInstance Clone()
         {
-            return new ItemInstance(ItemDefId, Quantidade);
+            var copia = new ItemInstance(ItemDefId, Quantidade)
+            {
+                Grau = Grau,
+                NivelDoItem = NivelDoItem,
+            };
+
+            if (Afixos != null)
+                foreach (var a in Afixos)
+                    if (a != null) copia.Afixos.Add(new AfixoRolado(a.AfixoId, a.Stat, a.Valor));
+
+            return copia;
+        }
+
+        /// <summary>
+        /// Todos os modificadores que este exemplar concede: os <b>implícitos</b> da base
+        /// (autorados no <c>ItemDef</c>) mais os <b>afixos rolados</b> desta instância.
+        ///
+        /// <para><b>É por aqui que o sistema de afixos entra no jogo.</b> O
+        /// <c>GerenciadorEfeitosPassivos</c> lia <c>slot.Def.Modificadores</c>, que é só a
+        /// camada da base — ler isso agora perderia tudo que a instância rolou, e todo o
+        /// sistema seria invisível em jogo.</para>
+        ///
+        /// <para>Aloca uma lista por chamada, então <b>não deve ser usada em hot path</b>: o
+        /// agregador de bônus tem cache próprio, invalidado por evento (Regra de Ouro 1).</para>
+        /// </summary>
+        public IReadOnlyList<ModificadorFixo> ModificadoresEfetivos()
+        {
+            var todos = new List<ModificadorFixo>();
+
+            var def = Def;
+            if (def?.Modificadores != null) todos.AddRange(def.Modificadores);
+
+            if (Afixos != null)
+                foreach (var a in Afixos)
+                    if (a != null) todos.Add(a.ComoModificador());
+
+            return todos;
         }
     }
 }
