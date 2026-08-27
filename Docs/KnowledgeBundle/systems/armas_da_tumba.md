@@ -7,6 +7,19 @@ tags: [combat, weapons, tumba, sangramento]
 
 # As Três Armas da Tumba
 
+
+> ⚠️ **Os números de dano deste documento estão DEFASADOS, e a divergência é conhecida.** A
+> tabela de panorama abaixo diz **40/25/60** (Cravo/Estilete/Alfanje) para o dano básico; o
+> código sempre disse **40/30/45**. O `CLAUDE.md` §3.1 regra 4 manda seguir o código para "como
+> funciona", então a migração para dado de 2026-08-27 preservou **40/30/45** — os valores estão
+> agora fixados em `EquivalenciaDaMigracaoTests`, e mexer neles é decisão de balanceamento
+> deliberada, não efeito colateral de editar um asset. **Se 40/25/60 for a intenção de design,
+> é mudança a fazer de propósito, no asset e no teste juntos.**
+>
+> **As armas deixaram de ser classes C#** em 2026-08-27. Vivem em
+> `Config/Habilidades/Habilidade_*.asset` (o que o golpe faz) e `Config/Armas/BaseArma_*.asset`
+> (alcance, raio e janela — a *família*). Ver [habilidades_de_item.md](habilidades_de_item.md).
+
 O baú da Câmara do Baú (Zona 6b) **sorteia uma** das três armas seladas — não é escolha, é
 RNG, e é o que faz a build variar entre partidas. Cada arma tem **ataque básico + uma
 habilidade em botão separado**, com cooldown próprio.

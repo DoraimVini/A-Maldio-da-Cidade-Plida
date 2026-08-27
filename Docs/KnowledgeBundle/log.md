@@ -6,6 +6,94 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-27 — Itemização a dado, afixos rolados e física de impacto (`develop_items`)
+
+Trabalho de uma noite inteira em `develop_items`, com a build do edital preservada e
+intocada em `develop_manager`. **Sete fases, todas verdes.** Suíte: 677 → **755 testes**.
+
+### A decisão que abriu tudo
+
+O Vini apontou o furo da invariante que vigorava desde 10/08 — *"o sorteio nunca gera
+atributos"*: **sem geração, uma arma de nível máximo entrega os mesmos status de uma de nível
+1**. Não há curva de poder, e a segunda cópia de um item nunca interessa, que é o loop de loot
+mais fraco que um ARPG pode ter. A invariante foi **revogada** e substituída por uma mais
+fraca e ainda real: *o gerador nunca inventa um afixo — escolhe de um pool autorado e rola
+dentro de uma faixa autorada*.
+
+`CLAUDE.md` §1 e `loot_e_drop.md` foram reescritos **na Fase 0**, antes de qualquer código: sem
+isso o Commandment faria a sessão seguinte reimpor a regra antiga e desfazer o trabalho.
+
+### Física: por que as coisas funcionam nessa realidade
+
+Medido: `AddForce`, `MovePosition` e `linearVelocity +=` **não existiam** em `Assets/Scripts`, e
+`ForcaRepulsao` tinha **zero leitores** — o Alfanje, cuja identidade de design é *"força bruta e
+espaço"*, preenchia o campo com 6 e não empurrava nada.
+
+A regra adotada: **em Carcosa, quanto mais uma coisa está impregnada, menos ela se comporta como
+matéria.** Não é sabor — é legibilidade: o jogador descobre o que uma coisa é pela forma como
+ela reage ao golpe. Esqueleto 0,10 < Cultista 0,15 < Cortesão 0,45 < Coisa 0,60 < Byakhee 0,75 <
+Espectro 0,90. Rei, Abdul, Pedra de Poder e Eco **não têm `Rigidbody2D`** — já são inamovíveis
+por construção, e a ficção concorda com a técnica.
+
+**A armadilha:** 20+ atribuições de `linearVelocity` em 9 arquivos de IA fariam qualquer
+`AddForce` ser sobrescrito no passo seguinte, sem erro nenhum. A repulsão é estado temporizado
+em `[DefaultExecutionOrder(1000)]` — **nenhum dos 9 arquivos foi tocado**.
+
+Também entrou **hit-stop** (2–4 quadros no acerto, escalados pelo dano), que este projeto não
+tinha em forma nenhuma.
+
+### Armas: de código para dado
+
+- **`BaseDeArma`** — a família. Alcance/raio/janela deixaram de ser um `alcance = 1.2f` do
+  `MaoFisicaBridge` valendo para todas as armas. Lâmina fina 0,95 fura um ponto; Alfanje 1,60
+  varre um arco.
+- **`HabilidadeDef` + `HabilidadeComposta` + `IEfeitoDeHabilidade`** — as três peças que
+  `habilidades_de_item.md` desenhou em 10/08 e ninguém implementou.
+- **As 3 armas migraram e as classes C# saíram**, mas só depois de `EquivalenciaDaMigracaoTests`
+  provar igualdade **campo a campo** nos doze campos do `ArmaResult` e cadência em 9 pontos de
+  tempo. Isso importava: o `armas_da_tumba.md` diz 40/25/60 e o código dizia **40/30/45** —
+  migrar "conferindo pela documentação" teria mudado o balanceamento de duas armas em silêncio.
+
+### Afixos
+
+`AfixoDef` + `GeradorDeItem` + `RegrasDeGrau`, com as armadilhas clássicas do gênero testadas:
+grupo de exclusão (impede "+5 Vit" e "+8 Vit" na mesma peça), **peso renormalizado depois do
+filtro** (o erro mais difícil de perceber: o jogo continua funcionando e só as proporções ficam
+erradas), nível **do item** e não do jogador, e faixa invertida que não pode zerar o afixo.
+
+**Save v2**: grau, nível e os **valores rolados** — nunca a semente, que re-rolaria todo item já
+dropado assim que um `AfixoDef` fosse editado. A v1 continua legível de graça.
+
+### O que deixou de ser cosmético
+
+- **`ProgressionBridge.AdicionarExposicao` nunca era chamado.** O nível ficava em 1. Com afixos
+  por nível do item isso virou bloqueante — agora `EnemyBase.Abater` concede, então inimigo novo
+  concede de graça.
+- **Os `StatType` decorativos viraram defeito ativo.** Um afixo de `Furtividade` ou
+  `DefesaAnomalia` produz item que **mente**. Guardado em `PoolDeAfixosTests`.
+
+### A Forja (o pedido original)
+
+O Carcosa Debugger virou duas abas, e a **Forja funciona fora do Play Mode** — criar item é
+autoria, e autoria acontece com o jogo parado. Ela grava **asset de verdade** em
+`Config/Resources/Itens/`: um `ItemDef` só em memória some no reload e deixa o save
+referenciando um item que não existe, com `BaseInventory.CanAdd` recusando `Def` nulo **sem log
+nenhum**.
+
+### Listas escritas à mão que morreram nesta noite
+
+`LimparHudDasCenas` (varre a pasta), `TabelaDeDropAssetsTests` (contagem vem do asset), o enum
+`ArmaDeTeste`, o dicionário da `WeaponFactory`, o `BaseDeArma.Arquetipo` e o array de GUIDs de
+arma do Debugger. Eram **quatro listas paralelas de armas** obrigadas a concordar entre si.
+
+### Pendências deixadas de propósito
+
+- **A contrapartida do grau Impregnado.** `loot_e_drop.md` registra que "o que o grau alto cobra"
+  é decisão em aberto do Vini; inventar seria decidir design por conta própria.
+- **Tooltip de item na UI.** `NomeExibido` e `LinhasDeAfixo` existem e estão testados, mas a UI
+  do inventário ainda mostra só ícone e quantidade.
+- **Mão Secundária no combate** (escudo/foco) — decidida, ainda não implementada.
+
 ## 2026-08-26 — HUD persistente: um prefab, cinco cenas a menos para sincronizar
 
 **Bloco 6 do plano da build.** O HUD deixou de ser remontado por cena e passou a nascer uma

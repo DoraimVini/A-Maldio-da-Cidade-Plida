@@ -6,6 +6,24 @@ description: Auditoria completa do inventário — o que existe, o que está lig
 
 # Análise do Sistema de Inventário
 
+
+> ⚠️ **Corrigido em 2026-08-27.** Este documento afirmava que **7 dos 15 `StatType` declarados
+> não são lidos por ninguém**. Remedido: são **4** sem consumidor nenhum (`RCMaxima`,
+> `Velocidade`, `Furtividade`, `DefesaAnomalia`), mais `RMMaxima`, que funciona **só como
+> consumível** e não como passiva. Os quatro de Vigor foram ligados depois de este texto ser
+> escrito.
+>
+> **O que mudou de gravidade.** Enquanto o loot entregava só itens autorados à mão, isso era
+> dívida conhecida. Com **afixos rolados** (ver [loot_e_drop.md](loot_e_drop.md)), o gerador
+> pode pôr esse número em qualquer item — e aí ele deixa de ser dívida e vira um item que
+> **mente** para o jogador: ele lê o valor, ocupa o slot e não recebe nada. `DefesaAnomalia` é
+> o pior caso, porque o `PainelDeFicha` **exibe** a linha e o combate não aplica.
+>
+> A lista canônica vive agora em `NomesDeAtributo.SemEfeito` (um lugar só — ela chegou a estar
+> duplicada em três), e `PoolDeAfixosTests` proíbe que qualquer afixo autorado role um deles.
+> **A pergunta em aberto continua a mesma:** implementar os quatro, ou removê-los do enum? Um
+> enum que promete o que não cumpre permite autorar itens que mentem.
+
 Auditoria pedida pelo Vini em 2026-08-14, a partir de três queixas de playtest. **As três
 procedem**, mas nenhuma pela razão que aparentava. O sistema não está "quebrado" — está
 **incompleto em pontos que não avisam**.

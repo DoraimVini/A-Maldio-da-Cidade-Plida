@@ -7,7 +7,31 @@ tags: [arquitetura, habilidades, itens, armas, artefatos, poco]
 
 # Habilidades de Item — Arquitetura Data-Driven
 
-> **Status:** Design escrito em 2026-08-10. **Não implementado.** Nasce de uma pergunta do
+> **Status:** Design escrito em 2026-08-10. **IMPLEMENTADO em 2026-08-27**, na branch
+> `develop_items`. As três peças existem: `IEfeitoDeHabilidade` e `HabilidadeComposta` em
+> `Assets/Scripts/Core/Abilities/`, `HabilidadeDef` em `Assets/Scripts/Inventario/`. O catálogo
+> fechado de efeitos está em `Core/Abilities/Efeitos/` (Dano, TraumaAnomalia, Atordoamento,
+> Repulsão, Sangramento, Interrupção).
+>
+> **Duas divergências do que está escrito abaixo, ambas deliberadas:**
+>
+> 1. **A assinatura do efeito.** O texto propõe `Aplicar(AlvoDeEfeito alvo)`, com o efeito
+>    agindo direto no alvo. O implementado é `Aplicar(ConstrutorDeGolpe golpe)`: o efeito
+>    **compõe um `ArmaResult`**. Motivo concreto: `ArmaResult` já é o valor que carrega efeito
+>    por todo o pipeline (`Hurtbox`, `EnemyStatusEffects`, `RepulsaoDeImpacto`, `HitStop`).
+>    Agir direto no alvo exigiria reescrever esse pipeline inteiro para ganhar a mesma coisa.
+>    O `ConstrutorDeGolpe` existe porque `ArmaResult` é um `readonly struct` de **doze**
+>    parâmetros, e compor criando um struct novo a cada efeito repetiria os doze argumentos
+>    posicionais em cada um.
+>
+> 2. **O passo 3 do caminho de migração NÃO foi seguido.** Ele dizia que as 3 armas existentes
+>    "continuam funcionando sem migrar — troca é opcional". O Vini decidiu o contrário
+>    ("migram todas"), e as classes `CravoDeAklo`, `EstileteDeIrem` e `AlfanjeDeAlhazred` foram
+>    **deletadas**, junto da `WeaponFactory`. A troca só aconteceu depois de
+>    `EquivalenciaDaMigracaoTests` provar igualdade campo a campo nos doze campos do
+>    `ArmaResult` e cadência em nove pontos de tempo.
+
+> **Status original (preservado):** Design escrito em 2026-08-10. Não implementado. Nasce de uma pergunta do
 > Vini sobre [loot_e_drop.md](loot_e_drop.md): o catálogo de itens vai crescer (árvore de
 > tiers + drop em todo inimigo/baú + Artefatos) e o padrão atual de habilidade não escala
 > junto sem virar trabalho de programador por item.
