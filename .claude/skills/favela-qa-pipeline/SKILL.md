@@ -28,7 +28,34 @@ Nesses três casos, **repita a mesma chamada uma ou duas vezes** antes de tratar
 
 ## Caminho alternativo: script batch (só com o Editor fechado)
 
-`C:\Users\Vini\Desktop\Peregrino_Amarelo\Peregrino_Amarelo\Tools\run_qa_tests.ps1` roda os testes em batch mode e é mais determinístico (sem flakiness de MCP), mas **falha imediatamente com "another Unity instance running"** se o Editor estiver aberto. Use-o só quando:
+`Tools\run_qa_tests.ps1` roda os testes em batch mode e é mais determinístico (sem flakiness de MCP), mas **exige o Editor fechado**.
+
+**Reescrito em 2026-08-27.** Ele classifica o resultado em EXATAMENTE UM de quatro estados e diz qual:
+
+| estado | o que significa |
+|---|---|
+| `EDITOR ABERTO` | detectado ANTES de rodar — nada foi executado, nada mudou |
+| `ERRO DE COMPILAÇÃO` | vem com arquivo, linha e mensagem, já sem repetição |
+| `TESTES FALHARAM` | vem com os nomes e as três primeiras linhas de cada mensagem |
+| `VERDE` | com as contagens |
+
+Antes disso os três primeiros caíam todos em "arquivo de resultados não encontrado", e a mensagem chutava entre duas causas. Pior: o log da Unity sai em **UTF-16** quando redirecionado pelo PowerShell, então um `grep "error CS"` **não achava nada e o silêncio parecia sucesso** — foi assim que uma compilação quebrada passou por compilada em 2026-08-27.
+
+O ruído de boot (~20 mil linhas) vai para `TestResults/unity_EditMode.log`; só o diagnóstico é impresso.
+
+### Ferramenta de Editor: `Tools\run_editor_tool.ps1`
+
+Para rodar `-executeMethod`, **use este wrapper, não o Unity direto**:
+
+```
+.\Tools\run_editor_tool.ps1 -Metodo FavelaAmarela.EditorTools.MontarBasesDeArma.Executar -Marcador "[BasesDeArma]"
+```
+
+O Corolário 4 do COMMANDMENT diz que exit code não é evidência — e `-executeMethod` devolve exatamente isso. Método com nome errado, método que retornou cedo por uma guarda, e método que funcionou saem **todos com código 0**. O wrapper exige o `-Marcador` (o prefixo dos `Debug.Log` da ferramenta) e **reprova se o log não tiver nenhuma linha com ele** — porque aí a ferramenta não deixou rastro de ter feito nada. Verificado: rodar com marcador errado devolve `TOOL FAILED` mesmo com a Unity saindo em 0.
+
+Isso não substitui conferir o disco. Substitui o passo anterior: saber se vale a pena olhar.
+
+Use-o só quando:
 - O usuário pedir explicitamente uma rodada de QA "limpa"/definitiva (ex.: antes de um commit importante), ou
 - O MCP estiver genuinamente indisponível após as tentativas acima.
 

@@ -22,4 +22,7 @@ MonoBehaviour:
   ArmaFisica: 2
   Base: {fileID: 11400000, guid: eeb92c719d2f02840857d6d1cf15e6bd, type: 2}
   Empunhadura: 0
+  Funcao: 0
+  PotenciaDaMaoSecundaria: 0
+  ReducaoAoBloquear: 0.5
   Modificadores: []

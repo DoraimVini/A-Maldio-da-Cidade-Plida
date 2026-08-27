@@ -125,3 +125,7 @@ Tools/aseprite-bridge/node_modules/
 # Para trazer: remova estas linhas e faca git add da pasta.
 /Assets/ThirdParty/CraftPix_UndeadTileset/
 /Assets/ThirdParty/CraftPix_CursedLand/
+
+# Saída dos wrappers de QA: XML de resultado e log da Unity. É artefato de build,
+# não fonte — vinha sendo commitado como ruído em praticamente todo commit.
+TestResults/

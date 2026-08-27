@@ -18,4 +18,3 @@ MonoBehaviour:
   JanelaAtiva: 0.15
   Empunhadura: 0
   Habilidade: {fileID: 11400000, guid: 9b4c051909261df49ac92392addc72d5, type: 2}
-  Arquetipo: 3
