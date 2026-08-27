@@ -55,7 +55,30 @@ namespace FavelaAmarela.Runtime.Persistencia
 
         private void OnDestroy() => GerenciadorDeSave.Instancia?.Desregistrar(this);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Grava a <b>Vitalidade</b>. A arma <b>não</b> viaja mais por aqui.
+        ///
+        /// <para><b>Por que o canal da arma foi colapsado (2026-08-27).</b> A mesma arma era
+        /// persistida por <b>dois caminhos independentes</b>: o <c>equipSlotData</c> do
+        /// inventário, por <c>ItemDef.Id</c>, e esta chave, pelo <b>nome do valor do enum</b>
+        /// <c>TipoArmaFisica</c>. Eles convergiam só porque ambos terminavam em
+        /// <c>EquiparArma(TipoArmaFisica)</c>.</para>
+        ///
+        /// <para>Com a arma montada por dado (<c>HabilidadeDef</c>), o enum deixou de descrever
+        /// a arma — ele é identificador, não comportamento. Manter o segundo canal passaria a
+        /// gravar algo que não reconstrói mais nada, e dois canais que discordam são piores que
+        /// um só.</para>
+        ///
+        /// <para><b>O inventário já bastava</b>, e por construção: o equipamento é restaurado
+        /// pelo <c>EstadoPersistenteDoInventario</c>, e a <c>MaoFisicaBridge</c> reage por dois
+        /// caminhos que se cobrem — o evento <c>OnSlotChanged</c> (se o inventário restaurar
+        /// depois) e a leitura do slot corrente no <c>Start</c> (se restaurar antes). Foi
+        /// justamente essa dupla cobertura que consertou o "quando saio da Tumba a arma some"
+        /// do playtest de 2026-07-31.</para>
+        ///
+        /// <para>A chave <c>ArmaEquipada</c> continua sendo a identidade deste componente para
+        /// não órfãozar partidas salvas; ela só passou a carregar vazio.</para>
+        /// </summary>
         public string CapturarEstado()
         {
             // A Vitalidade viaja por chave própria: são dois dados independentes, e
@@ -68,26 +91,21 @@ namespace FavelaAmarela.Runtime.Persistencia
                     _vitalidade.Vitalidade.Atual.ToString(CultureInfo.InvariantCulture));
             }
 
-            var id = _maoFisica != null ? _maoFisica.IdDaArmaEquipada : null;
-            return id.HasValue ? id.Value.ToString() : "";
+            return "";
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Não faz nada com a arma — quem a devolve é o inventário (ver
+        /// <see cref="CapturarEstado"/>).
+        ///
+        /// <para>Continua existindo para <b>consumir em silêncio</b> o valor de partidas
+        /// salvas antes de 2026-08-27, que ainda carregam um nome de enum aqui. Reequipar por
+        /// esse valor agora seria um segundo caminho competindo com o inventário, e foi
+        /// exatamente essa competição que o colapso removeu.</para>
+        /// </summary>
         public void AplicarEstado(string estado)
         {
-            if (string.IsNullOrWhiteSpace(estado)) return; // desarmado: nada a reequipar
-            if (_maoFisica == null) return;
-
-            // Enum desconhecido (save de uma versão com outra arma) não pode quebrar o
-            // load: fica desarmado, que é o estado padrão seguro.
-            if (!System.Enum.TryParse(estado, out TipoArmaFisica qual))
-            {
-                Debug.LogWarning($"[EstadoPersistenteDoJogador] Arma '{estado}' não existe mais — " +
-                                 "Damião continua desarmado.", this);
-                return;
-            }
-
-            _maoFisica.EquiparArma(qual);
+            // Intencionalmente vazio. Ver o XML doc acima antes de "consertar".
         }
 
         private void AplicarVitalidade(string valor)

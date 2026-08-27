@@ -17,4 +17,5 @@ MonoBehaviour:
   Raio: 0.6
   JanelaAtiva: 0.1
   Empunhadura: 0
+  Habilidade: {fileID: 11400000, guid: 78f3a0fccebe2f24f85d258f83e4e7cc, type: 2}
   Arquetipo: 1

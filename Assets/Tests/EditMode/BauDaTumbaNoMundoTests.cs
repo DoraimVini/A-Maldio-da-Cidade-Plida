@@ -73,6 +73,13 @@ namespace FavelaAmarela.Tests.EditMode
             PastaDeCenas + "Santuario_Yhtill.unity",
         };
 
+                // MIGRADO EM 2026-08-27 (Fase 4 da itemização): o campo `armaInicialParaTeste` e o
+        // enum `ArmaDeTeste` saíram da MaoFisicaBridge junto com as classes C# de arma. Eram a
+        // TERCEIRA lista de armas do projeto, mantida à mão. Com o campo fora, este guarda
+        // verifica um valor que a Unity nem serializa mais -- ele não pode falhar, e um teste
+        // que não pode falhar é ruído. Quem quer testar combate isolado usa o Carcosa Debugger,
+        // que concede a arma pelo inventário de verdade e portanto sobrevive à troca de cena.
+        [Ignore("Contrato mudou: o campo saiu do código em 2026-08-27")]
         [TestCaseSource(nameof(CenasQueComecamDesarmadas))]
         public void CenaJogavel_NaoComecaComArmaDeTeste(string caminhoDaCena)
         {

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Inventario;
 
 namespace FavelaAmarela.EditorTools
@@ -35,18 +34,18 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static readonly (string Asset, string ItemDef, string Familia,
                                  float Alcance, float Raio, float Janela,
-                                 TipoArmaFisica Arquetipo, string Porque)[] Familias =
+                                 string Porque)[] Familias =
         {
             ("BaseArma_LaminaFina", "Item_Arma_EstileteDeIrem", "Lâmina fina",
-             0.95f, 0.42f, 0.07f, TipoArmaFisica.EstileteDeIrem,
+             0.95f, 0.42f, 0.07f,
              "fura um ponto: curta, estreita e sem perdão de mira — quem erra o passo não acerta"),
 
             ("BaseArma_Cravo", "Item_Arma_CravoDeAklo", "Cravo",
-             1.20f, 0.60f, 0.10f, TipoArmaFisica.CravoDeAklo,
+             1.20f, 0.60f, 0.10f,
              "o meio-termo do arsenal: é a referência contra a qual as outras duas são lidas"),
 
             ("BaseArma_Alfanje", "Item_Arma_AlfanjeDeAlhazred", "Alfanje",
-             1.60f, 0.85f, 0.15f, TipoArmaFisica.AlfanjeDeAlhazred,
+             1.60f, 0.85f, 0.15f,
              "varre um arco: alcança, pega mais de um e perdoa a mira — é o 'espaço' do design"),
         };
 
@@ -84,7 +83,7 @@ namespace FavelaAmarela.EditorTools
 
         private static string Montar((string Asset, string ItemDef, string Familia,
                                       float Alcance, float Raio, float Janela,
-                                      TipoArmaFisica Arquetipo, string Porque) f)
+                                      string Porque) f)
         {
             string caminhoBase = $"{PastaDasBases}/{f.Asset}.asset";
 
@@ -101,7 +100,6 @@ namespace FavelaAmarela.EditorTools
             baseDeArma.Alcance = f.Alcance;
             baseDeArma.Raio = f.Raio;
             baseDeArma.JanelaAtiva = f.Janela;
-            baseDeArma.Arquetipo = f.Arquetipo;
 
             EditorUtility.SetDirty(baseDeArma);
             AssetDatabase.SaveAssetIfDirty(baseDeArma);

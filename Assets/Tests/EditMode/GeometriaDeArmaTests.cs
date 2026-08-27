@@ -50,12 +50,16 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// A base diz qual POCO de combate construir. Se ela divergir do <c>ArmaFisica</c> do
-        /// item, a arma teria a geometria de uma e o comportamento de outra — um alfanje com
-        /// alcance de alfanje e dano de estilete, sem nada acusando.
+        /// A família tem de estar ligada à habilidade <b>da própria arma</b>. Uma troca aqui
+        /// daria ao alfanje a geometria de alfanje com o comportamento de estilete — os dois
+        /// metade certos, e nada acusando.
+        ///
+        /// <para>Substituiu, em 2026-08-27, um guarda que comparava <c>BaseDeArma.Arquetipo</c>
+        /// com <c>ItemDef.ArmaFisica</c>. Esse campo saiu junto com as classes C# de arma: com
+        /// a habilidade vindo de dado, não há mais arquétipo com que divergir.</para>
         /// </summary>
         [Test]
-        public void AFamilia_ConcordaComOComportamentoDaArma()
+        public void AFamilia_EstaLigadaAHabilidadeDaPropriaArma()
         {
             var divergentes = new List<string>();
 
@@ -63,14 +67,23 @@ namespace FavelaAmarela.Tests.EditMode
             {
                 if (def.Base == null) continue;   // já coberto acima
 
-                if (def.Base.Arquetipo != def.ArmaFisica)
-                    divergentes.Add($"{def.name}: item diz {def.ArmaFisica}, " +
-                                    $"família '{def.Base.name}' diz {def.Base.Arquetipo}");
+                if (def.Base.Habilidade == null)
+                {
+                    divergentes.Add($"{def.name}: família '{def.Base.name}' sem HabilidadeDef");
+                    continue;
+                }
+
+                string nomeDaArma = def.Base.Habilidade.NomeDaArma;
+
+                if (!string.Equals(nomeDaArma, def.Nome, StringComparison.Ordinal))
+                    divergentes.Add($"{def.name}: o item se chama '{def.Nome}' e a habilidade " +
+                                    $"ligada monta '{nomeDaArma}'");
             }
 
             Assert.IsEmpty(divergentes,
-                "Família e comportamento divergem:" + Environment.NewLine + "  " +
-                string.Join(Environment.NewLine + "  ", divergentes));
+                "Família ligada à habilidade errada:" + Environment.NewLine + "  " +
+                string.Join(Environment.NewLine + "  ", divergentes) + Environment.NewLine +
+                "O jogador equiparia uma arma e empunharia outra.");
         }
 
         /// <summary>

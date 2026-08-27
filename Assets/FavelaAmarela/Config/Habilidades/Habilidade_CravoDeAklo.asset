@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fb99ecbc5fbc9d4caf24dafb94e31cc, type: 3}
+  m_Name: Habilidade_CravoDeAklo
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.HabilidadeDef
+  NomeDaArma: Cravo de Aklo
+  NomeDaHabilidade: Fincar o Aklo
+  DuracaoBasico: 0.35
+  CooldownBasico: 0.5
+  EfeitosDoBasico:
+  - Tipo: 0
+    Valor: 40
+    Duracao: 0
+    Acumulos: 0
+  DuracaoHabilidade: 0.4
+  CooldownHabilidade: 6
+  EfeitosDaHabilidade:
+  - Tipo: 0
+    Valor: 30
+    Duracao: 0
+    Acumulos: 0
+  - Tipo: 5
+    Valor: 0
+    Duracao: 0
+    Acumulos: 0

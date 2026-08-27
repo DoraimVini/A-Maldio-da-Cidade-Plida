@@ -94,28 +94,23 @@ namespace FavelaAmarela.EditorTools
         /// Devolve <c>armaInicialParaTeste</c> a <c>Nenhuma</c>. No jogo real Damião começa
         /// desarmado — a arma vem do baú.
         /// </summary>
-        private static int DesarmarOverrideDeTeste()
-        {
-            int zerados = 0;
-
-            foreach (var mao in Object.FindObjectsByType<Player.MaoFisicaBridge>(
-                         FindObjectsInactive.Include))
-            {
-                var so = new SerializedObject(mao);
-                var p = so.FindProperty("armaInicialParaTeste");
-                if (p == null || p.enumValueIndex == 0) continue;
-
-                Undo.RecordObject(mao, "Desarmar override de teste");
-                p.enumValueIndex = 0; // ArmaDeTeste.Nenhuma
-                so.ApplyModifiedProperties();
-                EditorUtility.SetDirty(mao);
-                zerados++;
-
-                Debug.Log($"[RepararArmaDaTumba] '{mao.name}': armaInicialParaTeste devolvido a " +
-                          "Nenhuma — Damião volta a começar desarmado.", mao);
-            }
-
-            return zerados;
-        }
+        /// <summary>
+        /// <b>Inerte desde 2026-08-27.</b> O campo <c>armaInicialParaTeste</c> e o enum
+        /// <c>ArmaDeTeste</c> saíram da <c>MaoFisicaBridge</c> na Fase 4 da itemização, junto
+        /// com as classes C# de arma: eram a <b>terceira</b> lista de armas do projeto — depois
+        /// do enum <c>TipoArmaFisica</c> e do dicionário da fábrica —, todas mantidas à mão e
+        /// obrigadas a concordar entre si.
+        ///
+        /// <para>O defeito que este método consertava <b>deixou de ser possível</b>: não há
+        /// mais campo para alguém sobrescrever numa cena e esquecer. Quem quer testar combate
+        /// isolado usa o Carcosa Debugger, que concede a arma pelo inventário de verdade — e
+        /// por isso ela sobrevive à troca de cena, que era justamente o sintoma
+        /// ("a arma sumiu") que a arma de teste produzia.</para>
+        ///
+        /// <para>Fica como no-op documentado em vez de sumir para que o relatório da ferramenta
+        /// continue com a mesma forma, e para que quem procurar pelo defeito antigo encontre a
+        /// explicação de por que ele não existe mais.</para>
+        /// </summary>
+        private static int DesarmarOverrideDeTeste() => 0;
     }
 }

@@ -4,51 +4,36 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
-using FavelaAmarela.Core.Abilities;
-using FavelaAmarela.Core.Factories;
 using FavelaAmarela.Inventario;
 
 namespace FavelaAmarela.Tests.EditMode
 {
     /// <summary>
-    /// A rede que precisa existir <b>antes</b> de a arma virar dado.
+    /// O contrato mínimo de <b>toda arma do catálogo</b>: se o jogador consegue equipar, tem de
+    /// virar uma arma que causa dano.
     ///
-    /// <para><b>O buraco que isto fecha (medido em 2026-08-27).</b> A <c>WeaponFactory</c> é o
-    /// único ponto de produção onde um item equipado vira uma arma jogável — e tinha
-    /// <b>zero</b> cobertura de teste. Pior: <c>Criar</c> devolve <c>null</c> por "degradação
-    /// graciosa" quando não conhece o valor, então uma arma que sumisse do dicionário viraria
-    /// Damião desarmado <b>sem uma linha no console</b>. O <c>ArmasDaTumbaTests</c> não pega
-    /// isso: ele instancia as classes na mão (<c>new CravoDeAklo()</c>) e nunca passa pela
-    /// fábrica.</para>
+    /// <para><b>O buraco que este arquivo fechou (2026-08-27).</b> A <c>WeaponFactory</c> era o
+    /// único ponto de produção onde um item equipado virava arma jogável, e tinha <b>zero</b>
+    /// cobertura. Pior: <c>Criar</c> devolvia <c>null</c> por "degradação graciosa" para valor
+    /// desconhecido — uma arma sumindo do dicionário viraria Damião desarmado <b>sem uma linha
+    /// no console</b>. O <c>ArmasDaTumbaTests</c> não pegava: ele instanciava as classes na mão
+    /// e nunca passava pela fábrica.</para>
     ///
-    /// <para>Estes guardas continuam valendo depois da migração para dado — o que muda é de
-    /// onde a fábrica lê, não o contrato de que <b>toda arma autorada tem de virar uma arma
-    /// que causa dano</b>.</para>
+    /// <para>A fábrica saiu com a migração para dado; o contrato ficou, e agora aponta para
+    /// <c>BaseDeArma.ConstruirArma</c> — o único lugar que monta uma arma. <b>Este guarda é o
+    /// que faz uma arma nova, criada pelo Item Creator, não nascer inerte.</b></para>
     /// </summary>
     public sealed class ArmaDeDadoTests
     {
         private const string PastaDosItens = "Assets/FavelaAmarela/Config/Resources/Itens";
 
-        /// <summary>
-        /// Todo <c>ItemDef</c> do catálogo — varrido da pasta, não listado à mão. Item novo
-        /// entra sozinho neste guarda.
-        /// </summary>
-        private static IEnumerable<ItemDef> TodosOsItens()
-        {
-            if (!Directory.Exists(PastaDosItens)) yield break;
-
-            foreach (var caminho in Directory.GetFiles(PastaDosItens, "*.asset",
-                                                       SearchOption.AllDirectories)
-                                             .Select(c => c.Replace(Path.DirectorySeparatorChar, '/'))
-                                             .OrderBy(c => c))
-            {
-                var def = AssetDatabase.LoadAssetAtPath<ItemDef>(caminho);
-                if (def != null) yield return def;
-            }
-        }
-
         private static ItemDef[] ArmasAutoradas() =>
-            TodosOsItens().Where(d => d.Tipo == ItemType.Arma).ToArray();
+            Directory.GetFiles(PastaDosItens, "*.asset", SearchOption.AllDirectories)
+                     .Select(c => c.Replace(Path.DirectorySeparatorChar, '/'))
+                     .Select(AssetDatabase.LoadAssetAtPath<ItemDef>)
+                     .Where(d => d != null && d.Tipo == ItemType.Arma)
+                     .OrderBy(d => d.name)
+                     .ToArray();
 
         [Test]
         public void OCatalogo_TemArmas()
@@ -59,9 +44,8 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// O contrato central: uma arma que o jogador pode equipar <b>tem</b> de virar uma arma
-        /// empunhável. Hoje isso depende do enum bater com o dicionário da fábrica; depois da
-        /// migração dependerá do asset de base estar ligado. O guarda é o mesmo nos dois mundos.
+        /// O contrato central. Uma arma que não constrói é Damião equipando e continuando
+        /// desarmado, sem erro no console.
         /// </summary>
         [Test]
         public void TodaArmaAutorada_ViraUmaArmaEmpunhavel()
@@ -70,23 +54,28 @@ namespace FavelaAmarela.Tests.EditMode
 
             foreach (var def in ArmasAutoradas())
             {
-                var arma = WeaponFactory.Criar(def.ArmaFisica);
+                if (def.Base == null)
+                {
+                    quebradas.Add($"{def.name}: sem BaseDeArma — não há o que construir");
+                    continue;
+                }
 
-                if (arma == null)
-                    quebradas.Add($"{def.name} (ArmaFisica: {def.ArmaFisica}) → a fábrica " +
-                                  "devolveu null");
+                if (def.Base.ConstruirArma() == null)
+                    quebradas.Add($"{def.name}: a família '{def.Base.name}' devolveu null " +
+                                  "(HabilidadeDef vazia?)");
             }
 
             Assert.IsEmpty(quebradas,
-                "Arma(s) autorada(s) que o jogador consegue equipar e que não viram arma " +
-                "nenhuma:" + Environment.NewLine + "  " +
+                "Arma(s) que o jogador consegue equipar e que não viram arma nenhuma:" +
+                Environment.NewLine + "  " +
                 string.Join(Environment.NewLine + "  ", quebradas) + Environment.NewLine +
-                "Em jogo isso é o Damião equipar e continuar desarmado, sem erro no console.");
+                "Em jogo isso é equipar e continuar desarmado, sem erro no console.");
         }
 
         /// <summary>
-        /// Toda arma tem de causar dano. Sem isto, um asset com todos os números zerados — o
-        /// erro mais provável ao migrar para dado — passaria como "arma existe e é não-nula".
+        /// Toda arma tem de causar dano e ocupar tempo. Sem isto, um asset com todos os números
+        /// zerados — o erro mais provável ao autorar pelo Item Creator — passaria como "arma
+        /// existe e não é nula".
         /// </summary>
         [Test]
         public void TodaArmaAutorada_CausaDanoNoGolpeBasico()
@@ -95,7 +84,7 @@ namespace FavelaAmarela.Tests.EditMode
 
             foreach (var def in ArmasAutoradas())
             {
-                var arma = WeaponFactory.Criar(def.ArmaFisica);
+                var arma = def.Base != null ? def.Base.ConstruirArma() : null;
                 if (arma == null) continue;   // já coberto pelo guarda acima
 
                 var golpe = arma.Execute();
@@ -113,41 +102,50 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// Cobre o caminho oposto: valor do enum que a fábrica não conhece. Hoje ela engole e
-        /// devolve <c>null</c>; este guarda garante que ninguém acrescente um valor ao enum e
-        /// esqueça de registrar a arma — que é exatamente o erro que a migração vai convidar.
+        /// Nenhuma arma pode ter cadência zero: um golpe sem recarga é dano infinito por
+        /// segundo, e é o valor que um campo recém-criado no Inspector tem por padrão.
         /// </summary>
         [Test]
-        public void TodoValorDoEnum_TemArmaRegistrada()
+        public void NenhumaArma_TemCadenciaZero()
         {
-            var semFabrica = new List<string>();
+            var infinitas = new List<string>();
 
-            foreach (TipoArmaFisica tipo in Enum.GetValues(typeof(TipoArmaFisica)))
+            foreach (var def in ArmasAutoradas())
             {
-                // MaoVazia é null de propósito: desarmado é um estado, não uma arma.
-                if (tipo == TipoArmaFisica.MaoVazia) continue;
+                var arma = def.Base != null ? def.Base.ConstruirArma() : null;
+                if (arma == null) continue;
 
-                if (WeaponFactory.Criar(tipo) == null) semFabrica.Add(tipo.ToString());
+                if (arma.CanActivate(0f))
+                    infinitas.Add($"{def.name}: pronta de novo em 0 s");
             }
 
-            Assert.IsEmpty(semFabrica,
-                "Valor(es) de TipoArmaFisica sem arma registrada na WeaponFactory: " +
-                string.Join(", ", semFabrica) + ". A fábrica devolve null em silêncio para " +
-                "valor desconhecido, então isto não apareceria em jogo como erro — só como " +
-                "uma arma que não faz nada.");
+            Assert.IsEmpty(infinitas,
+                "Arma(s) sem cadência nenhuma: " + string.Join(", ", infinitas) +
+                ". Dano por segundo infinito trivializa qualquer chefe.");
         }
 
         /// <summary>
-        /// <c>MaoVazia</c> tem de continuar devolvendo <c>null</c>. É o que faz a
-        /// <c>MaoFisicaBridge</c> cair no <c>_maoVazia</c> local, com dano 0 por decisão de
-        /// design (ver <c>armas_da_tumba.md</c>: Damião começa desarmado).
+        /// Arma sem nome desenha um rótulo vazio na barra de ações — o jogador vê um espaço em
+        /// branco onde deveria estar a arma que ele acabou de achar.
         /// </summary>
         [Test]
-        public void MaoVazia_NaoEUmaArma()
+        public void NenhumaArma_FicaSemNomeNaBarraDeAcoes()
         {
-            Assert.IsNull(WeaponFactory.Criar(TipoArmaFisica.MaoVazia),
-                "MaoVazia passou a devolver uma arma — desarmado deixaria de ser um estado e " +
-                "o Damião começaria o jogo batendo.");
+            var anonimas = new List<string>();
+
+            foreach (var def in ArmasAutoradas())
+            {
+                var arma = def.Base != null ? def.Base.ConstruirArma() : null;
+                if (arma == null) continue;
+
+                if (string.IsNullOrWhiteSpace(arma.NomeDaArma) ||
+                    arma.NomeDaArma == "Arma sem nome")
+                    anonimas.Add(def.name);
+            }
+
+            Assert.IsEmpty(anonimas,
+                "Arma(s) sem nome autorado: " + string.Join(", ", anonimas) +
+                ". A barra de ações desenharia um rótulo vazio.");
         }
     }
 }

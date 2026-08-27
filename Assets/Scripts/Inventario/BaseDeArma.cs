@@ -1,6 +1,5 @@
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
-using FavelaAmarela.Core.Factories;
 
 namespace FavelaAmarela.Inventario
 {
@@ -52,28 +51,26 @@ namespace FavelaAmarela.Inventario
 
         [Header("Comportamento")]
         [Tooltip("A habilidade desta arma, montada por EFEITOS no Inspector. [ASSET] " +
-                 "Preenchido = arma a dado. Vazio = cai no arquétipo abaixo (caminho legado).")]
+                 "Sem ela a arma é equipável e inerte — a bridge reclama alto ao equipar.")]
         public HabilidadeDef Habilidade;
 
-        [Tooltip("Caminho LEGADO: qual classe C# construir quando não há HabilidadeDef. " +
-                 "Existe para as armas ainda não migradas continuarem funcionando.")]
-        public TipoArmaFisica Arquetipo = TipoArmaFisica.MaoVazia;
+        // O campo `Arquetipo` (TipoArmaFisica) saiu em 2026-08-27, junto com as três classes
+        // de arma e a WeaponFactory. Ele era o caminho legado -- "se não houver HabilidadeDef,
+        // construa a classe C#" --, e manter um caminho paralelo depois de a migração estar
+        // provada equivalente seria manter viva a duplicação que a migração existiu para
+        // remover.
 
         /// <summary>
-        /// Constrói o POCO de combate desta arma. <b>É o único lugar que decide</b> entre a
-        /// arma a dado e a classe C# legada — ter essa escolha espalhada seria criar mais uma
-        /// divergência para manter à mão.
+        /// Constrói o POCO de combate desta arma. <b>É o único lugar que monta uma arma</b> —
+        /// ter essa lógica espalhada seria criar mais uma divergência para manter à mão.
         /// </summary>
         /// <returns>
-        /// A arma, ou <c>null</c> quando nem habilidade nem arquétipo resolvem — que é o mesmo
-        /// que estar desarmado, e é o comportamento que a bridge já sabe tratar.
+        /// A arma, ou <c>null</c> quando não há habilidade autorada — que é o mesmo que estar
+        /// desarmado, e é o comportamento que a bridge já sabe tratar (e denunciar).
         /// </returns>
-        public IArmaComHabilidade ConstruirArma()
-        {
-            if (Habilidade != null) return Habilidade.Construir();
-
-            return WeaponFactory.Criar(Arquetipo);
-        }
+        public IArmaComHabilidade ConstruirArma() => Habilidade != null
+            ? Habilidade.Construir()
+            : null;
 
         /// <summary>
         /// Geometria padrão para quem não tem base ligada — os mesmos números que viviam

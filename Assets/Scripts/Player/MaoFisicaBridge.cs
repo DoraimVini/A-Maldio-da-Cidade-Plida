@@ -4,7 +4,6 @@ using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Player;
 using FavelaAmarela.Runtime.Combat;
-using FavelaAmarela.Core.Factories;
 using FavelaAmarela.Inventario;
 
 namespace FavelaAmarela.Player
@@ -21,12 +20,11 @@ namespace FavelaAmarela.Player
     [AddComponentMenu("Favela Amarela/Mao Fisica Bridge")]
     public class MaoFisicaBridge : MonoBehaviour
     {
-        /// <summary>Armas da Tumba para equipar em teste isolado (no jogo real vem do baú).</summary>
-        public enum ArmaDeTeste { Nenhuma, CravoDeAklo, EstileteDeIrem, AlfanjeDeAlhazred }
-
-        [Header("Arma (equipada pelo baú no jogo; aqui só para teste isolado)")]
-        [Tooltip("No jogo real Damião começa DESARMADO — a arma vem do baú da Tumba. Escolha uma aqui só para testar o combate.")]
-        [SerializeField] private ArmaDeTeste armaInicialParaTeste = ArmaDeTeste.Nenhuma;
+        // O enum `ArmaDeTeste` e o campo `armaInicialParaTeste` saíram em 2026-08-27.
+        // Eram a TERCEIRA lista de armas do projeto -- depois de TipoArmaFisica e do
+        // dicionário da fábrica --, todas mantidas à mão e todas obrigadas a concordar.
+        // Quem quer testar combate isolado usa o Carcosa Debugger, que concede as armas de
+        // verdade, pelo inventário de verdade.
 
         [Header("Alcance do Golpe")]
         [SerializeField] private float alcance = 1.2f;
@@ -66,9 +64,11 @@ namespace FavelaAmarela.Player
         /// </summary>
         private Hitbox _hitbox;
 
-        // Identificador serializável da arma empunhada. A instância de IArmaComHabilidade
-        // não sobrevive a uma troca de cena; o enum sim, e a fábrica reconstrói a arma.
-        private TipoArmaFisica? _idDaArmaEquipada;
+        // O campo `_idDaArmaEquipada` e a propriedade `IdDaArmaEquipada` saíram em
+        // 2026-08-27. Existiam para o save reconstruir a arma pelo enum -- um SEGUNDO canal,
+        // paralelo ao equipSlotData do inventário, que gravava a mesma arma por outra chave.
+        // Com a arma montada por dado o enum deixou de descrever comportamento, e dois canais
+        // que podem discordar são piores que um só. Quem devolve a arma é o inventário.
 
         private float _lastUseTime = -999f;
         private float _lastAbilityUseTime = -999f;
@@ -137,7 +137,6 @@ namespace FavelaAmarela.Player
         public void EquiparArma(IArmaComHabilidade arma)
         {
             _armaEquipada = arma;
-            _idDaArmaEquipada = null; // via genérica: identidade desconhecida para o save
 
             // Arma nova entra com a habilidade pronta (não herda a recarga da anterior).
             _cooldownHabilidadeAtual = 0f;
@@ -151,17 +150,13 @@ namespace FavelaAmarela.Player
         /// só ela deixa o save saber o que reequipar depois de uma troca de cena — a
         /// instância de <see cref="IArmaComHabilidade"/> sozinha não é serializável.
         /// </summary>
-        public void EquiparArma(TipoArmaFisica qual)
-        {
-            EquiparArma(WeaponFactory.Criar(qual));
-            _idDaArmaEquipada = qual; // depois do Equipar: a sobrecarga base limpa o id
-        }
-
         /// <summary>
-        /// Qual arma da Tumba está empunhada, ou null se desarmado (ou se a arma foi
-        /// equipada por uma via que não informou o identificador).
+        /// Volta ao gesto de mão vazia. Substituiu a sobrecarga por enum em
+        /// 2026-08-27: com a arma montada por dado, o enum deixou de descrever comportamento e
+        /// virou identificador — não há mais nada para a fábrica construir a partir dele.
         /// </summary>
-        public TipoArmaFisica? IdDaArmaEquipada => _idDaArmaEquipada;
+        public void Desarmar() => EquiparArma((IArmaComHabilidade)null);
+
 
         private void Awake()
         {
@@ -173,9 +168,6 @@ namespace FavelaAmarela.Player
                 camadaInimigos = LayerMask.GetMask("Enemy", "EnemyHurtbox");
 
             GarantirHitbox();
-
-            var armaTeste = CriarArmaDeTeste(armaInicialParaTeste);
-            if (armaTeste != null) EquiparArma(armaTeste);
         }
 
         // ── Geometria do golpe, vinda da arma ─────────────────────────────────
@@ -240,11 +232,9 @@ namespace FavelaAmarela.Player
 
             inv.Equipment.OnSlotChanged += VerificarSlotDeArma;
 
-            // Só sobrescreve se o inventário tiver mesmo uma arma: slot vazio deixa de pé o que
-            // o Awake equipou (o override de teste 'armaInicialParaTeste').
-            var slot = inv.Equipment.GetSlot(SlotDeArma);
-            if (slot != null && slot.Def != null && slot.Def.Tipo == ItemType.Arma)
-                EquiparArma(slot.Def.ArmaFisica);
+            // Aplica o slot corrente pelo MESMO caminho do evento -- ter dois jeitos de
+            // equipar era como as duas metades divergiam.
+            VerificarSlotDeArma(SlotDeArma);
         }
 
         private void OnDestroy()
@@ -258,7 +248,7 @@ namespace FavelaAmarela.Player
 
         /// <summary>
         /// Reage ao inventário: quando o slot de Arma muda, reconstrói o POCO da arma pela
-        /// <see cref="WeaponFactory"/>. É o que liga o baú da Tumba à Mão Física sem que o
+        /// a família da arma. É o que liga o baú da Tumba à Mão Física sem que o
         /// baú precise conhecer esta bridge.
         /// </summary>
         private void VerificarSlotDeArma(int slotIndex)
@@ -270,11 +260,11 @@ namespace FavelaAmarela.Player
 
             var slot = inv.Equipment.GetSlot(slotIndex);
 
-            // Slot esvaziado (desequipou): Damião volta a lutar de mão vazia.
+            // Slot esvaziado (desequipou), ou nunca houve arma: Damião luta de mão vazia.
             if (slot == null || slot.Def == null)
             {
                 AplicarBase(null);
-                EquiparArma(TipoArmaFisica.MaoVazia);
+                Desarmar();
                 return;
             }
 
@@ -285,36 +275,26 @@ namespace FavelaAmarela.Player
             // continuaria com a mesma pegada -- que era o estado até 2026-08-27.
             AplicarBase(slot.Def.Base);
 
-            // Arma a DADO tem prioridade: a família sabe montar a si mesma (por HabilidadeDef
-            // ou, quando ela está vazia, pelo arquétipo legado). Só quando não há família é que
-            // se cai no enum do item.
-            if (slot.Def.Base != null)
-            {
-                var construida = slot.Def.Base.ConstruirArma();
-                if (construida != null)
-                {
-                    EquiparArma(construida);
+            var construida = slot.Def.Base != null ? slot.Def.Base.ConstruirArma() : null;
 
-                    // O save ainda viaja por TipoArmaFisica; colapsar esse canal para o
-                    // ItemDef.Id é a Fase 4. Enquanto isso, manter o identificador é o que faz
-                    // a arma sobreviver à troca de cena.
-                    _idDaArmaEquipada = slot.Def.ArmaFisica;
-                    return;
-                }
+            if (construida == null)
+            {
+                // Uma arma sem família (ou com família sem habilidade) é equipável e inerte:
+                // o jogador vê a arma na mão e não causa dano nenhum. Isso precisa GRITAR --
+                // é o modo de falha que o Item Creator vai produzir com mais frequência.
+                Debug.LogError(
+                    $"[MaoFisicaBridge] '{slot.Def.Nome}' é uma arma sem BaseDeArma/HabilidadeDef " +
+                    "ligada: Damião fica desarmado com ela equipada. Conserto: " +
+                    "'Tools/FavelaAmarela/Armas: montar as bases (famílias)' e " +
+                    "'... montar as habilidades a dado'.", this);
+
+                Desarmar();
+                return;
             }
 
-            // Sobrecarga com o identificador: só ela deixa o save reequipar depois da troca de cena.
-            EquiparArma(slot.Def.ArmaFisica);
+            EquiparArma(construida);
         }
 
-
-        private static IArmaComHabilidade CriarArmaDeTeste(ArmaDeTeste escolha) => escolha switch
-        {
-            ArmaDeTeste.CravoDeAklo => new CravoDeAklo(),
-            ArmaDeTeste.EstileteDeIrem => new EstileteDeIrem(),
-            ArmaDeTeste.AlfanjeDeAlhazred => new AlfanjeDeAlhazred(),
-            _ => null,
-        };
 
         /// <summary>
         /// Ataque básico na direção dada. Com arma equipada, usa a arma; <b>desarmado</b>,
@@ -327,7 +307,7 @@ namespace FavelaAmarela.Player
             if (direcao == Vector2.zero) return;
             if (_fsm == null || !_fsm.EstaLivre) return;
 
-            // A arma equipada é a fonte da verdade do golpe — a WeaponFactory já a
+            // A arma equipada é a fonte da verdade do golpe — a família já a
             // reconstruiu a partir do slot do inventário (ver VerificarSlotDeArma), então
             // não há por que reler o inventário a cada ataque.
             IArma arma = _armaEquipada != null ? (IArma)_armaEquipada : _maoVazia;
