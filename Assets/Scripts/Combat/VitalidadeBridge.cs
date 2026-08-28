@@ -78,6 +78,17 @@ namespace FavelaAmarela.Runtime.Combat
         }
 
         /// <summary>
+        /// Nível de Exposição de Damião, ou 1 quando a progressão ainda não existe em cena.
+        ///
+        /// <para>É lido <b>uma vez</b>, na criação da ficha. Subir de nível no meio da partida
+        /// não recalcula a ficha ainda — fazer isso exige decidir o que acontece com a
+        /// Vitalidade corrente (cura junto? mantém a fração?), e essa é decisão de design, não
+        /// detalhe de implementação. Fica registrado aqui em vez de virar surpresa depois.</para>
+        /// </summary>
+        private static int NivelDoAtor =>
+            FavelaAmarela.Runtime.Progression.ProgressionBridge.Instancia?.NivelAtual ?? 1;
+
+        /// <summary>
         /// Cria a ficha e a <see cref="Vitalidade"/> uma única vez, sob demanda.
         /// </summary>
         private void GarantirInicializacao()
@@ -85,7 +96,11 @@ namespace FavelaAmarela.Runtime.Combat
             if (_vitalidade != null) return;
 
             if (ficha != null)
-                _atributosBase = ficha.CriarFicha();
+                // O NÍVEL entra aqui: é o que faz "no nível 2 o Damião é mais forte e mais
+                // defendido" (pedido do Vini, 2026-08-28). Sem ProgressionBridge em cena o
+                // nível é 1, que devolve exatamente o valor autorado -- degrada para o
+                // comportamento antigo em vez de zerar a ficha.
+                _atributosBase = ficha.CriarFicha(NivelDoAtor);
             else
             {
                 Debug.LogError($"[VitalidadeBridge] Nenhuma ficha encontrada em '{name}'. Usando base.", this);

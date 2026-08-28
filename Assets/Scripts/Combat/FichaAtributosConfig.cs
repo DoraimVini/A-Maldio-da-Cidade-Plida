@@ -48,6 +48,22 @@ namespace FavelaAmarela.Core.Combat
         [FormerlySerializedAs("resistenciaAnomala")]
         public float ResistenciaAnomala = 0f;
 
+        [Header("Escala por nível")]
+        [Tooltip("Quanto a Vitalidade cresce por nível, em fração do valor base. 0,30 = +30% " +
+                 "do valor de nível 1 a cada nível. Nível 1 vale exatamente o número acima.")]
+        [Min(0f)]
+        public float VitalidadePorNivel = 0.30f;
+
+        [Tooltip("Quanto o Ataque cresce por nível, em fração do valor base.")]
+        [Min(0f)]
+        public float AtaquePorNivel = 0.25f;
+
+        [Tooltip("Quanto a Defesa cresce por nível. Cresce MAIS DEVAGAR que o ataque de " +
+                 "propósito: defesa subtrai e ataque multiplica, então casá-las no mesmo passo " +
+                 "faria o combate travar no meio da curva.")]
+        [Min(0f)]
+        public float DefesaPorNivel = 0.15f;
+
         [Header("Movimento (inimigos)")]
         [Tooltip("Velocidade de patrulha (errante).")]
         [FormerlySerializedAs("velocidadeErrante")]
@@ -68,12 +84,34 @@ namespace FavelaAmarela.Core.Combat
         /// <summary>
         /// Cria uma FichaDeAtributos a partir dos valores configurados.
         /// </summary>
-        public FichaDeAtributos CriarFicha()
+        public FichaDeAtributos CriarFicha() => CriarFicha(1);
+
+        /// <summary>
+        /// Cria a ficha <b>no nível pedido</b>, aplicando a lei única de
+        /// <see cref="FavelaAmarela.Core.Progression.EscalaDeNivel"/>.
+        ///
+        /// <para><b>Por que existe (2026-08-28).</b> O Vini pediu que a escala cresça com o jogo
+        /// e com o personagem — "saber que ele no nível 2 está mais forte e com mais defesa".
+        /// Sem uma lei única cada sistema inventaria a sua, e as duas divergiriam em silêncio.</para>
+        ///
+        /// <para><b>Nível 1 devolve exatamente o autorado</b>, o que permitiu ligar a escala sem
+        /// reescrever um único <c>.asset</c> nem rebalancear o jogo inteiro junto.</para>
+        ///
+        /// <para>Conjuração e Resistência Anômala <b>não escalam</b> por enquanto: o canal
+        /// anômalo é do desenho de cada chefe (o Abdul conjura 25, o Byakhee 20) e escalá-lo
+        /// junto tornaria o Trauma incontrolável antes de existir defesa contra ele no jogador —
+        /// que só passou a existir hoje, com a <c>DefesaAnomalia</c>.</para>
+        /// </summary>
+        public FichaDeAtributos CriarFicha(int nivel)
         {
+            var escala = new System.Func<float, float, float>(
+                (valor, ganho) =>
+                    FavelaAmarela.Core.Progression.EscalaDeNivel.Valor(valor, ganho, nivel));
+
             return new FichaDeAtributos(
-                vitalidadeMax: VitalidadeMax,
-                ataque: Ataque,
-                defesa: Defesa,
+                vitalidadeMax: escala(VitalidadeMax, VitalidadePorNivel),
+                ataque: escala(Ataque, AtaquePorNivel),
+                defesa: escala(Defesa, DefesaPorNivel),
                 conjuracao: Conjuracao,
                 resistenciaAnomala: ResistenciaAnomala,
                 velocidadeErrante: VelocidadeErrante,

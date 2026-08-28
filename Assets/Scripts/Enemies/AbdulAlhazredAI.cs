@@ -49,6 +49,11 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Ficha do Abdul (Vitalidade, Defesa, Conjuração, Resistência Anômala).")]
         [SerializeField] private FichaAtributosConfig ficha;
 
+        [Tooltip("Nível do Abdul. Escala Vitalidade, Ataque e Defesa pela mesma lei da arma " +
+                 "do jogador. 1 = exatamente o que a ficha diz.")]
+        [Min(1)]
+        [SerializeField] private int nivelDaUnidade = 1;
+
         [Header("Conversa antes da luta")]
         [Tooltip("Rótulo do prompt de interação enquanto Abdul dorme em Transe.")]
         [SerializeField] private string rotuloDeInteracao = "Falar com o vulto";
@@ -242,7 +247,7 @@ namespace FavelaAmarela.Runtime.Enemies
             }
             else
             {
-                _atributos = ficha.CriarFicha();
+                _atributos = ficha.CriarFicha(nivelDaUnidade);
             }
 
             _vitalidade = new Vitalidade(_atributos.VitalidadeMax);

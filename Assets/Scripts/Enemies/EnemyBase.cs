@@ -13,6 +13,16 @@ namespace FavelaAmarela.Runtime.Enemies
     {
         [Header("Vitalidade")]
         [SerializeField] private FichaAtributosConfig ficha;
+
+        [Tooltip("Nível desta unidade. Escala Vitalidade, Ataque e Defesa pela MESMA lei que " +
+                 "escala a arma do jogador (EscalaDeNivel). 1 = exatamente o que a ficha diz. " +
+                 "É por instância, não por ficha: o mesmo Cultista vale 1 no Deserto e mais no " +
+                 "endgame, sem precisar de um asset por região.")]
+        [Min(1)]
+        [SerializeField] private int nivelDaUnidade = 1;
+
+        /// <summary>Nível desta unidade — ver <c>nivelDaUnidade</c>.</summary>
+        public int NivelDaUnidade => nivelDaUnidade < 1 ? 1 : nivelDaUnidade;
         [SerializeField] private bool ehAparicaoPrimordial = false;
 
         [Header("Feedback")]
@@ -134,7 +144,7 @@ namespace FavelaAmarela.Runtime.Enemies
             }
             else
             {
-                _atributos = ficha.CriarFicha();
+                _atributos = ficha.CriarFicha(nivelDaUnidade);
             }
 
             _vitalidade = new Vitalidade(_atributos.VitalidadeMax);
