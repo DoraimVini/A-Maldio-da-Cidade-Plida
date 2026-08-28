@@ -65,5 +65,55 @@ namespace FavelaAmarela.Core.Player
 
             return new Vector2(x, y).normalized;
         }
+
+        /// <summary>
+        /// A direção que uma <b>ação</b> (golpe, habilidade, esquiva) deve usar: a do input
+        /// quando há input, e a <b>última encarada</b> quando não há.
+        ///
+        /// <para><b>O defeito que isto conserta (playtest de 2026-08-28).</b> O Vini: <i>"o
+        /// boneco só está atacando enquanto está se movimentando; ele não bate parado"</i>. As
+        /// três ações recebiam a direção do <b>input</b>, e as três começam com
+        /// <c>if (direcao == Vector2.zero) return;</c> — que é guarda correta, porque golpe sem
+        /// direção não tem para onde apontar a hitbox. Parado, o input é zero, então todo golpe
+        /// era descartado <b>na primeira linha, sem um log</b>.</para>
+        ///
+        /// <para><b>Não foi a unificação de espaço que causou:</b> antes dela o código passava
+        /// <c>inputDirection</c> cru, que é zero parado do mesmo jeito. O defeito é mais velho —
+        /// mas vivia exatamente nas linhas que aquela mudança tocou, e continuou de pé porque
+        /// nenhum teste EditMode consegue apertar um botão com o personagem parado.</para>
+        ///
+        /// <para>A regra certa é simples: <b>ataca-se para onde se encara</b>. Em movimento,
+        /// encarar e andar são a mesma direção, então nada muda; parado, a última encarada é a
+        /// única resposta que o jogador espera.</para>
+        /// </summary>
+        /// <param name="input">Direção lida do controle, em espaço de input.</param>
+        /// <param name="ultimaDirecaoEncarada">
+        /// Para onde o personagem encara, <b>já em espaço de mundo</b>. Nunca deve ser
+        /// <c>Vector2.zero</c> — quem a mantém a inicializa com um valor válido.
+        /// </param>
+        /// <param name="alinhadoAoGrid">
+        /// Se o input é remapeado para o grid isométrico. É o <c>useIsometricGridAlignment</c>
+        /// do <c>PlayerMovement</c>, e mora aqui para que os dois caminhos sejam testáveis.
+        /// </param>
+        /// <param name="alturaDaCelula">O <c>cellSize.y</c> do Grid. Ver <see cref="ParaMundo"/>.</param>
+        public static Vector2 DirecaoDeAcao(Vector2 input, Vector2 ultimaDirecaoEncarada,
+                                            bool alinhadoAoGrid = true,
+                                            float alturaDaCelula = AlturaDeCelulaPadrao)
+        {
+            Vector2 mundo = DirecaoDeMundo(input, alinhadoAoGrid, alturaDaCelula);
+            return mundo == Vector2.zero ? ultimaDirecaoEncarada : mundo;
+        }
+
+        /// <summary>
+        /// A direção de mundo correspondente ao input, com ou sem o remapeamento isométrico.
+        /// Devolve <c>Vector2.zero</c> para input nulo nos dois casos.
+        /// </summary>
+        public static Vector2 DirecaoDeMundo(Vector2 input, bool alinhadoAoGrid = true,
+                                             float alturaDaCelula = AlturaDeCelulaPadrao)
+        {
+            if (alinhadoAoGrid) return ParaMundo(input, alturaDaCelula);
+
+            return input.sqrMagnitude < 0.000001f ? Vector2.zero : input.normalized;
+        }
     }
 }

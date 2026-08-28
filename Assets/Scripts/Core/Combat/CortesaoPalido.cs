@@ -31,7 +31,13 @@ namespace FavelaAmarela.Core.Combat
     public class CortesaoPalido : MonoBehaviour
     {
         [Header("Status do Cortesão")]
-        [SerializeField] private float vida = 100f;
+        // Havia aqui um 'vida = 100f' que NINGUÉM lia -- o compilador denunciava
+        // (CS0414) e o aviso estava certo. O Cortesão não implementa IDanificavel: não
+        // existe caminho no jogo que tire vida dele. O campo prometia uma barra de vida
+        // que não existe, e no Inspector era indistinguível de um número em uso.
+        //
+        // Se um dia ele for feito abatível, o caminho é o mesmo do resto do elenco --
+        // EnemyBase + Vitalidade + Hurtbox --, não ressuscitar este float.
         [SerializeField] private float velocidadePatrulha = 1.5f;
         [SerializeField] private float campoDeVisao = 6f;
 

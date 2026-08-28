@@ -345,9 +345,8 @@ namespace FavelaAmarela.Player
             // tudo parece meio fora".
             //
             // Não era sistema quebrado: eram dois espaços de coordenada que ninguém reconciliou.
-            Vector2 direcaoNoMundo = useIsometricGridAlignment
-                ? BaseIsometrica.ParaMundo(inputDirection)
-                : inputDirection.normalized;
+            Vector2 direcaoNoMundo =
+                BaseIsometrica.DirecaoDeMundo(inputDirection, useIsometricGridAlignment);
 
             if (isMoving)
             {
@@ -357,24 +356,36 @@ namespace FavelaAmarela.Player
                 LookDirection = direcaoNoMundo;
             }
 
+            // A direção das AÇÕES não é a do input: é para onde o personagem ENCARA.
+            //
+            // Parado, o input é Vector2.zero, e as três ações abaixo começam com
+            // `if (direcao == Vector2.zero) return;` -- guarda correta, porque golpe sem direção
+            // não tem para onde apontar a hitbox. O resultado era o golpe morrer na primeira
+            // linha, sem um log: "o boneco só ataca andando" (playtest de 2026-08-28).
+            //
+            // Em movimento isto é idêntico a direcaoNoMundo, então nada muda; parado, vale a
+            // última encarada, que é a única resposta que o jogador espera.
+            Vector2 direcaoDaAcao = BaseIsometrica.DirecaoDeAcao(
+                inputDirection, LookDirection, useIsometricGridAlignment);
+
             // Trigger Esquiva
             if (dodgeAction != null && dodgeAction.WasPressedThisFrame() && esquivaBridge != null)
             {
-                esquivaBridge.TryActivateEsquiva(direcaoNoMundo);
+                esquivaBridge.TryActivateEsquiva(direcaoDaAcao);
                 if (!_fsm.EstaLivre) return; // Esquiva pegou
             }
 
             // Trigger Ataque (Mão Física)
             if (attackAction != null && attackAction.WasPressedThisFrame() && maoFisicaBridge != null)
             {
-                maoFisicaBridge.TryAtacar(direcaoNoMundo);
+                maoFisicaBridge.TryAtacar(direcaoDaAcao);
                 if (!_fsm.EstaLivre) return; // Ataque pegou
             }
 
             // Trigger Habilidade da Arma (botão separado do ataque básico)
             if (habilidadeArmaAction != null && habilidadeArmaAction.WasPressedThisFrame() && maoFisicaBridge != null)
             {
-                maoFisicaBridge.TryUsarHabilidade(direcaoNoMundo);
+                maoFisicaBridge.TryUsarHabilidade(direcaoDaAcao);
                 if (!_fsm.EstaLivre) return; // Habilidade pegou
             }
 

@@ -189,6 +189,87 @@ namespace FavelaAmarela.Tests.EditMode
                 "LookDirection precisa receber a direção convertida para o mundo.");
         }
 
+        // ── Parado ainda encara para algum lado ──────────────────────────────
+
+        /// <summary>
+        /// <b>O golpe parado.</b> O Vini, no playtest de 2026-08-28: <i>"o boneco só está
+        /// atacando enquanto está se movimentando; ele não bate parado"</i>.
+        ///
+        /// <para>As três ações — golpe, habilidade e esquiva — recebiam a direção do
+        /// <b>input</b>, e as três começam com <c>if (direcao == Vector2.zero) return;</c>. Essa
+        /// guarda está <b>certa</b>: golpe sem direção não tem para onde apontar a hitbox. O
+        /// erro era alimentá-la com input em vez de encarada — parado, o input é zero, e todo
+        /// golpe morria na primeira linha <b>sem um log sequer</b>.</para>
+        ///
+        /// <para><b>Não foi a unificação de espaço da Fase 1 que causou:</b> antes dela o código
+        /// passava <c>inputDirection</c> cru, zero parado do mesmo jeito. O defeito é mais
+        /// velho — e sobreviveu porque nenhum teste EditMode aperta um botão com o personagem
+        /// parado. Este aqui testa a <b>regra</b>, que é o que dá para afirmar sem cena.</para>
+        /// </summary>
+        [Test]
+        public void ParadoAAcaoUsaAUltimaEncarada()
+        {
+            var encarando = new Vector2(1f, 0.5f).normalized;   // cima-direita, como o D produz
+
+            Assert.AreEqual(encarando,
+                BaseIsometrica.DirecaoDeAcao(Vector2.zero, encarando),
+                "Parado, a ação tem de sair para onde o personagem encara. Devolver zero faz a " +
+                "guarda das bridges descartar o golpe — e o jogo fica sem ataque parado.");
+        }
+
+        [Test]
+        public void ParadoNenhumaAcaoRecebeZero()
+        {
+            Assert.AreNotEqual(Vector2.zero,
+                BaseIsometrica.DirecaoDeAcao(Vector2.zero, Vector2.right));
+
+            Assert.AreNotEqual(Vector2.zero,
+                BaseIsometrica.DirecaoDeAcao(Vector2.zero, Vector2.right, alinhadoAoGrid: false),
+                "O caminho sem alinhamento ao grid tem a mesma regra — ele existe para " +
+                "depuração e não pode divergir em silêncio.");
+        }
+
+        /// <summary>
+        /// Em movimento nada muda: a ação sai na mesma direção do movimento. É o que garante que
+        /// o conserto do golpe parado não mexeu no golpe andando.
+        /// </summary>
+        [TestCase(1f, 0f)]
+        [TestCase(0f, 1f)]
+        [TestCase(1f, 1f)]
+        [TestCase(-1f, -1f)]
+        public void EmMovimentoAAcaoSegueOInput(float x, float y)
+        {
+            var input = new Vector2(x, y);
+
+            Assert.AreEqual(BaseIsometrica.ParaMundo(input),
+                BaseIsometrica.DirecaoDeAcao(input, Vector2.left),
+                "Com input, a última encarada não pode prevalecer — senão o golpe sairia " +
+                "atrasado em relação ao movimento.");
+        }
+
+        /// <summary>
+        /// O <c>PlayerMovement</c> tem de mandar a direção de AÇÃO para as três bridges, não a
+        /// do movimento. É guarda de fonte porque o caminho vivo é um <c>MonoBehaviour</c> lendo
+        /// input — não há como instanciá-lo aqui.
+        /// </summary>
+        [Test]
+        public void OPlayerMovement_MandaADirecaoDeAcaoParaAsTresBridges()
+        {
+            string fonte = File.ReadAllText("Assets/Scripts/Player/PlayerMovement.cs");
+
+            StringAssert.Contains("BaseIsometrica.DirecaoDeAcao(", fonte,
+                "O PlayerMovement parou de perguntar a direção de ação ao POCO.");
+
+            foreach (var acao in new[] { "TryAtacar(direcaoDaAcao)",
+                                         "TryUsarHabilidade(direcaoDaAcao)",
+                                         "TryActivateEsquiva(direcaoDaAcao)" })
+            {
+                StringAssert.Contains(acao, fonte,
+                    $"'{acao}' deixou de usar a direção de ação. Recebendo a direção do " +
+                    "movimento, a ação volta a não sair com o personagem parado.");
+            }
+        }
+
         /// <summary>
         /// Duas implementações da base isométrica no mesmo arquivo foi exatamente como
         /// movimento e mira acabaram em espaços diferentes. Só pode haver uma.
