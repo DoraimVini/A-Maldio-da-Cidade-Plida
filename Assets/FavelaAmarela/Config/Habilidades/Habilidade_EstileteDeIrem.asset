@@ -17,8 +17,8 @@ MonoBehaviour:
   DuracaoBasico: 0.25
   CooldownBasico: 0.3
   EfeitosDoBasico:
-  - Tipo: 0
-    Valor: 30
+  - Tipo: 6
+    Valor: 1
     Duracao: 0
     Acumulos: 0
   - Tipo: 4
@@ -28,8 +28,8 @@ MonoBehaviour:
   DuracaoHabilidade: 0.3
   CooldownHabilidade: 5
   EfeitosDaHabilidade:
-  - Tipo: 0
-    Valor: 15
+  - Tipo: 6
+    Valor: 0.5
     Duracao: 0
     Acumulos: 0
   - Tipo: 4

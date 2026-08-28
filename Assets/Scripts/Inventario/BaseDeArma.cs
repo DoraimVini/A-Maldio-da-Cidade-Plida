@@ -1,4 +1,6 @@
 using UnityEngine;
+using FavelaAmarela.Core.Combat;
+using FavelaAmarela.Core.Progression;
 using FavelaAmarela.Core.Abilities;
 
 namespace FavelaAmarela.Inventario
@@ -49,6 +51,31 @@ namespace FavelaAmarela.Inventario
         [Tooltip("Quantas mãos a arma toma. DuasMaos bloqueia a Mão Secundária.")]
         public Empunhadura Empunhadura = Empunhadura.UmaMao;
 
+        [Header("Dano branco")]
+        [Tooltip("Piso do dano da arma no nível 1. Dano de ARPG é FAIXA, não número fixo: é o " +
+                 "intervalo que dá textura a golpes repetidos e o que os afixos de aumento " +
+                 "percentual multiplicam.")]
+        [Min(0f)]
+        public float DanoMinBase = 8f;
+
+        [Tooltip("Teto do dano da arma no nível 1.")]
+        [Min(0f)]
+        public float DanoMaxBase = 14f;
+
+        [Header("Crítico e precisão")]
+        [Tooltip("Chance de o golpe sair crítico, em fração (0,05 = 5%).")]
+        [Range(0f, 1f)]
+        public float ChanceCriticaBase = 0.05f;
+
+        [Tooltip("Quanto o crítico multiplica o dano (1,5 = +50%).")]
+        [Min(1f)]
+        public float MultiplicadorCritico = 1.5f;
+
+        [Tooltip("Chance de acertar, em fração. Falhar aqui é ERRAR de verdade — dano zero, " +
+                 "não golpe de raspão (decisão do Vini, 2026-08-28). Arma pesada erra mais.")]
+        [Range(0f, 1f)]
+        public float PrecisaoBase = 0.90f;
+
         [Header("Comportamento")]
         [Tooltip("A habilidade desta arma, montada por EFEITOS no Inspector. [ASSET] " +
                  "Sem ela a arma é equipável e inerte — a bridge reclama alto ao equipar.")]
@@ -68,9 +95,26 @@ namespace FavelaAmarela.Inventario
         /// A arma, ou <c>null</c> quando não há habilidade autorada — que é o mesmo que estar
         /// desarmado, e é o comportamento que a bridge já sabe tratar (e denunciar).
         /// </returns>
-        public IArmaComHabilidade ConstruirArma() => Habilidade != null
-            ? Habilidade.Construir()
+        public IArmaComHabilidade ConstruirArma(int nivelDoItem = 1) => Habilidade != null
+            ? Habilidade.Construir(PerfilNoNivel(nivelDoItem))
             : null;
+
+        /// <summary>
+        /// O bloco de combate desta arma no nível pedido.
+        ///
+        /// <para>Hoje o nível só multiplica a faixa de dano; crítico e precisão são identidade
+        /// da <b>família</b> e não crescem sozinhos — quem os aumenta é afixo. É o que mantém
+        /// um alfanje sempre mais lento e mais errático que um estilete, por mais alto que seja
+        /// o tier.</para>
+        /// </summary>
+        public PerfilDeArma PerfilNoNivel(int nivelDoItem)
+        {
+            float fator = EscalaDeNivel.FatorDeDano(nivelDoItem);
+
+            return new PerfilDeArma(
+                DanoMinBase * fator, DanoMaxBase * fator,
+                ChanceCriticaBase, MultiplicadorCritico, PrecisaoBase);
+        }
 
         /// <summary>
         /// Geometria padrão para quem não tem base ligada — os mesmos números que viviam

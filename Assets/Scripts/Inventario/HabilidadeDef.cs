@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Abilities.Efeitos;
 
@@ -34,6 +35,19 @@ namespace FavelaAmarela.Inventario
 
         /// <summary>Corta a conjuração de quem estiver conjurando.</summary>
         Interrupcao,
+
+        /// <summary>
+        /// Dano como <b>percentual do dano branco da arma</b> (Valor 1,0 = 100%).
+        ///
+        /// <para>Acrescentado no FIM em 2026-08-28, junto com o bloco de combate da
+        /// <c>BaseDeArma</c>. É o efeito que faz a habilidade escalar com o equipamento em vez
+        /// de ter número próprio — trocar de arma passa a melhorar todas as habilidades de uma
+        /// vez, que é o loop que faz o loot valer a pena.</para>
+        ///
+        /// <para><c>Dano</c> plano continua existindo e continua legítimo: golpe de inimigo e
+        /// habilidade de valor fixo não têm arma de onde escalar.</para>
+        /// </summary>
+        DanoDaArma,
     }
 
     /// <summary>Um efeito autorado no Inspector, com os números que ele carrega.</summary>
@@ -105,11 +119,13 @@ namespace FavelaAmarela.Inventario
         /// <summary>
         /// Constrói o POCO de combate. Chamado pela <c>WeaponFactory</c> ao equipar.
         /// </summary>
-        public HabilidadeComposta Construir() => new HabilidadeComposta(
-            NomeDaArma, NomeDaHabilidade,
-            Traduzir(EfeitosDoBasico), Traduzir(EfeitosDaHabilidade),
-            DuracaoBasico, CooldownBasico,
-            DuracaoHabilidade, CooldownHabilidade);
+        public HabilidadeComposta Construir(PerfilDeArma perfil = default) =>
+            new HabilidadeComposta(
+                NomeDaArma, NomeDaHabilidade,
+                Traduzir(EfeitosDoBasico), Traduzir(EfeitosDaHabilidade),
+                DuracaoBasico, CooldownBasico,
+                DuracaoHabilidade, CooldownHabilidade,
+                perfil);
 
         /// <summary>
         /// Dado autorado → efeitos POCO. Um <c>Tipo</c> desconhecido é <b>ignorado com aviso</b>
@@ -142,6 +158,9 @@ namespace FavelaAmarela.Inventario
                         break;
                     case TipoDeEfeito.Interrupcao:
                         efeitos.Add(new EfeitoDeInterrupcao());
+                        break;
+                    case TipoDeEfeito.DanoDaArma:
+                        efeitos.Add(new EfeitoDeDanoDaArma(a.Valor));
                         break;
                     default:
                         Debug.LogWarning($"[HabilidadeDef] Efeito desconhecido '{a.Tipo}' — " +

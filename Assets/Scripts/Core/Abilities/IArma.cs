@@ -56,13 +56,41 @@ namespace FavelaAmarela.Core.Abilities
         /// </summary>
         public readonly float TraumaAnomalia;
 
+        /// <summary>
+        /// Quanto do <b>dano branco da arma</b> este golpe aproveita (1,0 = 100%). É o que
+        /// substitui o dano fixo autorado na habilidade.
+        ///
+        /// <para><b>Por que percentual e não número.</b> Com o dano vivendo no
+        /// <c>HabilidadeDef</c> — um asset por família —, todo Alfanje era idêntico e um Alfanje
+        /// melhor era inexprimível. Como percentual, "Golpe do Deserto: 140% da arma" melhora
+        /// sozinho toda vez que a arma melhora, que é o loop que faz o loot valer a pena.</para>
+        ///
+        /// <para>Zero em golpe de inimigo e em habilidade de dano fixo: esses continuam usando
+        /// <see cref="Dano"/> plano, e <c>ResolucaoDeGolpe</c> os deixa passar intactos.</para>
+        /// </summary>
+        public readonly float PercentualDoDanoDaArma;
+
+        /// <summary>Se este golpe saiu crítico. Preenchido por <c>ResolucaoDeGolpe</c>.</summary>
+        public readonly bool Critico;
+
+        /// <summary>
+        /// Se este golpe <b>errou</b>. O Vini escolheu o modelo do D2: falhar na precisão é
+        /// dano zero, não golpe de raspão. Existe como campo — e não só como dano 0 — para a UI
+        /// poder dizer "Errou" em vez de mostrar um zero, que o jogador leria como imunidade.
+        /// </summary>
+        public readonly bool Errou;
+
         public ArmaResult(bool success, float durationSeconds, float cooldownSeconds,
             bool atordoou = false, float duracaoAtordoamento = 0f,
             float dano = 0f, bool interrompeConjuracao = false,
             float sangramentoPorSegundo = 0f, float duracaoSangramento = 0f,
             float forcaRepulsao = 0f, int acumulosDeSangramento = 0,
-            float traumaAnomalia = 0f)
+            float traumaAnomalia = 0f, float percentualDoDanoDaArma = 0f,
+            bool critico = false, bool errou = false)
         {
+            PercentualDoDanoDaArma = percentualDoDanoDaArma;
+            Critico = critico;
+            Errou = errou;
             AcumulosDeSangramento = acumulosDeSangramento;
             Success = success;
             DurationSeconds = durationSeconds;
@@ -97,7 +125,29 @@ namespace FavelaAmarela.Core.Abilities
                 Dano + bonusFisico, InterrompeConjuracao,
                 SangramentoPorSegundo, DuracaoSangramento,
                 ForcaRepulsao, AcumulosDeSangramento,
-                TraumaAnomalia + bonusAnomalia);
+                TraumaAnomalia + bonusAnomalia,
+                PercentualDoDanoDaArma, Critico, Errou);
+
+        /// <summary>
+        /// Devolve uma cópia com o dano físico <b>já resolvido</b> — a saída de
+        /// <c>ResolucaoDeGolpe</c>, depois da faixa branca, dos afixos, do acerto e do crítico.
+        ///
+        /// <para>O <see cref="PercentualDoDanoDaArma"/> é preservado de propósito: ele deixa de
+        /// ser instrução e passa a ser <b>registro</b> de quanto da arma este golpe aproveitou,
+        /// que é o que a Forja do Debugger precisa para mostrar a conta. Resolver duas vezes é
+        /// impossível porque <c>ResolucaoDeGolpe</c> só age sobre resultado ainda não
+        /// resolvido — e o guarda disso é este método ser o único que escreve
+        /// <see cref="Critico"/> e <see cref="Errou"/>.</para>
+        /// </summary>
+        public ArmaResult ComDanoResolvido(float dano, bool critico, bool errou)
+            => new ArmaResult(
+                Success, DurationSeconds, CooldownSeconds,
+                Atordoou, DuracaoAtordoamento,
+                dano, InterrompeConjuracao,
+                SangramentoPorSegundo, DuracaoSangramento,
+                ForcaRepulsao, AcumulosDeSangramento,
+                TraumaAnomalia,
+                PercentualDoDanoDaArma, critico, errou);
     }
 
     /// <summary>
@@ -109,6 +159,15 @@ namespace FavelaAmarela.Core.Abilities
     /// </summary>
     public interface IArma
     {
+        /// <summary>
+        /// O bloco de combate desta arma — faixa de dano branco, crítico e precisão.
+        ///
+        /// <para>Vive na interface porque é <b>a arma</b> que responde "quanto dói", e não a
+        /// habilidade. Até 2026-08-28 o dano morava num asset por família, o que tornava duas
+        /// cópias sempre idênticas e uma arma melhor inexprimível.</para>
+        /// </summary>
+        FavelaAmarela.Core.Combat.PerfilDeArma Perfil { get; }
+
         /// <summary>Nome diegético da arma.</summary>
         string NomeDaArma { get; }
 

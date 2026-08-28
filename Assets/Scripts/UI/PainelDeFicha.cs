@@ -219,6 +219,10 @@ namespace FavelaAmarela.Runtime.UI
             StatType.DrenoRM => true,          // GerenciadorEfeitosPassivos.Update → SofrerTrauma
             StatType.Furtividade => true,      // PlayerStealthState.GetCurrentNoiseEmission
             StatType.DefesaAnomalia => true,   // ResilienciaBridge.SofrerTrauma
+            StatType.ChanceCritica => true,    // ResolucaoDeGolpe, via MaoFisicaBridge
+            StatType.DanoCritico => true,      // ResolucaoDeGolpe
+            StatType.Precisao => true,         // ResolucaoDeGolpe
+            StatType.AumentoDeDanoFisico => true, // ResolucaoDeGolpe
             _ => false,
         };
     }

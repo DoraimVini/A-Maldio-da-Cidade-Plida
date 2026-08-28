@@ -27,6 +27,13 @@ namespace FavelaAmarela.Core.Abilities
             this.cooldown = cooldown;
         }
 
+        /// <summary>
+        /// O punho: dano zero, precisão cheia. O gesto desarmado faz barulho e prende o ator no
+        /// estado Atacando, mas não mata — e não pode "errar", porque errar um golpe que já não
+        /// causa dano só confundiria o jogador.
+        /// </summary>
+        public Combat.PerfilDeArma Perfil => Combat.PerfilDeArma.Desarmado;
+
         public bool CanActivate(float timeSinceLastUse) => timeSinceLastUse >= cooldown;
 
         /// <summary>Executa o gesto desarmado. <c>Dano</c> é sempre 0.</summary>

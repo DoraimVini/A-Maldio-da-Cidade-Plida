@@ -74,6 +74,20 @@ namespace FavelaAmarela.Inventario
         VigorMaximo,      // Stamina total
         RegeneracaoVigor, // Regen. passiva
         CustoEsquivaVigor,// Custo de dash
-        CustoCorridaVigor // Custo de run
+        CustoCorridaVigor,// Custo de run
+
+        // ── Combate a dado (2026-08-28) ───────────────────────────────────────
+        // Acrescentados NO FIM: os índices são posicionais e já estão gravados em .asset.
+        // Inserir no meio remapearia todo afixo autorado em silêncio -- um "de Irem" (Vigor)
+        // viraria outra coisa sem ninguém notar.
+        //
+        // Os quatro são consumidos por ResolucaoDeGolpe, via MaoFisicaBridge. Todos entram
+        // em PERCENTUAL no asset (5 = 5%), porque é assim que o gênero escreve e é como o
+        // jogador lê num tooltip -- a conversão para fração acontece na bridge.
+
+        ChanceCritica,       // Chance de o golpe sair crítico
+        DanoCritico,         // Quanto o crítico multiplica, somado ao da arma
+        Precisao,            // Chance de acertar (errar é dano zero)
+        AumentoDeDanoFisico  // Multiplica o dano físico total do golpe
     }
 }

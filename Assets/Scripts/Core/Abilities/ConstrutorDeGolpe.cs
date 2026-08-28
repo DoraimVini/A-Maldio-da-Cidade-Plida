@@ -23,6 +23,13 @@ namespace FavelaAmarela.Core.Abilities
         /// <summary>Dano físico direto.</summary>
         public float Dano;
 
+        /// <summary>
+        /// Fração do dano branco da arma que este golpe aproveita (1,0 = 100%). Acumula, como o
+        /// dano plano. Zero significa "não escala com arma" — golpe de inimigo, ou habilidade de
+        /// valor fixo.
+        /// </summary>
+        public float PercentualDoDanoDaArma;
+
         /// <summary>Dano de anomalia (estática cósmica).</summary>
         public float TraumaAnomalia;
 
@@ -67,6 +74,7 @@ namespace FavelaAmarela.Core.Abilities
             duracaoSangramento: DuracaoSangramento,
             forcaRepulsao: ForcaRepulsao,
             acumulosDeSangramento: AcumulosDeSangramento,
-            traumaAnomalia: TraumaAnomalia);
+            traumaAnomalia: TraumaAnomalia,
+            percentualDoDanoDaArma: PercentualDoDanoDaArma);
     }
 }

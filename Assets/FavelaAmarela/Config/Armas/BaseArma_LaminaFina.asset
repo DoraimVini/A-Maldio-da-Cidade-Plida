@@ -17,4 +17,9 @@ MonoBehaviour:
   Raio: 0.42
   JanelaAtiva: 0.07
   Empunhadura: 0
+  DanoMinBase: 24
+  DanoMaxBase: 35
+  ChanceCriticaBase: 0.12
+  MultiplicadorCritico: 1.6
+  PrecisaoBase: 0.95
   Habilidade: {fileID: 11400000, guid: 15f8068b35e8e204bb3012011145571a, type: 2}

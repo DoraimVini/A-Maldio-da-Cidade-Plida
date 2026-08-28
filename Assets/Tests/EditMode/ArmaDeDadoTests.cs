@@ -87,10 +87,18 @@ namespace FavelaAmarela.Tests.EditMode
                 var arma = def.Base != null ? def.Base.ConstruirArma() : null;
                 if (arma == null) continue;   // já coberto pelo guarda acima
 
-                var golpe = arma.Execute();
+                // O golpe sai da arma com um PERCENTUAL; quem o transforma em número é a
+                // ResolucaoDeGolpe, com o perfil da arma. Resolver aqui (com fonte nula, ou
+                // seja, na média e sem erro nem crítico) testa o caminho INTEIRO -- é mais
+                // forte que ler .Dano do Execute, que desde 2026-08-28 é só o dano plano.
+                var golpe = FavelaAmarela.Core.Combat.ResolucaoDeGolpe.Resolver(
+                    arma.Execute(), arma.Perfil);
 
                 if (!golpe.Success) inertes.Add($"{def.name}: Execute devolveu Success=false");
-                else if (golpe.Dano <= 0f) inertes.Add($"{def.name}: dano {golpe.Dano}");
+                else if (golpe.Dano <= 0f)
+                    inertes.Add($"{def.name}: dano {golpe.Dano} — a arma tem faixa de dano " +
+                                $"branco {arma.Perfil.DanoMin}–{arma.Perfil.DanoMax} e o golpe " +
+                                $"aproveita {golpe.PercentualDoDanoDaArma:P0} dela");
                 else if (golpe.DurationSeconds <= 0f)
                     inertes.Add($"{def.name}: duração {golpe.DurationSeconds}s — o golpe não " +
                                 "ocupa tempo nenhum, então a FSM nunca entra em Atacando");

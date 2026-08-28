@@ -31,6 +31,9 @@ namespace FavelaAmarela.Core.Abilities
         /// <inheritdoc/>
         public string NomeHabilidade { get; }
 
+        /// <inheritdoc/>
+        public Combat.PerfilDeArma Perfil { get; }
+
         /// <summary>
         /// Monta a arma. As listas são guardadas como estão — quem constrói é o
         /// <c>HabilidadeDef</c>, e ele não as reusa depois.
@@ -49,8 +52,10 @@ namespace FavelaAmarela.Core.Abilities
             IReadOnlyList<IEfeitoDeHabilidade> efeitosDoBasico,
             IReadOnlyList<IEfeitoDeHabilidade> efeitosDaHabilidade,
             float duracaoBasico, float cooldownBasico,
-            float duracaoHabilidade, float cooldownHabilidade)
+            float duracaoHabilidade, float cooldownHabilidade,
+            Combat.PerfilDeArma perfil = default)
         {
+            Perfil = perfil;
             NomeDaArma = string.IsNullOrWhiteSpace(nomeDaArma) ? "Arma sem nome" : nomeDaArma;
             NomeHabilidade = string.IsNullOrWhiteSpace(nomeHabilidade)
                 ? "Habilidade sem nome"

@@ -307,7 +307,12 @@ namespace FavelaAmarela.Player
             // continuaria com a mesma pegada -- que era o estado até 2026-08-27.
             AplicarBase(slot.Def.Base);
 
-            var construida = slot.Def.Base != null ? slot.Def.Base.ConstruirArma() : null;
+            // O NÍVEL DO ITEM entra aqui: é ele que escala a faixa de dano branco. Sem esta
+            // linha, uma arma de tier alto bateria igual a uma de tier 1 -- que era o estado
+            // até 2026-08-28, quando o dano vivia num asset por família.
+            var construida = slot.Def.Base != null
+                ? slot.Def.Base.ConstruirArma(slot.NivelDoItem)
+                : null;
 
             if (construida == null)
             {
@@ -361,9 +366,10 @@ namespace FavelaAmarela.Player
             if (!arma.CanActivate(Time.time - _lastUseTime)) return;
 
             ArmaResult resultado = _armaEquipada != null
-                ? _armaEquipada.Execute().ComBonus(
-                    BonusPassivo(StatType.TraumaFisico),
-                    BonusPassivo(StatType.TraumaAnomalia))
+                ? Resolver(_armaEquipada.Execute().ComBonus(
+                      BonusPassivo(StatType.TraumaFisico),
+                      BonusPassivo(StatType.TraumaAnomalia)),
+                      _armaEquipada.Perfil)
                 // Gesto de mão vazia: dano 0 por design — bônus passivos não se aplicam,
                 // senão desarmado passaria a matar.
                 : _maoVazia.Execute();
@@ -391,9 +397,10 @@ namespace FavelaAmarela.Player
 
             if (!_armaEquipada.CanActivateHabilidade(decorrido)) return;
 
-            var resultado = _armaEquipada.ExecuteHabilidade().ComBonus(
-                BonusPassivo(StatType.TraumaFisico),
-                BonusPassivo(StatType.TraumaAnomalia));
+            var resultado = Resolver(_armaEquipada.ExecuteHabilidade().ComBonus(
+                    BonusPassivo(StatType.TraumaFisico),
+                    BonusPassivo(StatType.TraumaAnomalia)),
+                _armaEquipada.Perfil);
 
             if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
 
@@ -410,6 +417,30 @@ namespace FavelaAmarela.Player
         /// </summary>
         private static float BonusPassivo(StatType atributo)
             => GerenciadorEfeitosPassivos.Instance?.GetBonus(atributo) ?? 0f;
+
+        /// <summary>
+        /// Fecha o dano do golpe: faixa branca da arma, percentual da habilidade, afixos,
+        /// acerto e crítico. A regra mora no POCO <see cref="ResolucaoDeGolpe"/>; aqui só se
+        /// junta o que a bridge sabe — o perfil da arma empunhada e os bônus do equipamento.
+        ///
+        /// <para>A fonte de aleatoriedade é a mesma classe que o gerador de itens usa. Ela é um
+        /// campo, não uma nova a cada golpe: <c>new</c> em caminho de combate é a Regra de Ouro 1,
+        /// e um <c>System.Random</c> recriado por golpe repetiria a sequência.</para>
+        /// </summary>
+        private ArmaResult Resolver(ArmaResult golpe, PerfilDeArma perfil)
+            => ResolucaoDeGolpe.Resolver(
+                golpe, perfil,
+                aumentoPercentual: BonusPassivo(StatType.AumentoDeDanoFisico) / 100f,
+                bonusChanceCritica: BonusPassivo(StatType.ChanceCritica) / 100f,
+                bonusDanoCritico: BonusPassivo(StatType.DanoCritico) / 100f,
+                bonusPrecisao: BonusPassivo(StatType.Precisao) / 100f,
+                fonte: _sorteioDoGolpe);
+
+        /// <summary>
+        /// Aleatoriedade do combate. Um campo só, criado uma vez — ver <see cref="Resolver"/>.
+        /// </summary>
+        private readonly FavelaAmarela.Runtime.Itens.FonteDeAleatoriedadeUnity _sorteioDoGolpe =
+            new FavelaAmarela.Runtime.Itens.FonteDeAleatoriedadeUnity();
 
         /// <summary>
         /// Arma a área do golpe. <b>Não resolve dano aqui</b> — quem resolve é a

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using FavelaAmarela.Core.Combat;
 using UnityEditor;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Inventario;
@@ -22,38 +23,75 @@ namespace FavelaAmarela.Tests.EditMode
     ///
     /// <para>Alterar um número aqui é <b>decisão de balanceamento</b> e deve ser deliberada —
     /// não efeito colateral de mexer num asset.</para>
+    ///
+    /// <para><b>Segunda migração, 2026-08-28: dano fixo → faixa de dano branco.</b> O dano saiu
+    /// do <c>HabilidadeDef</c> (um asset por família, o que tornava duas cópias da mesma arma
+    /// sempre idênticas) e foi para a <c>BaseDeArma</c>, como intervalo. Os literais de dano
+    /// deste arquivo <b>deixaram de existir</b> — não há mais um número de dano a fixar.</para>
+    ///
+    /// <para>O que sobreviveu, e é o que estes testes passam a guardar, é o <b>valor
+    /// esperado</b>: <c>média × precisão × (1 + chanceCrítica × (multiplicador − 1))</c> tem de
+    /// cair em cima do dano fixo antigo. Foi essa a regra de calibragem da migração, e é a
+    /// afirmação que prova que a Fase 1 mudou a <i>textura</i> do combate — variância, crítico,
+    /// erro — sem mexer na dificuldade. Rebalancear é decisão separada.</para>
     /// </summary>
     public sealed class EquivalenciaDaMigracaoTests
     {
-        private const string PastaDasHabilidades = "Assets/FavelaAmarela/Config/Habilidades";
+        private const string PastaDasBases = "Assets/FavelaAmarela/Config/Armas";
 
+        /// <summary>
+        /// Constrói pela <b>BaseDeArma</b>, que é onde o dano branco mora desde 2026-08-28 e o
+        /// caminho que o jogo usa ao equipar.
+        /// </summary>
         private static IArmaComHabilidade Arma(string arquivo)
         {
-            var def = AssetDatabase.LoadAssetAtPath<HabilidadeDef>(
-                $"{PastaDasHabilidades}/{arquivo}.asset");
+            var def = AssetDatabase.LoadAssetAtPath<BaseDeArma>(
+                $"{PastaDasBases}/{arquivo}.asset");
 
             Assert.IsNotNull(def,
-                $"HabilidadeDef ausente: {arquivo}. Conserto: " +
-                "'Tools/FavelaAmarela/Armas: montar as habilidades a dado'.");
+                $"BaseDeArma ausente: {arquivo}. Conserto: " +
+                "'Tools/FavelaAmarela/Armas: montar as bases (famílias)'.");
 
-            return def.Construir();
+            var arma = def.ConstruirArma();
+            Assert.IsNotNull(arma, $"'{arquivo}' não constrói arma — HabilidadeDef solta?");
+            return arma;
         }
+
+        /// <summary>Golpe resolvido na MÉDIA da faixa, sem erro nem crítico (fonte nula).</summary>
+        private static ArmaResult Basico(IArmaComHabilidade a)
+            => ResolucaoDeGolpe.Resolver(a.Execute(), a.Perfil);
+
+        /// <inheritdoc cref="Basico"/>
+        private static ArmaResult Habilidade(IArmaComHabilidade a)
+            => ResolucaoDeGolpe.Resolver(a.ExecuteHabilidade(), a.Perfil);
+
+        /// <summary>
+        /// O valor esperado de um golpe desta arma — média da faixa, corrigida por precisão e
+        /// crítico. É o número que a migração preservou.
+        /// </summary>
+        private static float Esperado(PerfilDeArma p, float percentual)
+            => (p.DanoMin + p.DanoMax) * 0.5f * percentual
+               * p.Precisao * (1f + p.ChanceCritica * (p.MultiplicadorCritico - 1f));
 
         [Test]
         public void CravoDeAklo_MantemOsNumerosDaMigracao()
         {
-            var arma = Arma("Habilidade_CravoDeAklo");
+            var arma = Arma("BaseArma_Cravo");
             Assert.AreEqual("Cravo de Aklo", arma.NomeDaArma);
             Assert.AreEqual("Fincar o Aklo", arma.NomeHabilidade);
 
-            var b = arma.Execute();
-            Assert.AreEqual(40f, b.Dano, 0.0001f, "dano básico");
+            var b = Basico(arma);
+            Assert.AreEqual(40f, Esperado(arma.Perfil, b.PercentualDoDanoDaArma), 1.0f,
+                "O Cravo causava 40 fixos antes da migração. O valor ESPERADO do golpe tem de " +
+                "cair em cima disso — é o que separa 'mudei a textura' de 'rebalanceei sem " +
+                "querer'.");
             Assert.AreEqual(0.35f, b.DurationSeconds, 0.0001f, "duração do básico");
             Assert.AreEqual(0.5f, b.CooldownSeconds, 0.0001f, "cadência do básico");
             Assert.IsFalse(b.InterrompeConjuracao, "o básico do Cravo não interrompe");
 
-            var h = arma.ExecuteHabilidade();
-            Assert.AreEqual(30f, h.Dano, 0.0001f, "dano da habilidade");
+            var h = Habilidade(arma);
+            Assert.AreEqual(30f, Esperado(arma.Perfil, h.PercentualDoDanoDaArma), 1.5f,
+                "Fincar o Aklo causava 30 fixos.");
             Assert.AreEqual(0.4f, h.DurationSeconds, 0.0001f);
             Assert.AreEqual(6f, h.CooldownSeconds, 0.0001f);
             Assert.IsTrue(h.InterrompeConjuracao,
@@ -66,12 +104,13 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void EstileteDeIrem_MantemOsNumerosDaMigracao()
         {
-            var arma = Arma("Habilidade_EstileteDeIrem");
+            var arma = Arma("BaseArma_LaminaFina");
             Assert.AreEqual("Estilete de Irem", arma.NomeDaArma);
             Assert.AreEqual("Ferida de Aklo", arma.NomeHabilidade);
 
-            var b = arma.Execute();
-            Assert.AreEqual(30f, b.Dano, 0.0001f, "dano básico");
+            var b = Basico(arma);
+            Assert.AreEqual(30f, Esperado(arma.Perfil, b.PercentualDoDanoDaArma), 1.0f,
+                "O Estilete causava 30 fixos antes da migração.");
             Assert.AreEqual(0.25f, b.DurationSeconds, 0.0001f);
             Assert.AreEqual(0.3f, b.CooldownSeconds, 0.0001f, "é a arma rápida do arsenal");
             Assert.AreEqual(1, b.AcumulosDeSangramento,
@@ -79,8 +118,9 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.AreEqual(4f, b.SangramentoPorSegundo, 0.0001f);
             Assert.AreEqual(5f, b.DuracaoSangramento, 0.0001f);
 
-            var h = arma.ExecuteHabilidade();
-            Assert.AreEqual(15f, h.Dano, 0.0001f, "dano da habilidade");
+            var h = Habilidade(arma);
+            Assert.AreEqual(15f, Esperado(arma.Perfil, h.PercentualDoDanoDaArma), 1.5f,
+                "Ferida de Aklo causava 15 fixos.");
             Assert.AreEqual(0.3f, h.DurationSeconds, 0.0001f);
             Assert.AreEqual(5f, h.CooldownSeconds, 0.0001f);
             Assert.AreEqual(3, h.AcumulosDeSangramento,
@@ -92,19 +132,21 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void AlfanjeDeAlhazred_MantemOsNumerosDaMigracao()
         {
-            var arma = Arma("Habilidade_AlfanjeDeAlhazred");
+            var arma = Arma("BaseArma_Alfanje");
             Assert.AreEqual("Alfanje de Alhazred", arma.NomeDaArma);
             Assert.AreEqual("Golpe do Deserto", arma.NomeHabilidade);
 
-            var b = arma.Execute();
-            Assert.AreEqual(45f, b.Dano, 0.0001f, "dano básico");
+            var b = Basico(arma);
+            Assert.AreEqual(45f, Esperado(arma.Perfil, b.PercentualDoDanoDaArma), 1.0f,
+                "O Alfanje causava 45 fixos antes da migração.");
             Assert.AreEqual(0.45f, b.DurationSeconds, 0.0001f);
             Assert.AreEqual(0.7f, b.CooldownSeconds, 0.0001f, "é a arma pesada do arsenal");
             Assert.IsFalse(b.Atordoou, "o básico do Alfanje não atordoa");
             Assert.AreEqual(0f, b.ForcaRepulsao, 0.0001f, "o básico do Alfanje não repele");
 
-            var h = arma.ExecuteHabilidade();
-            Assert.AreEqual(40f, h.Dano, 0.0001f, "dano da habilidade");
+            var h = Habilidade(arma);
+            Assert.AreEqual(40f, Esperado(arma.Perfil, h.PercentualDoDanoDaArma), 1.5f,
+                "Golpe do Deserto causava 40 fixos.");
             Assert.AreEqual(0.5f, h.DurationSeconds, 0.0001f);
             Assert.AreEqual(5f, h.CooldownSeconds, 0.0001f);
             Assert.IsTrue(h.Atordoou);

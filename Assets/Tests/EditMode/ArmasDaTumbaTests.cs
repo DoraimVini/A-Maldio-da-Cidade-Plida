@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using FavelaAmarela.Core.Combat;
 using UnityEditor;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Inventario;
@@ -26,24 +27,48 @@ namespace FavelaAmarela.Tests.EditMode
     [TestFixture]
     public class ArmasDaTumbaTests
     {
-        private const string PastaDasHabilidades = "Assets/FavelaAmarela/Config/Habilidades";
+        private const string PastaDasBases = "Assets/FavelaAmarela/Config/Armas";
 
-        /// <summary>Monta a arma a partir do asset, como o jogo faz ao equipar.</summary>
+        /// <summary>
+        /// Monta a arma a partir da <b>BaseDeArma</b>, como o jogo faz ao equipar.
+        ///
+        /// <para><b>Mudou em 2026-08-28.</b> Antes carregava o <c>HabilidadeDef</c> e chamava
+        /// <c>Construir()</c> sem perfil — o que hoje devolve uma arma com faixa de dano ZERO,
+        /// porque o dano branco passou a morar na base. O comentário anterior dizia "como o jogo
+        /// faz ao equipar" e deixou de ser verdade no mesmo instante: o caminho vivo é
+        /// <c>BaseDeArma.ConstruirArma(nível)</c>, e é ele que entrega o perfil de combate.</para>
+        /// </summary>
         private static IArmaComHabilidade Arma(string arquivo)
         {
-            var def = AssetDatabase.LoadAssetAtPath<HabilidadeDef>(
-                $"{PastaDasHabilidades}/{arquivo}.asset");
+            var def = AssetDatabase.LoadAssetAtPath<BaseDeArma>(
+                $"{PastaDasBases}/{arquivo}.asset");
 
             Assert.IsNotNull(def,
-                $"HabilidadeDef ausente: {arquivo}. Conserto: " +
-                "'Tools/FavelaAmarela/Armas: montar as habilidades a dado'.");
+                $"BaseDeArma ausente: {arquivo}. Conserto: " +
+                "'Tools/FavelaAmarela/Armas: montar as bases (famílias)'.");
 
-            return def.Construir();
+            var arma = def.ConstruirArma();
+
+            Assert.IsNotNull(arma,
+                $"{arquivo} não tem HabilidadeDef ligada — a arma sai inerte.");
+
+            return arma;
         }
 
-        private static IArmaComHabilidade Cravo() => Arma("Habilidade_CravoDeAklo");
-        private static IArmaComHabilidade Estilete() => Arma("Habilidade_EstileteDeIrem");
-        private static IArmaComHabilidade Alfanje() => Arma("Habilidade_AlfanjeDeAlhazred");
+        /// <summary>
+        /// O golpe básico <b>resolvido</b>: faixa de dano branco → percentual → dano final.
+        /// Fonte nula = média, sem erro nem crítico, que é o que um teste de contrato quer.
+        /// </summary>
+        private static ArmaResult Basico(IArmaComHabilidade arma)
+            => ResolucaoDeGolpe.Resolver(arma.Execute(), arma.Perfil);
+
+        /// <inheritdoc cref="Basico"/>
+        private static ArmaResult Habilidade(IArmaComHabilidade arma)
+            => ResolucaoDeGolpe.Resolver(arma.ExecuteHabilidade(), arma.Perfil);
+
+        private static IArmaComHabilidade Cravo() => Arma("BaseArma_Cravo");
+        private static IArmaComHabilidade Estilete() => Arma("BaseArma_LaminaFina");
+        private static IArmaComHabilidade Alfanje() => Arma("BaseArma_Alfanje");
 
         // ── Ataque básico ────────────────────────────────────────────────────
 
@@ -52,7 +77,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             foreach (IArmaComHabilidade arma in new[] { Cravo(), Estilete(), Alfanje() })
             {
-                var r = arma.Execute();
+                var r = Basico(arma);
                 Assert.IsTrue(r.Success, $"{arma.NomeDaArma}: básico deveria ter sucesso.");
                 Assert.Greater(r.Dano, 0f, $"{arma.NomeDaArma}: básico deveria causar dano.");
             }
@@ -102,7 +127,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void CravoDeAklo_Habilidade_InterrompeConjuracao()
         {
-            var r = Cravo().ExecuteHabilidade();
+            var r = Habilidade(Cravo());
             Assert.IsTrue(r.Success);
             Assert.IsTrue(r.InterrompeConjuracao, "Fincar o Aklo deve interromper a conjuração.");
             Assert.Greater(r.Dano, 0f);
@@ -138,7 +163,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             foreach (var arma in new[] { Cravo(), Estilete(), Alfanje() })
             {
-                var r = arma.Execute();
+                var r = Basico(arma);
                 Assert.Greater(r.Dano, 0f, $"{arma.NomeDaArma} não causa dano no básico.");
                 Assert.Greater(r.DurationSeconds, 0f,
                     $"{arma.NomeDaArma}: golpe de duração zero — a FSM nunca entraria em " +
