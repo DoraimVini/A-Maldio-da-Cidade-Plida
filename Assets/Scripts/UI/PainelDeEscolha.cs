@@ -31,6 +31,13 @@ namespace FavelaAmarela.Runtime.UI
         [Tooltip("Texto onde as opções são escritas, uma por linha.")]
         [SerializeField] private Text texto;
 
+        /// <summary>
+        /// O <c>Text</c> onde as opções são escritas. Exposto para as ferramentas de Editor —
+        /// ver a nota em <see cref="TutorialHintUI.TextoDeSaida"/> sobre por que chegar nele por
+        /// <c>SerializedObject</c> devolvia o objeto errado dentro de um prefab carregado.
+        /// </summary>
+        public Text TextoDeSaida => texto;
+
         [Tooltip("PlayerInput de onde ler Move (navegar) e Interact (confirmar).")]
         [SerializeField] private PlayerInput playerInput;
 

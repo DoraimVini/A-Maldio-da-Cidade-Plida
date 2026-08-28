@@ -137,8 +137,7 @@ namespace FavelaAmarela.EditorTools
             int ampliacao = PadraoDeCamera.AmpliacaoDe(caminho);
             int mexidas = 0;
 
-            foreach (var cam in Object.FindObjectsByType<Camera>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var cam in Object.FindObjectsByType<Camera>(FindObjectsInactive.Include))
             {
                 // Só a câmera de JOGO, e a marca disso é ela seguir o Damião. A do menu não
                 // enquadra mundo nenhum: dar a ela uma resolução de referência de pixel art
@@ -205,8 +204,7 @@ namespace FavelaAmarela.EditorTools
         {
             int mexidos = 0;
 
-            foreach (var canvas in Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include,
-                                                                     FindObjectsSortMode.None))
+            foreach (var canvas in Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include))
             {
                 // Só o Canvas raiz tem CanvasScaler; sub-canvases herdam a escala do pai.
                 if (canvas.transform.parent != null &&
@@ -231,8 +229,7 @@ namespace FavelaAmarela.EditorTools
         {
             int paineis = 0, botoes = 0;
 
-            foreach (var img in Object.FindObjectsByType<Image>(FindObjectsInactive.Include,
-                                                                 FindObjectsSortMode.None))
+            foreach (var img in Object.FindObjectsByType<Image>(FindObjectsInactive.Include))
             {
                 string nome = img.gameObject.name;
 

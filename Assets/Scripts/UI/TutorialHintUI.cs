@@ -44,6 +44,20 @@ namespace FavelaAmarela.Runtime.UI
         [Tooltip("Texto que exibe a mensagem da dica. [ASSET]")]
         [SerializeField] private Text texto;
 
+        /// <summary>
+        /// O <c>Text</c> onde a fala é escrita.
+        ///
+        /// <para>Exposto para as ferramentas de Editor alcançarem o componente <b>pelo objeto
+        /// real</b>. A versão anterior da padronização de tipografia chegava nele por
+        /// <c>SerializedObject(this).FindProperty("texto").objectReferenceValue</c> — e dentro
+        /// de <c>PrefabUtility.LoadPrefabContents</c> aquilo devolvia o <c>Text</c> do
+        /// <b>asset</b>, não o da cópia carregada. A ferramenta então alterava um objeto e
+        /// salvava outro: o log dizia "máximo 60 → 44" e o disco continuava 60. Levou três
+        /// rodadas até o guarda de tipografia (que lê o YAML, caminho independente) provar a
+        /// divergência.</para>
+        /// </summary>
+        public Text TextoDeSaida => texto;
+
         private Coroutine _rotina;
 
         private void Awake()

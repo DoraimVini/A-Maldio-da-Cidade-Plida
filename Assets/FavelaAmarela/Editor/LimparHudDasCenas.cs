@@ -77,8 +77,7 @@ namespace FavelaAmarela.EditorTools
 
                 var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
 
-                var huds = Object.FindObjectsByType<HUDController>(
-                    FindObjectsInactive.Include, FindObjectsSortMode.None);
+                var huds = Object.FindObjectsByType<HUDController>(FindObjectsInactive.Include);
 
                 int resgatados = 0, removidos = 0;
 
@@ -107,8 +106,7 @@ namespace FavelaAmarela.EditorTools
                 }
 
                 // 2. Os painéis migrados, onde quer que tenham ficado.
-                foreach (var t in Object.FindObjectsByType<Transform>(
-                             FindObjectsInactive.Include, FindObjectsSortMode.None)
+                foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include)
                          .Where(t => t != null && Migrados.Contains(t.name))
                          .ToList())
                 {
@@ -153,8 +151,7 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static GameObject GarantirCanvasDaCena(GameObject hudParaIgnorar)
         {
-            foreach (var c in Object.FindObjectsByType<Canvas>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var c in Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include))
             {
                 if (c == null || c.gameObject == hudParaIgnorar) continue;
                 return c.gameObject;

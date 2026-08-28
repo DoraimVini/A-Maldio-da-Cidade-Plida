@@ -81,8 +81,7 @@ namespace FavelaAmarela.EditorTools
                 var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
                 bool algumaMudanca = false;
 
-                foreach (var rb in Object.FindObjectsByType<Rigidbody2D>(
-                             FindObjectsInactive.Include, FindObjectsSortMode.None))
+                foreach (var rb in Object.FindObjectsByType<Rigidbody2D>(FindObjectsInactive.Include))
                 {
                     if (rb.bodyType != RigidbodyType2D.Dynamic) continue;
                     if (rb.interpolation == RigidbodyInterpolation2D.Interpolate) continue;

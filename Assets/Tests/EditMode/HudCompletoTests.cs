@@ -79,6 +79,11 @@ namespace FavelaAmarela.Tests.EditMode
                                 "um GameObject. Quem aparece em cena são as concretas " +
                                 "(ResilienciaBar, VitalidadeBar, VigorBar), verificadas nos " +
                                 "casos de HUDController_TemAsSeisViewsLigadas.",
+
+            ["PadraoDeTextoDeDialogo"] = "Classe ESTÁTICA de constantes, não componente: guarda " +
+                                "os limites do Best Fit do texto de diálogo (24–44) num lugar só, " +
+                                "lidos pela ferramenta de Editor e pelo TipografiaDeDialogoTests. " +
+                                "Não tem o que anexar a um GameObject.",
         };
 
         // ── HUDController: os 6 campos ligados em toda cena de jogo ──────────

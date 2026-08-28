@@ -151,8 +151,7 @@ namespace FavelaAmarela.EditorTools
         private static int MarcarPorTipo<T>(float resistencia, List<string> resumo,
                                             string rotulo, string leitura) where T : Component
         {
-            var alvos = Object.FindObjectsByType<T>(FindObjectsInactive.Include,
-                                                    FindObjectsSortMode.None);
+            var alvos = Object.FindObjectsByType<T>(FindObjectsInactive.Include);
 
             int marcados = 0;
             int semCorpo = 0;

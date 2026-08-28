@@ -468,9 +468,28 @@ namespace FavelaAmarela.Runtime.Quests
                 ? falasPorFragmento[i]
                 : "Obrigada por trazer a letra dele de volta para mim.";
 
+        /// <summary>
+        /// Põe uma fala de Cassilda na caixa de diálogo.
+        ///
+        /// <para><b>O fallback que faltava (2026-08-28).</b> <c>caixaDeTexto</c> está vazio no
+        /// prefab dela, e sem este <c>?? Instancia</c> a condição <c>!= null</c> simplesmente
+        /// pulava tudo: <b>nenhuma fala de Cassilda aparecia em jogo</b>, em silêncio. São as
+        /// falas mais longas escritas até agora — as três reações do primeiro encontro têm
+        /// quase 300 caracteres cada — e nunca chegaram à tela.</para>
+        ///
+        /// <para>O <c>AbdulAlhazredAI</c> já fazia esta mesma queda para
+        /// <c>TutorialHintUI.Instancia</c> desde que a caixa migrou para o prefab persistente
+        /// da HUD, quando toda referência de cena para ela virou nula de uma vez. A Cassilda
+        /// ficou de fora daquela passada.</para>
+        /// </summary>
         private void Falar(string texto)
         {
-            if (caixaDeTexto != null) caixaDeTexto.Mostrar(texto);
+            var caixa = caixaDeTexto != null ? caixaDeTexto : TutorialHintUI.Instancia;
+
+            if (caixa != null) caixa.Mostrar(texto);
+            else
+                Debug.LogWarning($"[CassildaNPC] Sem caixa de diálogo: a fala \"{texto}\" não " +
+                                 "vai aparecer para o jogador.", this);
         }
 
         private static string ChaveDoFragmento(int i) => $"Quest.Cassilda.Fragmento{i}";

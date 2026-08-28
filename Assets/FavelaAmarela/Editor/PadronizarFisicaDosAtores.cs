@@ -105,8 +105,7 @@ namespace FavelaAmarela.EditorTools
             var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
             var mudancas = new List<string>();
 
-            foreach (var rb in Object.FindObjectsByType<Rigidbody2D>(
-                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (var rb in Object.FindObjectsByType<Rigidbody2D>(FindObjectsInactive.Include))
             {
                 var feitas = Padronizar(rb);
                 foreach (var f in feitas) mudancas.Add($"{rb.name} ({f})");

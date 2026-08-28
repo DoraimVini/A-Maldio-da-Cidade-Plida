@@ -366,7 +366,7 @@ namespace FavelaAmarela.EditorTools
             EditorGUILayout.LabelField("Set de relíquias", EditorStyles.boldLabel);
 
             var artefatos = ObterArtefatosBridge();
-            var rei = FindFirstObjectByType<ReiEmAmareloAI>();
+            var rei = FindAnyObjectByType<ReiEmAmareloAI>();
 
             using (new EditorGUI.DisabledScope(artefatos == null || rei == null))
             {

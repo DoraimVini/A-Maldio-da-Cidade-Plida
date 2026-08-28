@@ -64,8 +64,7 @@ namespace FavelaAmarela.EditorTools
         {
             string nome = Path.GetFileName(caminho);
 
-            var listeners = Object.FindObjectsByType<AudioListener>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var listeners = Object.FindObjectsByType<AudioListener>(FindObjectsInactive.Include);
 
             if (listeners.Length == 1) return $"{nome}: já tinha 1 (em '{listeners[0].name}')";
 

@@ -71,8 +71,7 @@ namespace FavelaAmarela.EditorTools
                 var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
                 bool mudou = false;
 
-                foreach (var colisor in Object.FindObjectsByType<TilemapCollider2D>(
-                             FindObjectsInactive.Include, FindObjectsSortMode.None))
+                foreach (var colisor in Object.FindObjectsByType<TilemapCollider2D>(FindObjectsInactive.Include))
                 {
                     string linha = Tratar(colisor, ref mudou);
                     resumo.Add($"{Path.GetFileName(caminho)} · {linha}");
