@@ -1,76 +1,36 @@
-using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using FavelaAmarela.Player;
-using FavelaAmarela.Runtime.Enemies;
 
 namespace FavelaAmarela.EditorTools
 {
     /// <summary>
-    /// Utilitário de Editor: fecha as duas últimas pontas soltas da luta do Abdul na cena
-    /// aberta — o <b>sprite do Abdul</b> (que pode ter ficado órfão) e o
-    /// <see cref="CongelamentoBridge"/> no Damião (sem ele os Cones de Gelo não congelam
-    /// ninguém).
+    /// Utilitário de Editor: garante o <see cref="CongelamentoBridge"/> no Damião da cena
+    /// aberta — sem ele os Cones de Gelo do Abdul não congelam ninguém.
     ///
-    /// <para>Idempotente: reatribui o sprite só se estiver faltando e não duplica componente.</para>
+    /// <para><b>Ela fazia duas coisas até 2026-08-28.</b> A outra era reatribuir o sprite de
+    /// idle do Abdul a partir de <c>abdul_alhazred_spritesheet.png</c>. Essa folha era arte de
+    /// IA <b>totalmente opaca</b> (o xadrez de transparência foi achatado na exportação, e em
+    /// jogo o boss virava um quadrado claro de 4×4 unidades); foi substituída pelo Mage do
+    /// Horror Enemy Pack em <c>LigarAnimacaoDoAbdul</c>, e o Vini mandou apagar os órfãos. Com a
+    /// folha fora do projeto aquele passo só saberia emitir erro, então saiu junto — <b>reatribuir
+    /// o sprite hoje seria restaurar a arte quebrada</b>.</para>
+    ///
+    /// <para>Idempotente: não duplica componente.</para>
     /// </summary>
     public static class FecharLutaDoAbdul
     {
-        private const string CaminhoSpritesheet =
-            "Assets/Sprites/Bosses/Alhazred/abdul_alhazred_spritesheet.png";
-        private const string SpriteIdleDoAbdul = "abdul_transe_0";
-
-        [MenuItem("Tools/FavelaAmarela/Fechar Luta do Abdul (sprite + congelamento)")]
+        [MenuItem("Tools/FavelaAmarela/Fechar Luta do Abdul (congelamento no Damião)")]
         public static void Fechar()
         {
-            int mudancas = 0;
-            mudancas += ReconectarSpriteDoAbdul();
-            mudancas += AdicionarCongelamentoNoDamiao();
+            int mudancas = AdicionarCongelamentoNoDamiao();
 
             if (mudancas > 0)
                 EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
 
             Debug.Log($"[FecharLuta] {mudancas} ajuste(s) aplicado(s). " +
                       "Cena NÃO foi salva — confira antes.");
-        }
-
-        /// <summary>
-        /// Reatribui o sprite de idle do Abdul. A referência pode ficar órfã se a folha for
-        /// refatiada — os `spriteID` mudavam a cada execução do slicer (corrigido depois,
-        /// com IDs determinísticos), e uma referência quebrada deixa o boss **invisível**
-        /// sem nenhum erro no console.
-        /// </summary>
-        private static int ReconectarSpriteDoAbdul()
-        {
-            var abdul = Object.FindAnyObjectByType<AbdulAlhazredAI>(FindObjectsInactive.Include);
-            if (abdul == null)
-            {
-                Debug.LogWarning("[FecharLuta] Nenhum AbdulAlhazredAI na cena.");
-                return 0;
-            }
-
-            var sr = abdul.GetComponent<SpriteRenderer>();
-            if (sr == null) return 0;
-            if (sr.sprite != null) return 0; // já tem sprite válido
-
-            var sprite = AssetDatabase.LoadAllAssetsAtPath(CaminhoSpritesheet)
-                .OfType<Sprite>()
-                .FirstOrDefault(s => s.name == SpriteIdleDoAbdul);
-
-            if (sprite == null)
-            {
-                Debug.LogError($"[FecharLuta] Sprite '{SpriteIdleDoAbdul}' não encontrado — " +
-                               "rode 'Slice Spritesheet do Abdul' antes.");
-                return 0;
-            }
-
-            var so = new SerializedObject(sr);
-            so.FindProperty("m_Sprite").objectReferenceValue = sprite;
-            so.ApplyModifiedPropertiesWithoutUndo();
-
-            Debug.Log($"[FecharLuta] Sprite do Abdul reconectado ('{SpriteIdleDoAbdul}').");
-            return 1;
         }
 
         /// <summary>

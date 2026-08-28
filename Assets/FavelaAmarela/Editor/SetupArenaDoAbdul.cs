@@ -22,9 +22,8 @@ namespace FavelaAmarela.EditorTools
     public static class SetupArenaDoAbdul
     {
         private const string NomeRaiz = "TumbaDeAbdul_Conteudo";
-        private const string CaminhoSpritesheet =
-            "Assets/Sprites/Bosses/Alhazred/abdul_alhazred_spritesheet.png";
-        private const string SpriteIdleDoAbdul = "abdul_transe_0";
+        private const string CaminhoPrefabDoAbdul =
+            "Assets/FavelaAmarela/Art/Enemies/Abdul_Alhazred.prefab";
         private const string CaminhoFichaAbdul = "Assets/FavelaAmarela/Config/Ficha_Abdul.asset";
 
         /// <summary>
@@ -81,27 +80,39 @@ namespace FavelaAmarela.EditorTools
 
         // ── Abdul ────────────────────────────────────────────────────────────
 
+        /// <summary>
+        /// Instancia o <b>prefab</b> do Abdul na âncora da arena.
+        ///
+        /// <para><b>Ela montava um Abdul à mão até 2026-08-28</b> — <c>new GameObject</c> +
+        /// <c>SpriteRenderer</c> + <c>BoxCollider2D</c> 1,2×1,2 + <c>AbdulAlhazredAI</c> —, com o
+        /// sprite vindo de <c>abdul_alhazred_spritesheet.png</c>. Era uma <b>segunda fonte de
+        /// verdade</b> para o boss, e ficou pior que a primeira a cada coisa que o prefab
+        /// ganhou: Hurtbox de 2,54×1,29 (sem ela o golpe do jogador não o alcança),
+        /// <c>CorpoImpregnado</c>, o animator do Mage, a ficha.</para>
+        ///
+        /// <para>E a folha que ela lia era a arte de IA <b>opaca</b>, substituída em
+        /// <c>LigarAnimacaoDoAbdul</c> e apagada a pedido do Vini. Rodar esta ferramenta
+        /// restauraria o boss quadrado e claro.</para>
+        /// </summary>
         private static AbdulAlhazredAI CriarAbdul(Transform pai)
         {
-            var go = new GameObject("Abdul_Alhazred");
-            go.transform.SetParent(pai, false);
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(CaminhoPrefabDoAbdul);
+            if (prefab == null)
+            {
+                Debug.LogError($"[SetupArena] Prefab do Abdul não encontrado em " +
+                               $"'{CaminhoPrefabDoAbdul}'. A arena fica sem boss — montar um à " +
+                               "mão aqui seria criar uma segunda versão dele, que é o que esta " +
+                               "ferramenta parou de fazer.");
+                return null;
+            }
+
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, pai);
+            go.name = "Abdul_Alhazred";
             go.transform.position = new Vector3(AncoraDaArena.x, AncoraDaArena.y, 0f);
-            go.layer = LayerMask.NameToLayer("Enemy");
 
-            var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = CarregarSprite(SpriteIdleDoAbdul);
-            if (sr.sprite == null)
-                Debug.LogWarning($"[SetupArena] Sprite '{SpriteIdleDoAbdul}' não encontrado — " +
-                                 "o Abdul fica invisível até a folha ser fatiada.");
-
-            var col = go.AddComponent<BoxCollider2D>();
-            col.size = new Vector2(1.2f, 1.2f);
-
-            var ai = go.AddComponent<AbdulAlhazredAI>();
-            AtribuirCampo(ai, "ficha", AssetDatabase.LoadAssetAtPath<FichaAtributosConfig>(CaminhoFichaAbdul));
-
-            // Y-sorting dinâmico: sem isto o boss não é ocultado por paredes à frente.
-            AdicionarYSortSeExistir(go);
+            var ai = go.GetComponent<AbdulAlhazredAI>();
+            if (ai == null)
+                Debug.LogError("[SetupArena] O prefab do Abdul não tem AbdulAlhazredAI.");
 
             return ai;
         }
@@ -131,11 +142,6 @@ namespace FavelaAmarela.EditorTools
         }
 
         // ── Helpers ──────────────────────────────────────────────────────────
-
-        private static Sprite CarregarSprite(string nome)
-            => AssetDatabase.LoadAllAssetsAtPath(CaminhoSpritesheet)
-                .OfType<Sprite>()
-                .FirstOrDefault(s => s.name == nome);
 
         /// <summary>
         /// Sprite branco 1×1 embutido da Unity, usado como placeholder até a arte real
