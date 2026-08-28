@@ -69,9 +69,39 @@ namespace FavelaAmarela.Player
         /// Storm acts as white noise, reducing how far player sounds propagate.
         /// </summary>
         public float GetCurrentNoiseEmission(bool isMoving, float stormIntensity)
+            => GetCurrentNoiseEmission(isMoving, stormIntensity, 0f);
+
+        /// <summary>
+        /// Ruído efetivo, agora descontando a <b>Furtividade</b> vinda do equipamento.
+        ///
+        /// <para><b>Por que o parâmetro existe (2026-08-28).</b> <c>StatType.Furtividade</c>
+        /// estava no enum, era rolado pelo <c>Artefato_AnelDoSinalAmarelo</c>, e <b>nenhuma
+        /// linha do jogo o lia</b> — o artefato prometia discrição e não entregava nada. Num
+        /// jogo cujo pilar é a furtividade, era o atributo mais caro de deixar decorativo.</para>
+        ///
+        /// <para>Entra como <b>redução de raio</b>, não como multiplicador, porque é assim que o
+        /// resto do sistema pensa: <c>EnemyPerception</c> compara distância com raio, e a
+        /// tempestade também abafa reduzindo raio. O piso de
+        /// <see cref="PisoDeRuidoEmMovimento"/> continua valendo depois — quem se move nunca
+        /// fica literalmente inaudível, nem com a tempestade nem com o Anel.</para>
+        /// </summary>
+        /// <param name="furtividade">Bônus agregado de <c>StatType.Furtividade</c>.</param>
+        public float GetCurrentNoiseEmission(bool isMoving, float stormIntensity, float furtividade)
         {
             if (!isMoving) return 0f;
-            return AplicarAbafamentoTempestade(NoiseRadius, stormIntensity);
+
+            float reduzido = NoiseRadius - (furtividade < 0f ? 0f : furtividade);
+
+            // O piso vale para a Furtividade também, e a primeira versão disto o furava: eu
+            // travava o raio em ZERO antes de chamar o abafamento, e lá dentro "raio 0" quer
+            // dizer "parado". Com Anel suficiente, o Damião ficava LITERALMENTE inaudível
+            // correndo -- a mesma invisibilidade que o piso existe para impedir na tempestade.
+            //
+            // O teto do piso é o próprio NoiseRadius: um modo de movimento autorado mais
+            // silencioso que o piso não pode ficar MAIS barulhento por causa desta linha.
+            float chao = Mathf.Min(NoiseRadius, PisoDeRuidoEmMovimento);
+
+            return AplicarAbafamentoTempestade(Mathf.Max(reduzido, chao), stormIntensity);
         }
 
         /// <summary>
@@ -458,7 +488,8 @@ namespace FavelaAmarela.Player
                 if (_soundTimer >= IntervaloBroadcastSom)
                 {
                     _soundTimer = 0f;
-                    float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, _environment.StormIntensity);
+                    float currentNoise = stealthState.GetCurrentNoiseEmission(
+                        isMoving, _environment.StormIntensity, FurtividadeEquipada);
                     if (currentNoise > 0f && !PassosSilenciados)
                     {
                         _soundBroadcaster.Emitir(new SomEmitido(transform.position, currentNoise));
@@ -475,12 +506,21 @@ namespace FavelaAmarela.Player
         // doc da Unity 6.4 diz que esse número É o cellSize.y do Grid, e um literal aqui seria
         // mais uma constante para divergir do mundo desenhado.
 
+        /// <summary>
+        /// Bônus agregado de <c>StatType.Furtividade</c> do equipamento. Mesmo padrão de
+        /// <c>MaoFisicaBridge.BonusPassivo</c>: zero quando o gerenciador ainda não existe.
+        /// </summary>
+        private static float FurtividadeEquipada =>
+            GerenciadorEfeitosPassivos.Instance
+                ?.GetBonus(FavelaAmarela.Inventario.StatType.Furtividade) ?? 0f;
+
         private void OnDrawGizmos()
         {
             if (!showNoiseGizmo || stealthState == null) return;
 
             float stormIntensity = _environment != null ? _environment.StormIntensity : debugStormIntensity;
-            float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, stormIntensity);
+            float currentNoise = stealthState.GetCurrentNoiseEmission(
+                isMoving, stormIntensity, FurtividadeEquipada);
             if (currentNoise <= 0f) return;
 
             // Filled circle (projected sphere in 2D ortho looks like a disk)

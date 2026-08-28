@@ -21,3 +21,4 @@ MonoBehaviour:
     QuantidadeMax: 1
     NivelMinimo: 1
   tetoDeItens: 1
+  nivelDoItem: 3

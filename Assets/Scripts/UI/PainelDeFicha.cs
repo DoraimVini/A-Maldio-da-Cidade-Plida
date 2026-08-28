@@ -196,9 +196,14 @@ namespace FavelaAmarela.Runtime.UI
         }
 
         /// <summary>
-        /// Quais <see cref="StatType"/> algum sistema de fato consome hoje. Ver o levantamento
-        /// completo em <c>systems/inventario_analise.md</c>: dos 15 declarados, 7 não são lidos
-        /// por ninguém. Esta lista é o que separa "o item deu +5" de "o item diz que deu +5".
+        /// Quais <see cref="StatType"/> algum sistema de fato consome hoje. Esta lista é o que
+        /// separa "o item deu +5" de "o item <i>diz</i> que deu +5".
+        ///
+        /// <para><b>Passaram a ser consumidos em 2026-08-28:</b> <c>Furtividade</c> e
+        /// <c>DefesaAnomalia</c>. Os dois eram decorativos e os dois eram <b>rolados por
+        /// artefatos</b> — o Anel do Sinal Amarelo prometia discrição e a Coroa de Ossos
+        /// prometia proteção anômala, e nenhum dos dois entregava nada. Restam 5 dos 15 sem
+        /// consumidor.</para>
         /// </summary>
         private static bool AtributoConsomeBonus(StatType stat) => stat switch
         {
@@ -212,6 +217,8 @@ namespace FavelaAmarela.Runtime.UI
             StatType.CustoCorridaVigor => true,// GerenciadorDeVigor
             StatType.RegenRM => true,          // GerenciadorEfeitosPassivos.Update → Ancorar
             StatType.DrenoRM => true,          // GerenciadorEfeitosPassivos.Update → SofrerTrauma
+            StatType.Furtividade => true,      // PlayerStealthState.GetCurrentNoiseEmission
+            StatType.DefesaAnomalia => true,   // ResilienciaBridge.SofrerTrauma
             _ => false,
         };
     }

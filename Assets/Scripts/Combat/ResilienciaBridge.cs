@@ -81,8 +81,26 @@ namespace FavelaAmarela.Runtime.Combat
         public void SofrerTrauma(float quantidade)
         {
             if (IgnorarTrauma) return;
-            _resiliencia?.SofrerTrauma(quantidade);
+
+            _resiliencia?.SofrerTrauma(MitigacaoDeDano.Aplicar(quantidade, DefesaAnomala));
         }
+
+        /// <summary>
+        /// Defesa anômala agregada do equipamento — a contraparte mental da
+        /// <c>DefesaFisica</c> que a <c>VitalidadeBridge</c> já consulta.
+        ///
+        /// <para><b>A assimetria que isto fecha (2026-08-28).</b> Todo inimigo mitiga o canal
+        /// anômalo pela <c>ResistenciaAnomala</c> da ficha (<c>EnemyBase:111</c>), e o Damião
+        /// <b>não mitigava nada</b>: o Trauma chegava cru à Resiliência Mental. Ao mesmo tempo,
+        /// <c>StatType.DefesaAnomalia</c> existia no enum, era rolado pela Coroa de Ossos, e
+        /// <b>ninguém lia</b> — o artefato prometia proteção que não existia.</para>
+        ///
+        /// <para>Fica inerte até alguém equipar algo que role o atributo, então não muda
+        /// dificuldade nenhuma hoje: fecha o buraco sem mexer no balanceamento.</para>
+        /// </summary>
+        private static float DefesaAnomala =>
+            FavelaAmarela.Player.GerenciadorEfeitosPassivos.Instance
+                ?.GetBonus(FavelaAmarela.Inventario.StatType.DefesaAnomalia) ?? 0f;
 
         /// <summary>
         /// Restaura Resiliência (Ancoragem). <b>Não</b> respeita <see cref="IgnorarTrauma"/> —

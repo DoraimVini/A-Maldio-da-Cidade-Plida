@@ -81,8 +81,25 @@ namespace FavelaAmarela.Player
             }
         }
 
+        /// <summary>
+        /// Único ponto de invalidação do cache de bônus. Os quatro eventos que mexem no que o
+        /// Damião carrega — equipamento, slot de mochila, Artefatos e Ecos — passam por aqui.
+        ///
+        /// <para><b>O defeito, achado em 2026-08-28.</b> Este método só disparava
+        /// <see cref="OnBonusChanged"/>. <c>_cacheValido</c> era escrito em <b>um lugar só</b>
+        /// (<c>Recalcular</c>, no fim) e <b>nunca voltava para false</b>: o bônus era calculado
+        /// na primeira leitura de <see cref="GetBonus"/> e <b>congelava para o resto da
+        /// partida</b>. Trocar de arma, equipar armadura, pegar item com afixo ou destravar um
+        /// Eco deixavam de mudar qualquer número.</para>
+        ///
+        /// <para>O comentário acima de <c>_cacheValido</c> descrevia essa invalidação por evento
+        /// como se ela existisse — foi escrito junto com o cache e a linha que o implementava
+        /// nunca chegou. É a razão de a itemização a dado não aparecer em jogo: o afixo rolava,
+        /// entrava no <c>ItemInstance</c>, e o cache já estava fechado.</para>
+        /// </summary>
         private void NotificarMudanca()
         {
+            _cacheValido = false;
             OnBonusChanged?.Invoke();
         }
 

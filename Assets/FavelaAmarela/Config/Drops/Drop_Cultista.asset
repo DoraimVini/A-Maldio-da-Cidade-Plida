@@ -49,3 +49,4 @@ MonoBehaviour:
     QuantidadeMax: 2
     NivelMinimo: 1
   tetoDeItens: 2
+  nivelDoItem: 1
