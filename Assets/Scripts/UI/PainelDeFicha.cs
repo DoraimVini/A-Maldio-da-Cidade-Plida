@@ -38,8 +38,29 @@ namespace FavelaAmarela.Runtime.UI
         [SerializeField] private Text corpo;
 
         [Header("Fonte dos atributos")]
-        [Tooltip("VitalidadeBridge de Damião — dona da ficha final. [CENA]")]
+        [Tooltip("VitalidadeBridge de Damião. Deixe VAZIO: quem liga é o GameLoopBootstrap. [CENA]")]
         [SerializeField] private VitalidadeBridge vitalidadeDoJogador;
+
+        /// <summary>
+        /// Liga a ficha ao corpo de Damião. Chamado pelo <c>GameLoopBootstrap</c>, no mesmo
+        /// padrão de <c>ResilienciaBar</c> e <c>PlayerDeathController</c>.
+        ///
+        /// <para><b>Por que não dá para ligar no Inspector (achado em 2026-08-28).</b> Este
+        /// painel vive dentro do <c>HUD_Gameplay.prefab</c>, que é um <b>asset em
+        /// Resources</b>. Um prefab-asset não pode referenciar um objeto de cena: o campo
+        /// serializado ficava em <c>{fileID: 0}</c> e <b>não havia como preenchê-lo</b>. A ficha
+        /// nunca funcionou — o painel abria dizendo "Ficha indisponível: sem VitalidadeBridge
+        /// ligada", e a mensagem estava certa sobre o sintoma e muda sobre a causa.</para>
+        ///
+        /// <para>Depois que a HUD virou persistente (<c>DontDestroyOnLoad</c>), ligar por
+        /// Inspector deixou de ser possível <b>por construção</b>: o Damião troca a cada cena e
+        /// a HUD não. Resolver por <c>Bind</c> é o único caminho que sobrevive à troca de cena.</para>
+        /// </summary>
+        public void Bind(VitalidadeBridge corpoDeDamiao)
+        {
+            vitalidadeDoJogador = corpoDeDamiao;
+            if (isActiveAndEnabled) Redesenhar();
+        }
 
         private GerenciadorEfeitosPassivos _passivas;
         private readonly StringBuilder _sb = new StringBuilder(512);
@@ -67,7 +88,11 @@ namespace FavelaAmarela.Runtime.UI
 
             if (vitalidadeDoJogador == null)
             {
-                corpo.text = "Ficha indisponível: sem VitalidadeBridge ligada.";
+                // A mensagem diz o que fazer, não só o que faltou: a versão anterior ("sem
+                // VitalidadeBridge ligada") mandava o leitor procurar um campo de Inspector que
+                // é IMPOSSÍVEL de preencher, porque este painel vive num prefab-asset.
+                corpo.text = "Ficha indisponível: o GameLoopBootstrap não ligou o corpo de " +
+                             "Damião nesta cena.";
                 return;
             }
 

@@ -786,10 +786,48 @@ namespace FavelaAmarela.Runtime.Enemies
             _fsm.DefinirTotalDePedras(_pedrasAtivas.Count);
         }
 
+        /// <summary>
+        /// Onde as Pedras nascem: os pontos autorados, ou o anel de fallback.
+        ///
+        /// <para><b>A decisão é pelos pontos USÁVEIS, não pelo tamanho do array</b> — e é essa a
+        /// diferença que quebrou a luta do Abdul (achado em 2026-08-28, no playtest do Vini).
+        /// A cena da Tumba tinha <c>pontosDasPedras</c> com <b>tamanho 1 e o único elemento
+        /// nulo</b>: alguém dimensionou o array no Inspector e nunca arrastou o
+        /// <c>Transform</c>. A versão anterior perguntava só <c>Length &gt; 0</c>, entrava neste
+        /// ramo, o <c>Where(t =&gt; t != null)</c> devolvia <b>vazio</b>, e o laço de invocação
+        /// rodava zero vezes.</para>
+        ///
+        /// <para><b>E o silêncio era total.</b> A guarda de <c>prefabPedraDePoder == null</c>
+        /// passava — o prefab <i>estava</i> atribuído. Nenhum log, nenhuma exceção. O que
+        /// acontecia depois é que a coisa fica cara: <c>DefinirTotalDePedras(0)</c> deixa
+        /// <c>EscudoDestruido</c> (que exige <c>TotalDePedras &gt; 0</c>) <b>falso para
+        /// sempre</b>, e como nada pode chamar <c>QuebrarPedraDePoder</c> sem Pedras de pé, o
+        /// escudo nunca cai. <b>O chefe fica invencível</b>, e o sintoma que aparece é "as
+        /// pedras não nascem".</para>
+        /// </summary>
         private Vector3[] ObterPontosDasPedras()
         {
-            if (pontosDasPedras != null && pontosDasPedras.Length > 0)
-                return pontosDasPedras.Where(t => t != null).Select(t => t.position).ToArray();
+            var autorados = pontosDasPedras == null
+                ? System.Array.Empty<Vector3>()
+                : pontosDasPedras.Where(t => t != null).Select(t => t.position).ToArray();
+
+            int declarados = pontosDasPedras?.Length ?? 0;
+
+            if (autorados.Length > 0)
+            {
+                if (autorados.Length < declarados)
+                    Debug.LogWarning($"[AbdulAlhazredAI] {declarados - autorados.Length} de " +
+                                     $"{declarados} pontos de Pedra estão vazios no Inspector — " +
+                                     "nascem menos Pedras do que a arena promete.", this);
+
+                return autorados;
+            }
+
+            if (declarados > 0)
+                Debug.LogError($"[AbdulAlhazredAI] 'pontosDasPedras' tem {declarados} entrada(s) " +
+                               "e TODAS estão vazias. Sem ponto usável não nasce Pedra nenhuma, " +
+                               "e sem Pedra o escudo do Abdul NUNCA cai — a luta fica " +
+                               "invencível. Usando o anel de fallback ao redor dele.", this);
 
             // Fallback: quatro Pedras nas diagonais ao redor de Abdul. As diagonais (e não
             // os eixos) casam com a leitura isométrica do chão — no losango anterior, as

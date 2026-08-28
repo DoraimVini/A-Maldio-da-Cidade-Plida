@@ -278,6 +278,40 @@ namespace FavelaAmarela.Tests.EditMode
         /// quando a chave <b>não existe</b> no YAML, que é o caso de cena salva antes de o campo
         /// ser criado.
         /// </summary>
+        /// <summary>
+        /// A ficha do inventário só pode ser ligada por código.
+        ///
+        /// <para><b>Por quê (achado no playtest de 2026-08-28).</b> O <c>PainelDeFicha</c> mora
+        /// dentro do <c>HUD_Gameplay.prefab</c>, que é um <b>asset em Resources</b> — e um
+        /// prefab-asset não pode referenciar objeto de cena. O campo
+        /// <c>vitalidadeDoJogador</c> era, portanto, <b>impossível de preencher</b>: ficava em
+        /// <c>{fileID: 0}</c> e a tela abria dizendo "Ficha indisponível: sem VitalidadeBridge
+        /// ligada". A mensagem estava certa sobre o sintoma e mandava o leitor procurar um
+        /// campo de Inspector que nunca ia funcionar.</para>
+        ///
+        /// <para>Depois que a HUD virou persistente, ligar por Inspector deixou de ser possível
+        /// <b>por construção</b>: o Damião troca a cada cena e a HUD não.</para>
+        /// </summary>
+        [Test]
+        public void OBootstrap_LigaAFichaDoInventario()
+        {
+            string fonte = File.ReadAllText("Assets/Scripts/GameLoop/GameLoopBootstrap.cs");
+
+            StringAssert.Contains("PainelDeFicha", fonte,
+                "O GameLoopBootstrap parou de procurar o PainelDeFicha. Como ele vive num " +
+                "prefab-asset, NÃO existe outro caminho: a ficha volta a abrir vazia.");
+
+            StringAssert.Contains("ficha.Bind(_vitalidadeDamiao)", fonte,
+                "O bind da ficha sumiu. Sem ele o painel abre com 'Ficha indisponível' e o " +
+                "efeito de todo item equipado volta a ser invisível — que é justamente o " +
+                "problema que essa tela existe para expor.");
+
+            StringAssert.Contains("FindObjectsInactive.Include", fonte,
+                "A busca do PainelDeFicha precisa incluir inativos: ele fica desligado " +
+                "enquanto a mochila está fechada, que é a maior parte do tempo. Sem isso o " +
+                "bind acha null e falha em silêncio.");
+        }
+
         private static string ReferenciaDe(List<string> bloco, string nomeDoCampo)
         {
             var padrao = new Regex($@"^  {Regex.Escape(nomeDoCampo)}: \{{fileID: (-?\d+)");

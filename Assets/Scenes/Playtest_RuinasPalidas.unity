@@ -18813,11 +18813,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3695343334338554330, guid: c62d1274d419a8d40bd30749d03fd36f, type: 3}
       propertyPath: pontosDasPedras.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3695343334338554330, guid: c62d1274d419a8d40bd30749d03fd36f, type: 3}
-      propertyPath: 'pontosDasPedras.Array.data[0]'
-      value: 
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6792242425801775998, guid: c62d1274d419a8d40bd30749d03fd36f, type: 3}
       propertyPath: m_Size.x
