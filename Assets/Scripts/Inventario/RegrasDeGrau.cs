@@ -44,6 +44,6 @@ namespace FavelaAmarela.Inventario
         /// tem história própria.
         /// </summary>
         public static bool PodeSerGerado(GrauDeImpregnacao grau) =>
-            grau != GrauDeImpregnacao.Reliquia;
+            CurvaDeGrau.EhSorteavel(grau);
     }
 }

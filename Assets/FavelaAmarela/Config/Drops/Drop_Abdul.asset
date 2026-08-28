@@ -10,29 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0bb33166f8a964d4ba14254b2ecbb5d1, type: 3}
-  m_Name: Drop_Byakhee
+  m_Name: Drop_Abdul
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.TabelaDeDrop
   entradas:
-  - Item: {fileID: 11400000, guid: 748bf24d78b8471f812df3438e8c4211, type: 2}
-    Grau: 3
-    Garantido: 1
-    Chance: 1
-    QuantidadeMin: 1
-    QuantidadeMax: 1
-    NivelMinimo: 1
-  - Item: {fileID: 11400000, guid: 58baf661cb6619c47bd037c5960a85fc, type: 2}
+  - Item: {fileID: 11400000, guid: b48855e3bf450c5469431b269fdee337, type: 2}
     Grau: 1
     Garantido: 0
     Chance: 0.6
     QuantidadeMin: 1
     QuantidadeMax: 1
     NivelMinimo: 1
-  - Item: {fileID: 11400000, guid: 95408026a46f4eafb7f3612515e52933, type: 2}
+  - Item: {fileID: 11400000, guid: 05170b5293814ab686909110c71e97e8, type: 2}
     Grau: 1
     Garantido: 0
     Chance: 0.6
     QuantidadeMin: 1
     QuantidadeMax: 1
     NivelMinimo: 1
-  tetoDeItens: 3
-  nivelDoItem: 3
+  tetoDeItens: 2
+  nivelDoItem: 2

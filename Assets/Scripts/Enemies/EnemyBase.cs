@@ -9,7 +9,7 @@ using FavelaAmarela.Runtime.Combat;
 namespace FavelaAmarela.Runtime.Enemies
 {
     [RequireComponent(typeof(Rigidbody2D), typeof(SpriteRenderer))]
-    public class EnemyBase : MonoBehaviour, IDanificavel
+    public class EnemyBase : MonoBehaviour, IDanificavel, FavelaAmarela.Runtime.Itens.IFonteDeEspolio
     {
         [Header("Vitalidade")]
         [SerializeField] private FichaAtributosConfig ficha;

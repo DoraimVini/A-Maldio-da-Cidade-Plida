@@ -298,6 +298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyBase
   ficha: {fileID: 11400000, guid: 5cf185e9f3504e8a9242296f5d32d099, type: 2}
+  nivelDaUnidade: 1
   ehAparicaoPrimordial: 0
   mostrarNumerosDeDano: 1
   corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}

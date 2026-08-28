@@ -43,7 +43,8 @@ namespace FavelaAmarela.Runtime.Enemies
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer))]
     [AddComponentMenu("Favela Amarela/Enemies/Abdul Alhazred")]
-    public sealed class AbdulAlhazredAI : MonoBehaviour, IDanificavel, IInteragivel
+    public sealed class AbdulAlhazredAI : MonoBehaviour, IDanificavel, IInteragivel,
+                                       FavelaAmarela.Runtime.Itens.IFonteDeEspolio
     {
         [Header("Ficha de Atributos")]
         [Tooltip("Ficha do Abdul (Vitalidade, Defesa, Conjuração, Resistência Anômala).")]
@@ -653,8 +654,17 @@ namespace FavelaAmarela.Runtime.Enemies
         /// restauração de save também precisa dele: o tomo é instanciado em runtime, então
         /// sair da cena sem recolhê-lo o destruiria para sempre.
         /// </summary>
+        /// <summary>
+        /// Disparado ao ser derrotado — é por aqui que o <c>DropAoAbater</c> materializa o
+        /// espólio. O Necronomicon continua vindo por código (é item de rito, garantido); o
+        /// que a tabela acrescenta é a <b>recompensa de progressão</b> que o Vini pediu.
+        /// </summary>
+        public event System.Action OnAbatido;
+
         private void InstanciarNecronomicon()
         {
+            OnAbatido?.Invoke();
+
             if (prefabNecronomicon != null)
                 Instantiate(prefabNecronomicon, transform.position, Quaternion.identity);
             else

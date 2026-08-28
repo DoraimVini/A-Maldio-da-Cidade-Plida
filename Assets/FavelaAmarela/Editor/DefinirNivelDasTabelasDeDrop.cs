@@ -48,6 +48,10 @@ namespace FavelaAmarela.EditorTools
             ("Drop_Byakhee", 3,
              "chefe que fecha a Fase 1: abre o pool inteiro, incluindo 'do Sinal' (nível 3), " +
              "que hoje é conteúdo inalcançável"),
+
+            ("Drop_Abdul", 2,
+             "primeiro chefe do jogo: acima da tropa, abaixo do que fecha a fase — a " +
+             "recompensa dele tem de ser sentida no Cultista seguinte, não igualar a do Byakhee"),
         };
 
         [MenuItem("Tools/FavelaAmarela/Itens: definir o nível das tabelas de drop")]

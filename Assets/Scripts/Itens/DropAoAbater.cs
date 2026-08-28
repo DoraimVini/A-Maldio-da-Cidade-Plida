@@ -15,7 +15,14 @@ namespace FavelaAmarela.Runtime.Itens
     /// <para>O item cai no chão e é recolhido com E, como todo o resto — nada de coleta
     /// automática por toque.</para>
     /// </summary>
-    [RequireComponent(typeof(EnemyBase))]
+    // SEM [RequireComponent(typeof(EnemyBase))] -- ele ficou aqui por um commit depois de o
+    // binding virar interface, e o estrago foi imediato: acrescentar este componente ao Abdul
+    // arrastou um EnemyBase inteiro (e o Rigidbody2D que ELE exige) para um ator que é
+    // deliberadamente sem corpo físico. Os guardas de física pegaram na mesma rodada --
+    // gravidade 1, sem FreezeRotation, detecção Discrete.
+    //
+    // Exigir a classe contradiz o motivo de existir a interface: quem larga espólio é quem
+    // sabe avisar que foi derrotado, não quem herda de uma classe específica.
     [AddComponentMenu("Favela Amarela/Itens/Drop ao Abater")]
     public sealed class DropAoAbater : MonoBehaviour
     {
@@ -31,7 +38,7 @@ namespace FavelaAmarela.Runtime.Itens
         [Min(0f)]
         [SerializeField] private float raioDeEspalhamento = 0.4f;
 
-        private EnemyBase _enemyBase;
+        private IFonteDeEspolio _fonteDeEspolio;
         private SorteioDeDrop _sorteio;
         private IFonteDeAleatoriedade _fonte;
 
@@ -40,19 +47,23 @@ namespace FavelaAmarela.Runtime.Itens
             _sorteio = new SorteioDeDrop();
             _fonte = new FonteDeAleatoriedadeUnity();
 
-            _enemyBase = GetComponent<EnemyBase>();
-            if (_enemyBase == null)
+            // Liga na INTERFACE, não na classe: o Abdul não é EnemyBase (implementa
+            // IDanificavel direto) e ficava de fora do espólio por construção -- abater o
+            // primeiro chefe do jogo nunca largou uma peça de equipamento.
+            _fonteDeEspolio = GetComponent<IFonteDeEspolio>();
+            if (_fonteDeEspolio == null)
             {
-                Debug.LogError($"[DropAoAbater] '{name}' não tem EnemyBase — nada será largado.", this);
+                Debug.LogError($"[DropAoAbater] '{name}' não implementa IFonteDeEspolio — " +
+                               "nada será largado.", this);
                 return;
             }
 
-            _enemyBase.OnAbatido += HandleAbatido;
+            _fonteDeEspolio.OnAbatido += HandleAbatido;
         }
 
         private void OnDestroy()
         {
-            if (_enemyBase != null) _enemyBase.OnAbatido -= HandleAbatido;
+            if (_fonteDeEspolio != null) _fonteDeEspolio.OnAbatido -= HandleAbatido;
         }
 
         private void HandleAbatido()
@@ -81,7 +92,18 @@ namespace FavelaAmarela.Runtime.Itens
                 // O item que cai é um EXEMPLAR: base + grau + afixos rolados. Sem esta linha,
                 // o gerador existiria e não estaria ligado a nada -- o modo de falha que este
                 // repositório já catalogou nove vezes.
-                var exemplar = _gerador.Gerar(def, sorteados[i].Grau, tabela.NivelDoItem,
+                //
+                // O GRAU é sorteado pela curva (2026-08-28), com o valor autorado na entrada
+                // servindo de PISO: um chefe que declara Impregnado nunca larga Inerte por
+                // azar, mas um Cultista que declara Inerte pode surpreender. É o que faz o
+                // loot da primeira fase deixar de ser sempre igual.
+                var grau = CurvaDeGrau.Sortear(nivel, sorteados[i].Grau, _fonte);
+
+                // E o NÍVEL do item acompanha o jogador, com o piso da tabela: chefe nunca
+                // larga item de nível 1, e o Deserto deixa de entregar tier 1 no endgame.
+                int nivelDoItem = Mathf.Max(tabela.NivelDoItem, nivel);
+
+                var exemplar = _gerador.Gerar(def, grau, nivelDoItem,
                                               CatalogoDeAfixos.Todos, _fonte);
 
                 if (exemplar != null) exemplar.Quantidade = sorteados[i].Quantidade;
