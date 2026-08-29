@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using FavelaAmarela.Core.Loot;
 using FavelaAmarela.Core.Artefatos;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Inventario;
@@ -185,9 +186,162 @@ namespace FavelaAmarela.EditorTools
                     (Empunhadura)EditorGUILayout.EnumPopup("Empunhadura", _receita.Empunhadura);
 
             GUILayout.Space(6);
+            DesenharBlocoDeCombate();
+            GUILayout.Space(6);
             DesenharModificadores();
             GUILayout.Space(6);
             DesenharValidacaoECriacao();
+        }
+
+        /// <summary>
+        /// A <b>matemática construída</b>: família, nível, grau — e a conta que sai deles.
+        ///
+        /// <para><b>Por que a prévia existe (2026-08-28).</b> O Vini pediu que o Debugger criasse
+        /// itens "com a matemática construída, para conseguirmos melhorar e expandir o arsenal
+        /// do jogo". Expandir arsenal sem ver a conta é chutar: a única forma de saber se uma
+        /// arma nova estava forte ou fraca era criá-la, equipar, entrar em Play e bater em
+        /// alguém. A prévia responde antes de o asset existir.</para>
+        /// </summary>
+        private void DesenharBlocoDeCombate()
+        {
+            EditorGUILayout.LabelField("Matematica do item", EditorStyles.boldLabel);
+
+            _receita.NivelDoItem = Mathf.Max(1,
+                EditorGUILayout.IntField("Nivel do item", _receita.NivelDoItem));
+
+            _receita.Grau = (GrauDeImpregnacao)EditorGUILayout.EnumPopup(
+                "Grau (previa)", _receita.Grau);
+
+            if (_receita.Tipo != ItemType.Arma)
+            {
+                EditorGUILayout.HelpBox(
+                    "Nivel abre o pool de afixos. Dano branco so vale para arma.",
+                    MessageType.None);
+
+                DesenharPreviaDeAfixos();
+                return;
+            }
+
+            _receita.Base = (BaseDeArma)EditorGUILayout.ObjectField(
+                "Familia (BaseDeArma)", _receita.Base, typeof(BaseDeArma), false);
+
+            if (_receita.Base == null)
+            {
+                // Este era o buraco silencioso da Forja: ela criava a arma sem familia, e o
+                // jogador equipava e continuava desarmado.
+                EditorGUILayout.HelpBox(
+                    "SEM FAMILIA a arma sai INERTE: equipar nao causa dano nenhum. A familia " +
+                    "carrega o dano branco, a geometria do golpe e a habilidade.",
+                    MessageType.Error);
+                return;
+            }
+
+            DesenharContaDaArma(_receita.Base.PerfilNoNivel(_receita.NivelDoItem));
+            DesenharPreviaDeAfixos();
+        }
+
+        /// <summary>
+        /// A conta de uma arma no nível escolhido, e o que ela significa contra o elenco.
+        /// "Golpes para abater" é a única linha que um designer lê sem traduzir.
+        /// </summary>
+        private void DesenharContaDaArma(PerfilDeArma perfil)
+        {
+            float media = (perfil.DanoMin + perfil.DanoMax) * 0.5f;
+            float esperado = media * perfil.Precisao
+                             * (1f + perfil.ChanceCritica * (perfil.MultiplicadorCritico - 1f));
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField(
+                    "Dano branco: " + perfil.DanoMin.ToString("0.#") + " - " +
+                    perfil.DanoMax.ToString("0.#") + "  (media " + media.ToString("0.#") + ")");
+
+                EditorGUILayout.LabelField(
+                    "Critico: " + perfil.ChanceCritica.ToString("P0") + " x" +
+                    perfil.MultiplicadorCritico.ToString("0.##") + "   Precisao: " +
+                    perfil.Precisao.ToString("P0"));
+
+                EditorGUILayout.LabelField("Esperado por golpe: " + esperado.ToString("0.#"),
+                                           EditorStyles.boldLabel);
+
+                GUILayout.Space(2);
+                EditorGUILayout.LabelField("Golpes para abater:", EditorStyles.miniBoldLabel);
+
+                foreach (var ficha in FichasDoElenco())
+                {
+                    var alvo = ficha.CriarFicha(1);
+                    if (alvo.VitalidadeMax <= 0f) continue;
+
+                    float porGolpe = MitigacaoDeDano.Aplicar(esperado, alvo.Defesa);
+                    if (porGolpe <= 0f) continue;
+
+                    int golpes = Mathf.CeilToInt(alvo.VitalidadeMax / porGolpe);
+
+                    EditorGUILayout.LabelField(
+                        "   " + ficha.name + ": " + golpes + "  (" + porGolpe.ToString("0.#") +
+                        " por golpe, " + alvo.VitalidadeMax.ToString("0") + " de Vitalidade, " +
+                        alvo.Defesa.ToString("0") + " de Defesa)",
+                        EditorStyles.miniLabel);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Quantos afixos o grau concede, e o que o pool tem a oferecer neste nível. Mostrar a
+        /// <b>chance de cada grau</b> junto responde "quão raro é isto?" sem sortear mil vezes.
+        /// </summary>
+        private void DesenharPreviaDeAfixos()
+        {
+            int prefixos = RegrasDeGrau.Prefixos(_receita.Grau);
+            int sufixos = RegrasDeGrau.Sufixos(_receita.Grau);
+
+            var elegiveis = CatalogoDeAfixos.Todos
+                .Where(a => a != null && a.EhLegalPara(_receita.Slot, _receita.NivelDoItem))
+                .ToList();
+
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                EditorGUILayout.LabelField(
+                    "Grau " + _receita.Grau + ": " + prefixos + " prefixo(s) + " +
+                    sufixos + " sufixo(s)");
+
+                EditorGUILayout.LabelField(
+                    "Pool elegivel no nivel " + _receita.NivelDoItem + ": " +
+                    elegiveis.Count + " afixo(s)", EditorStyles.miniLabel);
+
+                if (elegiveis.Count == 0 && (prefixos + sufixos) > 0)
+                    EditorGUILayout.HelpBox(
+                        "O grau concede afixos e NENHUM afixo do pool e elegivel para este " +
+                        "slot/nivel. O item sairia com grau alto e nenhum modificador.",
+                        MessageType.Warning);
+
+                GUILayout.Space(2);
+                EditorGUILayout.LabelField("Chance de cair, por nivel de jogador:",
+                                           EditorStyles.miniBoldLabel);
+
+                foreach (int nivel in new[] { 1, 6, 12 })
+                {
+                    EditorGUILayout.LabelField(
+                        "   nivel " + nivel + ": Inerte " +
+                        CurvaDeGrau.Chance(GrauDeImpregnacao.Inerte, nivel).ToString("P1") +
+                        "   Marcado " +
+                        CurvaDeGrau.Chance(GrauDeImpregnacao.Marcado, nivel).ToString("P1") +
+                        "   Impregnado " +
+                        CurvaDeGrau.Chance(GrauDeImpregnacao.Impregnado, nivel).ToString("P1"),
+                        EditorStyles.miniLabel);
+                }
+            }
+        }
+
+        /// <summary>As fichas do elenco, para a linha de "golpes para abater".</summary>
+        private static FichaAtributosConfig[] FichasDoElenco()
+        {
+            return AssetDatabase.FindAssets("t:FichaAtributosConfig")
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Select(AssetDatabase.LoadAssetAtPath<FichaAtributosConfig>)
+                .Where(f => f != null && f.Ataque > 0f)   // so quem luta de volta
+                .OrderBy(f => f.name)
+                .ToArray();
         }
 
         private void DesenharModificadores()
@@ -288,6 +442,11 @@ namespace FavelaAmarela.EditorTools
             def.EmpilhamentoMaximo = _receita.EmpilhamentoMaximo;
             def.Empunhadura = _receita.Empunhadura;
             def.Modificadores = new List<ModificadorFixo>(_receita.Modificadores);
+
+            // A FAMILIA. Sem esta linha a Forja criava arma inerte: o ItemDef existia, o
+            // jogador equipava, e o golpe nao causava dano nenhum -- o MaoFisicaBridge grita,
+            // mas gritar depois de o asset existir e tarde.
+            def.Base = _receita.Base;
 
             EditorUtility.SetDirty(def);
             AssetDatabase.SaveAssetIfDirty(def);

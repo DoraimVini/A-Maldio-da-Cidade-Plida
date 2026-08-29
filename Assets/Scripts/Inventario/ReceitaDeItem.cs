@@ -51,6 +51,32 @@ namespace FavelaAmarela.Inventario
         public List<ModificadorFixo> Modificadores = new List<ModificadorFixo>();
 
         /// <summary>
+        /// A <b>família</b> da arma — o que carrega o dano branco, a geometria do golpe e a
+        /// habilidade.
+        ///
+        /// <para><b>Sem ela a arma sai inerte</b>, e essa era a maior lacuna da Forja: ela criava
+        /// um <c>ItemDef</c> de arma com <c>Base</c> nulo, o que em jogo significa equipar e
+        /// continuar desarmado. O <c>MaoFisicaBridge</c> grita nesse caso, mas gritar depois de
+        /// o item existir é tarde — o autor já achou que tinha terminado.</para>
+        /// </summary>
+        public BaseDeArma Base;
+
+        /// <summary>
+        /// Nível do item. Escala a faixa de dano branco pela mesma lei que escala a ficha
+        /// (<c>EscalaDeNivel</c>), e abre o pool de afixos: um item de nível 3 alcança
+        /// afixos que um de nível 1 nunca rola.
+        /// </summary>
+        public int NivelDoItem = 1;
+
+        /// <summary>
+        /// Grau de impregnação a pré-visualizar. Não vai para o <c>ItemDef</c> — grau é da
+        /// <c>ItemInstance</c>, por exemplar. Serve para a Forja mostrar quantos afixos o item
+        /// receberia e quais.
+        /// </summary>
+        public FavelaAmarela.Core.Loot.GrauDeImpregnacao Grau =
+            FavelaAmarela.Core.Loot.GrauDeImpregnacao.Inerte;
+
+        /// <summary>
         /// Os atributos sem consumidor no jogo. Delega para <see cref="NomesDeAtributo.SemEfeito"/>
         /// — a lista morava aqui e em mais dois lugares, e três cópias divergiriam na primeira
         /// vez que alguém implementasse um dos quatro.
