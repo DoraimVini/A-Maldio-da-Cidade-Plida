@@ -6,6 +6,87 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-29 — Console de runtime, e um script de build que prova o que entregou
+
+Pergunta do Vini: *"O Carcosa Debugger vai funcionar na build?"* **Não, e não tinha como.**
+O `CarcosaDebuggerWindow` é um `EditorWindow` em `Assets/FavelaAmarela/Editor/`, e isso o
+exclui por duas razões independentes: a Unity remove toda pasta chamada `Editor` do player, e
+`UnityEditor` não existe em runtime.
+
+Isso custa caro **neste projeto**: o Byakhee fecha a Fase 1, e chegar nele custa o Deserto e a
+Tumba inteiros. Foi jogando que o Vini descobriu que a luta não fechava — e conferir o conserto
+numa build custaria uma partida inteira por tentativa.
+
+### `ConsoleDeCarcosa` — a metade que a build pode ter
+
+`Assets/Scripts/Diagnostico/ConsoleDeCarcosa.cs`, **F1** para abrir. O arquivo inteiro vive
+dentro de `#if UNITY_EDITOR || DEVELOPMENT_BUILD`: numa build de entrega a classe **não é
+compilada**.
+
+Quatro abas, e nenhuma delas cria item — criar é autoria, e uma build não escreve assets dentro
+de si mesma. A Forja do Editor continua sendo o lugar certo para isso.
+
+- **Estado** — cena, nível, Exposição e quanto falta para a próxima, Vitalidade, Resiliência, e
+  o que está equipado **com o nível do item e a conta da arma** (faixa, crítico, precisão). Esse
+  nível não aparece em lugar nenhum da UI do jogo, e é ele que decide o dano.
+- **Arsenal** — concede equipamento já autorado, no nível que se pedir, rolado pelo **mesmo**
+  `GeradorDeItem` e pela **mesma** `CurvaDeGrau` do espólio. Um caminho próprio produziria um
+  item que o jogo não produz, e aí o console estaria aferindo outra coisa que não o jogo.
+- **Progressão** — soma Exposição, ou salta direto para um nível. **Só sobe:** descer exigiria
+  apagar Ecos já gastos, e um botão que apaga progresso em silêncio é pior que a ausência dele.
+- **Ir para** — troca de cena por `NavegacaoDeCenas.IrPara`, preservando o progresso da sessão.
+
+Decisões que valem registro:
+
+- **Nasce sozinho** (`RuntimeInitializeOnLoadMethod(BeforeSceneLoad)` + `DontDestroyOnLoad`),
+  como o `ProgressionBridge` e o `ItemDatabase`. Um console que precisasse ser arrastado para
+  cada cena estaria ausente justamente na cena com o bug — que é como a progressão ficou inerte
+  por meses.
+- **Congela o jogo enquanto aberto**, e restaura a *escala anterior*, não `1`: se a partida já
+  estava pausada quando o console abriu, fechá-lo não pode despausá-la.
+- **IMGUI**, e não Canvas — é o que funciona em qualquer cena sem nenhum asset autorado.
+
+### `Progressao.ExposicaoParaONivel` / `ExposicaoAteOProximoNivel`
+
+A curva era privada e não havia como perguntar "quanto falta para o próximo nível". Qualquer UI
+de progressão seria obrigada a manter uma **cópia da curva** — e cópia de número é exatamente
+como este repositório chegou a ter dois testes e um documento defendendo valores que o jogo não
+usava mais.
+
+### `GerarBuild` — e o projeto não tinha script de build nenhum
+
+Toda build saía do diálogo do Editor, à mão, sem registro do que entrou nela. Para um projeto
+de edital com prazo, *"eu acho que marquei Development Build"* não é um estado aceitável.
+
+Dois menus separados de propósito, cada um dizendo o que faz — um menu único com uma caixinha
+seria a mesma armadilha do diálogo:
+
+- `Build: DESENVOLVIMENTO (com console F1)`
+- `Build: ENTREGA (sem console)`
+
+Ambos imprimem tamanho, tempo, avisos e **se o console está presente**. Há também
+`PelaLinhaDeComando` para CI.
+
+### A verificação, medida e não afirmada
+
+As duas builds foram geradas e os símbolos conferidos dentro de
+`FavelaAmarela.Runtime.dll`:
+
+| símbolo | DESENVOLVIMENTO | ENTREGA |
+|---|---|---|
+| `ConsoleDeCarcosa` | **PRESENTE** | **AUSENTE** |
+| `ExposicaoAoAbater` | presente | presente |
+| `ResolucaoDeGolpe` | presente | presente |
+| `DropAoAbater` | presente | presente |
+
+164 MB e 104 MB, 6 cenas cada. `/Builds/` entrou no `.gitignore`.
+
+> ⚠️ **A build ligou o Unity Connect sozinha** (`UnityConnectSettings.m_Enabled: 0 → 1`) — é
+> telemetria da Unity, e foi revertida antes do commit. Conferir esse arquivo depois de gerar
+> build, porque a Unity o reescreve sem avisar.
+
+Suíte: 886 → **894 testes**, 871 passando, 23 aposentados, 0 falhas.
+
 ## 2026-08-28 — A arma vira a fonte do dano: itemização, escala e balanceamento (`develop_items`)
 
 Começou com o Vini jogando e relatando: *"Não tem como ganhar da Byakhee. Os itens são fracos

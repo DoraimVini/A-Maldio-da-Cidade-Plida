@@ -55,6 +55,32 @@ namespace FavelaAmarela.Core.Progression
         /// <summary>Se já chegou ao teto — a partir daqui a Exposição para de ser contada.</summary>
         public bool NoTeto => _nivelAtual >= _curvaDeExposicao.Length;
 
+        /// <summary>
+        /// Exposição acumulada que a curva exige para alcançar <paramref name="nivel"/>. Nível 1
+        /// devolve 0; acima do teto devolve o último degrau.
+        ///
+        /// <para><b>Por que existe (2026-08-29).</b> A curva era privada e não havia como
+        /// perguntar "quanto falta para o próximo nível" — o que deixava qualquer UI de
+        /// progressão obrigada a manter uma <b>cópia própria da curva</b>, que divergiria no
+        /// primeiro rebalanceamento. É exatamente a forma de defeito que este repositório mais
+        /// repete, e apareceu de novo em 2026-08-28: dois testes e um documento carregavam cada
+        /// um a sua cópia de números que o jogo não usava mais.</para>
+        /// </summary>
+        public int ExposicaoParaONivel(int nivel)
+        {
+            if (nivel <= 1) return 0;
+
+            int indice = Math.Min(nivel, _curvaDeExposicao.Length) - 1;
+            return _curvaDeExposicao[indice];
+        }
+
+        /// <summary>
+        /// Exposição que ainda falta para o próximo nível, ou <b>0</b> no teto. É o número que
+        /// uma barra de progresso mostra.
+        /// </summary>
+        public int ExposicaoAteOProximoNivel =>
+            NoTeto ? 0 : Math.Max(0, ExposicaoParaONivel(_nivelAtual + 1) - _exposicaoAtual);
+
         /// <param name="curvaDeExposicao">
         /// Exposição acumulada necessária para cada nível, indexada por nível−1. O primeiro
         /// elemento é o nível 1 e vale 0. O tamanho do vetor <b>é</b> o teto de nível — num jogo

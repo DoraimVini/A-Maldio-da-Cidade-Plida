@@ -80,6 +80,9 @@ sysinfo.txt
 mono_crash.*
 
 # Builds
+# A pasta de saida do GerarBuild.cs -- centenas de MB por build, e regeravel
+# a partir do repositorio. Nunca versionada.
+/Builds/
 *.apk
 *.aab
 *.unitypackage
