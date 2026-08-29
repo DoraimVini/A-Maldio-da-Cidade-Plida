@@ -1,4 +1,7 @@
 using UnityEngine;
+using FavelaAmarela.Progression;
+using FavelaAmarela.Runtime.Progression;
+using FavelaAmarela.Core.Loot;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.Interaction;
 using FavelaAmarela.Runtime.Persistencia;
@@ -155,7 +158,7 @@ namespace FavelaAmarela.Runtime.Itens
             // grau, nível e afixos rolados -- o item bom no chão viraria item comum na mochila.
             var aEntregar = _exemplar != null
                 ? _exemplar.Clone()
-                : new FavelaAmarela.Inventario.ItemInstance(item.Id, quantidade);
+                : RolarExemplarAutorado();
 
             bool coube = invManager.Main.Add(aEntregar);
             if (!coube)
@@ -170,6 +173,50 @@ namespace FavelaAmarela.Runtime.Itens
                 ? $"Você recolheu: {item.Nome}."
                 : mensagem);
         }
+
+        /// <summary>
+        /// Monta o exemplar de um pickup <b>autorado à mão</b> — o que foi posto na cena pelo
+        /// designer, sem passar por tabela de drop.
+        ///
+        /// <para><b>O que estava errado (2026-08-28).</b> Este caminho montava
+        /// <c>new ItemInstance(id, quantidade)</c>, o que significa <c>NivelDoItem = 1</c>
+        /// para sempre. Uma peça de equipamento posta na cena da última fase entrava na mochila
+        /// no piso da escala — a arma achada no Castelo saía mais fraca que a largada por um
+        /// Cultista do Deserto.</para>
+        ///
+        /// <para><b>Equipamento ganha nível e grau; o resto, não.</b> Consumível e chave não
+        /// têm afixo nem escala, e um grau visível neles ("Tônico Impregnado") seria ruído
+        /// diegético. Para eles o exemplar simples continua sendo a resposta certa.</para>
+        /// </summary>
+        private FavelaAmarela.Inventario.ItemInstance RolarExemplarAutorado()
+        {
+            bool ehEquipamento = item.Tipo == FavelaAmarela.Inventario.ItemType.Arma
+                              || item.Tipo == FavelaAmarela.Inventario.ItemType.Armadura
+                              || item.Tipo == FavelaAmarela.Inventario.ItemType.Amuleto;
+
+            if (!ehEquipamento)
+                return new FavelaAmarela.Inventario.ItemInstance(item.Id, quantidade);
+
+            int nivel = ProgressionBridge.Instancia != null
+                ? ProgressionBridge.Instancia.NivelAtual
+                : 1;
+
+            var grau = CurvaDeGrau.Sortear(nivel, GrauDeImpregnacao.Inerte, _fonte);
+
+            var exemplar = _gerador.Gerar(item, grau, nivel,
+                                          FavelaAmarela.Inventario.CatalogoDeAfixos.Todos, _fonte);
+
+            if (exemplar == null)
+                return new FavelaAmarela.Inventario.ItemInstance(item.Id, quantidade);
+
+            exemplar.Quantidade = quantidade;
+            return exemplar;
+        }
+
+        private readonly FavelaAmarela.Inventario.GeradorDeItem _gerador =
+            new FavelaAmarela.Inventario.GeradorDeItem();
+
+        private readonly IFonteDeAleatoriedade _fonte = new FonteDeAleatoriedadeUnity();
 
         /// <summary>
         /// Concede o Artefato e retira o objeto do mundo. <b>Nunca falha por falta de espaço</b>

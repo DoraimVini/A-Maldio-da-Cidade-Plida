@@ -638,6 +638,12 @@ namespace FavelaAmarela.Runtime.Enemies
 
             InstanciarNecronomicon();
 
+            // O espólio sai AQUI, e não dentro do InstanciarNecronomicon: aquele método também
+            // roda na restauração de save (AplicarEstadoSalvo, quando o tomo ficou no chão), e
+            // pendurar o evento nele transformava "recarregar a cena sem pegar o Necronomicon"
+            // num farm de espólio de chefe -- uma tabela nova rolada a cada carga.
+            AnunciarAbatido();
+
             // A luta também liberta Yug-Neth — só o Necronomicon é exclusivo deste caminho.
             LibertarYugNeth();
 
@@ -661,10 +667,24 @@ namespace FavelaAmarela.Runtime.Enemies
         /// </summary>
         public event System.Action OnAbatido;
 
+        /// <summary>
+        /// Já anunciou a derrota? O <c>EnemyBase</c> tem a mesma trava pelo mesmo motivo:
+        /// espólio e Exposição são concedidos <b>uma vez</b>, e o caminho de derrota do Abdul
+        /// tem mais de um jeito de ser reencenado (restauração de save, sobretudo).
+        /// </summary>
+        private bool _jaAnunciouAbate;
+
+        /// <summary>Dispara <see cref="OnAbatido"/> no máximo uma vez na vida deste ator.</summary>
+        private void AnunciarAbatido()
+        {
+            if (_jaAnunciouAbate) return;
+            _jaAnunciouAbate = true;
+
+            OnAbatido?.Invoke();
+        }
+
         private void InstanciarNecronomicon()
         {
-            OnAbatido?.Invoke();
-
             if (prefabNecronomicon != null)
                 Instantiate(prefabNecronomicon, transform.position, Quaternion.identity);
             else

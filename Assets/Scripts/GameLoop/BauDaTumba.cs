@@ -114,8 +114,8 @@ namespace FavelaAmarela.Runtime.GameLoop
                 return;
             }
 
-            // 1. Guarda no inventário
-            bool coube = invManager.Main.Add(new FavelaAmarela.Inventario.ItemInstance(armaEscolhida.Id, 1));
+            // 1. Guarda no inventário -- como EXEMPLAR rolado, não como id cru.
+            bool coube = invManager.Main.Add(RolarExemplar(armaEscolhida));
             if (!coube)
             {
                 Debug.LogWarning($"[BauDaTumba] Inventário cheio — '{armaEscolhida.Nome}' não coube na mochila.", this);
@@ -145,6 +145,52 @@ namespace FavelaAmarela.Runtime.GameLoop
             if (hintUI != null)
                 hintUI.Mostrar($"A Tumba te entregou: {armaEscolhida.Nome}.");
         }
+        /// <summary>
+        /// Rola o exemplar da arma que o baú entrega: <b>grau, nível e afixos</b>, e não só o
+        /// id.
+        ///
+        /// <para><b>O defeito que isto fecha (2026-08-28).</b> O baú montava
+        /// <c>new ItemInstance(id, 1)</c> à mão, o que significa <c>NivelDoItem = 1</c>, grau
+        /// Inerte e nenhum afixo. As três armas da Tumba — a única fonte de arma do jogo até o
+        /// primeiro chefe — nasciam no piso da escala e <b>ficavam lá para sempre</b>.</para>
+        ///
+        /// <para>Isso é o que sustentava o relato do Vini: <i>"não tem como ganhar da Byakhee,
+        /// os itens são fracos demais"</i>. Com a arma travada no nível 1, o Alfanje entrega
+        /// 45,1 esperados contra a Defesa 8 do chefe — 37 por golpe, <b>catorze golpes</b> para
+        /// derrubar as 500 de Vitalidade dele, enquanto ele precisava de cinco. O
+        /// <c>GeradorDeItem</c>, a <c>CurvaDeGrau</c> e a <c>EscalaDeNivel</c> existiam,
+        /// estavam testados, e este caminho não chamava nenhum dos três.</para>
+        ///
+        /// <para><b>O nível acompanha o jogador</b>, com o piso da tabela — a mesma regra do
+        /// <c>DropAoAbater</c>, escrita uma vez e usada nos dois lugares. É o que o Vini pediu:
+        /// <i>"os níveis de arma vão aumentando conforme você vai jogando e é ligado
+        /// diretamente conforme o jogador for subindo de nível"</i>.</para>
+        /// </summary>
+        private FavelaAmarela.Inventario.ItemInstance RolarExemplar(
+            FavelaAmarela.Inventario.ItemDef def)
+        {
+            int nivel = ProgressionBridge.Instancia != null
+                ? ProgressionBridge.Instancia.NivelAtual
+                : 1;
+
+            int nivelDoItem = Mathf.Max(tabela != null ? tabela.NivelDoItem : 1, nivel);
+
+            // Piso Inerte: a arma da Tumba é o começo do jogo, e a curva sobe a partir daí.
+            var grau = FavelaAmarela.Core.Loot.CurvaDeGrau.Sortear(
+                nivel, FavelaAmarela.Core.Loot.GrauDeImpregnacao.Inerte, _fonte);
+
+            var exemplar = _gerador.Gerar(def, grau, nivelDoItem,
+                                          FavelaAmarela.Inventario.CatalogoDeAfixos.Todos, _fonte);
+
+            // O gerador só devolve nulo se a base for nula, e isso já foi barrado acima. Ainda
+            // assim: ficar sem arma nenhuma na Tumba é o pior desfecho possível deste método.
+            return exemplar ?? new FavelaAmarela.Inventario.ItemInstance(def.Id, 1);
+        }
+
+        /// <summary>Gera o exemplar rolado. POCO sem estado — uma instância basta.</summary>
+        private readonly FavelaAmarela.Inventario.GeradorDeItem _gerador =
+            new FavelaAmarela.Inventario.GeradorDeItem();
+
         /// <summary>
         /// Resolve qual arma o baú entrega: o override de teste, se ligado, senão um sorteio
         /// ponderado pela tabela. O baú entrega <b>exatamente uma</b> peça — por isso usa

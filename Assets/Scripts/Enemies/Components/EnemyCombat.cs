@@ -9,6 +9,9 @@ namespace FavelaAmarela.Runtime.Enemies
         [Header("Ataque")]
         [SerializeField] private float alcanceDeGolpe = 1.2f;
         [SerializeField] private float cadenciaDeAtaque = 1.2f;
+        [Tooltip("Dano do golpe. Fallback: se houver EnemyBase com ficha no mesmo objeto, " +
+                 "quem manda é o Ataque DA FICHA -- porque é ele que escala com o nível da " +
+                 "unidade. Este campo passa a valer só para inimigo sem ficha.")]
         [SerializeField] private float danoDoGolpe = 20f;
         [Tooltip("Quem este inimigo aceita como alvo. Vazio = Jogador + Aliados.")]
         [SerializeField] private LayerMask camadasAlvo;
@@ -28,6 +31,25 @@ namespace FavelaAmarela.Runtime.Enemies
         private static readonly string[] LayersDeAlvo = { "Player", "Aliados" };
 
         private float _attackCooldown;
+        private EnemyBase _corpo;
+
+        /// <summary>
+        /// O dano que este inimigo causa: o <b>Ataque da ficha</b> quando existe, e só então o
+        /// campo local.
+        ///
+        /// <para><b>O defeito que isto fecha (2026-08-28).</b> A ficha do Cultista autora
+        /// <c>Ataque 14</c> e este componente batia com <c>20</c>. Eram <b>dois números
+        /// independentes mantidos à mão</b>, e o da ficha era dado morto: rebalancear pela ficha
+        /// não mudava nada em jogo, e a <c>ficha_de_atributos.md</c> documentava contas
+        /// baseadas num número que ninguém usava.</para>
+        ///
+        /// <para>E é o que faz o <c>nivelDaUnidade</c> valer: o Ataque escala com o nível pela
+        /// <c>EscalaDeNivel</c>, o campo local não escala com nada.</para>
+        /// </summary>
+        private float DanoEfetivo =>
+            _corpo != null && _corpo.Atributos != null && _corpo.Atributos.Ataque > 0f
+                ? _corpo.Atributos.Ataque
+                : danoDoGolpe;
         private readonly Collider2D[] _bufferAlvo = new Collider2D[4];
         private ContactFilter2D _filtroAlvo;
         private IDanificavel _alvoCache;
@@ -37,6 +59,10 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            // O corpo carrega a ficha -- e com ela o Ataque autorado, que é a fonte da verdade
+            // do dano deste componente (ver DanoEfetivo).
+            _corpo = GetComponent<EnemyBase>();
+
             int padrao = LayerMask.GetMask(LayersDeAlvo);
 
             // Prefabs salvos antes da layer Aliados existir guardam uma máscara que só tem
@@ -81,7 +107,7 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             if (!EstaPronto || !AlvoEstaAoAlcance()) return false;
             _attackCooldown = cadenciaDeAtaque;
-            _alvoCache?.ReceberGolpe(new ArmaResult(true, 0f, 0f, false, 0f, danoDoGolpe));
+            _alvoCache?.ReceberGolpe(new ArmaResult(true, 0f, 0f, false, 0f, DanoEfetivo));
             OnAtaqueDesferido?.Invoke();
             return true;
         }

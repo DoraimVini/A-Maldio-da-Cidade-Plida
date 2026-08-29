@@ -35,8 +35,26 @@ namespace FavelaAmarela.Runtime.Enemies
         [SerializeField] private float velocidadeCircundando = 4f;
 
         [Header("Combate")]
-        [Tooltip("Dano das garras durante o pouso agressivo.")]
+        [Tooltip("Dano das garras durante o pouso agressivo. FALLBACK: a fonte da verdade e o " +
+                 "Ataque da ficha (ver DanoDasGarras). So e usado se a ficha nao autorar Ataque.")]
         [SerializeField] private float danoDasGarras = 26f;
+
+        /// <summary>
+        /// O dano das garras: o <b>Ataque da ficha</b> quando existe, e so entao o campo local.
+        ///
+        /// <para><b>O defeito que isto fecha (2026-08-28).</b> A <c>Ficha_Byakhee</c> autora
+        /// <c>Ataque 26</c> e este campo tambem dizia <c>26</c> — <b>dois numeros independentes
+        /// mantidos a mao</b>, que so por sorte concordavam. Rebalancear o chefe pela ficha nao
+        /// mudaria nada em jogo, e a <c>ficha_de_atributos.md</c> documentava contas baseadas
+        /// num numero que ninguem lia.</para>
+        ///
+        /// <para>E e o que faz o <c>nivelDaUnidade</c> valer: o Ataque escala pela
+        /// <c>EscalaDeNivel</c>, o campo local nao escala com nada.</para>
+        /// </summary>
+        private float DanoDasGarras =>
+            _enemyBase != null && _enemyBase.Atributos != null && _enemyBase.Atributos.Ataque > 0f
+                ? _enemyBase.Atributos.Ataque
+                : danoDasGarras;
 
         [Tooltip("Trauma do cone de pressão sonora (fase 2+).")]
         [SerializeField] private float traumaDoGrito = 20f;
@@ -263,7 +281,7 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             if (_jogador == null) return;
 
-            var golpe = new ArmaResult(true, 0f, 0f, false, 0f, danoDasGarras);
+            var golpe = new ArmaResult(true, 0f, 0f, false, 0f, DanoDasGarras);
 
             if (hitboxDasGarras != null)
             {
