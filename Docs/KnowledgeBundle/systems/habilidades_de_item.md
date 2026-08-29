@@ -98,6 +98,42 @@ existentes — que é 90% do que uma arma nova precisa — vira dado puro. O Alf
 linhas de classe, reduz a **um `HabilidadeDef` com dois `EfeitoDeAtordoamento`+
 `EfeitoDeRepulsao` configurados**.
 
+### O efeito que mudou tudo: `DanoDaArma` (2026-08-28)
+
+O catálogo acima abriu com `EfeitoDeDano` — **dano plano, autorado na habilidade**. Foi assim
+que as 3 armas nasceram, e foi o defeito estrutural do sistema de itens inteiro.
+
+`Habilidade_AlfanjeDeAlhazred` é **um asset só, pendurado na família**. Todo Alfanje que existir
+aponta para ele. Logo: **dois Alfanjes são sempre idênticos, e um Alfanje melhor é
+inexprimível** — não há campo onde escrever que este é melhor que aquele. A Forja do Carcosa
+Debugger não conseguia criar uma arma mais forte porque o número não estava no item.
+
+Num ARPG a **arma é a fonte do dano** e a **habilidade é um multiplicador dela**. É isso que faz
+trocar de arma melhorar todas as habilidades de uma vez, e é isso que dá sentido ao tier.
+
+O catálogo ganhou `TipoDeEfeito.DanoDaArma`, cujo `Valor` é um **percentual**:
+
+| Antes | Depois |
+|---|---|
+| `Golpe do Deserto: Dano 45` | `Golpe do Deserto: DanoDaArma 100%` |
+| Melhora quando alguém edita o asset da família | Melhora sozinho toda vez que a arma melhora |
+
+> **Por que um tipo novo em vez de reinterpretar o `Dano`.** `Valor: 45` viraria 45% em silêncio
+> — o mesmo asset, lido de outro jeito, sem nenhum erro. E o dano plano continua legítimo: golpe
+> de inimigo e habilidade de valor fixo usam-no, e `ResolucaoDeGolpe` os deixa passar intactos
+> (`PercentualDoDanoDaArma <= 0` retorna cedo). Os 3 assets de arma migraram explicitamente,
+> por ferramenta de Editor, com o **valor esperado preservado**.
+
+> ⚠️ **`TipoDeEfeito` é serializado por índice.** `DanoDaArma` entrou **no fim** do enum. Inserir
+> um valor no meio remapearia silenciosamente todo efeito já autorado — a Impregnação viraria
+> Sangramento e ninguém veria um erro.
+
+**A calibração dos percentuais foi derivada, não chutada:** `percentual = danoAntigoDaHabilidade
+÷ valorEsperadoDaArma`. O ataque básico das três ficou em 100%; as habilidades especiais
+guardam a proporção que tinham. A primeira tentativa dividiu pela **média da faixa** em vez do
+**valor esperado** (que inclui precisão e crítico) e errou o Golpe do Deserto em 10% — 36,06 no
+lugar de 40. O teste pegou.
+
 ### Quando ainda escrever uma classe
 
 Chefes e Relíquias com mecânica de verdade única (o Escudo Mágico do Abdul, os Hieróglifos do

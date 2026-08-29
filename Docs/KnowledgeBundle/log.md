@@ -6,6 +6,168 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-28 — A arma vira a fonte do dano: itemização, escala e balanceamento (`develop_items`)
+
+Começou com o Vini jogando e relatando: *"Não tem como ganhar da Byakhee. Os itens são fracos
+demais. O Carcosa Debugger está funcionando da forma como foi pedido?"* Ao medir, o problema
+não era o número — **era a ausência do eixo**. Suíte: 820 → **884 testes**, 861 passando, 0
+falhas.
+
+O pedido que definiu o escopo: *"Toda arma tem que ter o range de ataque básico (dano branco),
+chance de acerto crítico, dano crítico, chance de acerto e os outros modificadores embutidos de
+acordo com cada tier de item."*
+
+### O diagnóstico
+
+O dano morava no lugar errado:
+
+```
+Item_Arma_AlfanjeDeAlhazred   Modificadores: []        ← o item não dá nada
+  └ Base: BaseArma_Alfanje    Alcance, Raio, Janela    ← só geometria, zero dano
+      └ Habilidade_AlfanjeDeAlhazred
+            EfeitosDoBasico:  Tipo 0, Valor 45         ← o dano está AQUI
+```
+
+`Habilidade_AlfanjeDeAlhazred` é **um asset só, pendurado na família**. Todo Alfanje aponta para
+ele: dois Alfanjes eram sempre idênticos e um Alfanje melhor era **inexprimível**. Num ARPG a
+arma é a fonte do dano e a habilidade é um multiplicador dela — o projeto estava ao contrário.
+
+E **três defeitos travavam a itemização** antes de qualquer número novo poder aparecer em jogo:
+
+1. `GerenciadorEfeitosPassivos._cacheValido` **nunca virava `false`**. O bônus de equipamento era
+   calculado na primeira leitura e congelava para sempre — trocar de arma não mudava mais nada.
+   O comentário descrevia a invalidação por evento como se ela existisse. Uma linha.
+2. `TabelaDeDrop.nivelDoItem` não estava serializado em nenhum dos 3 assets → todo item que caía
+   era nível 1 → **3 dos 8 afixos eram conteúdo morto** (nunca podiam rolar).
+3. `DropAoAbater` era o **único chamador de `GeradorDeItem`** no projeto inteiro. Item posto à
+   mão em cena ou no Baú da Tumba nascia sem grau e sem afixo.
+
+### Fase 1 — A arma vira a fonte do dano
+
+`BaseDeArma` ganhou o bloco de combate: `DanoMinBase`/`DanoMaxBase` (o **dano branco**, como
+faixa), `ChanceCriticaBase`, `MultiplicadorCritico`, `PrecisaoBase`.
+
+POCO novo `Core/Combat/ResolucaoDeGolpe.cs`, no molde do `Bloqueio` — aleatoriedade injetada,
+resultado com *flag* para UI e áudio. `MitigacaoDeDano` **não mudou**: a camada nova roda antes
+dela, e os 7 testes dela seguem verdes.
+
+`TipoDeEfeito.DanoDaArma` (percentual), acrescentado **no fim** do enum. `ArmaResult` ganhou
+`PercentualDoDanoDaArma`, `Critico` e `Errou`. Quatro `StatType` novos no fim do enum:
+`ChanceCritica`, `DanoCritico`, `Precisao`, `AumentoDeDanoFisico`.
+
+**Chance de acerto: errar de verdade** (modelo D2), decisão do Vini — falhar na precisão é dano
+zero, não golpe de raspão. O `Errou` existe como campo, e não só como dano 0, para a UI dizer
+"Errou" em vez de mostrar um zero que o jogador leria como imunidade.
+
+Calibração das 3 armas da Tumba com o **valor esperado inalterado** — o que mudou foi a textura:
+
+| Arma | Faixa | Crítico | Precisão | Esperado | Era |
+|---|---|---|---|---|---|
+| Alfanje | 40 – 61 | 5 % × 2,0 | 85 % | 45,1 | 45 |
+| Cravo | 33 – 49 | 8 % × 1,7 | 92 % | 39,8 | 40 |
+| Estilete | 24 – 35 | 12 % × 1,6 | 95 % | 30,0 | 30 |
+
+### Fase 2 — A escala cresce com o jogo
+
+*"Temos que usar uma escala que cresça com o jogo e com o personagem, saber que ele no nível 2
+está mais forte e com mais defesa."*
+
+POCO `Core/Progression/EscalaDeNivel.cs` — uma lei só, linear, e no nível 1 devolve exatamente o
+valor autorado (nenhum asset precisou ser reescrito). `FichaAtributosConfig` ganhou
+`VitalidadePorNivel` (0,30), `AtaquePorNivel` (0,25) e `DefesaPorNivel` (0,15); inimigos ganharam
+`nivelDaUnidade` **por instância**, não por ficha.
+
+### Fase 3 — Tier, drop e recompensa de chefe
+
+*"Nível 1: maioria dos itens de mais baixo tier, e construir uma escala de RNG onde seja possível
+o drop de uma arma ou armadura lendária na primeira fase, mas ter um drop realmente baixo."*
+
+`Core/Loot/CurvaDeGrau.cs`: pesos que deslizam com o nível, **nenhum zero em nível nenhum**.
+Nível 1 dá 3,2 % de Impregnado; o nível 12 derruba o Inerte a 1,7 % **por peso, não por
+bloqueio**. O grau autorado na entrada da tabela virou **piso**, não valor.
+
+Chefe passou a largar progressão além do item de rito — `Drop_Byakhee` tinha **uma entrada só**
+(o Anel) e o **Abdul não tinha tabela nenhuma**. `DropAoAbater` deixou de exigir `EnemyBase` e
+passou a ligar na interface `IFonteDeEspolio`: o Abdul implementa `IDanificavel` direto e ficava
+de fora do espólio **por construção**.
+
+### Fase 4 — O balanceamento, e por que ele não estava chegando
+
+A curva de Exposição pede **100 para o nível 2**, e todo o elenco concedia **1** por abate. O
+caminho crítico tem treze abates: o jogador terminava o Vertical Slice no nível 1, e tudo que as
+Fases 1–3 construíram ficava inerte. Pior — a concessão morava dentro do `EnemyBase`, e dos nove
+prefabs do elenco **apenas dois** são `EnemyBase`: o Abdul concedia **zero**.
+
+- `ExposicaoAoAbater`: componente novo, ligado ao mesmo `IFonteDeEspolio` do espólio.
+- Calibrado com a razão de cada valor: Cultista **25**, Abdul **150**, Byakhee **200**, e a lista
+  explícita de quem concede zero por decisão (o Esqueleto Invocado é infinito — seria farm).
+- **Contado nas cenas, não estimado:** 11 Cultistas no Deserto + 2 na Tumba + Abdul = **475** de
+  Exposição. O jogador encara o Byakhee no **nível 3**.
+
+**As armas nasciam no piso e ficavam lá.** O Baú da Tumba montava `new ItemInstance(id, 1)` à
+mão. Era a causa real do relato do Vini: com a arma travada no nível 1, a luta pede 14 acertos
+contra os 5 do chefe. Corrigido no baú e no pickup autorado em cena.
+
+**Dois números de dano por inimigo.** `Ficha_Byakhee` autora `Ataque 26` e
+`ByakheeAI.danoDasGarras` também dizia 26 — concordavam por sorte. `EnemyCombat` dizia 20 contra
+os 14 da ficha do Cultista, e só o 20 rodava. Ambos passam a ler a ficha; a ficha do Cultista foi
+corrigida para **20**, porque uma refatoração não pode enfraquecer um inimigo em 30 % de
+passagem.
+
+A troca de golpes no nível 3 — **era 14 contra 5**:
+
+| Arma (nv 3) | Esperado | vs Defesa 8 | Golpes | Cadência |
+|---|---|---|---|---|
+| Alfanje | 67,6 | 59,6 | **9** | 0,70 s |
+| Cravo | 59,8 | 51,8 | **10** | 0,50 s |
+| Estilete | 45,1 | 37,1 | **14** | 0,30 s |
+
+Byakhee: 26 → 18,2 contra a Defesa 7,8 do Damião nível 3, sobre 160 de Vitalidade = **9
+garradas**.
+
+### Fase 5 — A Forja do Carcosa Debugger
+
+*"Carcosa Debugger needs to have the ability of creating new items, with the constructed
+mathematics, to we be able to improve and expand our armory of the game."*
+
+A Forja já criava um `ItemDef` real em `Resources`, mas **não preenchia `Base`** — a arma saía
+sem família, o que em jogo é equipar e continuar desarmado. E não mostrava conta nenhuma: a única
+forma de saber se uma arma nova estava forte era criá-la, equipar, entrar em Play e bater em
+alguém.
+
+Ganhou a **prévia da matemática antes de criar**: faixa no nível escolhido, crítico, precisão,
+valor esperado, **golpes-para-abater contra cada ficha do elenco**, e a chance de cada grau por
+nível de jogador.
+
+### Bugs colhidos no caminho
+
+- **Luta do Abdul invencível.** `pontosDasPedras` era um array de tamanho 1 com o elemento nulo →
+  zero pedras → `TotalDePedras = 0` → `EscudoDestruido` permanentemente falso.
+- **`PainelDeFicha` nunca funcionou.** Vive num prefab de `Resources`, que estruturalmente não
+  pode referenciar um objeto de cena. Ligado no `GameLoopBootstrap`.
+- **O boneco só atacava andando.** As três ações recebiam a direção do *input* (zero parado) em
+  vez de `LookDirection`.
+- **A Cassilda nunca falava** — faltava o fallback de `TutorialHintUI.Instancia` no `Falar`.
+- **O espólio do Abdul podia ser farmado.** `OnAbatido` ficou pendurado dentro do
+  `InstanciarNecronomicon`, e a restauração de save chama esse método de novo quando o tomo ficou
+  no chão: sair da cena e voltar rolava a tabela do chefe outra vez.
+- **Uma ferramenta relatou mudanças por 5 rodadas enquanto revertia as edições no disco.** O
+  cache de artefatos da Library serve dado velho em batch mode, e `LoadPrefabContents`/`OpenScene`
+  leem *ele*, não o arquivo. Nem `ImportAsset(ForceUpdate)` nem `SerializedObject` resolveram; a
+  ferramenta passou a **abortar sem escrever** quando a leitura da Unity diverge do disco.
+
+### Documentação
+
+- [`systems/ficha_de_atributos.md`](systems/ficha_de_atributos.md) — **estava factualmente
+  errada**: dizia "Alfanje 60" (o asset dizia 45), "Estilete 25" (dizia 30) e "escala unificada
+  0–100" com o Byakhee em 500. `LutaContraByakheeTests` chegou a copiar o 25 de lá e passou meses
+  verde defendendo um número que o jogo não usava. Reescrita com a matemática da arma, a escala
+  por nível e as contas refeitas.
+- [`systems/loot_e_drop.md`](systems/loot_e_drop.md) — a curva de grau por nível, as três portas
+  de entrada de item, e duas pendências resolvidas.
+- [`systems/habilidades_de_item.md`](systems/habilidades_de_item.md) — a habilidade como
+  percentual da arma.
+
 ## 2026-08-27 (noite) — Revisão completa de física 2D (`develop_items`)
 
 Pedida pelo Vini depois de um playtest em que "tudo parecia meio fora". **Não era uma coisa:

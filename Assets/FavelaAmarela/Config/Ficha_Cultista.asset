@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ficha_Cultista
   m_EditorClassIdentifier:
   vitalidadeMax: 100
-  ataque: 14
+  ataque: 20
   conjuracao: 0
   defesa: 5
   resistenciaAnomala: 0

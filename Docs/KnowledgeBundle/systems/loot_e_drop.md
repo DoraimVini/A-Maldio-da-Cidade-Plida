@@ -125,6 +125,61 @@ Set — senão o Templo perde a razão de existir.
 ruído a mais), não ser só "melhor". É o que mantém a escassez do survival horror em vez de
 virar uma escada de upgrades. *Forma exata pendente de decisão do Vini.*
 
+## A curva de grau por nível (2026-08-28)
+
+**Decisão do Vini**, textual: *"Nível 1: maioria dos itens de mais baixo tier, e construir uma
+escala de RNG onde seja possível o drop de uma arma ou armadura lendária na primeira fase, mas
+ter um drop realmente baixo. E ir escalonando conforme a progressão de tier e de item, com base
+no itemlvl + playerlvl, onde no endgame você ignore totalmente os itens de T1."*
+
+O grau **não é autorado na entrada da tabela** — é sorteado por `Core.Loot.CurvaDeGrau`, com o
+grau da entrada servindo de **piso**. Um chefe que declara Impregnado nunca larga Inerte por
+azar; um Cultista que declara Inerte pode surpreender.
+
+| Grau | Peso base | Deslocamento por nível |
+|---|---|---|
+| Inerte | 100 | × 0,75 |
+| Marcado | 20 | × 1,15 |
+| Impregnado | 4 | × 1,35 |
+
+O peso de cada grau é multiplicado pelo seu deslocamento elevado a `nível − 1`. Nenhum peso é
+zero em nível nenhum, e é essa a diferença entre uma **curva** e um **portão**:
+
+| Nível do jogador | Inerte | Marcado | Impregnado |
+|---|---|---|---|
+| 1 | 80,6 % | 16,1 % | **3,2 %** |
+| 6 | 32,8 % | 37,0 % | 30,2 % |
+| 12 (teto) | **1,7 %** | 44,3 % | 54,0 % |
+
+Portão ("Impregnado só a partir do nível 5") faz o loot da primeira fase ser sempre igual e
+tira o motivo de abrir o próximo baú. Peso baixo produz a história que o jogador conta depois.
+No teto, o Inerte **some por peso, não por bloqueio** — o que faz um drop ruim no endgame ser
+azar, e não bug.
+
+**Relíquia nunca é sorteada.** `CurvaDeGrau.EhSorteavel` a exclui, e `RegrasDeGrau.PodeSerGerado`
+delega para lá — a regra tem uma fonte só, porque duas cópias em camadas diferentes divergem em
+silêncio e o sintoma seria uma relíquia aleatória. Uma relíquia autorada numa tabela de chefe
+**atravessa a curva intacta**.
+
+### O nível do item acompanha o jogador
+
+`nivelDoItem = max(nivelDaTabela, nivelDoJogador)` no momento em que o item é obtido. A tabela
+declara o **piso** (um chefe nunca larga item de nível 1), e o jogador puxa para cima (o Deserto
+deixa de entregar tier 1 no endgame).
+
+O nível do item multiplica a faixa de dano branco pela `EscalaDeNivel` (+25% por nível) e abre o
+pool de afixos, que é filtrado por `AfixoDef.NivelMinimoDoItem`.
+
+> ⚠️ **Isto vale para as TRÊS portas de entrada de item**, e por muito tempo valeu só para uma.
+> `DropAoAbater` rolava certo; o **Baú da Tumba** montava `new ItemInstance(id, 1)` à mão e o
+> **pickup autorado em cena** também. As três armas da Tumba — a única fonte de arma do jogo até
+> o primeiro chefe — nasciam no piso da escala e ficavam lá para sempre. Era a causa real do
+> *"não tem como ganhar da Byakhee"*: a arma no nível 1 precisa de 14 acertos contra os 5 do
+> chefe. Corrigido em 2026-08-28; `ItemizacaoDestravadaTests` guarda as três portas.
+
+**Consumível e chave não rolam grau.** Só Arma, Armadura e Amuleto passam pelo gerador — um
+"Tônico Impregnado" seria ruído diegético, e nenhum dos dois tem afixo ou escala.
+
 ## Arquitetura
 
 Segue a divisão POCO/Unity do `CLAUDE.md` §2 — a regra do sorteio é lógica pura e testável
@@ -154,6 +209,13 @@ e o campo `forcarArma` continua existindo como ferramenta de teste de build.
 
 Isso **não** altera a garantia do `boss_abdul.md`: a luta segue vencível com qualquer uma das
 3 armas, porque a premissa é sobre balanceamento do Abdul, não sobre o mecanismo de sorteio.
+
+> **Feito pela metade até 2026-08-28.** A migração para `Drop_BauDaTumba` aconteceu, mas o baú
+> parou no meio: sorteava *qual* arma pela tabela e depois montava `new ItemInstance(id, 1)` à
+> mão para entregá-la. Nível 1, grau Inerte, zero afixos — o `GeradorDeItem`, a `CurvaDeGrau` e
+> a `EscalaDeNivel` existiam, estavam testados, e este caminho não chamava nenhum dos três. É o
+> modo de falha que este repositório mais repete: **a peça existe, não dá erro, e a ligação não
+> acontece.**
 
 ### Ordem de resolução do sorteio
 
@@ -278,11 +340,22 @@ precisa de motivo narrativo, igual às 3 armas da Tumba (cada uma tem lore próp
 Nada abaixo está resolvido — são as perguntas que sobraram do design:
 
 1. **Contrapartida do Impregnado**: o que exatamente o grau alto cobra?
-2. **Curva de chance por arquétipo**: um Cultista comum larga arma com que frequência? Se for
-   alto demais, mata a escassez que o `CLAUDE.md` §1 protege.
-3. **Nível de personagem**: o `CLAUDE.md` prevê progressão por nível junto do loot. Se drop
-   escalar por nível, a tabela precisa de faixa de nível por entrada — o que muda a forma da
-   `TabelaDeDrop`. **Decidir antes de implementar**, não depois.
+2. ~~**Curva de chance por arquétipo**~~ — **resolvido (2026-08-28):** `Drop_Cultista` larga
+   cada entrada com 15 % a 30 %, teto de 2 itens por abate. As tabelas de chefe garantem o item
+   de rito e sorteiam arma + armadura a 60 %, com grau **mínimo Marcado** e teto de 2 a 3 —
+   *"que ele sinta a progressão do personagem"* (pedido do Vini). O que segura a escassez agora
+   é o **grau**, não a frequência: o Cultista larga bastante coisa Inerte, e coisa boa é rara
+   pela curva acima.
+3. ~~**Nível de personagem**~~ — **resolvido (2026-08-28):** a `TabelaDeDrop` ganhou um
+   `nivelDoItem` único (piso da fonte), e não faixa por entrada — o jogador puxa o nível para
+   cima, então a faixa por entrada seria uma segunda fonte da verdade para a mesma coisa. E a
+   progressão deixou de ser teórica: o elenco concede Exposição de verdade (Cultista 25, Abdul
+   150, Byakhee 200), o que põe o jogador no **nível 3** ao chegar no Byakhee. Ver
+   [ficha_de_atributos.md](ficha_de_atributos.md) e `EconomiaDeExposicaoTests`.
+
+   > Isto **revoga** para a branch `develop_items` a nota do `CLAUDE.md` §1.1 de que "com o
+   > nível travado em 1, o loot só entrega tier 1 — isso é esperado no VS, não bug". Continua
+   > valendo para a build do edital, que sai de `develop_manager`.
 4. ~~Armadura ainda não existe~~ — **resolvido parcialmente (2026-08-11):** três peças
    **Inerte** autoradas, uma por slot de armadura, cada uma com `DefesaFisica +1` (teto
    propositalmente baixo — bem abaixo do Elmo de Set, que é Relíquia): `Capuz de Farrapos`
