@@ -6,6 +6,77 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-29 (noite) — Auditoria: a barra sem sprite, o Sprite Atlas e o Templo
+
+Três pedidos do Vini numa sequência: *"revê as UI de vida e resiliência, que não parecem estar
+diminuindo"*, *"faz uma análise inteira no jogo"*, e *"corrige o applicationIdentifier e cria o
+Sprite Atlas"*. Suíte: 900 → **911 testes**, 888 passando, 0 falhas.
+
+### A barra não estava quebrada — estava sem sprite
+
+Toda a lógica funcionava: `Bind`, evento, `fillAmount`, cor. Da fonte do uGUI desta Unity
+(`Image.cs:883`):
+
+```csharp
+protected override void OnPopulateMesh(VertexHelper toFill)
+{
+    if (activeSprite == null)
+    {
+        base.OnPopulateMesh(toFill);   // Graphic: quad INTEIRO, sempre
+        return;                        // o 'type' nunca é consultado
+    }
+    switch (type) { ... case Type.Filled:
+```
+
+Sem sprite o `Image` retorna **antes** de olhar o tipo. O `fillAmount` muda no código e a malha
+desenhada é sempre o retângulo cheio — sintoma indistinguível de "o dano não está sendo
+aplicado", e foi para lá que a investigação foi primeiro. Estavam assim o trilho **e** o
+preenchimento das quatro barras, mais a `Recarga` da barra de ações (o cooldown da habilidade).
+
+**Regrediu por duas causas independentes, as duas silenciosas:** a ferramenta de conserto
+varria a *cena ativa*, e o HUD não está em cena nenhuma desde a migração para prefab
+persistente; e os sprites nunca carregavam, porque os PNGs estão em `spriteMode: Multiple`,
+onde o `Sprite` é sub-asset e `LoadAssetAtPath<Sprite>` devolve `null`.
+
+### O prefab do Abdul não carregava as próprias conjurações
+
+`prefabPedraDePoder`, `prefabEsqueleto`, `prefabConeDeGelo` e `prefabNecronomicon` **todos
+nulos**. A luta funciona porque a instância de `Playtest_RuinasPalidas` sobrescreve os quatro —
+não era bug ativo, era um prefab que só funciona num lugar. Perder o override apagaria as
+Pedras de Poder, e sem pedras o escudo é permanente: **o chefe fica invencível**.
+
+### Sprite Atlas
+
+O empacotador já estava ligado (`m_SpritePackerMode: 5`, V2 sempre ativo) e **não havia um
+único atlas**. Três grupos por "o que é desenhado junto" — Cenário, Elenco, UI —, agrupados por
+**pasta** para arte nova entrar sozinha.
+
+**O erro que quase passou:** os números do atlas sobrepõem os das texturas de origem, e a
+primeira versão da ferramenta chamava `SetPackingSettings`/`SetTextureSettings` no
+`SpriteAtlasAsset` em memória. Na V2 aquilo não persiste — o `.spriteatlasv2` guarda só os
+*packables*, e o resto vive no `SpriteAtlasImporter`, no `.meta`. O arquivo saiu com
+`filterMode: 1` (**Bilinear**) e a ferramenta reportou sucesso: a pixel art inteira borrada, com
+cada PNG continuando certo no Inspector. Só apareceu porque conferi o disco.
+
+Empacotam de fato — `PackAtlases` + `spriteCount`: Cenário 15, Elenco **228**, UI 22.
+
+### Templo do Povo Serpente
+
+`Ficha_Sseth`, `Ficha_Nagaraja` e `Ficha_AvatarDeSet` autoradas, e os três scripts passam a ler
+o `Ataque` da ficha. **Os três não podiam ser abatidos** — `MonoBehaviour` puros, sem
+`EnemyBase` nem `IDanificavel`. Falta `EnemyBase` nos prefabs, que ainda não existem.
+
+### O que este placar mediu
+
+Zero APIs renomeadas ou obsoletas da Unity 6; zero violações de hot path em 51 métodos de
+`Update`; zero assinaturas de evento sem cancelamento; zero avisos do compilador.
+`applicationIdentifier` saiu de `com.DefaultCompany.2D-Project`.
+
+**Nota de processo:** o cache da Library reverteu uma correção minha no meio do trabalho —
+editei um prefab no disco e rodei uma ferramenta de Editor nele logo depois, e o
+`EditPrefabContentsScope` reserializou a partir do artefato velho. Depois de editar asset fora
+do Editor, não rodar ferramenta que abra esse mesmo asset até reabrir o projeto.
+
 ## 2026-08-29 — Console de runtime, e um script de build que prova o que entregou
 
 Pergunta do Vini: *"O Carcosa Debugger vai funcionar na build?"* **Não, e não tinha como.**

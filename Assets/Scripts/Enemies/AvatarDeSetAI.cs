@@ -15,6 +15,30 @@ namespace FavelaAmarela.Runtime.Enemies
         [SerializeField] private float cadenciaDeAtaque = 2.0f;
         [SerializeField] private float danoDoGolpe = 80f;
 
+
+        /// <summary>
+        /// O dano deste golpe: o <b>Ataque da ficha</b> quando existe, e só então o campo local.
+        ///
+        /// <para><b>Por que (2026-08-29).</b> Cada inimigo carregava <b>dois</b> números de dano
+        /// — o da ficha e um campo serializado aqui — e só o segundo rodava. Rebalancear pela
+        /// ficha não mudava nada em jogo. O Cultista e o Byakhee foram unificados na véspera;
+        /// estes três ficaram para trás por não terem prefab nem cena.</para>
+        ///
+        /// <para>E é o que faz o <c>nivelDaUnidade</c> valer: o Ataque escala pela
+        /// <c>EscalaDeNivel</c>, o campo local não escala com nada.</para>
+        ///
+        /// <para><b>O corpo ainda não existe.</b> Enquanto este ator não ganhar um
+        /// <c>EnemyBase</c> no prefab, <c>_corpo</c> é nulo e o campo local responde — o que
+        /// preserva exatamente o comportamento de hoje em vez de zerar o dano.</para>
+        /// </summary>
+        private float DanoDoGolpe =>
+            _corpo != null && _corpo.Atributos != null && _corpo.Atributos.Ataque > 0f
+                ? _corpo.Atributos.Ataque
+                : danoDoGolpe;
+
+        /// <summary>O corpo que carrega a ficha, quando este ator tiver um.</summary>
+        private EnemyBase _corpo;
+
         [Header("Drops")]
         [Tooltip("Prefab do item coletável 'Elmo de Set' que dropa ao morrer")]
         [SerializeField] private GameObject prefabElmoDeSet;
@@ -30,6 +54,9 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            // O corpo carrega a ficha, que e a fonte da verdade do dano (ver acima).
+            _corpo = GetComponent<EnemyBase>();
+
             _enemyBase = GetComponent<EnemyBase>();
             _enemyMovement = GetComponent<EnemyMovement>();
         }
@@ -91,7 +118,7 @@ namespace FavelaAmarela.Runtime.Enemies
             var alvo = _jogador.GetComponent<IDanificavel>();
             if (alvo != null)
             {
-                alvo.ReceberGolpe(new ArmaResult(true, 0f, 0f, false, 0f, danoDoGolpe));
+                alvo.ReceberGolpe(new ArmaResult(true, 0f, 0f, false, 0f, DanoDoGolpe));
             }
         }
 

@@ -139,6 +139,57 @@ namespace FavelaAmarela.Tests.EditMode
                 "Lutar deixou de ser uma escolha viável contra a tropa comum.");
         }
 
+        // ── O Templo do Povo Serpente ─────────────────────────────────────────
+
+        /// <summary>
+        /// Os três atores do Templo (Dungeon 2) precisam de ficha para <b>poder ser
+        /// abatidos</b>.
+        ///
+        /// <para><b>O que a auditoria de 2026-08-29 encontrou:</b> os três são
+        /// <c>MonoBehaviour</c> puros, sem <c>EnemyBase</c> e sem <c>IDanificavel</c> — eles
+        /// <b>causam dano e não podem receber</b>. Nunca apareceu em jogo porque não há prefab
+        /// nem cena do Templo; apareceria no dia em que a fase fosse montada, como "o inimigo
+        /// não morre".</para>
+        /// </summary>
+        [TestCase("Sseth")]
+        [TestCase("Nagaraja")]
+        [TestCase("AvatarDeSet")]
+        public void OsAtoresDoTemplo_TemFichaComVitalidade(string nome)
+        {
+            var ficha = Ficha(nome);
+
+            Assert.Greater(ficha.VitalidadeMax, 0f,
+                $"Ficha_{nome} sem Vitalidade — o ator não tem como ser abatido.");
+
+            Assert.Greater(ficha.Ataque, 0f,
+                $"Ficha_{nome} sem Ataque — o dano cairia no campo local do script, que é " +
+                "exatamente o que a unificação desfez.");
+        }
+
+        /// <summary>
+        /// O <c>Ataque</c> das fichas do Templo tem de ser <b>o número que os scripts já
+        /// autoravam</b>. Criar a ficha com outro valor teria mudado o balanceamento de uma
+        /// fase inteira dentro de uma mudança anunciada como estrutural — o mesmo erro que
+        /// quase enfraqueceu o Cultista em 30%.
+        /// </summary>
+        [TestCase("Sseth", "SsethFarejadorAI", 20f)]
+        [TestCase("Nagaraja", "NagarajaAI", 35f)]
+        [TestCase("AvatarDeSet", "AvatarDeSetAI", 80f)]
+        public void OAtaqueDoTemplo_PreservaOValorDoScript(string nome, string script, float esperado)
+        {
+            Assert.AreEqual(esperado, Ficha(nome).Ataque, 0.01f,
+                $"Ficha_{nome}.Ataque divergiu do que {script} autorava. Se foi decisão de " +
+                "balanceamento, mude o fallback do script junto e diga por quê.");
+
+            // E o fallback do script continua igual: ele é quem responde enquanto o ator não
+            // tiver EnemyBase no prefab.
+            string fonte = File.ReadAllText($"Assets/Scripts/Enemies/{script}.cs");
+
+            StringAssert.Contains($"danoDoGolpe = {esperado:0}f", fonte,
+                $"O fallback de {script} divergiu da ficha. Enquanto não há prefab com " +
+                "EnemyBase, é o fallback que roda — e os dois números voltariam a discordar.");
+        }
+
         // ── A ficha é a fonte, em todo o elenco ───────────────────────────────
 
         /// <summary>
@@ -158,6 +209,13 @@ namespace FavelaAmarela.Tests.EditMode
                      {
                          ("Assets/Scripts/Enemies/Components/EnemyCombat.cs", "danoDoGolpe"),
                          ("Assets/Scripts/Enemies/ByakheeAI.cs", "danoDasGarras"),
+
+                         // Templo do Povo Serpente (Dungeon 2), unificados em 2026-08-29. Eles
+                         // ficaram para trás na primeira rodada por não terem prefab nem cena --
+                         // que é justamente como um ator some do radar neste repositório.
+                         ("Assets/Scripts/Enemies/SsethFarejadorAI.cs", "danoDoGolpe"),
+                         ("Assets/Scripts/Enemies/NagarajaAI.cs", "danoDoGolpe"),
+                         ("Assets/Scripts/Enemies/AvatarDeSetAI.cs", "danoDoGolpe"),
                      })
             {
                 if (!File.Exists(arquivo)) { desalinhados.Add($"{arquivo}: ausente"); continue; }

@@ -88,6 +88,34 @@ dela — é uma escala de tropa, com chefes fora dela de propósito.
 | `Ficha_Abdul` | 300 | 8 | 5 | 25 | 20 |
 | `Ficha_Byakhee` | 500 | 26 | 8 | 20 | 12 |
 | `Ficha_YugNeth` | 40 | 0 | 0 | 0 | 0 |
+| `Ficha_Sseth` | 120 | 20 | 6 | 0 | 0 |
+| `Ficha_Nagaraja` | 220 | 35 | 7 | 0 | 10 |
+| `Ficha_AvatarDeSet` | 450 | 80 | 10 | 0 | 25 |
+
+As três últimas são o **Templo do Povo Serpente** (Dungeon 2), autoradas em 2026-08-29. O
+`Ataque` das três **já existia**, hardcoded nos scripts (20, 35, 80), e foi preservado — a
+mesma disciplina que corrigiu o Cultista para 20 em vez de deixar a unificação enfraquecê-lo.
+Vitalidade e Defesa são novas, derivadas do elenco existente e **abertas a mudança**: são
+decisão de design, e vivem no asset para serem mexidas sem tocar em código.
+
+> ⚠️ **Os três não podiam ser abatidos.** `SsethFarejadorAI`, `NagarajaAI` e `AvatarDeSetAI`
+> são `MonoBehaviour` puros — sem `EnemyBase`, sem `IDanificavel`, sem Vitalidade. Eles
+> **causam dano e não podem receber**. Nunca apareceu em jogo porque não há prefab nem cena do
+> Templo; apareceria no dia da montagem, como "o inimigo não morre". A ficha resolve metade:
+> falta acrescentar `EnemyBase` aos prefabs quando eles existirem, apontando a ficha e
+> definindo o `nivelDaUnidade` — sugestão **3**, o nível em que o jogador sai da Fase 1.
+
+**A identidade de cada um**, para os números não parecerem arbitrários:
+
+- **Sseth Farejador** — tropa. Bate igual ao Cultista (20) de propósito: ele não é mais forte,
+  ele **caça por faro**. O que muda é o jogo de furtividade, não a conta de dano.
+- **Nagaraja** — elite nomeado, fala Aklo, é `IInteragivel` (tem conversa antes da luta, como
+  o Abdul). É o único do Templo com **mente** (Resiliência 60): dá para derrotá-lo pelo canal
+  anômalo, o que é coerente com uma criatura que argumenta. Larga a Coroa de Ossos.
+- **Avatar de Set** — chefe. Ataque **80**, o maior do jogo, com cadência de 2,0 s: o oposto do
+  Byakhee — poucos golpes, cada um devastador. Vitalidade 450 fica **abaixo** das 500 do
+  Byakhee de propósito, porque o Templo é conteúdo opcional e punir quem explora seria punir a
+  curiosidade. Sem mente: é um avatar de deus, não há o que argumentar.
 
 > ⚠️ **O `Ataque` do Cultista era 14 no asset e 20 em jogo.** Cada inimigo carregava
 > **dois** números de dano — o da ficha e um campo serializado no `MonoBehaviour` — e só o
