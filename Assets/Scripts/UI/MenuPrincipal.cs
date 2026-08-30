@@ -32,6 +32,9 @@ namespace FavelaAmarela.Runtime.UI
         [Tooltip("Fecha o jogo. [ASSET]")]
         [SerializeField] private Button botaoSair;
 
+
+        [Tooltip("Abre a tela de Opções (volume, tela cheia, sincronização vertical). [ASSET]")]
+        [SerializeField] private Button botaoDeOpcoes;
         [Header("Confirmação")]
         [Tooltip("Painel de confirmação de 'Nova peregrinação'. [ASSET]")]
         [SerializeField] private GameObject painelDeConfirmacao;
@@ -44,6 +47,12 @@ namespace FavelaAmarela.Runtime.UI
             if (botaoContinuar != null) botaoContinuar.onClick.AddListener(Continuar);
             if (botaoNovaPartida != null) botaoNovaPartida.onClick.AddListener(PedirConfirmacao);
             if (botaoSair != null) botaoSair.onClick.AddListener(Sair);
+
+            // A tela de Opções é persistente e vive fora deste menu: aqui só se pede que ela
+            // apareça. Sem botão ligado, o jogador não tem como chegar nela -- que é como o
+            // controle de volume não existiu até 2026-08-29.
+            if (botaoDeOpcoes != null)
+                botaoDeOpcoes.onClick.AddListener(PainelDeOpcoes.AbrirSeExistir);
 
             if (botaoConfirmar != null) botaoConfirmar.onClick.AddListener(NovaPartida);
             if (botaoCancelar != null) botaoCancelar.onClick.AddListener(FecharConfirmacao);

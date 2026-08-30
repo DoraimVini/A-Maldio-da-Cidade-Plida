@@ -32,10 +32,19 @@ namespace FavelaAmarela.Runtime.UI
         [Tooltip("Fecha o jogo. [ASSET]")]
         [SerializeField] private Button botaoSair;
 
+        [Tooltip("Abre a tela de Opções (volume, tela cheia, sincronização vertical). [ASSET]")]
+        [SerializeField] private Button botaoDeOpcoes;
+
         private void Awake()
         {
             if (botaoContinuar != null) botaoContinuar.onClick.AddListener(Retomar);
             if (botaoSair != null) botaoSair.onClick.AddListener(Sair);
+
+            // A tela de Opções é persistente e vive fora deste menu: aqui só se pede que ela
+            // apareça. Sem botão ligado, o jogador não tem como chegar nela -- que é como o
+            // controle de volume não existiu até 2026-08-29.
+            if (botaoDeOpcoes != null)
+                botaoDeOpcoes.onClick.AddListener(PainelDeOpcoes.AbrirSeExistir);
         }
 
         private FavelaAmarela.Core.GameLoop.GameLoopStateMachine _maquina;
