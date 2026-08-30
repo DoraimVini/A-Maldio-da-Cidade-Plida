@@ -269,18 +269,18 @@ MonoBehaviour:
   magiasPorCiclo: 3
   duracaoExaustao: 5
   intervaloDeConjuracao: 3
-  prefabEsqueleto: {fileID: 0}
+  prefabEsqueleto: {fileID: 8380616875347976551, guid: 82cdc41146a039449830f1cdde6f5d5b, type: 3}
   pontosDeInvocacao: []
   esqueletosPorInvocacao: 2
   logarInvocacoes: 1
-  prefabConeDeGelo: {fileID: 0}
-  prefabPedraDePoder: {fileID: 0}
+  prefabConeDeGelo: {fileID: 7144954348415485153, guid: 3d7ae68b56570b840a057f78da2e49d8, type: 3}
+  prefabPedraDePoder: {fileID: 7635651438898051546, guid: 7705050836dcb22498188797eccc0866, type: 3}
   pontosDasPedras: []
   raioDasPedras: 3
   visualDoEscudo: {fileID: 0}
   corVulneravel: {r: 1, g: 1, b: 1, a: 1}
   corProtegido: {r: 1, g: 0.9067486, b: 0.54901963, a: 1}
-  prefabNecronomicon: {fileID: 0}
+  prefabNecronomicon: {fileID: 8628179692047720825, guid: 9fed0675323566d4893063953034ee27, type: 3}
   mostrarNumerosDeDano: 1
   corDoDano: {r: 0.7, g: 0.9, b: 1, a: 1}
   corDoSangramento: {r: 0.85, g: 0.15, b: 0.2, a: 1}
