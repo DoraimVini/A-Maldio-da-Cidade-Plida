@@ -82,7 +82,8 @@ namespace FavelaAmarela.Runtime.Diagnostico
         private Rect _janela = new Rect(20f, 20f, 520f, 560f);
 
         private int _abaAtual;
-        private static readonly string[] Abas = { "Estado", "Arsenal", "Progressão", "Ir para" };
+        private static readonly string[] Abas =
+            { "Estado", "Arsenal", "Progressão", "Ir para", "Desempenho" };
 
         private string _nivelDesejado = "3";
         private string _filtroDeItem = "";
@@ -148,7 +149,8 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 case 0: DesenharEstado(); break;
                 case 1: DesenharArsenal(); break;
                 case 2: DesenharProgressao(); break;
-                default: DesenharDestinos(); break;
+                case 3: DesenharDestinos(); break;
+                default: DesenharDesempenho(); break;
             }
 
             GUILayout.EndScrollView();
@@ -496,6 +498,121 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 NavegacaoDeCenas.IrPara(cena);
                 return;
             }
+        }
+
+        // ── Aba: Desempenho ───────────────────────────────────────────────────
+
+        /// <summary>
+        /// O que a análise estática <b>não</b> consegue responder: quanto custa um quadro.
+        ///
+        /// <para><b>Traduz em vez de despejar números.</b> "16,7 ms" não diz nada a quem não
+        /// decorou o orçamento de 60 quadros por segundo; "dentro do orçamento" diz. O painel
+        /// existe para o Vini jogar e saber, sem interpretar.</para>
+        ///
+        /// <para><b>A janela é de jogo, não de tela parada.</b> O medidor para de amostrar
+        /// quando <c>timeScale</c> é zero — que é o estado em que este console está enquanto
+        /// você o lê. O que aparece aqui são os últimos ~5 segundos <i>jogados</i>.</para>
+        /// </summary>
+        private void DesenharDesempenho()
+        {
+            var m = MedidorDeDesempenho.Instancia;
+
+            if (m == null)
+            {
+                GUILayout.Label("MedidorDeDesempenho não nasceu.");
+                return;
+            }
+
+            if (m.QuadrosMedidos == 0)
+            {
+                GUILayout.Label("Nada medido ainda. Feche o console (F1), jogue alguns " +
+                                "segundos e reabra.");
+                return;
+            }
+
+            GUILayout.Label($"Janela: os últimos {m.QuadrosMedidos} quadros jogados.");
+            GUILayout.Space(6f);
+
+            // ── O que decide se está bom ──────────────────────────────────────
+            float mediana = m.MedianaMs;
+            float pior = m.PiorMs;
+            float acima = m.FracaoAcimaDoOrcamento;
+
+            GUILayout.Label($"Mediana:  {mediana:0.0} ms   ({m.QuadrosPorSegundo:0} por segundo)",
+                            EditorEstiloForte);
+
+            GUILayout.Label($"Pior 1%:  {pior:0.0} ms" + Veredito(pior),
+                            EditorEstiloForte);
+
+            GUILayout.Label($"Acima de {MedidorDeDesempenho.OrcamentoDe60:0.0} ms: " +
+                            $"{acima:P1} dos quadros");
+
+            GUILayout.Space(8f);
+            GUILayout.Label(Diagnostico(mediana, pior, acima));
+
+            // ── Os contadores do Profiler ─────────────────────────────────────
+            GUILayout.Space(10f);
+            GUILayout.Label("Renderização e lixo:", EditorEstiloForte);
+
+            GUILayout.Label("   Chamadas de desenho: " + Contador(m.Desenhos));
+            GUILayout.Label("   Lotes: " + Contador(m.Lotes));
+
+            long lixo = m.LixoNoQuadro;
+            GUILayout.Label("   Lixo no último quadro: " +
+                            (lixo < 0 ? "—" : $"{lixo / 1024f:0.0} KB") +
+                            (lixo > 0 ? "   <<< em regime deveria ser ZERO" : ""));
+
+            GUILayout.Space(10f);
+            if (GUILayout.Button("Zerar a janela e medir de novo"))
+            {
+                m.Zerar();
+                Dizer("Janela zerada. Feche o console e jogue o trecho que quer medir.");
+            }
+
+            GUILayout.Space(6f);
+            GUILayout.Label("Como usar: zere aqui, feche com F1, jogue o trecho difícil " +
+                            "(Deserto povoado com a tempestade, ou a luta do Byakhee), e " +
+                            "reabra. O pior 1% é o número que o jogador sente.");
+        }
+
+        /// <summary>Estilo em negrito, resolvido uma vez — GUI não pode alocar por quadro.</summary>
+        private static GUIStyle _forte;
+
+        private static GUIStyle EditorEstiloForte =>
+            _forte ??= new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold };
+
+        private static string Veredito(float pior) =>
+            pior <= MedidorDeDesempenho.OrcamentoDe60 ? "   (dentro do orçamento)"
+            : pior <= 33.3f ? "   (passa de 60, ainda acima de 30)"
+            : "   <<< ENGASGO VISÍVEL";
+
+        private static string Contador(long v) => v < 0 ? "— (contador indisponível)" : v.ToString();
+
+        /// <summary>
+        /// A leitura que importa, em uma frase. Separar mediana de pico é o ponto: os dois
+        /// contam histórias diferentes, e só um deles é sentido como defeito.
+        /// </summary>
+        private static string Diagnostico(float mediana, float pior, float acima)
+        {
+            if (mediana > 33.3f)
+                return "A MEDIANA está acima de 33 ms: não é pico, é custo constante. " +
+                       "Procure o que roda todo quadro — quantidade de objetos, colisores, " +
+                       "chamadas de desenho — e não micro-otimização.";
+
+            if (mediana > MedidorDeDesempenho.OrcamentoDe60)
+                return "A mediana estoura 60 por segundo de forma constante. Ainda jogável, " +
+                       "mas o jogo não está entregando o alvo de um 2D.";
+
+            if (pior > 50f)
+                return "A mediana está boa e há PICOS: é engasgo, não lentidão. Suspeitos, " +
+                       "nesta ordem: coleta de lixo (veja o contador abaixo), Instantiate em " +
+                       "resposta a evento (espólio, esqueletos), carga de asset em runtime.";
+
+            if (acima > 0.05f)
+                return "Mais de 5% dos quadros estouram o orçamento. Não é grave, mas é " +
+                       "irregularidade suficiente para o movimento parecer sujo.";
+
+            return "Dentro do alvo: mediana sob 16,7 ms e sem picos relevantes.";
         }
 
         private void Dizer(string mensagem)
