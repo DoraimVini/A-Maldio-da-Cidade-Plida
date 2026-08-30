@@ -28,7 +28,8 @@ namespace FavelaAmarela.Runtime.Audio
 
         [Header("Mistura")]
         [Range(0f, 1f)]
-        [Tooltip("Volume geral do gameplay.")]
+        [Tooltip("Volume geral do gameplay. FALLBACK: a fonte da verdade é a preferência do " +
+                 "jogador (ver VolumeGeral). Só vale quando não há PreferenciasBridge.")]
         [SerializeField] private float volumeGeral = 0.8f;
 
         [Tooltip("Distância a partir da qual o som começa a atenuar.")]
@@ -80,6 +81,22 @@ namespace FavelaAmarela.Runtime.Audio
         }
 
         /// <summary>
+        /// O volume que vale: o <b>escolhido pelo jogador</b> quando há preferências, e só então
+        /// o campo do Inspector.
+        ///
+        /// <para><b>Por que passa por aqui (2026-08-29).</b> Este componente é o ponto único por
+        /// onde todo som do jogo passa — é o único lugar onde uma barra de volume precisa ser
+        /// lida para valer no jogo inteiro. Ler a preferência em cada chamador seria a mesma
+        /// duplicação que os dois números de dano por inimigo produziam.</para>
+        ///
+        /// <para>Sem <c>PreferenciasBridge</c> (cena de teste, por exemplo) o campo do Inspector
+        /// responde — degrada para o comportamento antigo em vez de emudecer o jogo.</para>
+        /// </summary>
+        private float VolumeGeral =>
+            FavelaAmarela.Runtime.Preferencias.PreferenciasBridge.Instancia?.Preferencias
+                ?.VolumeGeral ?? volumeGeral;
+
+        /// <summary>
         /// Toca um som numa posição do mundo.
         /// </summary>
         /// <param name="som">Qual som.</param>
@@ -95,7 +112,7 @@ namespace FavelaAmarela.Runtime.Audio
             if (clipe == null) clipe = SinteseDeSom.Obter(som);
             if (clipe == null) return;
 
-            float volume = volumeGeral * escalaDeVolume * (entrada != null ? entrada.Volume : 1f);
+            float volume = VolumeGeral * escalaDeVolume * (entrada != null ? entrada.Volume : 1f);
             if (volume <= 0.001f) return;
 
             var fonte = ProximaVozLivre();
