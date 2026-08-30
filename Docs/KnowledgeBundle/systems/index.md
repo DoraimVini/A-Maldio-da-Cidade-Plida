@@ -16,6 +16,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Vitalidade Corpórea](vitalidade.md) — Vida física (a "carne"), distinta da sanidade; zerá-la abate o ator
 - [Companheiro Mi-Go e Escolha Ramificada com Abdul](companheiro_mi_go.md) — Filhote Mi-Go obrigatório para os Portões de Carcosa; conversa lutar × concordar; morte do companheiro encerra a run
 - [Interação com o Mundo (botão E)](interacao.md) — Camada de interação deliberada: prompt + seleção de alvo, substitui o disparo por toque
+- [Opções e Preferências do Jogador](opcoes_e_preferencias.md) — **[NOVO, 2026-08-29]** Volume, tela cheia e sincronização vertical. Até esta data o jogo não tinha controle de volume nenhum. Padrão é **VSync ligada**, por recomendação explícita da doc da Unity 6.4 contra `targetFrameRate`
 - [Ficha de Atributos e Matemática do Combate](ficha_de_atributos.md) — Os 5 atributos de toda unidade, fórmula de mitigação e balanceamento
 - [Atributos, Níveis e Build](atributos_e_build.md) — **[CONSOLIDADO 2026-08-14]** Documento de discussão: os dois vocabulários de atributo que coexistem, os números reais das 5 fichas e das 3 armas, a curva de 12 níveis, e as 6 perguntas abertas de design
 - [As Três Armas da Tumba](armas_da_tumba.md) — Cravo/Estilete/Alfanje: básico + habilidade, e o sangramento por acúmulo

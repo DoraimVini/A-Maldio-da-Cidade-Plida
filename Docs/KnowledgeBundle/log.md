@@ -6,6 +6,82 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-08-29 (madrugada) — Opções do jogador, e o cache que reverteu a tipografia três vezes
+
+Continuação direta da auditoria. O Vini: *"corrige o applicationIdentifier e cria o Sprite
+Atlas"*, depois *"siga com o plano que você argumentou"*. Suíte: 911 → **928 testes**, 905
+passando, 0 falhas.
+
+### O jogo não tinha controle de volume
+
+Nem no menu, nem na pausa, nem opção de vídeo nenhuma. Documento novo:
+[`systems/opcoes_e_preferencias.md`](systems/opcoes_e_preferencias.md).
+
+**A doc da Unity 6.4 mudou o plano.** A auditoria tinha recomendado
+`Application.targetFrameRate`; a documentação é explícita contra:
+
+> *"It's recommended to use `QualitySettings.vSyncCount` over `Application.targetFrameRate`
+> because vSyncCount implements a hardware-based synchronization mechanism, whereas
+> targetFrameRate is a software-based timing method and is subject to microstuttering."*
+
+E: *"If `vSyncCount != 0`, then `targetFrameRate` is ignored."* Por isso o padrão virou **VSync
+ligada**, e o seletor de quadros fica **desabilitado** nesse caso — uma opção ativa mostrando
+"60" enquanto o motor ignora aquele número seria a interface descrevendo um estado que não
+existe.
+
+Três peças: `PreferenciasDoJogador` (Core, POCO puro), `PreferenciasBridge` (nasce sozinha em
+`BeforeSceneLoad`, grava em `preferencias.json` **ao lado do save** — apagar o progresso não
+pode zerar o volume) e `PainelDeOpcoes` (Canvas próprio, persistente).
+
+**A tela vive fora do HUD de propósito:** o HUD se oculta em toda cena sem `GameLoopBootstrap` —
+ou seja, no menu principal, que é justamente onde se procura as opções antes de começar.
+
+**Resolução não entrou**, e a razão fica registrada: uma resolução mal escolhida pode deixar a
+interface fora da tela, e então o jogador não alcança mais a opção para desfazê-la. Entra quando
+houver confirmação com contagem regressiva.
+
+### O cache da Library, agora com diagnóstico completo
+
+A tipografia da caixa de diálogo (máximo 60 contra o padrão 44 — a reclamação do Vini sobre as
+falas da Cassilda) foi corrigida **três vezes** e reverteu as três.
+
+**Não é a correção que falha.** Qualquer ferramenta que abra o `HUD_Gameplay` reserializa a
+partir do artefato em cache, que ainda diz 60 — e grava por cima. Aconteceu ao restaurar os
+sprites das barras e de novo ao ligar o botão de Opções: duas ferramentas sem nenhuma relação
+com tipografia desfizeram a tipografia.
+
+`PadronizarTextoDoHud` foi escrita para consertar **pela Unity**, na hipótese de que assim o
+cache aprenderia o valor novo. **Não funcionou** — e a ferramenta fica no repositório por isso:
+ela **relê o campo** depois de escrever e mostra que em memória o valor **é** 44, e que o
+`SaveAsPrefabAsset` não o leva ao disco. Quem topar com isso tem o diagnóstico pronto.
+
+> **A primeira versão dela imprimia a constante que eu tinha pedido**, em vez de reler o campo —
+> relatava sucesso mesmo quando a atribuição não pegava. Corolário 4 do COMMANDMENT aplicado a
+> um campo, e eu mesmo caí nele.
+
+**Regra prática que vale para o projeto inteiro:** depois de editar um asset fora do Editor, não
+rodar ferramenta que abra esse mesmo asset até reabrir o projeto.
+
+### Duas correções minhas, registradas
+
+- **O `HUD_ResilienciaBar.prefab` não é órfão.** A auditoria disse "zero referências" checando
+  cenas, prefabs e assets — e esqueceu o **código**. Ele é usado por **nove ferramentas de
+  Editor e dois testes**. Cheguei a renomeá-lo e reverti. O problema real era outro, e já estava
+  consertado: uma ferramenta de conserto apontava para ele em vez do HUD vivo.
+- **As fontes do painel de opções nasceram abaixo do piso** (22 e 20 px). `TextoLegivelTests`
+  pegou: o projeto exige **24 px** na referência 1920×1080, documentado como ~2,2% da altura da
+  tela.
+
+### Ainda aberto
+
+- **Física 2D multithread** (`useMultithreading: 0`) — marginal com o número de corpos que o
+  jogo tem hoje. Mexer nisso sem medir seria ruído, não conclusão.
+- **Prefabs do Templo do Povo Serpente** — as fichas existem, os prefabs não. Quando nascerem:
+  `EnemyBase` apontando a ficha e `nivelDaUnidade` 3.
+- **O comportamento em jogo** de tudo isto: o console de runtime, as barras encolhendo, a tela
+  de opções abrindo. Nada disso foi verificado rodando o jogo — só compilando, medindo assets e
+  afirmando em teste.
+
 ## 2026-08-29 (noite) — Auditoria: a barra sem sprite, o Sprite Atlas e o Templo
 
 Três pedidos do Vini numa sequência: *"revê as UI de vida e resiliência, que não parecem estar
