@@ -125,6 +125,49 @@ Set — senão o Templo perde a razão de existir.
 ruído a mais), não ser só "melhor". É o que mantém a escassez do survival horror em vez de
 virar uma escada de upgrades. *Forma exata pendente de decisão do Vini.*
 
+## A escada de armas (2026-09-01)
+
+**O defeito que ela conserta.** Medido: o jogo tinha **três armas** — as três do baú da Tumba,
+entregues no começo. Depois dele não existia no jogo uma arma que o jogador já não tivesse.
+Somado aos 80,6% de Inerte no nível 1, **oito em cada dez drops eram uma arma repetida sem afixo
+nenhum**. Era catálogo, não matemática.
+
+| Família | T1 | T2 | T3 |
+|---|---|---|---|
+| **Alfanje** — erra e explode | de Alhazred 40–61 | das Ruínas Pálidas 58–88 | do Rei 84–128 |
+| **Cravo** — equilibrado | de Aklo 33–49 | de Aldebaran 48–71 | do Sinal Amarelo 69–103 |
+| **Estilete** — rápido e certeiro | de Irem 24–35 | de Yhtill 35–51 | da Máscara Pálida 50–74 |
+
+**O tier muda só a faixa de dano.** Crítico, precisão, alcance, raio e cadência são identidade da
+*família*: escalá-los junto faria as três convergirem para "a mais forte, com números maiores", e
+a escolha entre elas morreria no tier 2. O Alfanje continua sendo o que erra e explode em
+qualquer degrau.
+
+Passo de **×1,45 por tier**, contra ×1,25 por nível de item — achar um tier precisa valer mais que
+subir um nível, senão o degrau não é um evento.
+
+Cada degrau tem **`HabilidadeDef` própria**, porque ela carrega o `NomeDaArma`, que o jogador lê.
+
+### O afixo agora acompanha o nível
+
+`AfixoDef.Rolar` recebia só a aleatoriedade: a base escalava e o afixo não. O `afixo_cravado`
+(+2 a 5) valia 4–11% num Alfanje de nível 1 e **1–3%** num de nível 12 — de marginal a invisível.
+
+Agora escala pela mesma lei do dano branco, com **`EscalaComONivelDoItem` por afixo**. Ficam
+planos os que são **taxa por segundo** (RegenRM, RegeneracaoVigor) e os que já são **fração**
+(crítico, precisão, aumento percentual): multiplicar RegenRM por 3,75 no nível 12 anularia a
+Resiliência como recurso.
+
+Pool ampliado de **8 para 15**, cobrindo os quatro eixos que o combate ganhou em 2026-08-28 e que
+nenhum afixo rolava.
+
+### Espaço para armas à distância e de fogo
+
+`BaseDeArma.Entrega` (`TipoDeEntrega`): `CorpoACorpo` — o único implementado —, `Projetil` e
+`Fogo`. A matemática de `PerfilDeArma` e `ResolucaoDeGolpe` é **a mesma** para uma lâmina e para
+um cano: uma espingarda rola igual a uma espada. O que faltará é munição, recarga e o golpe
+resolver no impacto em vez de no gesto.
+
 ## A curva de grau por nível (2026-08-28)
 
 **Decisão do Vini**, textual: *"Nível 1: maioria dos itens de mais baixo tier, e construir uma

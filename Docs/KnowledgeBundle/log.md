@@ -6,6 +6,122 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-01 (noite) — Escada de itens, mapa dobrado, e o Templo sob a tempestade
+
+Sessão longa, com o Vini dormindo depois de *"faça todo o projeto"*. Branch `develop_temple`.
+Suíte: 952 → **971 testes**, 948 passando, 0 falhas.
+
+### A mudança de direção
+
+Decisão do Vini: o jogo passa a ser **combate + exploração** com horror cósmico, referência de
+estrutura Zelda, dificuldade moderada. A furtividade deixa de ser pilar e vira ferramenta
+opcional. `CLAUDE.md` §1 atualizado.
+
+**Isto custou pouco porque não foi virada — foi a documentação alcançando o código.** A auditoria
+de 31/08 mediu: a única ferramenta de furtividade era a tempestade abafando som, e o Deserto tinha
+**um** obstáculo interno. Não havia decisão furtiva a tomar. O combate, enquanto isso, já tinha
+faixa de dano branco, crítico, precisão, escala por nível, afixos, curva de raridade e chefes com
+FSM — e todos os relatos de playtest do Vini foram relatos de combate.
+
+**Fica caro e não foi feito:** detecção **visual** de inimigo. A percepção é 100% sonora; visão
+exige cone, linha de visão e oclusão. É sistema, não ajuste.
+
+### "Todos os drops fracos" — o diagnóstico, medido
+
+O Vini relatou drops fracos e itens sem evolução, jogando no nível 1. Medido: **o jogo inteiro
+tinha três armas** — as três do baú da Tumba, entregues no começo. Depois dele, não existia no
+jogo uma arma que o jogador já não tivesse.
+
+Somado à curva de grau, que no nível 1 dá **80,6% de Inerte** (sem modificadores), **oito em cada
+dez drops eram uma arma repetida sem afixo nenhum**. As duas queixas eram o mesmo defeito visto de
+dois ângulos, e nenhuma era matemática: era **catálogo**.
+
+### A escada: 3 famílias × 3 degraus
+
+| | T1 | T2 | T3 |
+|---|---|---|---|
+| **Alfanje** | de Alhazred 40–61 | das Ruínas Pálidas 58–88 | do Rei 84–128 |
+| **Cravo** | de Aklo 33–49 | de Aldebaran 48–71 | do Sinal Amarelo 69–103 |
+| **Estilete** | de Irem 24–35 | de Yhtill 35–51 | da Máscara Pálida 50–74 |
+
+**O tier muda só a faixa de dano.** Crítico, precisão, alcance e cadência são identidade da
+**família** — escalá-los junto faria as três convergirem para "a mais forte, com números maiores",
+e a escolha entre elas morreria no tier 2.
+
+Passo de ×1,45 por tier contra ×1,25 por nível de item: achar um tier precisa valer mais que subir
+um nível. E a origem dos nomes **se aproxima de Carcosa** a cada degrau — Alhazred era um homem; o
+Rei não é.
+
+**O Byakhee larga o trio T2**, porque fechar a Fase 1 é o momento certo do primeiro degrau. As três
+T3 ficam **declaradas como pendentes** em `ArmaAlcancavelTests`, com a razão real: o Rei em Amarelo
+é *selado* por rito, não abatido — ele não dispara `OnAbatido` e não larga espólio pelo caminho
+normal.
+
+### O afixo que não acompanhava
+
+`AfixoDef.Rolar` recebia só a aleatoriedade. A base escalava +25% por nível e o afixo **não**: o
+`afixo_cravado` (+2 a 5) valia 4–11% num Alfanje nível 1 e **1–3%** num nível 12. Saía de marginal
+para invisível — e isso ataca a razão de existir de um ARPG.
+
+Agora escala pela mesma lei do dano branco, mas por **decisão autorada por afixo**: taxa por
+segundo (RegenRM, RegeneracaoVigor) e fração (crítico, precisão, aumento percentual) ficam planas.
+Multiplicar RegenRM por 3,75 no nível 12 anularia a Resiliência como recurso.
+
+**Pool de 8 para 15**, cobrindo os quatro eixos que o combate ganhou em 28/08 e que nenhum afixo
+rolava.
+
+### Espaço para armas à distância e de fogo
+
+`TipoDeEntrega` no `BaseDeArma`: `CorpoACorpo` (o único implementado), `Projetil`, `Fogo`. A
+matemática de dano é a mesma para uma lâmina e para um cano — **uma espingarda rola igual a uma
+espada**. Deixar a costura pronta custa um enum; descobrir depois que o modelo presumia
+corpo-a-corpo custaria reescrever a resolução do golpe.
+
+### O mapa dobrou
+
+**43 × 31 → 86 × 62.** Atravessar andando saiu de 10 para 19 segundos.
+
+O número que provava a queixa "está tudo muito perto": a `Chegada_TumbaAlhazred` ficava a **5,2
+unidades** da `Entrada_TumbaAlhazred`, e o raio de ruído do Damião andando é **5,5**. Marcos mais
+próximos entre si do que o alcance do próprio barulho do jogador. Agora são 10,3.
+
+Multiplica **posição**, não escala — cada peça mantém o tamanho e a topologia fica intacta. 43
+objetos afastados, 5.683 células de chão novas pintadas com o `RuleTile_Areia`. A ferramenta
+**recusa** rodar duas vezes: dobrar não é idempotente, e a segunda passagem quadruplicaria em
+silêncio.
+
+### O Templo sob a tempestade
+
+Ideia do Vini. Quem entra na área do Templo **sem a Carta das Areias** é arremessado pela
+Tempestade de Memória para outro canto do Deserto.
+
+A regra é POCO e determinística: nunca devolve ao canto onde o jogador já está, e manda sempre para
+o mais distante. **Aprender uma regra é jogo; sofrer um sorteio é frustração.**
+
+A **Carta das Areias** é item de Chave, semeada no Santuário de Yhtill — caminho crítico, lado
+oposto ao Templo, **67 unidades de distância**. Os cantos de destino são *derivados* dos `Limite_*`
+da cena: quatro posições autoradas teriam ficado no meio do mapa depois de ele dobrar.
+
+### O que NÃO precisou ser feito
+
+**Yug-Neth já é um companion simples.** O documento de direção pedia removê-lo como recurso
+crítico; medido, a Vitalidade zerada dele o **incapacita**, não mata, e ele é reanimado num
+Refúgio — decisão do próprio Vini em 31/07. Não há game over.
+
+Uma coisa real fica registrada e **intacta**: incapacitado, ele **bloqueia os Portões de Carcosa**.
+Isso é portão de progressão desenhado de propósito, e removê-lo é decisão, não conserto.
+
+### Guardas que pegaram erro meu
+
+Quatro, e todos estavam certos. O mais instrutivo: `NomesDeAtributo.SemEfeito` ainda declarava
+`Furtividade` e `DefesaAnomalia` como decorativos, embora os dois tenham ganhado consumidor em
+28/08 — e **o comentário do próprio arquivo previa a divergência**: *"três cópias que divergiriam
+na primeira vez que alguém implementasse um dos quatro"*. Um afixo legítimo foi barrado por um
+guarda lendo a lista velha.
+
+Unificado: `NomesDeAtributo` virou fonte única e `PainelDeFicha` delega. A dependência aponta na
+direção certa — dado não pergunta à interface.
+
 ## 2026-09-01 — Navegação A* em todas as unidades, e os primeiros Rule Tiles
 
 Pedido do Vini: *"vamos trabalhar o rule tiles e o pathfinding, só que, de todas as unidades do
