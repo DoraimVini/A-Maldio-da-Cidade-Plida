@@ -40,9 +40,20 @@ namespace FavelaAmarela.EditorTools
         private static readonly Recompensa[] Recompensas =
         {
             new Recompensa("Drop_Byakhee", "Byakhee",
-                new[] { "Item_Arma_EstileteDeIrem", "Item_Armadura_ColeteDeSucata" }, 3,
-                "fecha a Fase 1: arma e peitoral, para o jogador entrar no Castelo diferente " +
-                "de como saiu da Tumba"),
+                new[]
+                {
+                    "Item_Armadura_ColeteDeSucata",
+
+                    // O TRIO DE T2 (2026-09-01). Fechar a Fase 1 é o momento certo para o
+                    // primeiro degrau de arma: o jogador chega aqui no nível 3 com uma arma T1
+                    // do baú, e sai com uma de tier acima. Os três entram com a mesma chance --
+                    // qual deles cai vira variedade entre partidas, em vez de um roteiro.
+                    "Item_Arma_AlfanjeDasRuinasPalidas",
+                    "Item_Arma_CravoDeAldebaran",
+                    "Item_Arma_EstileteDeYhtill",
+                }, 3,
+                "fecha a Fase 1: peitoral e o PRIMEIRO DEGRAU de arma, para o jogador entrar no " +
+                "Castelo diferente de como saiu da Tumba"),
 
             new Recompensa("Drop_Abdul", "Abdul_Alhazred",
                 new[] { "Item_Arma_CravoDeAklo", "Item_Armadura_CapuzDeFarrapos" }, 2,
