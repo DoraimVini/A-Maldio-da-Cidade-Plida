@@ -6,6 +6,93 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-01 — Navegação A* em todas as unidades, e os primeiros Rule Tiles
+
+Pedido do Vini: *"vamos trabalhar o rule tiles e o pathfinding, só que, de todas as unidades do
+jogo"*. Branch nova: **`develop_temple`**, aberta de `develop_manager`. Suíte: 942 → **952
+testes**, 929 passando, 0 falhas.
+
+Documento novo: [`systems/navegacao_e_tiles.md`](systems/navegacao_e_tiles.md).
+
+### O que a auditoria do tilemap tinha medido
+
+O Deserto de Hali é um **plano aberto**: a geometria sólida dele são quatro bordas de mapa e o
+Lago de Hali — **um obstáculo dentro da área jogável inteira**, sem tilemap de colisão. E as
+nove unidades que se movem iam todas em **linha reta**. As duas coisas se escondiam mutuamente:
+linha reta funciona num plano vazio, e ninguém constrói geometria num jogo cuja IA trava nela.
+
+### Busca de caminho: A* na grade, não NavMesh
+
+O mundo **já é** uma grade. NavMesh exigiria pacote novo, é 3D por construção, e produziria uma
+segunda representação do mundo para divergir da primeira — este repositório já tem cicatrizes
+disso.
+
+`Core/Navegacao/` é POCO puro: os 12 testes afirmam o caminho inteiro com mapas desenhados em
+`#` e `.`, sem cena e sem Play Mode. Dois detalhes decidem se funciona em **movimento**:
+
+- **Não corta quina.** A diagonal só passa se os dois ortogonais adjacentes estiverem livres.
+  Sem isso o caminho parece válido e o ator, que tem largura, trava no vértice — e o sintoma se
+  lê como "a IA travou", com a evidência apontando para o lugar errado.
+- **Teto de nós.** Onze Cultistas perseguindo um alvo inalcançável varreriam o mapa inteiro cada
+  um. Não é lentidão, é travamento.
+
+### A ponte pergunta à FÍSICA
+
+Medido antes de escolher: **tudo que bloqueia está na layer `Obstacle`** — o tilemap `Colisao`,
+as paredes, os nobres do Castelo, e o **Lago de Hali**, que é um colisor solto fora de tilemap
+nenhum. Lendo o tilemap, o inimigo contornaria paredes e **atravessaria o lago**.
+
+### Ligada sem reescrever IA nenhuma
+
+O `SeguidorDeCaminho` devolve **direção** (Cultista, Coisa do Cemitério, Espectro, Nagaraja) ou
+**próximo ponto** (Yug-Neth e Esqueleto, que passam um destino ao seguidor de alvo deles e têm
+aceleração própria). Cada unidade mantém o movimento que já tinha, e degrada para linha reta sem
+malha — um seguidor que devolvesse zero trocaria "sem malha" por "inimigo paralisado".
+
+**E está nos prefabs.** O componente é opcional por design, o que traz o risco assinatura desta
+casa: código que existe, compila, passa nos testes e não está em prefab nenhum. Acrescentado em
+Cultista, Coisa do Cemitério, Espectro, Esqueleto e **Yug-Neth** — o companheiro é quem mais
+custa perder atrás de um muro.
+
+**Não** acrescentado, com razão registrada: o **Byakhee voa** (contornar chão inverteria a
+identidade da luta), o Cone de Gelo é projétil, e Abdul, Rei em Amarelo e Pedra de Poder não se
+deslocam.
+
+### Rule Tiles
+
+`RuleTile_Areia` sorteia entre as 5 variações a cada célula — hoje o chão é um tile repetido cuja
+repetição se vê da tela inteira. `RuleTile_Muro` colide em **losango**, e é o pincel que **torna
+o Deserto construível**.
+
+Usam `IsometricRuleTile`: em runtime é igual ao `RuleTile`, mas o **editor** desenha a matriz de
+vizinhança em losango em vez de cruz. Autorar regra isométrica num editor quadrado é o caminho
+curto para regras erradas que parecem certas.
+
+**A mina que estava armada:** os cinco tiles de **areia** — que são chão — estavam em
+`ColliderType.Sprite`, gerando colisão do contorno do PNG por célula. Inerte só porque o tilemap
+de chão não tem `TilemapCollider2D`: **mina, não bug**. No dia em que alguém acrescentasse um, o
+Deserto viraria parede.
+
+### O que continua faltando, e não é sistema
+
+Regra de terreno com **bordas e cantos** exige **arte de canto**. Os nove tiles são todos
+`spriteMode: Single`. É falta de arte.
+
+### Achado de caminho: o botão de sair nunca faltou
+
+O Vini mandou um print do menu sem "Sair". Ele estava lá — **ativo, clicável, chamando
+`Application.Quit()`** — e invisível **debaixo do "Opções"**, porque a ferramenta que criei em
+30/08 clonou o Sair e herdou as âncoras dele. Nenhum teste pegou porque todos verificavam
+**existência**, e um botão coberto passa em toda checagem de existência.
+
+Corrigido, com `MenuSemBotaoEscondidoTests`: nenhum botão irmão pode ocupar a mesma faixa
+vertical, e o Sair tem de ser o último.
+
+### E uma nota sobre asmdef
+
+`FavelaAmarela.Editor.asmdef` lista referências explícitas e não incluía o pacote de Rule Tiles
+— o tipo não resolvia mesmo com o pacote instalado, resolvido e no cache.
+
 ## 2026-08-29 (madrugada) — Opções do jogador, e o cache que reverteu a tipografia três vezes
 
 Continuação direta da auditoria. O Vini: *"corrige o applicationIdentifier e cria o Sprite
