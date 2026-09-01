@@ -67,6 +67,12 @@ namespace FavelaAmarela.Tests.EditMode
                 "Icone_CapuzDeFarrapos", "Icone_ColeteDeSucata", "Icone_CaneleirasDeFerro",
                 "Icone_ElmoDeSet", "Icone_PeitoralDeSet", "Icone_GrevasDeSet",
                 "Icone_Necronomicon", "Icone_AnelDoSinalAmarelo", "Icone_Estilete",
+
+                // Desenhado pixel a pixel por GerarIconeDaCarta em 2026-09-01, porque a Carta
+                // das Areias nasceu sem arte e item sem ícone aparece EM BRANCO na mochila, sem
+                // erro no console. É placeholder declarado: quando houver pintura, ele sai desta
+                // lista junto com a troca.
+                "Icone_CartaDasAreias",
             };
 
             Assert.IsTrue(Directory.Exists(pasta), $"Pasta de ícones ausente: {pasta}");
