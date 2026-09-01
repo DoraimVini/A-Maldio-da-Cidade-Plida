@@ -9,7 +9,7 @@ description: Histórico cronológico de mudanças na base de conhecimento
 ## 2026-09-01 (noite) — Escada de itens, mapa dobrado, e o Templo sob a tempestade
 
 Sessão longa, com o Vini dormindo depois de *"faça todo o projeto"*. Branch `develop_temple`.
-Suíte: 952 → **971 testes**, 948 passando, 0 falhas.
+Suíte: 952 → **974 testes**, 951 passando, 0 falhas.
 
 ### A mudança de direção
 
@@ -86,9 +86,27 @@ unidades** da `Entrada_TumbaAlhazred`, e o raio de ruído do Damião andando é 
 próximos entre si do que o alcance do próprio barulho do jogador. Agora são 10,3.
 
 Multiplica **posição**, não escala — cada peça mantém o tamanho e a topologia fica intacta. 43
-objetos afastados, 5.683 células de chão novas pintadas com o `RuleTile_Areia`. A ferramenta
-**recusa** rodar duas vezes: dobrar não é idempotente, e a segunda passagem quadruplicaria em
-silêncio.
+objetos afastados. A ferramenta **recusa** rodar duas vezes: dobrar não é idempotente, e a segunda
+passagem quadruplicaria em silêncio.
+
+#### E o chão saiu com buracos — 44,7% de cobertura
+
+Eu repintei o chão e relatei *"5.683 células pintadas"*. Era verdade e era inútil. **Contar o que
+se pintou não responde se o jogador tem onde pisar**, e é o Corolário 4 do `CLAUDE.md` na forma
+mais literal que já apareceu neste projeto.
+
+A causa: o repintor derivou um retângulo em espaço de **célula** a partir dos cantos do mundo.
+Numa grade `CellLayout.Isometric`, **um retângulo de células é um losango no mundo** — então os
+extremos leste e oeste, na faixa vertical do meio, ficaram sem chão nenhum. Andando para lá, o
+jogador encontrava o vazio.
+
+`ConferirCoberturaDoChao` amostrou a área jogável a cada 2 unidades e mediu: **44,7%**, 737 de
+1.333 pontos sem chão, os buracos começando em x = −42.
+
+`RepintarOChaoDoDeserto` varre o **mundo** a passos de 0,25 (metade da menor dimensão da célula) e
+pinta a célula de cada amostra — assim a cobertura é garantida **por construção**, sem geometria
+intermediária onde a conversão possa perder canto. 16.416 células novas. Medido depois:
+**100,0%, zero pontos sem chão.**
 
 ### O Templo sob a tempestade
 
@@ -101,6 +119,30 @@ o mais distante. **Aprender uma regra é jogo; sofrer um sorteio é frustração
 A **Carta das Areias** é item de Chave, semeada no Santuário de Yhtill — caminho crítico, lado
 oposto ao Templo, **67 unidades de distância**. Os cantos de destino são *derivados* dos `Limite_*`
 da cena: quatro posições autoradas teriam ficado no meio do mapa depois de ele dobrar.
+
+#### E o véu não vedava nada
+
+Mesmo defeito do chão, no outro extremo do mapa. O véu nasceu como caixa **14×26** centrada a
+oeste da entrada — número escrito quando o Deserto era 43×31. **O mapa dobrou; a caixa não.**
+
+Medido: sobravam **29 unidades** de corredor livre por baixo e **7** por cima. O jogador contornava
+e chegava ao Templo sem a carta, sem nunca tocar o gatilho. **Um portão contornável é pior que
+nenhum portão** — promete uma regra e não a cumpre, e o único a descobrir é quem estiver jogando.
+
+Agora a faixa é **derivada dos `Limite_*`**: x 31..45, altura 66, e a ferramenta *redimensiona* um
+véu existente em vez de sair cedo dizendo "já existe". Começa em x **31** de propósito e não na
+borda do véu antigo: os dois consumíveis do leste vivem em x 23,5 e 27,4, e consumível neste jogo é
+finito e não-farmável — vedá-los junto seria cobrar a carta por conteúdo que nada tem a ver com o
+Templo.
+
+`VeuDoTemploTests` guarda as três coisas que podem voltar a quebrar caladas: a entrada dentro do
+véu, nenhuma passagem por cima/baixo/leste, e a carta **fora** dele (chave trancada dentro da
+fechadura tornaria o Templo inalcançável). Lê o YAML da cena, não abre a cena — mesma técnica do
+`ConsumiveisNoMundoTests`.
+
+**A tempestade visual já estava lá.** A zona do Templo é autorada com intensidade **0,78–0,95**, a
+mais forte do Deserto. Quem desenhou o mapa já tinha escondido aquele canto; o que faltava era a
+consequência mecânica ter onde morder.
 
 ### O que NÃO precisou ser feito
 
