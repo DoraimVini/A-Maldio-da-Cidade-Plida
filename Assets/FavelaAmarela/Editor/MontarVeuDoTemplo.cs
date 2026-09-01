@@ -92,29 +92,54 @@ namespace FavelaAmarela.EditorTools
             if (entrada == null)
                 return "véu: 'Entrada_TemploSerpente' não encontrada — nada montado";
 
+            // A ALTURA vem dos limites do mapa, não de um número. A primeira versão usava
+            // 14×26 fixo, e a medição mostrou o estrago: sobravam 29 unidades de corredor livre
+            // por baixo e 7 por cima -- o jogador simplesmente contornava, e o véu não vedava
+            // nada. Um véu que se pode contornar é pior que nenhum: promete uma regra e não a
+            // cumpre.
+            var limites = cena.GetRootGameObjects()
+                .SelectMany(r => r.GetComponentsInChildren<Transform>(true))
+                .Where(t => t.name.StartsWith("Limite_"))
+                .ToArray();
+
+            if (limites.Length == 0) return "véu: sem Limite_* para medir a faixa — nada montado";
+
+            float alturaDoMapa = limites.Max(t => Mathf.Abs(t.position.y)) * 2f + 4f;
+
+            // A faixa começa a OESTE da entrada, mas depois dos consumíveis que vivem no leste
+            // (x 23,5 e 27,4): vedá-los junto tornaria dois dos nove consumíveis do Deserto
+            // reféns da carta, e consumível é finito e não-farmável neste jogo.
+            const float ComecoDaFaixa = 31f;
+
+            float bordaLeste = limites.Max(t => Mathf.Abs(t.position.x)) + 2f;
+            float larguraDaFaixa = bordaLeste - ComecoDaFaixa;
+            float centroX = ComecoDaFaixa + larguraDaFaixa / 2f;
+
             var existente = cena.GetRootGameObjects()
                 .SelectMany(r => r.GetComponentsInChildren<VeuDaTempestade>(true))
                 .FirstOrDefault();
 
-            if (existente != null)
-                return $"véu: já existe ('{existente.name}')";
+            var go = existente != null
+                ? existente.gameObject
+                : new GameObject("Veu_DaTempestade_Templo");
 
-            var go = new GameObject("Veu_DaTempestade_Templo");
-            go.transform.SetParent(entrada.parent, worldPositionStays: true);
+            if (existente == null)
+            {
+                go.transform.SetParent(entrada.parent, worldPositionStays: true);
+                go.AddComponent<BoxCollider2D>();
+                go.AddComponent<VeuDaTempestade>();
+            }
 
-            // Centrado um pouco a OESTE da entrada: o véu tem de ser atravessado antes de
-            // chegar, senão o jogador vê o Templo e só então é devolvido -- o que frustra em vez
-            // de intrigar.
-            go.transform.position = entrada.position + new Vector3(-6f, 0f, 0f);
+            go.transform.position = new Vector3(centroX, 0f, 0f);
 
-            var col = go.AddComponent<BoxCollider2D>();
+            var col = go.GetComponent<BoxCollider2D>();
             col.isTrigger = true;
-            col.size = new Vector2(14f, 26f);
+            col.size = new Vector2(larguraDaFaixa, alturaDoMapa);
 
-            go.AddComponent<VeuDaTempestade>();
-
-            return $"véu: 'Veu_DaTempestade_Templo' criado em {go.transform.position}, " +
-                   "14×26, a oeste da entrada do Templo";
+            return $"véu: '{go.name}' {(existente != null ? "REDIMENSIONADO" : "criado")} em " +
+                   $"x {ComecoDaFaixa:0}..{bordaLeste:0}, altura {alturaDoMapa:0} — veda a faixa " +
+                   $"leste INTEIRA, sem passagem por cima nem por baixo, e sem prender os dois " +
+                   "consumíveis que vivem em x 23,5 e 27,4";
         }
 
         // ── A carta, no mundo ─────────────────────────────────────────────────
