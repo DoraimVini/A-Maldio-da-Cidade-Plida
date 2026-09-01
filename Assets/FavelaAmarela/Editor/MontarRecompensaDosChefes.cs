@@ -55,6 +55,30 @@ namespace FavelaAmarela.EditorTools
                 "fecha a Fase 1: peitoral e o PRIMEIRO DEGRAU de arma, para o jogador entrar no " +
                 "Castelo diferente de como saiu da Tumba"),
 
+            // O REI EM AMARELO (2026-09-01). Era o único confronto do Vertical Slice que
+            // largava ZERO equipamento -- ele não é EnemyBase nem IDanificavel (não tem barra
+            // de vida, por design), então ficava de fora do espólio por construção.
+            //
+            // GARANTIDO, e os três de uma vez. Nas outras tabelas a chance de 0,6 é o que faz
+            // duas mortes do mesmo arquétipo renderem coisas diferentes -- mas o Rei é selado
+            // UMA vez e a cena acaba. Sorteio só é justo quando se repete: aqui, azar seria
+            // definitivo e não teria como ser corrigido jogando.
+            //
+            // PENDÊNCIA HONESTA: este é o degrau T3, e o Rei é a última luta. A casa real
+            // destas três armas é o Templo do Povo Serpente (fases 2-5, que não existem);
+            // enquanto ele não existir, isto é melhor que três armas autoradas que NADA no
+            // jogo produz. Ver ArmaAlcancavelTests.
+            new Recompensa("Drop_ReiEmAmarelo", "ReiEmAmarelo",
+                new[]
+                {
+                    "Item_Arma_AlfanjeDoRei",
+                    "Item_Arma_CravoDoSinalAmarelo",
+                    "Item_Arma_EstileteDaMascaraPalida",
+                }, 3,
+                "o desfecho do Vertical Slice deixa de largar nada: o degrau T3 inteiro, " +
+                "garantido, porque um rito que acontece uma vez só não comporta sorteio",
+                garantido: true, chance: 1f, piso: GrauDeImpregnacao.Impregnado),
+
             new Recompensa("Drop_Abdul", "Abdul_Alhazred",
                 new[] { "Item_Arma_CravoDeAklo", "Item_Armadura_CapuzDeFarrapos" }, 2,
                 "primeiro chefe do jogo: a recompensa tem de ser sentida no Cultista seguinte"),
@@ -66,9 +90,21 @@ namespace FavelaAmarela.EditorTools
             public readonly string[] Itens;
             public readonly int Teto;
 
-            public Recompensa(string tabela, string prefab, string[] itens, int teto, string razao)
+            /// <summary>Se as entradas ignoram chance e nível mínimo (drop roteirizado).</summary>
+            public readonly bool Garantido;
+
+            /// <summary>Probabilidade por entrada, quando não é garantida.</summary>
+            public readonly float Chance;
+
+            /// <summary>Piso de grau: a curva sobe daí, nunca desce.</summary>
+            public readonly GrauDeImpregnacao Piso;
+
+            public Recompensa(string tabela, string prefab, string[] itens, int teto, string razao,
+                              bool garantido = false, float chance = 0.6f,
+                              GrauDeImpregnacao piso = GrauDeImpregnacao.Marcado)
             {
                 Tabela = tabela; Prefab = prefab; Itens = itens; Teto = teto; Razao = razao;
+                Garantido = garantido; Chance = chance; Piso = piso;
             }
         }
 
@@ -131,7 +167,7 @@ namespace FavelaAmarela.EditorTools
 
             foreach (var r in Recompensas)
             {
-                resumo.Add(Aplicar(r.Tabela, r.Itens, r.Teto, r.Razao));
+                resumo.Add(Aplicar(r));
                 resumo.Add(LigarComponente(r));
             }
 
@@ -141,8 +177,12 @@ namespace FavelaAmarela.EditorTools
             Debug.Log("[RecompensaDeChefe] Concluído:\n  " + string.Join("\n  ", resumo));
         }
 
-        private static string Aplicar(string nome, string[] itens, int teto, string razao)
+        private static string Aplicar(Recompensa r)
         {
+            string nome = r.Tabela, razao = r.Razao;
+            string[] itens = r.Itens;
+            int teto = r.Teto;
+
             string caminho = $"{PastaDasTabelas}/{nome}.asset";
             var tabela = AssetDatabase.LoadAssetAtPath<TabelaDeDrop>(caminho);
 
@@ -187,12 +227,13 @@ namespace FavelaAmarela.EditorTools
 
                 nova.FindPropertyRelative("Item").objectReferenceValue = def;
 
-                // Grau MÍNIMO Marcado: a curva pode subir daí, nunca descer. Chefe que larga
-                // item cinza é chefe que não recompensa -- e "recompensa" era o pedido.
-                nova.FindPropertyRelative("Grau").enumValueIndex = (int)GrauDeImpregnacao.Marcado;
+                // Grau MÍNIMO Marcado por padrão: a curva pode subir daí, nunca descer. Chefe
+                // que larga item cinza é chefe que não recompensa -- e "recompensa" era o
+                // pedido.
+                nova.FindPropertyRelative("Grau").enumValueIndex = (int)r.Piso;
 
-                nova.FindPropertyRelative("Garantido").boolValue = false;
-                nova.FindPropertyRelative("Chance").floatValue = 0.6f;
+                nova.FindPropertyRelative("Garantido").boolValue = r.Garantido;
+                nova.FindPropertyRelative("Chance").floatValue = r.Chance;
                 nova.FindPropertyRelative("QuantidadeMin").intValue = 1;
                 nova.FindPropertyRelative("QuantidadeMax").intValue = 1;
                 nova.FindPropertyRelative("NivelMinimo").intValue = 1;

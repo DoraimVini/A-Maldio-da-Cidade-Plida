@@ -106,6 +106,17 @@ namespace FavelaAmarela.Core.Persistencia
         public const string PatuaColetado = "Quest.Patua.Coletado";
 
         /// <summary>
+        /// A quest "A Canção Incompleta" foi concluída — Cassilda cantou e entregou o Patuá.
+        ///
+        /// <para><b>Por que subiu para cá (2026-09-01).</b> Era um <c>private const</c> dentro
+        /// do <c>CassildaNPC</c>. Passou a ter um <b>segundo leitor</b> — o Baú de Yhtill, que
+        /// só abre depois da quest —, e duas cópias da mesma string em arquivos diferentes é
+        /// exatamente a divergência silenciosa que este projeto já catalogou várias vezes:
+        /// ninguém erra a primeira, todo mundo erra a terceira.</para>
+        /// </summary>
+        public const string CassildaConcluida = "Quest.Cassilda.Concluida";
+
+        /// <summary>
         /// Prefixo das chaves de "esta criatura já foi abatida". Diferente das constantes
         /// acima, não é uma chave única: cada inimigo tem a sua, formada com o GUID imutável
         /// do próprio objeto (ver <c>ObjetoPersistente</c>).

@@ -63,6 +63,14 @@ namespace FavelaAmarela.EditorTools
             ("Abdul_Alhazred", 150,
              "primeiro chefe. Abaixo do Byakhee de propósito: é o começo da curva, e ele " +
              "concedia ZERO até hoje por não ser um EnemyBase"),
+
+            // 2026-09-01: o Rei passou a largar espólio, e o guarda
+            // TodoAtorQueLargaEspolio_ConcedeExposicao pegou na mesma rodada -- ator que
+            // recompensa com item tem de recompensar com nível. O guarda estava certo.
+            ("ReiEmAmarelo", 400,
+             "o desfecho. Selar o Rei é o maior feito do jogo e vale o dobro do Byakhee. Que " +
+             "não haja luta depois não muda a regra: Exposição é Aprofundamento, e entender " +
+             "Carcosa é exatamente o que acabou de acontecer"),
         };
 
         /// <summary>

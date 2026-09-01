@@ -494,6 +494,8 @@ namespace FavelaAmarela.Runtime.Quests
 
         private static string ChaveDoFragmento(int i) => $"Quest.Cassilda.Fragmento{i}";
         private static string ChaveDeEntrega(int i) => $"Quest.Cassilda.Entregue{i}";
-        private const string ChaveDaConclusao = "Quest.Cassilda.Concluida";
+        // Fonte única em ChavesDeSave: o Baú de Yhtill lê esta mesma chave para saber se pode
+        // abrir. Uma cópia literal aqui divergiria da dele no primeiro renomeio.
+        private const string ChaveDaConclusao = ChavesDeSave.CassildaConcluida;
     }
 }

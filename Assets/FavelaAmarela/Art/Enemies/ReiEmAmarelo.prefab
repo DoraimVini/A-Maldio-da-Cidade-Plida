@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 4654559023530953403}
   - component: {fileID: 2402154893393499738}
   - component: {fileID: 7971172491043839927}
+  - component: {fileID: 4892778864163907010}
+  - component: {fileID: 1308208907030066596}
   m_Layer: 6
   m_Name: ReiEmAmarelo
   m_TagString: Untagged
@@ -206,3 +208,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 1
+--- !u!114 &4892778864163907010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635383446983437150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ba4fe4047e0f3468dffc05509a987b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.DropAoAbater
+  tabela: {fileID: 11400000, guid: f491a844cd17e2d4f985f8dd98a9609f, type: 2}
+  prefabColetavel: {fileID: 0}
+  raioDeEspalhamento: 0.4
+--- !u!114 &1308208907030066596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 635383446983437150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24ebb6e3c9252f3478323148093b824f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Progression.ExposicaoAoAbater
+  exposicao: 400

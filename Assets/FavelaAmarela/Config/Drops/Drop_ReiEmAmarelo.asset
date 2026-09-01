@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bb33166f8a964d4ba14254b2ecbb5d1, type: 3}
+  m_Name: Drop_ReiEmAmarelo
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.TabelaDeDrop
+  entradas:
+  - Item: {fileID: 11400000, guid: a839c24ed38d1454ba70b87af4dacb1b, type: 2}
+    Grau: 2
+    Garantido: 1
+    Chance: 1
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: 4bffe7e9f6607ce4da1d16cfaffa7c7a, type: 2}
+    Grau: 2
+    Garantido: 1
+    Chance: 1
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: cf22692666613cb4e8cd117424927602, type: 2}
+    Grau: 2
+    Garantido: 1
+    Chance: 1
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  tetoDeItens: 3
+  nivelDoItem: 6

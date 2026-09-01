@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEngine;
 using FavelaAmarela.Inventario;
 
 namespace FavelaAmarela.Tests.EditMode
@@ -28,18 +29,24 @@ namespace FavelaAmarela.Tests.EditMode
         /// Armas que ainda não têm fonte, e por quê. Sair desta lista é o trabalho; entrar nela
         /// sem razão, não.
         /// </summary>
+        /// <remarks>
+        /// <b>Vazia desde 2026-09-01, e isso é a notícia.</b> As três armas T3 (Alfanje do Rei,
+        /// Cravo do Sinal Amarelo, Estilete da Máscara Pálida) ficaram aqui declaradas como
+        /// inalcançáveis com uma razão real: <i>"o Rei em Amarelo é SELADO por rito, não abatido
+        /// — ele não dispara OnAbatido, então não larga espólio pelo caminho normal"</i>.
+        ///
+        /// <para>A saída foi a que a própria nota previa (<i>"ou uma recompensa do
+        /// selamento"</i>): o <c>ReiEmAmareloAI</c> passou a implementar
+        /// <c>IFonteDeEspolio</c> e dispara <c>OnAbatido</c> no selamento. Foi o mesmo conserto
+        /// que o Abdul recebeu em 28/08 — quem larga espólio é quem sabe avisar que foi
+        /// derrotado, não quem herda de uma classe.</para>
+        ///
+        /// <para><b>Mantida, e não apagada</b>, porque é o contrato deste par de testes: arma
+        /// nova sem fonte entra aqui <b>com a razão escrita</b>, ou o
+        /// <see cref="TodaArma_TemFonteOuRazaoRegistrada"/> falha.</para>
+        /// </remarks>
         private static readonly (string Id, string Porque)[] SemFonteAinda =
         {
-            ("Item_Arma_AlfanjeDoRei",
-             "T3, previsto para o Castelo de Carcosa. O Rei em Amarelo é SELADO por rito, não " +
-             "abatido — ele não dispara OnAbatido, então não larga espólio pelo caminho normal. " +
-             "Precisa de fonte própria: os Cortesãos Pálidos, ou uma recompensa do selamento"),
-
-            ("Item_Arma_CravoDoSinalAmarelo",
-             "T3, mesma situação do Alfanje do Rei"),
-
-            ("Item_Arma_EstileteDaMascaraPalida",
-             "T3, mesma situação do Alfanje do Rei"),
         };
 
         private static ItemDef[] ArmasAutoradas() =>
@@ -133,6 +140,73 @@ namespace FavelaAmarela.Tests.EditMode
                 "O Byakhee deixou de largar T2: " + string.Join(", ", faltando) +
                 Environment.NewLine + "O jogador chega nele no nível 3 com uma arma T1 do baú. " +
                 "Sem o degrau aqui, fechar a Fase 1 não melhora a arma de ninguém.");
+        }
+
+        /// <summary>
+        /// O <b>último degrau</b> tem de cair no desfecho. Antes de 2026-09-01 o Rei em Amarelo
+        /// era o único confronto do Vertical Slice que largava <b>zero</b> equipamento — ele não
+        /// é <c>EnemyBase</c> nem <c>IDanificavel</c> (não tem barra de vida, por design), e
+        /// ficava de fora do espólio por construção.
+        /// </summary>
+        [Test]
+        public void OUltimoDegrau_CaiAoSelarORei()
+        {
+            var rei = AssetDatabase.LoadAssetAtPath<TabelaDeDrop>(
+                "Assets/FavelaAmarela/Config/Drops/Drop_ReiEmAmarelo.asset");
+
+            Assert.IsNotNull(rei, "Drop_ReiEmAmarelo não existe — o desfecho voltou a não " +
+                                  "largar nada.");
+
+            var candidatos = rei.ProjetarCandidatos();
+            var ids = candidatos.Select(x => x.ItemDefId).ToHashSet();
+
+            var t3 = new[]
+            {
+                "Item_Arma_AlfanjeDoRei",
+                "Item_Arma_CravoDoSinalAmarelo",
+                "Item_Arma_EstileteDaMascaraPalida",
+            };
+
+            var faltando = t3.Where(i => !ids.Contains(i)).ToList();
+
+            Assert.IsEmpty(faltando,
+                "O Rei deixou de largar T3: " + string.Join(", ", faltando));
+
+            // GARANTIDO, e não sorteado. O Rei é selado UMA vez e a cena acaba: sorteio só é
+            // justo quando se repete, porque só aí o azar tem como ser corrigido jogando.
+            var sorteadas = candidatos
+                .Where(x => t3.Contains(x.ItemDefId) && !x.Garantido)
+                .Select(x => x.ItemDefId)
+                .ToList();
+
+            Assert.IsEmpty(sorteadas,
+                "Arma(s) T3 dependendo de sorte no Rei: " + string.Join(", ", sorteadas) +
+                Environment.NewLine + "O rito acontece uma vez só — quem tiver azar fica sem, " +
+                "e não existe segunda tentativa para corrigir.");
+        }
+
+        /// <summary>
+        /// E a tabela precisa estar <b>ligada</b> ao prefab. Criar tabela não é ligar tabela —
+        /// o <c>Drop_Abdul</c> passou um mês inteiro apontando para nada.
+        /// </summary>
+        [Test]
+        public void OReiTemODropAoAbaterLigado()
+        {
+            const string caminho = "Assets/FavelaAmarela/Art/Enemies/ReiEmAmarelo.prefab";
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(caminho);
+
+            Assert.IsNotNull(prefab, $"Prefab ausente: {caminho}");
+
+            var drop = prefab.GetComponentInChildren<FavelaAmarela.Runtime.Itens.DropAoAbater>(true);
+
+            Assert.IsNotNull(drop,
+                "O prefab do Rei não tem DropAoAbater: a tabela existe e nada a consulta.");
+
+            var so = new UnityEditor.SerializedObject(drop);
+            var tabela = so.FindProperty("tabela");
+
+            Assert.IsNotNull(tabela?.objectReferenceValue,
+                "O DropAoAbater do Rei está sem tabela — o componente existe e não entrega nada.");
         }
     }
 }

@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bb33166f8a964d4ba14254b2ecbb5d1, type: 3}
+  m_Name: Drop_BauDeYhtill
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.TabelaDeDrop
+  entradas:
+  - Item: {fileID: 11400000, guid: 224e845e999fdb64b8d334cef63d1583, type: 2}
+    Grau: 1
+    Garantido: 1
+    Chance: 1
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: 9d1880a0d4230c944803d2f73760f040, type: 2}
+    Grau: 1
+    Garantido: 0
+    Chance: 0.45
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: bd768322af9d28742bbdd7b37d711ffb, type: 2}
+    Grau: 1
+    Garantido: 0
+    Chance: 0.45
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: f583a85178c665c46841701cd4d64bf1, type: 2}
+    Grau: 1
+    Garantido: 0
+    Chance: 0.45
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: 756dfc95f9c9462bb77578e105422713, type: 2}
+    Grau: 1
+    Garantido: 0
+    Chance: 0.8
+    QuantidadeMin: 1
+    QuantidadeMax: 2
+    NivelMinimo: 1
+  tetoDeItens: 3
+  nivelDoItem: 3

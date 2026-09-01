@@ -52,6 +52,15 @@ namespace FavelaAmarela.EditorTools
             ("Drop_Abdul", 2,
              "primeiro chefe do jogo: acima da tropa, abaixo do que fecha a fase — a " +
              "recompensa dele tem de ser sentida no Cultista seguinte, não igualar a do Byakhee"),
+
+            ("Drop_BauDeYhtill", 3,
+             "recompensa da quest da Cassilda: mesmo piso do Byakhee de propósito. A quest é " +
+             "opcional e vem ANTES dele — quem explorar o Santuário entra no chefe mais forte, " +
+             "que é exatamente o que o Vini pediu quando disse que não dava para ganhar dele"),
+
+            ("Drop_ReiEmAmarelo", 6,
+             "o desfecho. Piso alto porque é o degrau T3 e não há nada depois — a única razão " +
+             "de moderar um número é o que vem em seguida, e aqui não vem nada"),
         };
 
         [MenuItem("Tools/FavelaAmarela/Itens: definir o nível das tabelas de drop")]

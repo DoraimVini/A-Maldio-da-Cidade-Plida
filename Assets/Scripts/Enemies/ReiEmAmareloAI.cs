@@ -21,7 +21,7 @@ namespace FavelaAmarela.Runtime.Enemies
     /// vitória).</para>
     /// </summary>
     [AddComponentMenu("Favela Amarela/Enemies/Rei em Amarelo AI")]
-    public sealed class ReiEmAmareloAI : MonoBehaviour
+    public sealed class ReiEmAmareloAI : MonoBehaviour, FavelaAmarela.Runtime.Itens.IFonteDeEspolio
     {
         [Header("Relíquias exigidas")]
         [Tooltip("Ids dos ItemDef de Artefato que o rito exige (ex.: 'necronomicon'). " +
@@ -80,6 +80,23 @@ namespace FavelaAmarela.Runtime.Enemies
 
         /// <summary>Disparado na vitória — quem monta a cena decide o que fazer com isso.</summary>
         public event System.Action OnVitoria;
+
+        /// <summary>
+        /// <see cref="FavelaAmarela.Runtime.Itens.IFonteDeEspolio"/>. Dispara junto com
+        /// <see cref="OnVitoria"/>, no selamento.
+        ///
+        /// <para><b>Sim, "abatido" para quem é selado.</b> O nome da interface descreve o que o
+        /// <c>DropAoAbater</c> precisa saber — <i>"quem sabe avisar que foi derrotado"</i> —, e
+        /// selar o Rei <b>é</b> derrotá-lo neste jogo. Renomear a interface por causa deste caso
+        /// mexeria em três atores que já a implementam para ganhar precisão em zero deles.</para>
+        ///
+        /// <para><b>O que isto conserta:</b> o Rei não é <c>EnemyBase</c> nem
+        /// <c>IDanificavel</c> (não tem barra de vida, por decisão de design), então ficava de
+        /// fora do espólio <b>por construção</b> — exatamente o buraco que a interface foi criada
+        /// para tapar quando o Abdul caiu nele. O último confronto do Vertical Slice largava
+        /// <b>zero</b> equipamento.</para>
+        /// </summary>
+        public event System.Action OnAbatido;
 
         private void Awake()
         {
@@ -239,6 +256,10 @@ namespace FavelaAmarela.Runtime.Enemies
             internal static readonly int Queda = Animator.StringToHash("queda");
         }
 
-        private void HandleSelado() => OnVitoria?.Invoke();
+        private void HandleSelado()
+        {
+            OnVitoria?.Invoke();
+            OnAbatido?.Invoke();
+        }
     }
 }
