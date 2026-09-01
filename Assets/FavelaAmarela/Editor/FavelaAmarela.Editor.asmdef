@@ -7,7 +7,9 @@
         "FavelaAmarela.Level",
         "Unity.InputSystem",
         "Unity.2D.Sprite.Editor",
-        "Unity.2D.PixelPerfect"
+        "Unity.2D.PixelPerfect",
+        "Unity.2D.Tilemap.Extras",
+        "Unity.2D.Tilemap.Extras.Editor"
     ],
     "includePlatforms": [
         "Editor"
