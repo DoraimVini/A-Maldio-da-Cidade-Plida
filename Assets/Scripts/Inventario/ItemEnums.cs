@@ -40,6 +40,42 @@ namespace FavelaAmarela.Inventario
     /// arma leve + foco/escudo na off-hand, ou uma lâmina colossal que toma as duas mãos
     /// e não deixa espaço para defesa.
     /// </summary>
+    /// <summary>
+    /// Como a arma <b>entrega</b> o dano. Separado do dano em si de propósito: a matemática de
+    /// <c>PerfilDeArma</c> e <c>ResolucaoDeGolpe</c> — faixa branca, crítico, precisão — é a
+    /// mesma para uma lâmina e para um cano. <b>Uma espingarda rola igual a uma espada</b>; o
+    /// que muda é como o golpe alcança o alvo.
+    ///
+    /// <para><b>Por que já existe, sem nada implementado (2026-09-01).</b> Decisão do Vini:
+    /// abrir espaço para armas à distância e de fogo no futuro do jogo. Deixar a costura pronta
+    /// custa um enum; descobrir depois que o modelo de dano presumia corpo-a-corpo custaria
+    /// reescrever a resolução do golpe inteira.</para>
+    ///
+    /// <para><b>Só <c>CorpoACorpo</c> tem implementação hoje.</b> Os outros dois existem para
+    /// serem autorados e para o código que os consumir falhar alto em vez de fingir que
+    /// funciona.</para>
+    /// </summary>
+    public enum TipoDeEntrega
+    {
+        /// <summary>Varredura no alcance da arma. O único caminho implementado.</summary>
+        CorpoACorpo,
+
+        // SEMPRE NO FIM: TipoDeEntrega é serializado por ÍNDICE nos .asset, e inserir um valor
+        // no meio remapearia silenciosamente toda arma já autorada.
+
+        /// <summary>
+        /// Projétil que viaja: arco, funda, lança. Precisa de velocidade de projétil e de o
+        /// golpe resolver no impacto, não no gesto.
+        /// </summary>
+        Projetil,
+
+        /// <summary>
+        /// Arma de fogo. Além do projétil, traz <b>munição e recarga</b> — dois recursos que o
+        /// jogo não tem, e é por isso que isto é planejamento e não implementação.
+        /// </summary>
+        Fogo
+    }
+
     public enum Empunhadura
     {
         /// <summary>Ocupa só a mão principal — deixa a secundária livre. Default.</summary>

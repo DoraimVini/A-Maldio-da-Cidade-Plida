@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254c99bc08b9e1f41bd77fea72f06c9f, type: 3}
+  m_Name: Item_Arma_CravoDoSinalAmarelo
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
+  Id: Item_Arma_CravoDoSinalAmarelo
+  Nome: Cravo do Sinal Amarelo
+  Icone: {fileID: 21300000, guid: 67a5d441c919723459f878f377dda1a8, type: 3}
+  Descricao: 
+  Tipo: 0
+  SlotEquipamento: 1
+  EmpilhamentoMaximo: 1
+  ArmaFisica: 1
+  Base: {fileID: 11400000, guid: eca85101f5c519f47888375f14ecae5e, type: 2}
+  Empunhadura: 0
+  Funcao: 0
+  PotenciaDaMaoSecundaria: 0
+  ReducaoAoBloquear: 0.5
+  Modificadores: []

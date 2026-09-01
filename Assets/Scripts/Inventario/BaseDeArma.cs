@@ -47,6 +47,18 @@ namespace FavelaAmarela.Inventario
         [Min(0.02f)]
         public float JanelaAtiva = 0.1f;
 
+        [Header("Como o golpe alcança")]
+        [Tooltip("Corpo-a-corpo é o único implementado. Projétil e Fogo existem para o jogo " +
+                 "poder ganhá-los sem reescrever a resolução do golpe — a matemática de dano é " +
+                 "a mesma para uma lâmina e para um cano.")]
+        public TipoDeEntrega Entrega = TipoDeEntrega.CorpoACorpo;
+
+        /// <summary>
+        /// Se esta arma já tem caminho implementado. <b>Falso significa autorada mas
+        /// injogável</b> — e quem a equipar tem de saber disso ao criar o asset, não em Play.
+        /// </summary>
+        public bool EntregaImplementada => Entrega == TipoDeEntrega.CorpoACorpo;
+
         [Header("Regras de porte")]
         [Tooltip("Quantas mãos a arma toma. DuasMaos bloqueia a Mão Secundária.")]
         public Empunhadura Empunhadura = Empunhadura.UmaMao;

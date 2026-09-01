@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fb99ecbc5fbc9d4caf24dafb94e31cc, type: 3}
+  m_Name: Habilidade_EstileteDeYhtill
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.HabilidadeDef
+  NomeDaArma: Estilete de Yhtill
+  NomeDaHabilidade: Ferida de Aklo
+  DuracaoBasico: 0.25
+  CooldownBasico: 0.3
+  EfeitosDoBasico:
+  - Tipo: 6
+    Valor: 1
+    Duracao: 0
+    Acumulos: 0
+  - Tipo: 4
+    Valor: 4
+    Duracao: 5
+    Acumulos: 1
+  DuracaoHabilidade: 0.3
+  CooldownHabilidade: 5
+  EfeitosDaHabilidade:
+  - Tipo: 6
+    Valor: 0.5
+    Duracao: 0
+    Acumulos: 0
+  - Tipo: 4
+    Valor: 4
+    Duracao: 5
+    Acumulos: 3

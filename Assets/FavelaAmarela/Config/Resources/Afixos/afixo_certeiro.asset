@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b72544fb874cc8438b0fcd3821cc1e5, type: 3}
-  m_Name: afixo_do_peregrino
+  m_Name: afixo_certeiro
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.AfixoDef
-  Id: afixo_do_peregrino
-  Tipo: 1
-  Rotulo: do Peregrino
-  Stat: 12
-  ValorMin: 0.5
-  ValorMax: 1.5
+  Id: afixo_certeiro
+  Tipo: 0
+  Rotulo: Certeiro
+  Stat: 17
+  ValorMin: 0.03
+  ValorMax: 0.08
   EscalaComONivelDoItem: 0
   NivelMinimoDoItem: 1
   Peso: 1
   SlotsPermitidos: 
-  GrupoDeExclusao: regen_vigor
+  GrupoDeExclusao: 

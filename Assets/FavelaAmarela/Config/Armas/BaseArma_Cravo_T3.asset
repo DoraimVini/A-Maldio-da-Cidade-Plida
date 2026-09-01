@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80cb255e30bcd9b4aa4d084503bb20cc, type: 3}
+  m_Name: BaseArma_Cravo_T3
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.BaseDeArma
+  NomeDaFamilia: Cravo
+  Alcance: 1.2
+  Raio: 0.6
+  JanelaAtiva: 0.1
+  Entrega: 0
+  Empunhadura: 0
+  DanoMinBase: 69
+  DanoMaxBase: 103
+  ChanceCriticaBase: 0.08
+  MultiplicadorCritico: 1.7
+  PrecisaoBase: 0.92
+  Habilidade: {fileID: 11400000, guid: b6f2cedd4fbc0714393e226fe757cb6b, type: 2}

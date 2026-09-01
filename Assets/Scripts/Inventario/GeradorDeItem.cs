@@ -77,7 +77,7 @@ namespace FavelaAmarela.Inventario
 
                 gruposUsados.Add(escolhido.Grupo);
                 item.Afixos.Add(new AfixoRolado(escolhido.Id, escolhido.Stat,
-                                                escolhido.Rolar(fonte)));
+                                                escolhido.Rolar(fonte, item.NivelDoItem)));
             }
         }
 

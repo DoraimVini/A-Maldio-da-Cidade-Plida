@@ -93,14 +93,28 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void AsTresArmas_NaoTemAMesmaPegada()
         {
+            // POR FAMÍLIA, e não por arma. Migrado em 2026-09-01, quando a escada de tiers
+            // entrou: as três famílias ganharam T2 e T3, e o TIER NÃO MUDA A GEOMETRIA de
+            // propósito -- alcance, raio e janela são identidade da família, e escalá-los junto
+            // com o dano faria as três convergirem para "a mais forte, com números maiores".
+            //
+            // A regra que este teste protege nunca foi "toda arma tem alcance único"; era
+            // "trocar de FAMÍLIA é sentido". Com nove armas em três famílias, medir por arma
+            // exigiria nove alcances distintos -- ou seja, exigiria justamente o que a decisão
+            // de design proíbe.
             var alcances = ArmasAutoradas().Where(d => d.Base != null)
-                                           .Select(d => d.Base.Alcance)
+                                           .Select(d => d.Base.NomeDaFamilia)
+                                           .Distinct()
+                                           .Select(f => ArmasAutoradas()
+                                               .First(d => d.Base != null &&
+                                                           d.Base.NomeDaFamilia == f)
+                                               .Base.Alcance)
                                            .ToList();
 
-            Assert.GreaterOrEqual(alcances.Count, 3, "Esperava ao menos 3 armas com família.");
+            Assert.GreaterOrEqual(alcances.Count, 3, "Esperava ao menos 3 famílias de arma.");
 
             Assert.AreEqual(alcances.Count, alcances.Distinct().Count(),
-                "Duas ou mais armas têm exatamente o mesmo alcance. Se a geometria não " +
+                "Duas ou mais FAMÍLIAS têm exatamente o mesmo alcance. Se a geometria não " +
                 "diferencia, trocar de arma não é sentido — que era o estado anterior a esta " +
                 "fase, e o motivo dela existir.");
         }

@@ -21,25 +21,28 @@ namespace FavelaAmarela.Inventario
         /// deles produz algo que <b>mente</b>: o jogador lê o número, ocupa o slot e não recebe
         /// nada.
         ///
-        /// <para><c>DefesaAnomalia</c> é o pior caso — o <c>PainelDeFicha</c> <b>exibe</b> a
-        /// linha e o combate não aplica. <c>RCMaxima</c> e <c>Velocidade</c> não têm uma única
-        /// menção em <c>Assets/Scripts</c>; <c>Furtividade</c> é autorada no Anel do Sinal
-        /// Amarelo e nenhum sistema de stealth a lê.</para>
+        /// <para><b>Esta é a FONTE ÚNICA</b>, e passou a ser em 2026-09-01. A versão anterior
+        /// dizia que a verdade morava em <c>PainelDeFicha.AtributoConsomeBonus</c> e que esta era
+        /// "a lista do lado de quem autora" — duas cópias do mesmo fato, com o aviso escrito de
+        /// que elas <i>"divergiriam na primeira vez que alguém implementasse um dos quatro"</i>.
+        /// Foi exatamente o que aconteceu: <c>Furtividade</c> e <c>DefesaAnomalia</c> ganharam
+        /// consumidor em 2026-08-28, só uma lista foi atualizada, e um afixo legítimo
+        /// (<c>afixo_couracado</c>) foi barrado por um guarda lendo a lista velha.</para>
         ///
-        /// <para><b>Mora aqui, e não em três lugares.</b> Ela estava duplicada na validação da
-        /// forja, no guarda do pool de afixos e implicitamente no <c>PainelDeFicha</c> — três
-        /// cópias que divergiriam na primeira vez que alguém implementasse um dos quatro. A
-        /// fonte da verdade sobre o que é consumido continua sendo
-        /// <c>PainelDeFicha.AtributoConsomeBonus</c>, cruzada com o código por
-        /// <c>AtributosConsumidosTests</c>; esta é a lista do lado de quem AUTORA.</para>
+        /// <para>Agora <c>PainelDeFicha</c> <b>delega para cá</b>. A dependência aponta na
+        /// direção certa — dado não pergunta à interface —, e não há segunda cópia para
+        /// envelhecer.</para>
+        ///
+        /// <para><b>Quem sobrou, e por quê:</b> <c>RMMaxima</c> existe no enum e nenhum sistema
+        /// a soma ao teto de Resiliência (que vem da ficha); <c>RCMaxima</c> e
+        /// <c>Velocidade</c> não têm uma única menção em <c>Assets/Scripts</c>.</para>
         /// </summary>
         public static readonly System.Collections.Generic.IReadOnlyList<StatType> SemEfeito =
             new[]
             {
+                StatType.RMMaxima,
                 StatType.RCMaxima,
                 StatType.Velocidade,
-                StatType.Furtividade,
-                StatType.DefesaAnomalia,
             };
 
         /// <summary>Se este atributo não faz nada em jogo.</summary>

@@ -199,31 +199,16 @@ namespace FavelaAmarela.Runtime.UI
         /// Quais <see cref="StatType"/> algum sistema de fato consome hoje. Esta lista é o que
         /// separa "o item deu +5" de "o item <i>diz</i> que deu +5".
         ///
-        /// <para><b>Passaram a ser consumidos em 2026-08-28:</b> <c>Furtividade</c> e
-        /// <c>DefesaAnomalia</c>. Os dois eram decorativos e os dois eram <b>rolados por
-        /// artefatos</b> — o Anel do Sinal Amarelo prometia discrição e a Coroa de Ossos
-        /// prometia proteção anômala, e nenhum dos dois entregava nada. Restam 5 dos 15 sem
-        /// consumidor.</para>
+        /// <para><b>Delega para <c>NomesDeAtributo.SemEfeito</c> desde 2026-09-01.</b> Antes
+        /// este switch era uma segunda cópia da mesma verdade, e ele divergiu: <c>Furtividade</c>
+        /// e <c>DefesaAnomalia</c> ganharam consumidor em 2026-08-28, este switch foi atualizado
+        /// e a outra lista não — e um afixo legítimo acabou barrado por um guarda lendo a lista
+        /// velha.</para>
+        ///
+        /// <para>A dependência aponta na direção certa: a interface pergunta ao dado, e não o
+        /// contrário. Para declarar um atributo consumido, edite <c>NomesDeAtributo</c>.</para>
         /// </summary>
-        private static bool AtributoConsomeBonus(StatType stat) => stat switch
-        {
-            StatType.VitMaxima => true,        // VitalidadeBridge
-            StatType.DefesaFisica => true,     // VitalidadeBridge
-            StatType.TraumaFisico => true,     // MaoFisicaBridge
-            StatType.TraumaAnomalia => true,   // MaoFisicaBridge
-            StatType.VigorMaximo => true,      // GerenciadorDeVigor
-            StatType.RegeneracaoVigor => true, // GerenciadorDeVigor
-            StatType.CustoEsquivaVigor => true,// GerenciadorDeVigor
-            StatType.CustoCorridaVigor => true,// GerenciadorDeVigor
-            StatType.RegenRM => true,          // GerenciadorEfeitosPassivos.Update → Ancorar
-            StatType.DrenoRM => true,          // GerenciadorEfeitosPassivos.Update → SofrerTrauma
-            StatType.Furtividade => true,      // PlayerStealthState.GetCurrentNoiseEmission
-            StatType.DefesaAnomalia => true,   // ResilienciaBridge.SofrerTrauma
-            StatType.ChanceCritica => true,    // ResolucaoDeGolpe, via MaoFisicaBridge
-            StatType.DanoCritico => true,      // ResolucaoDeGolpe
-            StatType.Precisao => true,         // ResolucaoDeGolpe
-            StatType.AumentoDeDanoFisico => true, // ResolucaoDeGolpe
-            _ => false,
-        };
+        private static bool AtributoConsomeBonus(StatType stat) =>
+            !FavelaAmarela.Inventario.NomesDeAtributo.NaoTemEfeito(stat);
     }
 }

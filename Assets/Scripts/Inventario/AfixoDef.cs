@@ -52,6 +52,11 @@ namespace FavelaAmarela.Inventario
         [Tooltip("Maior valor que este afixo pode rolar. Igual ao mínimo = valor fixo.")]
         public float ValorMax = 1f;
 
+        [Tooltip("Se o valor rolado cresce com o NÍVEL DO ITEM, pela mesma lei que escala o " +
+                 "dano branco. Ligue para valores absolutos (dano, vitalidade, defesa); " +
+                 "DESLIGUE para taxas e frações (regeneração por segundo, redução de ruído).")]
+        public bool EscalaComONivelDoItem = true;
+
         [Header("Quando pode cair")]
         [Tooltip("Nível DO ITEM a partir do qual este afixo entra no pool. Note: nível do " +
                  "ITEM, não do jogador — comparar com o nível do jogador faz uma zona inicial " +
@@ -91,14 +96,41 @@ namespace FavelaAmarela.Inventario
         /// <see cref="ValorMax"/> é normalizada aqui: um asset com o mínimo maior que o máximo
         /// é erro de autoria, não motivo para o item sair sem afixo.
         /// </summary>
-        public float Rolar(Core.Loot.IFonteDeAleatoriedade fonte)
+        public float Rolar(Core.Loot.IFonteDeAleatoriedade fonte) => Rolar(fonte, 1);
+
+        /// <summary>
+        /// Rola o valor <b>no nível do item</b>, pela mesma lei que escala o dano branco.
+        ///
+        /// <para><b>O defeito que isto conserta (2026-09-01).</b> O valor era rolado sempre na
+        /// mesma faixa, independente do nível. A <b>base</b> escalava +25% por nível e o
+        /// <b>afixo não</b> — então o <c>afixo_cravado</c> (+2 a 5 de dano) valia de 4% a 11%
+        /// num Alfanje de nível 1, e de <b>1% a 3%</b> num de nível 12. O afixo saía de
+        /// marginal para invisível conforme o jogador subia.</para>
+        ///
+        /// <para>Isso ataca a razão de existir de um ARPG: o jogador pega a quadragésima espada
+        /// porque os <i>afixos</i> dela podem ser melhores. Com afixos planos, todo drop é a
+        /// mesma arma com um erro de arredondamento — que foi exatamente o relato do Vini:
+        /// <i>"todos os drops fracos"</i>.</para>
+        ///
+        /// <para><b>Nem todo afixo escala</b>, e por isso é decisão autorada. Multiplicar uma
+        /// taxa por segundo (regeneração) pelo fator do nível 12 daria regeneração absurda;
+        /// multiplicar uma fração de redução de ruído a estouraria. Ver
+        /// <see cref="EscalaComONivelDoItem"/>.</para>
+        /// </summary>
+        public float Rolar(Core.Loot.IFonteDeAleatoriedade fonte, int nivelDoItem)
         {
             float min = Mathf.Min(ValorMin, ValorMax);
             float max = Mathf.Max(ValorMin, ValorMax);
 
-            if (fonte == null || Mathf.Approximately(min, max)) return min;
+            float bruto = fonte == null || Mathf.Approximately(min, max)
+                ? min
+                : min + (max - min) * Mathf.Clamp01(fonte.ProximoValor());
 
-            return min + (max - min) * Mathf.Clamp01(fonte.ProximoValor());
+            if (!EscalaComONivelDoItem) return bruto;
+
+            // A MESMA lei do dano branco: um afixo que crescesse por outra regra divergiria da
+            // base em silêncio, e a arma de nível alto voltaria a ter afixo decorativo.
+            return bruto * Core.Progression.EscalaDeNivel.FatorDeDano(nivelDoItem);
         }
 
 #if UNITY_EDITOR

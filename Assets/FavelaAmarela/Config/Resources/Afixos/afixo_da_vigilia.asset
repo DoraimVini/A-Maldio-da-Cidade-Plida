@@ -18,6 +18,7 @@ MonoBehaviour:
   Stat: 9
   ValorMin: 0.2
   ValorMax: 0.6
+  EscalaComONivelDoItem: 0
   NivelMinimoDoItem: 2
   Peso: 0.8
   SlotsPermitidos: 

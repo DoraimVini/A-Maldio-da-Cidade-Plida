@@ -87,20 +87,40 @@ namespace FavelaAmarela.Tests.EditMode
                         .ToList();
         }
 
-        /// <summary>Os <c>StatType.X =&gt; true</c> do switch do painel.</summary>
+        private const string Fonte = "Assets/Scripts/Inventario/NomesDeAtributo.cs";
+
+        /// <summary>
+        /// Os <c>StatType</c> declarados como <b>consumidos</b> — ou seja, todos menos os que
+        /// <c>NomesDeAtributo.SemEfeito</c> lista.
+        ///
+        /// <para><b>Migrado em 2026-09-01.</b> Antes lia os <c>StatType.X =&gt; true</c> do
+        /// switch do <c>PainelDeFicha</c>. Aquele switch era uma <b>segunda cópia</b> da mesma
+        /// verdade, e divergiu exatamente como o comentário de <c>NomesDeAtributo</c> previa:
+        /// <c>Furtividade</c> e <c>DefesaAnomalia</c> ganharam consumidor, só uma lista foi
+        /// atualizada, e um afixo legítimo foi barrado por um guarda lendo a lista velha.</para>
+        ///
+        /// <para>Agora o painel <b>delega</b>, e este guarda lê a fonte única. A dependência
+        /// aponta na direção certa: dado não pergunta à interface.</para>
+        /// </summary>
         private static HashSet<string> MarcadosComoConsumidos()
         {
-            string fonte = File.ReadAllText(Painel);
-            var corpo = Regex.Match(fonte, @"AtributoConsomeBonus.*?\{(.*?)\};",
-                                    RegexOptions.Singleline);
-            Assert.IsTrue(corpo.Success,
-                "Não achei AtributoConsomeBonus em " + Painel + " — se foi renomeado, atualize " +
-                "este guarda junto.");
+            var todos = StatTypesDeclarados().ToHashSet();
 
-            return Regex.Matches(corpo.Groups[1].Value, @"StatType\.(\w+)\s*=>\s*true")
-                        .Cast<Match>()
-                        .Select(m => m.Groups[1].Value)
-                        .ToHashSet();
+            string fonte = File.ReadAllText(Fonte);
+            var corpo = Regex.Match(fonte, @"SemEfeito\s*=\s*new\[\]\s*\{(.*?)\};",
+                                    RegexOptions.Singleline);
+
+            Assert.IsTrue(corpo.Success,
+                "Não achei a lista SemEfeito em " + Fonte + " — se foi renomeada, atualize este " +
+                "guarda junto.");
+
+            var semEfeito = Regex.Matches(corpo.Groups[1].Value, @"StatType\.(\w+)")
+                                 .Cast<Match>()
+                                 .Select(m => m.Groups[1].Value)
+                                 .ToHashSet();
+
+            todos.ExceptWith(semEfeito);
+            return todos;
         }
 
         /// <summary>
