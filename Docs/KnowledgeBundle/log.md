@@ -6,6 +6,90 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-01 (tarde) — Espólio dos chefes, Baú de Yhtill, e os pisos placeholder
+
+Três pedidos do Vini, e um estrago meu no meio deles que vale mais que os três.
+Suíte: 974 → **983 testes**, 960 passando, 0 falhas.
+
+### O Rei em Amarelo largava ZERO
+
+Era o **único confronto do Vertical Slice** que não entregava equipamento nenhum. Mesma causa do
+Abdul em 28/08: ele não é `EnemyBase` nem `IDanificavel` — não tem barra de vida, por design —,
+então ficava de fora do espólio **por construção**.
+
+`ReiEmAmareloAI` passou a implementar `IFonteDeEspolio`, disparando `OnAbatido` no selamento. Sim,
+"abatido" para quem é *selado*: a interface descreve o que o `DropAoAbater` precisa saber, e selar
+o Rei **é** derrotá-lo aqui.
+
+`Drop_ReiEmAmarelo` entrega **o degrau T3 inteiro**, garantido, nível de item 6. Garantido e não
+sorteado porque o rito acontece **uma vez** e a cena acaba: **sorteio só é justo quando se
+repete**, porque só aí o azar tem como ser corrigido jogando.
+
+Isso **esvaziou** `ArmaAlcancavelTests.SemFonteAinda`, onde as três T3 estavam declaradas como
+inalcançáveis. A saída foi a que a própria nota previa: *"ou uma recompensa do selamento"*.
+
+**Pendência honesta, escrita no código:** T3 na última luta é espólio sem o que matar depois. A
+casa real dessas armas é o Templo do Povo Serpente. Enquanto ele não existir, isto é melhor que
+três armas autoradas que **nada** no jogo produz.
+
+O guarda `TodoAtorQueLargaEspolio_ConcedeExposicao` pegou na mesma rodada: quem recompensa com item
+tem de recompensar com nível. O Rei concede **400**, o dobro do Byakhee.
+
+### O Baú de Yhtill
+
+"A Canção Incompleta" entregava só o **Patuá das Luas Gêmeas** — relíquia de rito cobrada lá no
+Castelo. Para quem está jogando a Fase 1, a maior quest do Santuário devolvia um item que não muda
+nada no minuto seguinte. A recompensa existia e não era **sentida**.
+
+`BauDeRecompensa` é `IInteragivel` + `IFonteDeEspolio` e **não materializa nada**: o `DropAoAbater`
+no mesmo objeto faz o que já sabe fazer. É literalmente para isso que a interface foi criada. O
+portão é uma **chave de save**, não uma referência a quest — o baú não conhece a Cassilda.
+
+**O broquel é garantido, e essa é a decisão de design.** A quest é opcional e vem *antes* do
+Byakhee, que bate 26 contra a Defesa 6 do Damião: cinco golpes até o Colapso. A mitigação é
+subtrativa, então cada ponto de Defesa muda essa conta. **Quem explora entra no chefe mais
+defendido** — exploração pagando em sobrevivência, que é a promessa do pivô.
+
+### Os pisos: a resposta é literal
+
+O Vini perguntou por que o chão do Santuário e da arena do Byakhee são diferentes dos outros.
+Medido: `santuario_piso_placeholder.png` e `arena_piso_placeholder.png` têm **duas cores** — um
+losango chapado mais a transparência. As areias do Deserto têm **5 variantes** com rampa de 5 tons
+e detalhes. **A grade é idêntica nas cinco cenas** (célula 1 × 0,5, isométrica). O que muda é que um
+lado tem arte e o outro tem um losango pintado de bege.
+
+6 tiles novos, gerados no molde **medido** do `sand_01` (32×16, contorno de 1px, rampa de 5
+bandas), PPU 32 / Point / sem compressão. 9.104 células trocadas, variação por **hash da célula**
+para a segunda execução dar o mesmo chão.
+
+### E o estrago, que importa mais que os três
+
+A primeira versão criava os `Tile` e repintava na **mesma** execução em batch mode, com `SetTile`
+singular. Cada chamada gravou **NULL**: Santuário 900 → 116 células, Portões 4.624 → 528, Castelo
+5.932 → 1.708. E a ferramenta relatou *"784 células trocadas"* — verdade sobre as chamadas, mentira
+sobre o resultado. **Corolário 4, e eu tinha escrito o comentário sobre ele no arquivo ao lado na
+mesma sessão.**
+
+Revertido por `git checkout` e refeito com três mudanças:
+
+1. Criação de tiles em **execução separada** (passo 1 / passo 2).
+2. **Guarda que conta células antes e depois e recusa salvar se cair.**
+3. **`SetTiles` em lote**, e não `SetTile`.
+
+O (3) é o achado. Medido: neste tilemap, em batch mode, `SetTile` grava NULL **inclusive numa
+célula vazia** e **inclusive com o `sand_01`**, que funciona há meses. `SetTiles` grava certo. A
+guarda do (2) pegou o estrago sozinha na execução seguinte — que é o ponto de existir.
+
+De carona, o cache da Library reverteu `m_MaxSize` 44 → 60 no Santuário e tocou o
+`Playtest_RuinasPalidas`, **que nenhuma ferramenta abriu**. Os dois revertidos, e a correção de
+disco feita **por último**, depois de toda ferramenta que abre cena — a ordem que a armadilha exige.
+
+### Achado de passagem
+
+O **Cortesão Pálido** existe e está no Castelo (2 instâncias), como `MonoBehaviour` solto e não
+prefab — por isso não apareceu no inventário de inimigos. A cena carregava um `vida: 100` morto
+para eles: o campo foi deletado da classe em 27/08 e o YAML nunca foi reescrito.
+
 ## 2026-09-01 (noite) — Escada de itens, mapa dobrado, e o Templo sob a tempestade
 
 Sessão longa, com o Vini dormindo depois de *"faça todo o projeto"*. Branch `develop_temple`.
