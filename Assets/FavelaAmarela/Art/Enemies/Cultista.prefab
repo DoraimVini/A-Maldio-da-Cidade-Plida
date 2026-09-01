@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 4727924443773620933}
   - component: {fileID: 1537815508846015432}
   - component: {fileID: 574957450421472710}
+  - component: {fileID: 5890481011034893996}
   m_Layer: 6
   m_Name: Cultista
   m_TagString: Untagged
@@ -383,6 +384,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 0.15
+--- !u!114 &5890481011034893996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14266fe95b07c2346be78a016a1e9010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho
+  intervaloDeRecalculo: 0.35
+  toleranciaDoAlvo: 1.5
+  raioDeChegada: 0.25
+  desenharCaminho: 0
 --- !u!1 &1450925050463748554
 GameObject:
   m_ObjectHideFlags: 0

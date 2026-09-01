@@ -510,6 +510,23 @@ namespace FavelaAmarela.Player
         /// Bônus agregado de <c>StatType.Furtividade</c> do equipamento. Mesmo padrão de
         /// <c>MaoFisicaBridge.BonusPassivo</c>: zero quando o gerenciador ainda não existe.
         /// </summary>
+        /// <summary>
+        /// Raio de ruído que o Damião emite <b>neste instante</b>, já com tempestade e
+        /// Furtividade aplicadas. Zero quer dizer parado.
+        ///
+        /// <para>Existe para o console de diagnóstico: quando um inimigo não persegue, a
+        /// primeira pergunta é se há som para ouvir — e adivinhar isso custou uma sessão
+        /// inteira de análise estática.</para>
+        /// </summary>
+        public float RuidoAtual => stealthState == null ? 0f
+            : stealthState.GetCurrentNoiseEmission(
+                isMoving,
+                _environment != null ? _environment.StormIntensity : 0f,
+                FurtividadeEquipada);
+
+        /// <summary>Se o serviço de som e o ambiente foram injetados. Falso = ninguém ouve nada.</summary>
+        public bool EmissaoDeSomLigada => _soundBroadcaster != null && _environment != null;
+
         private static float FurtividadeEquipada =>
             GerenciadorEfeitosPassivos.Instance
                 ?.GetBonus(FavelaAmarela.Inventario.StatType.Furtividade) ?? 0f;

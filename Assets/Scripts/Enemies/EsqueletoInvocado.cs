@@ -23,6 +23,15 @@ namespace FavelaAmarela.Runtime.Enemies
     [AddComponentMenu("Favela Amarela/Enemies/Esqueleto Invocado")]
     public sealed class EsqueletoInvocado : MonoBehaviour, IDanificavel
     {
+        /// <summary>
+        /// Contorno de obstáculos, quando este objeto tem um <c>SeguidorDeCaminho</c>.
+        ///
+        /// <para><b>Opcional de propósito (2026-09-01):</b> sem ele o movimento continua sendo o
+        /// de sempre, em linha reta. Um prefab esquecido degrada para o comportamento antigo,
+        /// não para unidade parada.</para>
+        /// </summary>
+        private FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho _seguidorDeCaminho;
+
         [Header("Atributos")]
         [Tooltip("Vitalidade do esqueleto — frágil de propósito.")]
         [SerializeField] private float vitalidadeMax = 30f;
@@ -64,6 +73,8 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            _seguidorDeCaminho = GetComponent<FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho>();
+
             // Área atingível derivada do sprite — invocado em runtime: sem isto nasceria sem área atingível.
             // A garantia vive aqui, no código, e não numa lista de prefabs: listas
             // escritas à mão são o modo de falha mais repetido deste projeto.
@@ -114,7 +125,11 @@ namespace FavelaAmarela.Runtime.Enemies
             }
 
             _tempoDesdeUltimoGolpe = 0f;
-            _rb.linearVelocity = _perseguidor.CalcularVelocidade(transform.position, _alvo.position);
+            Vector3 passo = _seguidorDeCaminho != null
+                ? _seguidorDeCaminho.ProximoPontoPara(_alvo.position)
+                : _alvo.position;
+
+            _rb.linearVelocity = _perseguidor.CalcularVelocidade(transform.position, passo);
         }
 
         private void TentarGolpear(float dt)

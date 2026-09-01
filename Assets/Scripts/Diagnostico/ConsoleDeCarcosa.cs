@@ -83,7 +83,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
 
         private int _abaAtual;
         private static readonly string[] Abas =
-            { "Estado", "Arsenal", "Progressão", "Ir para", "Desempenho" };
+            { "Estado", "Arsenal", "Progressão", "Ir para", "Desempenho", "IA" };
 
         private string _nivelDesejado = "3";
         private string _filtroDeItem = "";
@@ -150,7 +150,8 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 case 1: DesenharArsenal(); break;
                 case 2: DesenharProgressao(); break;
                 case 3: DesenharDestinos(); break;
-                default: DesenharDesempenho(); break;
+                case 4: DesenharDesempenho(); break;
+                default: DesenharIA(); break;
             }
 
             GUILayout.EndScrollView();
@@ -499,6 +500,110 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 return;
             }
         }
+
+        // ── Aba: IA ───────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Mostra <b>onde a cadeia de percepção quebra</b>, elo por elo.
+        ///
+        /// <para><b>Por que existe (2026-08-31).</b> O Vini relatou que os Cultistas não
+        /// perseguem nem batem. Uma sessão inteira de análise estática conferiu cada elo — o
+        /// Damião emite 5,5 de ruído andando, o Cultista ouve até 10, a suspeita sobe 0,4/s e
+        /// caça em 0,7, o alcance de golpe é 1,2, e o colisor do Damião está na layer que o
+        /// <c>EnemyCombat</c> procura. <b>Tudo confere no papel.</b></para>
+        ///
+        /// <para>Quando tudo confere e nada funciona, o que falta não é mais leitura: é ver
+        /// rodando. Este painel responde em dez segundos o que a leitura não respondeu.</para>
+        ///
+        /// <para><b>Lê da esquerda para a direita:</b> se "Emite som" está apagado, o problema é
+        /// no Damião e nenhum inimigo vai reagir. Se está aceso e "fonte" está apagada num
+        /// inimigo, aquele inimigo é surdo. Se a fonte está ligada e a suspeita não sobe ao
+        /// andar perto, é distância ou abafamento. Se a suspeita chega a 1,00 e o estado não
+        /// muda, o defeito é na máquina de estados.</para>
+        /// </summary>
+        private void DesenharIA()
+        {
+            // Busca global: proibida em hot path, legítima aqui -- este método só roda com o
+            // console aberto, e o console congela o jogo.
+            var jogador = GameObject.FindGameObjectWithTag("Player");
+            var movimento = jogador != null
+                ? jogador.GetComponent<FavelaAmarela.Player.PlayerMovement>()
+                : null;
+
+            GUILayout.Label("O QUE O DAMIÃO EMITE", EditorEstiloForte);
+
+            if (movimento == null)
+            {
+                GUILayout.Label("   PlayerMovement não encontrado nesta cena.");
+            }
+            else
+            {
+                GUILayout.Label("   Emissão ligada: " +
+                                (movimento.EmissaoDeSomLigada
+                                    ? "sim"
+                                    : "NÃO  <<< sem serviço de som ou sem ambiente: " +
+                                      "NINGUÉM ouve nada, em cena nenhuma"));
+
+                GUILayout.Label($"   Raio de ruído agora: {movimento.RuidoAtual:0.00}" +
+                                (movimento.RuidoAtual <= 0f ? "   (parado)" : ""));
+            }
+
+            GUILayout.Space(10f);
+            GUILayout.Label("INIMIGOS MAIS PRÓXIMOS", EditorEstiloForte);
+
+            var maquinas = Object.FindObjectsByType<
+                    FavelaAmarela.Runtime.Enemies.EnemyStateMachine>(
+                    FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+
+            if (maquinas.Length == 0)
+            {
+                GUILayout.Label("   Nenhum inimigo com EnemyStateMachine nesta cena.");
+                return;
+            }
+
+            Vector3 origem = jogador != null ? jogador.transform.position : Vector3.zero;
+
+            foreach (var m in maquinas
+                         .OrderBy(m => Vector3.Distance(origem, m.transform.position))
+                         .Take(6))
+            {
+                float dist = Vector3.Distance(origem, m.transform.position);
+
+                var percepcao = m.GetComponent<
+                    FavelaAmarela.Runtime.Enemies.EnemyPerception>();
+                var combate = m.GetComponent<
+                    FavelaAmarela.Runtime.Enemies.EnemyCombat>();
+
+                string fonte = percepcao == null ? "sem EnemyPerception"
+                    : percepcao.TemFonteDeSom ? "fonte ok" : "SURDO (sem fonte de som)";
+
+                string ouvindo = percepcao != null && percepcao.EstaOuvindo ? " ouvindo" : "";
+
+                GUILayout.Label($"   {m.name}  —  {dist:0.0} un");
+
+                GUILayout.Label($"      estado: {m.CurrentState}   " +
+                                (percepcao != null
+                                    ? $"suspeita: {percepcao.Suspeita:0.00}"
+                                    : "suspeita: —") +
+                                $"   {fonte}{ouvindo}",
+                                EditorEstiloMiudo);
+
+                if (combate != null)
+                    GUILayout.Label("      alvo ao alcance: " +
+                                    (combate.AlvoEstaAoAlcance() ? "SIM" : "não") +
+                                    (combate.EstaPronto ? "   (golpe pronto)" : "   (recarregando)"),
+                                    EditorEstiloMiudo);
+            }
+
+            GUILayout.Space(8f);
+            GUILayout.Label("Ande perto de um deles com o console FECHADO e reabra: a suspeita " +
+                            "sobe 0,4 por segundo e vira caça em 0,70.");
+        }
+
+        private static GUIStyle _miudo;
+
+        private static GUIStyle EditorEstiloMiudo =>
+            _miudo ??= new GUIStyle(GUI.skin.label) { fontSize = 11 };
 
         // ── Aba: Desempenho ───────────────────────────────────────────────────
 

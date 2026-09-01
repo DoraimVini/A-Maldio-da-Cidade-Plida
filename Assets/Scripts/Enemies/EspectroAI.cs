@@ -14,6 +14,15 @@ namespace FavelaAmarela.Runtime.Enemies
     [RequireComponent(typeof(SpriteRenderer), typeof(Rigidbody2D))]
     public sealed class EspectroAI : MonoBehaviour
     {
+        /// <summary>
+        /// Contorno de obstáculos, quando este objeto tem um <c>SeguidorDeCaminho</c>.
+        ///
+        /// <para><b>Opcional de propósito (2026-09-01):</b> sem ele o movimento continua sendo o
+        /// de sempre, em linha reta. Um prefab esquecido degrada para o comportamento antigo,
+        /// não para unidade parada.</para>
+        /// </summary>
+        private FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho _seguidorDeCaminho;
+
         [Header("Configurações")]
         [SerializeField] private float velocidadeCerco = 2.0f;
         [SerializeField] private float distanciaParada = 0.15f;
@@ -30,6 +39,8 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            _seguidorDeCaminho = GetComponent<FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho>();
+
             _spriteRenderer = GetComponent<SpriteRenderer>();
             _rb = GetComponent<Rigidbody2D>();
             _rb.gravityScale = 0f;
@@ -70,7 +81,9 @@ namespace FavelaAmarela.Runtime.Enemies
                 return;
             }
 
-            Vector2 direcao = (_alvoCerco - posicaoAtual).normalized;
+            Vector2 direcao = _seguidorDeCaminho != null
+                ? _seguidorDeCaminho.DirecaoPara(_alvoCerco)
+                : (_alvoCerco - posicaoAtual).normalized;
             _rb.linearVelocity = direcao * velocidadeCerco;
         }
 

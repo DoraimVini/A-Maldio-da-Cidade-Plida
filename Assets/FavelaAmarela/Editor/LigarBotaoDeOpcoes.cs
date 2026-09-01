@@ -105,6 +105,15 @@ namespace FavelaAmarela.EditorTools
                 clone.name = NomeDoBotao;
                 clone.transform.SetSiblingIndex(modelo.transform.GetSiblingIndex() + 1);
 
+                // Clonar copia as ÂNCORAS junto. Onde não há layout automático, isso põe o
+                // clone exatamente em cima do modelo -- e o irmão posterior desenha por cima,
+                // então o botão clonado ESCONDE o original. Foi o que aconteceu no menu
+                // principal: o "Sair" continuou lá, ativo e clicável, invisível debaixo do
+                // "Opções", e o jogo pareceu não ter como fechar.
+                if (modelo.GetComponentInParent<LayoutGroup>() == null)
+                    DescerUmDegrau(clone.GetComponent<RectTransform>(),
+                                   modelo.GetComponent<RectTransform>(), raiz);
+
                 // Herdou os listeners do modelo junto: um botão "Opções" que também fecha o
                 // jogo seria pior que nenhum botão.
                 var botao = clone.GetComponent<Button>();
@@ -120,6 +129,36 @@ namespace FavelaAmarela.EditorTools
             EditorUtility.SetDirty(menu);
 
             return $"{onde}: '{NomeDoBotao}' criado e ligado";
+        }
+
+        /// <summary>
+        /// Desloca o clone um "degrau" para baixo, medindo o degrau nos <b>irmãos que já
+        /// existem</b> em vez de chutar um número.
+        ///
+        /// <para>O espaçamento de um menu é decisão de layout de quem o desenhou; copiá-lo dos
+        /// próprios botões faz o clone entrar no ritmo da tela em vez de impor o meu.</para>
+        /// </summary>
+        private static void DescerUmDegrau(RectTransform clone, RectTransform modelo,
+                                           GameObject raiz)
+        {
+            var irmaos = raiz.GetComponentsInChildren<Button>(includeInactive: true)
+                .Select(b => b.GetComponent<RectTransform>())
+                .Where(r => r != null && r != clone && r.parent == modelo.parent)
+                .Select(r => r.anchorMin.y)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToArray();
+
+            // Menos de dois irmãos: não há degrau a medir. Meio décimo da própria altura é um
+            // fallback conservador -- separa sem inventar um ritmo.
+            float degrau = irmaos.Length >= 2
+                ? irmaos[0] - irmaos[1]
+                : (modelo.anchorMax.y - modelo.anchorMin.y) * 1.3f;
+
+            if (degrau <= 0f) return;
+
+            clone.anchorMin = new Vector2(modelo.anchorMin.x, modelo.anchorMin.y - degrau);
+            clone.anchorMax = new Vector2(modelo.anchorMax.x, modelo.anchorMax.y - degrau);
         }
 
         /// <summary>

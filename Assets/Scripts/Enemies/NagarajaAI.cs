@@ -13,6 +13,15 @@ namespace FavelaAmarela.Runtime.Enemies
     [AddComponentMenu("Favela Amarela/Enemies/Nagaraja (Sacerdote)")]
     public class NagarajaAI : MonoBehaviour, IInteragivel
     {
+        /// <summary>
+        /// Contorno de obstáculos, quando este objeto tem um <c>SeguidorDeCaminho</c>.
+        ///
+        /// <para><b>Opcional de propósito (2026-09-01):</b> sem ele o movimento continua sendo o
+        /// de sempre, em linha reta. Um prefab esquecido degrada para o comportamento antigo,
+        /// não para unidade parada.</para>
+        /// </summary>
+        private FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho _seguidorDeCaminho;
+
         [Header("Diálogo")]
         [SerializeField] private TutorialHintUI caixaDeTexto;
         
@@ -65,6 +74,8 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            _seguidorDeCaminho = GetComponent<FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho>();
+
             // O corpo carrega a ficha, que e a fonte da verdade do dano (ver acima).
             _corpo = GetComponent<EnemyBase>();
 
@@ -166,7 +177,9 @@ namespace FavelaAmarela.Runtime.Enemies
             }
             else
             {
-                Vector2 direcao = (_jogador.position - transform.position).normalized;
+                Vector2 direcao = _seguidorDeCaminho != null
+                    ? _seguidorDeCaminho.DirecaoPara(_jogador.position)
+                    : (Vector2)(_jogador.position - transform.position).normalized;
                 _rb.linearVelocity = direcao * _velocidadeCaca;
                 GetComponent<SpriteRenderer>().flipX = direcao.x < 0;
             }

@@ -31,6 +31,17 @@ namespace FavelaAmarela.Runtime.Enemies
         public event System.Action OnPerdeuAlvo;
 
         public float Suspeita => _suspeita;
+
+        /// <summary>
+        /// Se este inimigo recebeu o serviço de som. <b>Falso significa surdo</b> — ele ignora
+        /// o jogador até ser golpeado, e em playtest isso é indistinguível de "a IA está
+        /// quebrada". Exposto para o console de diagnóstico poder dizer QUAL elo falhou em vez
+        /// de deixar a investigação adivinhar.
+        /// </summary>
+        public bool TemFonteDeSom => _soundBroadcaster != null;
+
+        /// <summary>Se ouviu algo dentro da janela de memória do som, agora.</summary>
+        public bool EstaOuvindo => _tempoDesdeUltimoSom <= MemoriaDoSom;
         public Vector2? UltimaOrigemConhecida => _ultimaOrigemConhecida;
 
         public void Bind(SoundBroadcastService broadcaster)

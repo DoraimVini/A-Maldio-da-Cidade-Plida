@@ -19,6 +19,15 @@ namespace FavelaAmarela.Runtime.Enemies
     [AddComponentMenu("Favela Amarela/Enemies/Coisa Do Cemiterio AI")]
     public sealed class CoisaDoCemiterioAI : MonoBehaviour
     {
+        /// <summary>
+        /// Contorno de obstáculos, quando este objeto tem um <c>SeguidorDeCaminho</c>.
+        ///
+        /// <para><b>Opcional de propósito (2026-09-01):</b> sem ele o movimento continua sendo o
+        /// de sempre, em linha reta. Um prefab esquecido degrada para o comportamento antigo,
+        /// não para unidade parada.</para>
+        /// </summary>
+        private FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho _seguidorDeCaminho;
+
         private CoisaDoCemiterioFSM _fsm;
         private SpriteRenderer _spriteRenderer;
         private Rigidbody2D _rb;
@@ -35,6 +44,8 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            _seguidorDeCaminho = GetComponent<FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho>();
+
             _spriteRenderer = GetComponent<SpriteRenderer>();
             _rb = GetComponent<Rigidbody2D>();
             _rb.gravityScale = 0f;
@@ -65,7 +76,10 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void MoverEmDirecaoA(Vector2 alvo, float velocidade)
         {
-            Vector2 direcao = (alvo - (Vector2)transform.position).normalized;
+            // Caça por faro, mas o faro não atravessa parede: com seguidor, contorna.
+            Vector2 direcao = _seguidorDeCaminho != null
+                ? _seguidorDeCaminho.DirecaoPara(alvo)
+                : (alvo - (Vector2)transform.position).normalized;
             _rb.linearVelocity = direcao * velocidade;
         }
 

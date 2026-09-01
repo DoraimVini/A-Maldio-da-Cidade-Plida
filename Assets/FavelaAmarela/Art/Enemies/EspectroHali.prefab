@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 5903542959564898080}
   - component: {fileID: 1533339138125788716}
   - component: {fileID: 2293051127369639815}
+  - component: {fileID: 8507679089527238554}
   m_Layer: 6
   m_Name: EspectroHali
   m_TagString: Untagged
@@ -236,3 +237,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 0.9
+--- !u!114 &8507679089527238554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7890151004144615060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14266fe95b07c2346be78a016a1e9010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho
+  intervaloDeRecalculo: 0.35
+  toleranciaDoAlvo: 1.5
+  raioDeChegada: 0.25
+  desenharCaminho: 0

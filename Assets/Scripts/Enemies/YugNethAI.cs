@@ -43,6 +43,15 @@ namespace FavelaAmarela.Runtime.Enemies
     [AddComponentMenu("Favela Amarela/Enemies/Yug-Neth")]
     public sealed class YugNethAI : MonoBehaviour
     {
+        /// <summary>
+        /// Contorno de obstáculos, quando este objeto tem um <c>SeguidorDeCaminho</c>.
+        ///
+        /// <para><b>Opcional de propósito (2026-09-01):</b> sem ele o movimento continua sendo o
+        /// de sempre, em linha reta. Um prefab esquecido degrada para o comportamento antigo,
+        /// não para unidade parada.</para>
+        /// </summary>
+        private FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho _seguidorDeCaminho;
+
         [Header("Cativeiro (antes de ser libertado)")]
         [Tooltip("Meia-distância do vaivém em torno da posição inicial (anda para um lado, depois para o outro).")]
         [SerializeField] private float raioDeCativeiro = 1.2f;
@@ -99,6 +108,8 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Awake()
         {
+            _seguidorDeCaminho = GetComponent<FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho>();
+
             _rb = GetComponent<Rigidbody2D>();
             _rb.gravityScale = 0f;
             _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -234,7 +245,13 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_liberado)
             {
                 if (_alvo == null) return;
-                _rb.linearVelocity = _seguidor.CalcularVelocidade(transform.position, _alvo.position);
+                // O companheiro é quem mais custa perder atrás de um muro: ele some, o
+                // jogador não entende por quê, e a barra dele fica lá acusando presença.
+                Vector3 passo = _seguidorDeCaminho != null
+                    ? _seguidorDeCaminho.ProximoPontoPara(_alvo.position)
+                    : _alvo.position;
+
+                _rb.linearVelocity = _seguidor.CalcularVelocidade(transform.position, passo);
                 return;
             }
 

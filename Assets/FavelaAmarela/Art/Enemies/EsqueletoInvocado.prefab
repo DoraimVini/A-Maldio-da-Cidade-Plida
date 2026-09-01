@@ -107,6 +107,7 @@ GameObject:
   - component: {fileID: 343047722084577245}
   - component: {fileID: 3921314489000484428}
   - component: {fileID: 7663135862166218245}
+  - component: {fileID: 5909442056959582888}
   m_Layer: 6
   m_Name: EsqueletoInvocado
   m_TagString: Untagged
@@ -310,3 +311,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 0.1
+--- !u!114 &5909442056959582888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8380616875347976551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14266fe95b07c2346be78a016a1e9010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho
+  intervaloDeRecalculo: 0.35
+  toleranciaDoAlvo: 1.5
+  raioDeChegada: 0.25
+  desenharCaminho: 0
