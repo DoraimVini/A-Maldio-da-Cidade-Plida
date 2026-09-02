@@ -186,6 +186,51 @@ namespace FavelaAmarela.Inventario
             return true;
         }
 
+        /// <summary>
+        /// Move (ou troca) dois slots <b>da mochila</b>.
+        ///
+        /// <para><b>Por que precisou existir (2026-09-02).</b> O <c>BaseInventory.Swap</c> já
+        /// estava escrito, com um comentário dizendo que servia para "o arrastar da UI" — e
+        /// tinha <b>zero chamadores</b> em todo o projeto. O jogador conseguia equipar (teclas
+        /// 1–8 ou baú) e <b>nunca conseguia mover, reordenar ou descartar nada</b>.</para>
+        ///
+        /// <para>Este método é a porta: a UI fala com o <c>InventoryManager</c>, nunca com o
+        /// <c>BaseInventory</c> direto — é ele que sabe avisar quem escuta.</para>
+        /// </summary>
+        /// <returns>Se houve movimento.</returns>
+        public bool Mover(int origem, int destino)
+        {
+            if (origem == destino) return false;
+            if (origem < 0 || origem >= Main.Capacidade) return false;
+            if (destino < 0 || destino >= Main.Capacidade) return false;
+
+            // Mover o nada para lugar nenhum não é movimento, e devolver `true` faria a UI
+            // desenhar de novo à toa.
+            if (Main.GetSlot(origem) == null && Main.GetSlot(destino) == null) return false;
+
+            Main.Swap(origem, destino);
+            return true;
+        }
+
+        /// <summary>
+        /// Descarta o conteúdo de um slot da mochila.
+        ///
+        /// <para><b>Não larga no chão</b>, e isso é decisão: um item descartado que reaparece
+        /// aos pés do jogador convida a usar o descarte como depósito. Aqui ele some — o que
+        /// pede confirmação na UI antes de chamar.</para>
+        /// </summary>
+        /// <returns>Se havia o que descartar.</returns>
+        public bool Descartar(int indiceMochila)
+        {
+            if (indiceMochila < 0 || indiceMochila >= Main.Capacidade) return false;
+
+            var item = Main.GetSlot(indiceMochila);
+            if (item == null || item.Def == null) return false;
+
+            Main.Remove(indiceMochila, item.Quantidade);
+            return true;
+        }
+
         // ------------------ Verificação de Itens (Relíquias e Quest) ------------------
         /// <summary>
         /// Verifica se um item (como uma Relíquia passiva ou Chave) existe na Mochila.
