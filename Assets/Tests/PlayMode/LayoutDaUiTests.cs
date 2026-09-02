@@ -503,6 +503,122 @@ namespace FavelaAmarela.Tests.PlayMode
                 "borda mais fina para caixas baixas.");
         }
 
+        /// <summary>
+        /// Nenhum texto passa por baixo da <b>moldura</b> do painel que o contem.
+        ///
+        /// <para><b>O que motivou (2026-09-02).</b> O Vini: "as caixas de interacao estao
+        /// erradas". A cor ja tinha sido consertada; o que sobrava era geometria. Medido:</para>
+        ///
+        /// <code>
+        /// CaixaDeDialogo     caixa 1612x367   borda 71,9/lado   texto 1564x331  invade 54
+        /// PromptDeInteracao  caixa  845x76    borda 23,0/lado   texto  797x60   invade 15
+        /// </code>
+        ///
+        /// <para><b>Por que o teste irmao nao pegava.</b> O
+        /// <see cref="NenhumNoveFatiasEstouraAPropriaCaixa"/> pergunta se a moldura cabe na
+        /// caixa. Cabia nas duas. A pergunta que faltava e a seguinte: sobra centro <b>suficiente
+        /// para o texto</b>? E o mesmo padrao que me mordeu a sessao inteira -- a guarda existia,
+        /// correta, e nao generalizava para a pergunta vizinha.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator NenhumTextoPassaPorBaixoDaPropriaMoldura()
+        {
+            yield return MontarOHud();
+
+            var canvas = _hud.GetComponentInChildren<Canvas>(true);
+            Assert.IsNotNull(canvas, "O HUD nao tem Canvas - sem ele nao ha referencePPU.");
+
+            float referencia = canvas.referencePixelsPerUnit;
+            var invadindo = new List<string>();
+            int conferidos = 0;
+
+            foreach (var txt in _hud.GetComponentsInChildren<Text>(true))
+            {
+                if (string.IsNullOrWhiteSpace(txt.text)) continue;
+                if (!EhCorpoDeTexto(txt.rectTransform)) continue;
+
+                // A moldura MAIS PROXIMA subindo a arvore -- e so ela. Comparar cada texto
+                // com toda Image ancestral acusava o rotulo 'Tecla' de um slot contra a
+                // moldura da BARRA inteira, que nao e dona dele: o slot e.
+                Image moldura = null;
+                for (var a = txt.transform.parent; a != null; a = a.parent)
+                {
+                    var img = a.GetComponent<Image>();
+                    if (img == null || img.type != Image.Type.Sliced || img.sprite == null)
+                        continue;
+                    if (img.sprite.border == Vector4.zero) continue;
+                    moldura = img;
+                    break;
+                }
+
+                if (moldura == null) continue;
+
+                var borda = moldura.sprite.border;
+                float ppu = moldura.sprite.pixelsPerUnit *
+                            Mathf.Max(0.0001f, moldura.pixelsPerUnitMultiplier);
+                float escala = referencia / ppu;
+
+                var caixa = moldura.rectTransform.rect;
+                if (caixa.width <= Folga || caixa.height <= Folga) continue;
+
+                float esq = caixa.xMin + borda.x * escala;
+                float dir = caixa.xMax - borda.z * escala;
+                float baixo = caixa.yMin + borda.y * escala;
+                float cima = caixa.yMax - borda.w * escala;
+
+                if (dir <= esq || cima <= baixo) continue;   // ja acusado pelo teste irmao
+
+                var cantos = new Vector3[4];
+                txt.rectTransform.GetWorldCorners(cantos);
+
+                var t0 = moldura.rectTransform.InverseTransformPoint(cantos[0]);
+                var t2 = moldura.rectTransform.InverseTransformPoint(cantos[2]);
+
+                conferidos++;
+
+                float sai = Mathf.Max(
+                    Mathf.Max(esq - Mathf.Min(t0.x, t2.x), Mathf.Max(t0.x, t2.x) - dir),
+                    Mathf.Max(baixo - Mathf.Min(t0.y, t2.y), Mathf.Max(t0.y, t2.y) - cima));
+
+                if (sai <= Folga) continue;
+
+                invadindo.Add(
+                    $"{Caminho(txt.transform)}: invade {sai:0} un da moldura " +
+                    $"[{moldura.sprite.name}, borda {borda.x * escala:0}/lado numa caixa de " +
+                    $"{caixa.width:0}x{caixa.height:0}]");
+            }
+
+            // REGRA DURA: se nao houver par moldura+texto, este teste nao mediu nada.
+            Assert.Greater(conferidos, 2,
+                $"So achei {conferidos} texto(s) dentro de uma moldura 9-fatias. Este teste " +
+                "nao esta medindo o HUD.");
+
+            Assert.IsEmpty(invadindo,
+                "Texto por baixo do ornamento da propria caixa:" + System.Environment.NewLine +
+                "  " + string.Join(System.Environment.NewLine + "  ", invadindo) +
+                System.Environment.NewLine +
+                "Conserto: aumentar o recuo do RectTransform do texto (sizeDelta negativo), " +
+                "subir o pixelsPerUnitMultiplier da moldura, ou crescer a caixa.");
+        }
+
+        /// <summary>
+        /// Um texto <b>esticado no pai</b> (ancoras cobrindo ao menos 80% dos dois eixos) e corpo
+        /// de texto: ele ocupa o miolo do painel e tem de limpar a moldura.
+        ///
+        /// <para><b>Por que a distincao, e nao uma lista de excecoes.</b> O
+        /// <c>BarraDeItens/Slot_N/Tecla</c> (o numero do atalho) esta ancorado em
+        /// <c>0,04-0,50</c> x <c>0,02-0,45</c>, e a <c>Quantidade</c> no canto oposto. Sao
+        /// <b>selos de canto</b>, postos sobre a moldura de proposito -- e assim que uma barra de
+        /// atalhos se desenha. Uma lista de nomes isentos envelheceria no primeiro slot novo;
+        /// a ancora diz a intencao sozinha.</para>
+        /// </summary>
+        private static bool EhCorpoDeTexto(RectTransform r)
+        {
+            const float Espalha = 0.8f;
+            return (r.anchorMax.x - r.anchorMin.x) >= Espalha &&
+                   (r.anchorMax.y - r.anchorMin.y) >= Espalha;
+        }
+
         private static string Encurtar(string s)
         {
             s = s.Replace("\n", " ").Trim();
