@@ -6,6 +6,74 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-02 — Tipografia por último, e as duas barras que estavam pela metade
+
+Suíte: 990 → **994 testes**, 971 passando, 0 falhas.
+
+### A tipografia agora se defende sozinha
+
+`Tools/tipografia_por_ultimo.ps1` reimpõe o padrão **no disco**, sem abrir a Unity, e o
+`run_editor_tool.ps1` o chama logo depois de a Unity sair — **incondicionalmente**, inclusive
+quando a ferramenta falhou (ela pode ter salvado antes de falhar).
+
+**Por que PowerShell puro e não uma ferramenta de Editor:** escrever pela Unity *não resolve*. O
+`PadronizarTextoDoHud` faz exatamente isso, lê 44 de volta em memória, e o disco continua 60. O
+único conserto que gruda é editar o arquivo com a Unity já fechada.
+
+A regra vem do C# (`PadraoDeTextoDeDialogo`), não de números copiados no script — seria a terceira
+cópia da mesma constante. E o alvo é **derivado**, seguindo o campo `texto` de quem escreve
+diálogo, como o `TipografiaDeDialogoTests`: os objetos se chamam todos "Texto".
+
+Verificado **quebrando de propósito** (16/60) e rodando uma ferramenta qualquer: reimpôs 24/44 e se
+anunciou. Depois pegou o revert sozinho **duas vezes em trabalho real**, na mesma sessão.
+
+### A auditoria que faltava, e ela dói
+
+O Vini perguntou se eu tinha conferido a barra de artefatos e a de habilidades. **Não tinha.**
+Minha varredura anterior olhava `Image` *existente*, e essas duas barras tinham **referências
+nulas** — o que some de uma varredura assim.
+
+As duas estavam **funcionalmente incompletas**, e o código das duas já fazia tudo:
+
+- **`BarraDeAcoes.slots` estava VAZIO.** O `Update()` lê `slots[0]` para animar a recarga: com o
+  array vazio, **a recarga da habilidade nunca era desenhada**. O sumário da própria classe diz o
+  preço: *"sem isto, a habilidade da arma dispara às cegas — o jogador não sabe o que tem na mão
+  nem quando pode usar"*. `NomeDaHabilidade` e `Recarga` existiam **soltos** na hierarquia, sem
+  ninguém os ler. A `Recarga` foi reaproveitada, não duplicada.
+
+- **Os 4 slots da `BarraDeArtefatos`** tinham `icone`, `preenchimentoRecarga` e `rotuloTecla`
+  **nulos**. O `Redesenhar` já pinta o ícone do Artefato, já escreve "F1".."F4", e o `Update` já
+  preenche a recarga — tudo atrás de um `if (!= null)` que nunca passava. **Era fiação, não
+  código.**
+
+15 objetos criados, 18 referências ligadas.
+
+### Os ícones: a resposta medida
+
+| | |
+|---|---|
+| `ItemDef` | **25/25** com ícone, 17 artes distintas |
+| `ArtefatoDef` | **4/4**, todos distintos |
+| `HabilidadeDef` | **nem campo tinha** |
+
+Os 3 tiers de cada família de arma compartilham o ícone da família — isso é **correto**: um Alfanje
+parece um Alfanje em qualquer tier.
+
+`HabilidadeDef` ganhou `Icone`, e o valor é **derivado**: procura o `ItemDef` que usa aquela
+habilidade e toma o ícone dele. Casar por nome funcionaria hoje e mentiria no primeiro renomeio.
+9 de 9 autoradas.
+
+E o ícone precisava **chegar** até a barra: `IArmaComHabilidade` vive em `Core` e não pode carregar
+`Sprite`, então a `MaoFisicaBridge` passou a guardar o `ItemDef` equipado e expor
+`IconeDaArma`/`IconeDaHabilidade`. A `BarraDeAcoes` só ligava e desligava a `Image`; agora troca o
+sprite.
+
+### Um guarda que eu não conhecia me pegou
+
+`TextoLegivelTests` barrou meu `fontSize = 14` nos rótulos de tecla. Estava certo: **24 é o mínimo
+legível em 1920×1080**, e um "F3" que não se lê no meio da luta não serve para nada. Caixa crescida
+junto, senão o BestFit encolheria de volta.
+
 ## 2026-09-01 (noite) — O slot_cheio e o botao_realce passam a acontecer
 
 Suíte: 987 → **990 testes**, 967 passando, 0 falhas.
