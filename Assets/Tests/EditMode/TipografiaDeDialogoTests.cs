@@ -74,23 +74,45 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// <b>Truncate é o defeito silencioso desta tela.</b> A fala que não cabe é cortada sem
-        /// aviso: o jogador perde o fim da frase e nada denuncia. Transbordar é feio e
-        /// <i>visível</i>; cortar é limpo e é mentira.
+        /// Texto de diálogo usa <b>Truncate</b>, não Overflow.
+        ///
+        /// <para><b>Esta regra era o INVERSO até 2026-09-02</b>, e o raciocínio de então estava
+        /// certo <i>para o que existia</i>: <i>"a fala que não cabe é cortada sem aviso;
+        /// transbordar é feio e visível, cortar é limpo e é mentira"</i>. Sem garantia de caber,
+        /// o corte silencioso é mesmo o pior dos dois.</para>
+        ///
+        /// <para><b>O que mudou.</b> Primeiro, o preço real do Overflow apareceu: o Vini mandou
+        /// um print com o poema da Cassilda <b>atravessando a tela inteira</b>, por cima do HUD e
+        /// do cenário. Não era "feio e visível" — era ilegível. E a causa é técnica: com
+        /// <c>Overflow</c> a Unity <b>não encolhe por altura</b>, então o <c>BestFit</c>, mesmo
+        /// ligado, nunca era acionado. A caixa jamais tentou caber.</para>
+        ///
+        /// <para>Segundo, e é o que torna Truncate seguro: passou a existir a
+        /// <b>garantia de capacidade</b>. O
+        /// <c>LayoutDaUiTests.ACaixaDeDialogoComportaAFalaMaisLonga</c> (PlayMode) afirma que a
+        /// caixa comporta 12 linhas <b>no piso do BestFit</b> — mais do que a fala mais longa do
+        /// jogo. Com essa garantia o Truncate <b>nunca dispara</b>, e o que ele passa a fazer é
+        /// permitir que o BestFit funcione.</para>
+        ///
+        /// <para><b>Os dois testes são um par:</b> este exige Truncate, aquele garante que
+        /// Truncate não corta. Enfraquecer um sem o outro devolve o defeito.</para>
         /// </summary>
         [Test]
-        public void NenhumTextoDeDialogo_CortaAFalaEmSilencio()
+        public void TodoTextoDeDialogo_UsaTruncateParaOBestFitFuncionar()
         {
-            var cortam = TextosDeDialogo()
-                .Where(t => t.VerticalOverflow != Overflow)
-                .Select(t => $"{t.Onde} · {t.Dono}: vertical Truncate")
+            var vazam = TextosDeDialogo()
+                .Where(t => t.VerticalOverflow == Overflow)
+                .Select(t => $"{t.Onde} · {t.Dono}: vertical Overflow")
                 .ToList();
 
-            Assert.IsEmpty(cortam,
-                "Texto(s) de diálogo com corte silencioso:" + Environment.NewLine + "  " +
-                string.Join(Environment.NewLine + "  ", cortam) + Environment.NewLine +
-                "Com Truncate, a última frase do Abdul ou da Cassilda simplesmente some, e nem " +
-                "o console nem a tela dizem que sumiu.");
+            Assert.IsEmpty(vazam,
+                "Texto(s) de diálogo em Overflow:" + Environment.NewLine + "  " +
+                string.Join(Environment.NewLine + "  ", vazam) + Environment.NewLine +
+                "Com Overflow a Unity NÃO encolhe por altura: o BestFit fica ligado e nunca é " +
+                "acionado, e a fala atravessa a tela por cima do HUD e do cenário — foi o print " +
+                "do Vini em 2026-09-02." + Environment.NewLine +
+                "Truncate só é seguro junto com a garantia de capacidade: ver " +
+                "LayoutDaUiTests.ACaixaDeDialogoComportaAFalaMaisLonga. Os dois andam em par.");
         }
 
         [Test]

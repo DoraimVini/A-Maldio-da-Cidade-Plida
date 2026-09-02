@@ -163,7 +163,13 @@ namespace FavelaAmarela.EditorTools
             t.fontSize = PadraoDeTextoDeDialogo.TamanhoMaximo;
 
             t.horizontalOverflow = HorizontalWrapMode.Wrap;
-            t.verticalOverflow = VerticalWrapMode.Overflow;
+
+            // TRUNCATE, e não Overflow (2026-09-02). Com Overflow a Unity não encolhe por
+            // altura e o BestFit acima nunca é acionado -- o texto vaza por cima do resto da
+            // tela. O que torna Truncate seguro é a garantia de capacidade do
+            // LayoutDaUiTests.ACaixaDeDialogoComportaAFalaMaisLonga: se a caixa comporta a fala
+            // mais longa no piso do BestFit, o corte nunca dispara.
+            t.verticalOverflow = VerticalWrapMode.Truncate;
 
             EditorUtility.SetDirty(t);
         }

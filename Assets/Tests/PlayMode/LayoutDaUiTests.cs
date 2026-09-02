@@ -213,22 +213,55 @@ namespace FavelaAmarela.Tests.PlayMode
             foreach (var txt in _hud.GetComponentsInChildren<Text>(true))
             {
                 if (string.IsNullOrWhiteSpace(txt.text)) continue;
-                if (txt.resizeTextForBestFit) continue;              // o BestFit já encolhe
-                if (txt.verticalOverflow == VerticalWrapMode.Overflow) continue;  // pode vazar
+                // ANTES este teste pulava quem tinha BestFit ("já encolhe") e quem tinha
+                // Overflow ("pode vazar"). O bug da caixa de diálogo morava exatamente nessa
+                // segunda isenção: ela tinha BestFit LIGADO e Overflow, e com Overflow a Unity
+                // NÃO encolhe por altura -- o BestFit nunca era acionado e o poema da Cassilda
+                // atravessava a tela inteira. As duas isenções juntas faziam a régua cega no
+                // ponto exato onde o defeito estava.
+                //
+                // Agora todo mundo é medido. Overflow não é licença para vazar por cima do
+                // resto da tela; é uma decisão que continua tendo de caber.
 
                 // LOCAL contra LOCAL. 'preferredHeight' vem em unidades do próprio
                 // RectTransform; 'GetWorldCorners' vem em pixels de tela, já multiplicados pelo
                 // scaleFactor do Canvas. Comparar os dois acusou dois rótulos inocentes na
                 // primeira execução -- o teste é que estava errado, não o HUD.
-                float disponivel = txt.rectTransform.rect.height;
+                var caixa = txt.rectTransform.rect;
+                float disponivel = caixa.height;
                 if (disponivel <= Folga) continue;                    // sem área, sem asserção
 
-                float precisa = txt.preferredHeight;
+                // COM BESTFIT, MEDIR NO PISO. 'preferredHeight' responde para o fontSize
+                // autorado, não para o tamanho a que o BestFit encolhe -- então medi-lo direto
+                // acusa como cortado todo texto que o BestFit resolveria. Foi o que aconteceu
+                // ao remover a isenção: dois rótulos que eu tinha ACABADO de consertar
+                // apareceram como defeito.
+                //
+                // A pergunta certa para um texto com BestFit é: ele cabe no MENOR tamanho que
+                // lhe é permitido? Se cabe, o BestFit dá conta. Se não cabe nem ali, nenhuma
+                // configuração salva -- que é exatamente o caso da caixa de diálogo com o poema
+                // de 11 linhas.
+                var ajustes = txt.GetGenerationSettings(new Vector2(caixa.width, 0f));
+
+                if (txt.resizeTextForBestFit)
+                {
+                    ajustes.resizeTextForBestFit = false;
+                    ajustes.fontSize = txt.resizeTextMinSize;
+                }
+
+                float precisa = txt.cachedTextGeneratorForLayout
+                                   .GetPreferredHeight(txt.text, ajustes) /
+                                Mathf.Max(0.0001f, ajustes.scaleFactor);
+
                 if (precisa <= disponivel + Folga) continue;
+
+                string comoMedido = txt.resizeTextForBestFit
+                    ? $"no piso do BestFit ({txt.resizeTextMinSize})"
+                    : $"na fonte {txt.fontSize}";
 
                 estourando.Add(
                     $"{Caminho(txt.transform)}: precisa de {precisa:0} un de altura e tem " +
-                    $"{disponivel:0} (fonte {txt.fontSize}, texto \"{Encurtar(txt.text)}\")");
+                    $"{disponivel:0} — medido {comoMedido}, texto \"{Encurtar(txt.text)}\"");
             }
 
             Assert.IsEmpty(estourando,
@@ -296,6 +329,112 @@ namespace FavelaAmarela.Tests.PlayMode
                 System.Environment.NewLine +
                 "Com Wrap ligado, palavra que não cabe é cortada no meio — é o \"Pe…\" e o " +
                 "\"Arm…\" da tela. Conserto: caixa mais larga, fonte menor, ou BestFit.");
+        }
+
+        // ── 3c. A caixa de diálogo comporta a fala mais longa? ───────────────
+
+        /// <summary>
+        /// A caixa de diálogo, <b>com a fala mais longa do jogo dentro</b>.
+        ///
+        /// <para><b>Por que este teste precisou existir separado.</b> O
+        /// <see cref="TodoTextoCabeNaPropriaCaixa"/> mede o que está na tela, e a caixa de
+        /// diálogo está <b>vazia em repouso</b> — ela só recebe texto quando alguém fala. A
+        /// régua passava verde enquanto o poema da Cassilda atravessava a tela no jogo do Vini,
+        /// porque nunca havia texto para medir no momento da medição.</para>
+        ///
+        /// <para><b>O requisito é de design, e é POR CAIXA:</b> a de fala comporta 12 linhas
+        /// no piso legível (a mais longa do jogo, a <c>falaDeRecapitulacao</c> do
+        /// <c>CassildaNPC</c>, tem <b>11 quebras explícitas</b> — é um poema), e a de escolha
+        /// comporta 8 (até 4 opções que podem quebrar em duas). Exigir o mesmo das duas faria o
+        /// painel de escolha ocupar 44% da tela sem razão nenhuma.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ACaixaDeDialogoComportaAFalaMaisLonga()
+        {
+            yield return MontarOHud();
+
+            // AS DUAS caixas de fala do jogo. A de escolha ficou de fora na primeira versão
+            // e é tão capaz de vazar quanto a outra -- as opções vêm do roteiro.
+            // REQUISITO POR CAIXA, derivado do que cada uma mostra. Exigir o mesmo das duas
+            // seria super-especificar: o painel de escolha mostra OPÇÕES, não poemas, e obrigá-lo
+            // a caber 12 linhas o faria ocupar 44% da tela sem razão.
+            var alvos = new List<(string Nome, Text Texto, int Linhas)>();
+
+            var dica = _hud.GetComponentInChildren<FavelaAmarela.Runtime.UI.TutorialHintUI>(true);
+            Assert.IsNotNull(dica, "O HUD não tem TutorialHintUI — nada mostra fala.");
+
+            // 12: a fala mais longa do jogo (falaDeRecapitulacao, do CassildaNPC) tem 11
+            // quebras explícitas -- é um poema -- e uma linha de folga é barata.
+            alvos.Add(("TutorialHintUI", dica.GetComponentInChildren<Text>(true), 12));
+
+            var escolha = _hud.GetComponentInChildren<FavelaAmarela.Runtime.UI.PainelDeEscolha>(true);
+
+            // 8: até 4 opções, cada uma podendo quebrar em duas linhas. As opções vêm do
+            // roteiro e são frases curtas ("Onde estou?", "Você está presa aqui?").
+            if (escolha != null)
+                alvos.Add(("PainelDeEscolha", escolha.GetComponentInChildren<Text>(true), 8));
+
+            foreach (var (_, t, linhas) in alvos)
+            {
+                if (t == null) continue;
+
+                var texto = new List<string>();
+                for (int i = 0; i < linhas; i++)
+                    texto.Add("Ao longo da costa as ondas de nuvem se quebram,");
+
+                t.text = string.Join(System.Environment.NewLine, texto);
+            }
+
+            Canvas.ForceUpdateCanvases();
+            yield return null;
+            yield return null;
+
+            var estouram = new List<string>();
+
+            foreach (var (nome, texto, exigidas) in alvos)
+            {
+                if (texto == null) { estouram.Add($"{nome}: sem Text ligado"); continue; }
+
+                var rect = texto.rectTransform.rect;
+
+                if (rect.height <= Folga) { estouram.Add($"{nome}: Text sem altura"); continue; }
+
+                if (texto.verticalOverflow == VerticalWrapMode.Overflow)
+                {
+                    estouram.Add($"{nome}: verticalOverflow = Overflow — com ele a Unity NÃO " +
+                                 "encolhe por altura, e o BestFit nunca é acionado");
+                    continue;
+                }
+
+                var ajustes = texto.GetGenerationSettings(new Vector2(rect.width, 0f));
+
+                if (texto.resizeTextForBestFit)
+                {
+                    ajustes.resizeTextForBestFit = false;
+                    ajustes.fontSize = texto.resizeTextMinSize;
+                }
+
+                float precisa = texto.cachedTextGeneratorForLayout
+                                     .GetPreferredHeight(texto.text, ajustes) /
+                                Mathf.Max(0.0001f, ajustes.scaleFactor);
+
+                if (precisa <= rect.height + Folga) continue;
+
+                estouram.Add($"{nome}: {exigidas} linhas pedem {precisa:0} unidades e a caixa " +
+                             $"tem {rect.height:0}, medido no piso do BestFit " +
+                             $"({texto.resizeTextMinSize})");
+            }
+
+            Assert.IsEmpty(estouram,
+                "Caixa(s) de fala que não comportam o próprio conteúdo:" +
+                System.Environment.NewLine + "  " +
+                string.Join(System.Environment.NewLine + "  ", estouram) +
+                System.Environment.NewLine +
+                "Não cabe NEM encolhendo ao máximo — e o texto atravessa a tela por cima do HUD " +
+                "e do cenário, que foi o print do Vini em 2026-09-02." +
+                System.Environment.NewLine +
+                "Conserto: caixa mais alta ('Tools/FavelaAmarela/UI: consertar a caixa de " +
+                "diálogo'), ou falas mais curtas.");
         }
 
         // ── 4. O 9-slice cabe na caixa? ──────────────────────────────────────
