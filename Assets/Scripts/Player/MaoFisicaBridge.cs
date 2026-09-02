@@ -145,12 +145,34 @@ namespace FavelaAmarela.Player
         public string NomeDaHabilidade => _armaEquipada?.NomeHabilidade ?? "";
 
         /// <summary>
+        /// O <c>ItemDef</c> da arma na mão, ou <c>null</c> desarmado. Existe para a UI poder
+        /// mostrar <b>ícone</b>: <see cref="IArmaComHabilidade"/> vive em <c>Core</c> e não
+        /// pode carregar um <c>Sprite</c> — a arte é assunto da camada Runtime.
+        /// </summary>
+        private FavelaAmarela.Inventario.ItemDef _defEquipada;
+
+        /// <summary>Ícone da arma empunhada, ou <c>null</c> desarmado.</summary>
+        public Sprite IconeDaArma => _defEquipada != null ? _defEquipada.Icone : null;
+
+        /// <summary>Ícone da habilidade da arma empunhada, ou <c>null</c>.</summary>
+        public Sprite IconeDaHabilidade =>
+            _defEquipada != null && _defEquipada.Base != null && _defEquipada.Base.Habilidade != null
+                ? _defEquipada.Base.Habilidade.Icone
+                : null;
+
+        /// <summary>
         /// Equipa uma arma na Mão Física (chamado pelo baú da Tumba). Substitui a arma
         /// anterior — o slot de Mão Física é único (troca só sob a luz de um Refúgio, no design).
         /// </summary>
         public void EquiparArma(IArmaComHabilidade arma)
         {
             _armaEquipada = arma;
+
+            // Esta sobrecarga não sabe de qual ItemDef a arma veio -- é o caminho de quem já
+            // tem a instância construída. Quem tem o Def (o caminho por dado, abaixo) o
+            // reatribui DEPOIS de chamar aqui. Limpar é o padrão seguro: um ícone que sobrou
+            // da arma anterior é pior que ícone nenhum.
+            _defEquipada = null;
 
             // Arma nova entra com a habilidade pronta (não herda a recarga da anterior).
             _cooldownHabilidadeAtual = 0f;
@@ -330,6 +352,11 @@ namespace FavelaAmarela.Player
             }
 
             EquiparArma(construida);
+
+            // DEPOIS do EquiparArma, que limpa o Def por segurança. É este caminho -- o que
+            // vem do inventário -- que conhece a arte.
+            _defEquipada = slot.Def;
+            OnArmaTrocada?.Invoke();
         }
 
 

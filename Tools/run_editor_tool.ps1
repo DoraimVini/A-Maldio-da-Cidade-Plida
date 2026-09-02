@@ -98,6 +98,21 @@ Write-Host " ($duracao s)"
 
 $linhas = Read-UnityLog -Path $logFile
 
+# ── 2b. A TIPOGRAFIA, SEMPRE POR ÚLTIMO ────────────────────────────────────────────────
+#
+# Toda ferramenta que abre o HUD_Gameplay.prefab (ou uma cena com caixa de diálogo) em batch
+# mode reescreve m_MaxSize de 44 para 60 ao salvar: a Unity serializa o valor do cache de
+# artefatos da Library, não o do arquivo. Aconteceu CINCO vezes na develop_temple, e das cinco
+# quem pegou foi o TipografiaDeDialogoTests -- depois do estrago.
+#
+# Escrever pela Unity não resolve (o PadronizarTextoDoHud lê 44 de volta em memória e o disco
+# continua 60). O único conserto que gruda é editar o arquivo com a Unity já fechada, e é
+# exatamente aqui: a Unity acabou de sair.
+#
+# Roda incondicionalmente, inclusive quando a ferramenta falhou -- ela pode ter salvado antes
+# de falhar. É idempotente e não abre a Unity.
+& (Join-Path $PSScriptRoot "tipografia_por_ultimo.ps1") -Silencioso
+
 # ── 3. Classifica ──────────────────────────────────────────────────────────────────────
 if (Test-ColisaoDeInstancia -Linhas $linhas) {
     Write-Host ""

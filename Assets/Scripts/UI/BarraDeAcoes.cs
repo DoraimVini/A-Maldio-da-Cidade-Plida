@@ -113,7 +113,14 @@ namespace FavelaAmarela.Runtime.UI
                 nomeDaArma.text = armado ? _fonte.NomeDaArmaEquipada : rotuloDesarmado;
 
             if (iconeDaArma != null)
+            {
                 iconeDaArma.enabled = armado;
+
+                // Até 2026-09-02 só o `enabled` era mexido: a Image ligava e desligava
+                // mostrando sempre o mesmo sprite (ou nenhum). Trocar de arma não trocava
+                // nada na barra além do nome.
+                if (armado && _fonte.IconeDaArma != null) iconeDaArma.sprite = _fonte.IconeDaArma;
+            }
 
             if (slots != null)
             {
@@ -129,7 +136,12 @@ namespace FavelaAmarela.Runtime.UI
                         slot.nomeDaHabilidade.text = armado ? _fonte.NomeDaHabilidade : rotuloSemHabilidade;
                     
                     if (slot.icone != null)
+                    {
                         slot.icone.enabled = slotOcupado;
+
+                        if (i == 0 && slotOcupado && _fonte.IconeDaHabilidade != null)
+                            slot.icone.sprite = _fonte.IconeDaHabilidade;
+                    }
 
                     if (slot.grupo != null)
                     {

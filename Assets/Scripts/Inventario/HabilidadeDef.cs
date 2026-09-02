@@ -95,6 +95,19 @@ namespace FavelaAmarela.Inventario
         [Tooltip("Nome diegético da habilidade.")]
         public string NomeDaHabilidade;
 
+        /// <summary>
+        /// Ícone da habilidade, mostrado na barra de ações.
+        ///
+        /// <para><b>Faltava até 2026-09-02</b> — o campo não existia, então a barra de ações
+        /// não tinha o que desenhar no slot da habilidade da arma. É a última lacuna de ícone
+        /// do projeto: os 25 <c>ItemDef</c> e os 4 <c>ArtefatoDef</c> já têm o seu.</para>
+        ///
+        /// <para>Por padrão recebe o ícone da <b>família</b> da arma (o Alfanje do Rei usa o
+        /// mesmo do Alfanje de Alhazred). Isso é decisão, não preguiça: a habilidade É o gesto
+        /// da família, e os três tiers de um Alfanje golpeiam igual — o que muda é o número.</para>
+        /// </summary>
+        public Sprite Icone;
+
         [Header("Ataque básico")]
         [Tooltip("Quanto tempo o golpe prende o ator na ação.")]
         [Min(0.05f)]
