@@ -40,10 +40,21 @@ namespace FavelaAmarela.Runtime.UI
         [Range(0f, 1f)]
         [SerializeField] private float opacidadeCheio = 0.9f;
 
+        [Tooltip("Arte da casa vazia. [ASSET]")]
+        [SerializeField] private Sprite molduraVazia;
+
+        [Tooltip("Arte da casa ocupada — o mesmo par da mochila, porque é o mesmo gesto: ver " +
+                 "de relance onde tem coisa. [ASSET]")]
+        [SerializeField] private Sprite molduraCheia;
+
         [System.Serializable]
         public sealed class SlotDeItem
         {
             public CanvasGroup grupo;
+
+            [Tooltip("Moldura da casa. Troca de arte conforme vazia ou ocupada. [ASSET]")]
+            public Image moldura;
+
             public Image icone;
             public Text quantidade;
         }
@@ -180,6 +191,15 @@ namespace FavelaAmarela.Runtime.UI
 
                 if (slot.grupo != null)
                     slot.grupo.alpha = cheio ? opacidadeCheio : opacidadeVazio;
+
+                // A moldura carrega o estado, como no PainelDeInventario. Aqui importa mais:
+                // a barra fica sempre na tela, e "qual das oito casas tem consumível" é uma
+                // pergunta que o jogador faz no meio da luta, sem tempo de abrir nada.
+                if (slot.moldura != null)
+                {
+                    var arte = cheio ? molduraCheia : molduraVazia;
+                    if (arte != null) slot.moldura.sprite = arte;
+                }
 
                 if (slot.icone != null)
                 {

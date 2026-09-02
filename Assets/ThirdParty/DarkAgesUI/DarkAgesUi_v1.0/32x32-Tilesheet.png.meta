@@ -227,6 +227,9 @@ TextureImporter:
   - first:
       213: 735719993273505570
     second: botao_realce
+  - first:
+      213: 809606852993742749
+    second: moldura_slot_cheia
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -501,6 +504,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: moldura_slot_cheia
+      rect:
+        serializedVersion: 2
+        x: 304
+        y: 272
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 10, y: 10, z: 10, w: 10}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d35dbf7cd94b0d80800000000000000
+      internalID: 809606852993742749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -586,6 +611,7 @@ TextureImporter:
       botao: 1140554978215312723
       botao_realce: 735719993273505570
       moldura_slot: -2426919387455327664
+      moldura_slot_cheia: 809606852993742749
       painel_ornado: 1089723763042107428
       painel_pergaminho: -7308537856757825077
       slot_cheio: -707622370

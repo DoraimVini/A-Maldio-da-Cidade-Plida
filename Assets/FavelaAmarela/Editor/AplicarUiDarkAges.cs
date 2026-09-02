@@ -146,7 +146,13 @@ namespace FavelaAmarela.EditorTools
 
             // Toda regra tem de achar seu sprite ANTES de qualquer escrita: metade aplicada é
             // pior que nada aplicado, porque some no meio de um diff grande.
-            var exigidos = RegrasDoHud.Select(r => r.Sprite)
+            // Os recortes que a fase de ESTADOS consome. Não aparecem em regra nenhuma
+            // (ninguém os "veste": eles entram em runtime), então precisam ser exigidos aqui —
+            // sem isto, faltar um deles vira KeyNotFoundException no meio da escrita.
+            string[] daFaseDeEstados = { "slot_vazio", "slot_cheio", "moldura_slot",
+                                         "moldura_slot_cheia", "botao_realce" };
+
+            var exigidos = daFaseDeEstados.Concat(RegrasDoHud.Select(r => r.Sprite))
                 .Concat(RegrasDasOpcoes.Select(r => r.Sprite))
                 .Concat(RegrasDasCenas.SelectMany(c => c.Regras).Select(r => r.Sprite))
                 .Where(s => s != Limpar)
@@ -167,6 +173,8 @@ namespace FavelaAmarela.EditorTools
 
             foreach (var (cena, regras) in RegrasDasCenas)
                 resumo.Add(AplicarNaCena(cena, regras, sprites));
+
+            resumo.AddRange(LigarOsEstados(sprites));
 
             AssetDatabase.SaveAssets();
 
@@ -282,6 +290,157 @@ namespace FavelaAmarela.EditorTools
             EditorSceneManager.SaveScene(cena);
 
             return $"{nome}: {n} Image(s) vestida(s) — " + Agrupar(detalhes);
+        }
+
+        // -- Os ESTADOS: casa ocupada, e botao sob o cursor -------------------
+
+        /// <summary>
+        /// Liga os dois estados que o pacote sabe desenhar e que estavam mudos.
+        ///
+        /// <para><b>O caso da moldura e o modo de falha assinado deste projeto.</b> O
+        /// <c>PainelDeInventario</c> ja tinha <c>molduraVazia</c>/<c>molduraCheia</c>, ja trocava
+        /// as duas no <c>Pintar</c>, e as 19 <c>Image</c> de moldura ja estavam ligadas aos
+        /// slots. Faltavam <b>dois campos de Sprite</b> — a peca inteira existia, compilava, e
+        /// nao acontecia.</para>
+        ///
+        /// <para><b>E o botao:</b> os 11 estavam em <c>Transition.ColorTint</c> com o
+        /// <c>SpriteState</c> vazio. ColorTint sobre arte de moldura dourada escurece a moldura
+        /// junto e le como "desabilitado", nao como "sob o cursor".</para>
+        /// </summary>
+        private static List<string> LigarOsEstados(Dictionary<string, Sprite> sprites)
+        {
+            var saida = new List<string>();
+
+            var raiz = PrefabUtility.LoadPrefabContents(HudPrefab);
+            try
+            {
+                int n = 0;
+
+                var painel = raiz.GetComponentInChildren<FavelaAmarela.Runtime.UI.PainelDeInventario>(true);
+                if (painel == null) saida.Add("molduras: PainelDeInventario nao achado");
+                else
+                {
+                    var so = new SerializedObject(painel);
+                    n += Definir(so, "molduraVazia", sprites["slot_vazio"]);
+                    n += Definir(so, "molduraCheia", sprites["slot_cheio"]);
+                    n += Definir(so, "molduraCorpoVazia", sprites["moldura_slot"]);
+                    n += Definir(so, "molduraCorpoCheia", sprites["moldura_slot_cheia"]);
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+
+                var barra = raiz.GetComponentInChildren<FavelaAmarela.Runtime.UI.BarraDeItens>(true);
+                if (barra == null) saida.Add("molduras: BarraDeItens nao achada");
+                else
+                {
+                    var so = new SerializedObject(barra);
+                    n += Definir(so, "molduraVazia", sprites["slot_vazio"]);
+                    n += Definir(so, "molduraCheia", sprites["slot_cheio"]);
+
+                    // A moldura de cada casa e a Image do PROPRIO Slot_N -- o icone e filho
+                    // dela. Derivar do icone em vez de casar por nome: o icone ja esta ligado e
+                    // certo, entao a relacao de parentesco nao pode estar errada.
+                    var slots = so.FindProperty("slots");
+                    for (int i = 0; slots != null && i < slots.arraySize; i++)
+                    {
+                        var entrada = slots.GetArrayElementAtIndex(i);
+                        var icone = entrada.FindPropertyRelative("icone");
+                        var moldura = entrada.FindPropertyRelative("moldura");
+
+                        var img = icone != null ? icone.objectReferenceValue as Image : null;
+                        if (img == null || moldura == null) continue;
+                        if (img.transform.parent == null) continue;
+
+                        var dona = img.transform.parent.GetComponent<Image>();
+                        if (dona == null || moldura.objectReferenceValue == dona) continue;
+
+                        moldura.objectReferenceValue = dona;
+                        n++;
+                    }
+
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                }
+
+                n += TrocarPorSprite(raiz.GetComponentsInChildren<Button>(true),
+                                     sprites["botao_realce"]);
+
+                if (n > 0)
+                {
+                    PrefabUtility.SaveAsPrefabAsset(raiz, HudPrefab, out bool gravou);
+                    saida.Add(gravou
+                        ? $"estados no HUD: {n} campo(s)/botao(oes) ligado(s)"
+                        : "estados no HUD: SaveAsPrefabAsset RECUSOU");
+                }
+                else saida.Add("estados no HUD: nada a mudar (ja ligado)");
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(raiz);
+            }
+
+            var cena = EditorSceneManager.OpenScene("Assets/Scenes/Cena_Menu.unity",
+                                                    OpenSceneMode.Single);
+
+            int m = TrocarPorSprite(cena.GetRootGameObjects()
+                                        .SelectMany(r => r.GetComponentsInChildren<Button>(true)),
+                                    sprites["botao_realce"]);
+
+            if (m > 0)
+            {
+                EditorSceneManager.MarkSceneDirty(cena);
+                EditorSceneManager.SaveScene(cena);
+                saida.Add($"estados no menu: {m} botao(oes) em SpriteSwap");
+            }
+            else saida.Add("estados no menu: nada a mudar (ja ligado)");
+
+            return saida;
+        }
+
+        private static int Definir(SerializedObject so, string campo, Sprite valor)
+        {
+            var prop = so.FindProperty(campo);
+            if (prop == null)
+            {
+                Debug.LogError($"{Marcador} Campo '{campo}' nao existe mais em " +
+                               so.targetObject.GetType().Name + ".");
+                return 0;
+            }
+
+            if (prop.objectReferenceValue == valor) return 0;
+            prop.objectReferenceValue = valor;
+            return 1;
+        }
+
+        /// <summary>
+        /// Poe o botao em <c>SpriteSwap</c> com o realce nos tres estados que o jogador
+        /// realmente produz. O <c>disabledSprite</c> fica vazio de proposito: nenhum
+        /// <c>Button</c> deste projeto e desabilitado — medido, nao presumido —, e prometer um
+        /// estado que nunca aparece e o comeco de outro campo que nao faz nada.
+        /// </summary>
+        private static int TrocarPorSprite(IEnumerable<Button> botoes, Sprite realce)
+        {
+            int n = 0;
+
+            foreach (var b in botoes)
+            {
+                bool jaEsta = b.transition == Selectable.Transition.SpriteSwap &&
+                              b.spriteState.highlightedSprite == realce;
+                if (jaEsta) continue;
+
+                Undo.RecordObject(b, "Estados do botao");
+
+                b.transition = Selectable.Transition.SpriteSwap;
+
+                var estado = b.spriteState;
+                estado.highlightedSprite = realce;
+                estado.pressedSprite = realce;
+                estado.selectedSprite = realce;
+                b.spriteState = estado;
+
+                EditorUtility.SetDirty(b);
+                n++;
+            }
+
+            return n;
         }
 
         /// <summary>Resume "12 slots viraram slot_vazio" em vez de 12 linhas iguais.</summary>

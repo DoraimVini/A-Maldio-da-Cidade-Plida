@@ -41,7 +41,7 @@ namespace FavelaAmarela.Tests.EditMode
         /// </summary>
         private static readonly string[] Fatiados =
         {
-            "painel_ornado", "painel_pergaminho", "moldura_slot",
+            "painel_ornado", "painel_pergaminho", "moldura_slot", "moldura_slot_cheia",
             "slot_vazio", "slot_cheio", "botao", "botao_realce",
         };
 
@@ -135,6 +135,95 @@ namespace FavelaAmarela.Tests.EditMode
                 "em RUNTIME com o ícone do item que estiver no slot: arte fixa aqui desenha um " +
                 "item fantasma em todo slot VAZIO do inventário e da barra. " +
                 "Uma varredura de 'consertar toda Image sem sprite' cai exatamente aqui.");
+        }
+        // -- Os estados: casa ocupada, e botao sob o cursor --------------------
+
+        /// <summary>Corpo serializado do componente de nome dado, dentro do HUD.</summary>
+        private static string Componente(string classe)
+        {
+            string hud = Ler(Hud);
+
+            var m = Regex.Match(hud,
+                $@"m_EditorClassIdentifier:.*{Regex.Escape(classe)}\s*\n((?:.*\n)*?)(?=^--- )",
+                RegexOptions.Multiline);
+
+            Assert.IsTrue(m.Success, $"'{classe}' não está no HUD_Gameplay.prefab.");
+            return m.Groups[1].Value;
+        }
+
+        /// <summary>
+        /// O defeito que manteve este mecanismo mudo: o <c>PainelDeInventario</c> já trocava a
+        /// moldura conforme o slot tinha item, as 19 <c>Image</c> já estavam ligadas, e os
+        /// <b>campos de Sprite estavam vazios</b>. A peça inteira existia, compilava, e não
+        /// acontecia — o modo de falha assinado deste repositório.
+        /// </summary>
+        [Test]
+        public void AsMolduraDeSlotTemArteNosQuatroCampos()
+        {
+            string corpo = Componente("PainelDeInventario");
+
+            var vazios = new[] { "molduraVazia", "molduraCheia",
+                                 "molduraCorpoVazia", "molduraCorpoCheia" }
+                .Where(campo => !Regex.IsMatch(corpo,
+                    $@"^\s*{campo}: \{{fileID: -?[1-9]", RegexOptions.Multiline))
+                .ToList();
+
+            Assert.IsEmpty(vazios,
+                "Campo(s) de moldura sem arte no PainelDeInventario: " +
+                string.Join(", ", vazios) + ". Com eles vazios o Pintar não troca nada e a " +
+                "única pista de 'tem item aqui' volta a ser o desbotamento do slot.");
+        }
+
+        [Test]
+        public void ABarraDeItensTrocaAMolduraDasOitoCasas()
+        {
+            string corpo = Componente("BarraDeItens");
+
+            foreach (var campo in new[] { "molduraVazia", "molduraCheia" })
+                Assert.IsTrue(Regex.IsMatch(corpo, $@"^\s*{campo}: \{{fileID: -?[1-9]",
+                                            RegexOptions.Multiline),
+                    $"BarraDeItens.{campo} está sem arte.");
+
+            var ligadas = Regex.Matches(corpo, @"^\s*moldura: \{fileID: ([1-9]\d*)\}",
+                                        RegexOptions.Multiline).Count;
+
+            Assert.AreEqual(8, ligadas,
+                $"Só {ligadas} das 8 casas da barra de itens têm moldura ligada. A barra fica " +
+                "sempre na tela: 'qual das oito tem consumível' é pergunta feita no meio da " +
+                "luta, sem tempo de abrir nada.");
+        }
+
+        [Test]
+        public void OsBotoesTrocamDeArteSobOCursor()
+        {
+            // Selectable.Transition: 0 None, 1 ColorTint, 2 SpriteSwap, 3 Animation.
+            foreach (var arquivo in new[] { Hud, Menu })
+            {
+                string txt = Ler(arquivo);
+                var docs = Regex.Split(txt, @"^--- !u!114 &\d+\n", RegexOptions.Multiline);
+
+                int botoes = 0, semTroca = 0;
+
+                foreach (var d in docs)
+                {
+                    if (!d.Contains("guid: 4e29b1a8efbd4b44bb3f3716e73f07ff")) continue;
+                    botoes++;
+
+                    bool spriteSwap = Regex.IsMatch(d, @"^\s*m_Transition: 2\s*$",
+                                                    RegexOptions.Multiline);
+                    bool temRealce = Regex.IsMatch(d, @"^\s*m_HighlightedSprite: \{fileID: -?[1-9]",
+                                                   RegexOptions.Multiline);
+
+                    if (!spriteSwap || !temRealce) semTroca++;
+                }
+
+                Assert.Greater(botoes, 0, $"Nenhum Button em {arquivo}.");
+
+                Assert.Zero(semTroca,
+                    $"{semTroca} de {botoes} botão(ões) em {System.IO.Path.GetFileName(arquivo)} " +
+                    "sem troca de arte sob o cursor. Em ColorTint, o tint escurece a moldura " +
+                    "dourada junto e o botão lê como DESABILITADO em vez de realçado.");
+            }
         }
     }
 }

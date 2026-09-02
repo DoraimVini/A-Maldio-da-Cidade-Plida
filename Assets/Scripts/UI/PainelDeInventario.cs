@@ -56,11 +56,19 @@ namespace FavelaAmarela.Runtime.UI
         [Header("Aparência")]
         [Range(0f, 1f)]
         [Header("Molduras (Dark Ages UI)")]
-        [Tooltip("Arte da casa vazia. [ASSET]")]
+        [Tooltip("Arte da casa vazia da MOCHILA. [ASSET]")]
         [SerializeField] private Sprite molduraVazia;
 
-        [Tooltip("Arte da casa ocupada — tom distinto, para o estado ser legível de relance. [ASSET]")]
+        [Tooltip("Arte da casa ocupada da MOCHILA — tom distinto, para o estado ser legível de " +
+                 "relance. [ASSET]")]
         [SerializeField] private Sprite molduraCheia;
+
+        [Tooltip("Arte do slot de CORPO vazio. Par próprio, ornado: o que está vestido tem de " +
+                 "se distinguir do que está guardado. [ASSET]")]
+        [SerializeField] private Sprite molduraCorpoVazia;
+
+        [Tooltip("Arte do slot de CORPO ocupado. [ASSET]")]
+        [SerializeField] private Sprite molduraCorpoCheia;
 
         [Tooltip("Opacidade da casa vazia. Com molduras de dois tons ligadas, deixe em 1: quem " +
                  "comunica o estado passa a ser a arte, não o desbotamento.")]
@@ -173,7 +181,7 @@ namespace FavelaAmarela.Runtime.UI
                 if (visual == null) continue;
 
                 var item = i < _inventario.Main.Capacidade ? _inventario.Main.GetSlot(i) : null;
-                Pintar(visual, item);
+                Pintar(visual, item, molduraVazia, molduraCheia);
             }
         }
 
@@ -185,7 +193,12 @@ namespace FavelaAmarela.Runtime.UI
                 if (visual == null) continue;
 
                 var item = i < _inventario.Equipment.Capacidade ? _inventario.Equipment.GetSlot(i) : null;
-                Pintar(visual, item);
+
+                // Par PRÓPRIO para o corpo. Sem isto, o Pintar sobrescreveria em runtime a
+                // moldura ornada que os slots de equipamento recebem no prefab, e a distinção
+                // "vestido x guardado" existiria só no Editor -- que é a forma mais irritante
+                // de um detalhe de UI não existir.
+                Pintar(visual, item, molduraCorpoVazia, molduraCorpoCheia);
 
                 // O rótulo mostra que parte do corpo é, mesmo com o slot vazio — senão o
                 // jogador não descobre que existe um lugar para elmo até achar um.
@@ -194,7 +207,9 @@ namespace FavelaAmarela.Runtime.UI
             }
         }
 
-        private void Pintar(SlotVisual visual, ItemInstance item)
+        /// <param name="vazia">Arte da casa sem item.</param>
+        /// <param name="cheia">Arte da casa com item.</param>
+        private void Pintar(SlotVisual visual, ItemInstance item, Sprite vazia, Sprite cheia)
         {
             bool cheio = item != null && item.Quantidade > 0 && item.Def != null;
 
@@ -206,7 +221,7 @@ namespace FavelaAmarela.Runtime.UI
             // ilegível. Dois tons distintos resolvem sem depender de alpha.
             if (visual.moldura != null)
             {
-                var arte = cheio ? molduraCheia : molduraVazia;
+                var arte = cheio ? cheia : vazia;
                 if (arte != null) visual.moldura.sprite = arte;
             }
 
