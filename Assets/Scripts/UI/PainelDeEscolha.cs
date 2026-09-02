@@ -152,6 +152,14 @@ namespace FavelaAmarela.Runtime.UI
             _aberto = true;
             _timerMovimento = 0f;
 
+            // O árbitro, além das duas travas finas que este painel já ligava à mão desde
+            // agosto. Elas continuam: `MovimentoBloqueado` e `Bloqueado` foram o ÚNICO bloqueio
+            // de input que este projeto teve por meses, e são o que impede o Damião de andar
+            // enquanto se navega as opções. O árbitro é o que impede tudo o mais -- Artefato,
+            // esquiva, teclas 1-8, clique -- que aquelas duas nunca cobriram.
+            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Tomar(
+                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
+
             if (movimentoDoJogador != null) movimentoDoJogador.MovimentoBloqueado = true;
             if (detectorDeInteracao != null) detectorDeInteracao.Bloqueado = true;
             if (raiz != null) raiz.SetActive(true);
@@ -236,6 +244,9 @@ namespace FavelaAmarela.Runtime.UI
             if (movimentoDoJogador != null) movimentoDoJogador.MovimentoBloqueado = false;
             if (detectorDeInteracao != null) detectorDeInteracao.Bloqueado = false;
             if (raiz != null) raiz.SetActive(false);
+
+            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Devolver(
+                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
         }
     }
 }

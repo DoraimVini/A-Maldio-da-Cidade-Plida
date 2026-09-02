@@ -353,7 +353,15 @@ namespace FavelaAmarela.Player
             // Avança o relógio das ações exclusivas (substitui os Invoke(EndX) do modelo antigo).
             _fsm.Tick(Time.deltaTime);
 
-            if (MovimentoBloqueado)
+            // O ÁRBITRO DE FOCO, antes de tudo (2026-09-02). Com o inventário ou o console
+            // abertos, este Update continuava rodando -- `Time.timeScale = 0` não engole tecla
+            // nenhuma -- e o Damião continuava esquivando, golpeando e queimando Artefatos
+            // enquanto o jogador mexia num painel. Digitar "3" no console consumia o item do
+            // slot 3 da mochila.
+            //
+            // MovimentoBloqueado continua valendo: é a trava fina que a cinemática e o painel
+            // de escolha usam, e existe antes desta. Esta é a grossa.
+            if (MovimentoBloqueado || !FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.JogoNoComando)
             {
                 inputDirection = Vector2.zero;
                 isMoving = false;
@@ -405,8 +413,17 @@ namespace FavelaAmarela.Player
                 if (!_fsm.EstaLivre) return; // Esquiva pegou
             }
 
-            // Trigger Ataque (Mão Física)
-            if (attackAction != null && attackAction.WasPressedThisFrame() && maoFisicaBridge != null)
+            // Trigger Ataque (Mão Física).
+            //
+            // NÃO golpeia quando o ponteiro está sobre um elemento de UI (2026-09-02): o
+            // `Attack` está ligado ao botão esquerdo do mouse, o mesmo que o EventSystem usa
+            // para `Click`, e os dois disparavam juntos. Clicar "Continuar" na tela de pausa
+            // dava o golpe da Mão Física junto -- medido na auditoria.
+            //
+            // O árbitro acima não cobre este caso: a tela de pausa é estado de jogo, não camada
+            // de entrada, e um clique num botão do HUD acontece com o jogo no comando.
+            if (attackAction != null && attackAction.WasPressedThisFrame() && maoFisicaBridge != null
+                && !PonteiroSobreAUi())
             {
                 maoFisicaBridge.TryAtacar(direcaoDaAcao);
                 if (!_fsm.EstaLivre) return; // Ataque pegou
@@ -433,6 +450,12 @@ namespace FavelaAmarela.Player
             // Determine stealth mode from modifier keys
             bool podeCorrer = _vigor == null || (!_vigor.EstaExausto && _vigor.VigorAtual > 0f);
 
+            // Furtivo VENCE a corrida quando as duas teclas estão pressionadas, e isso é
+            // decisão: quem se agacha quer se esconder. O problema, medido em 2026-09-02, era
+            // outro -- `Sprint` e `Crouch` estavam ligadas à MESMA tecla (Shift esquerdo) no
+            // InputSystem_Actions, então este `else if` NUNCA era alcançado: correr era
+            // inatingível pelo teclado e o Vigor jamais era gasto correndo. O conserto está no
+            // asset de ações, não aqui; esta lógica sempre esteve certa.
             if (sneakAction != null && sneakAction.IsPressed())
             {
                 stealthState.SetMode(MovementMode.Sneaking);
@@ -573,5 +596,15 @@ namespace FavelaAmarela.Player
             if (duracaoSegundos <= 0f) return;
             _silencioTimer = Mathf.Max(_silencioTimer, duracaoSegundos);
         }
+        /// <summary>
+        /// Se o ponteiro está sobre um elemento de interface agora.
+        ///
+        /// <para>Sem <c>EventSystem</c> na cena a resposta é <b>não</b>: um jogo sem UI nenhuma
+        /// não pode perder o ataque por causa disto.</para>
+        /// </summary>
+        private static bool PonteiroSobreAUi() =>
+            UnityEngine.EventSystems.EventSystem.current != null &&
+            UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+
     }
 }

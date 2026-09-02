@@ -129,10 +129,19 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 _escalaAnterior = Time.timeScale;
                 Time.timeScale = 0f;
                 _equipamentos = null;   // recarrega o catálogo a cada abertura
+
+                // Toma o comando do teclado. O console tem CAMPOS DE TEXTO, e sem isto digitar
+                // "3" no nível do item consumia o item do slot 3 da mochila; letras disparavam
+                // Q (habilidade), E (interagir), I (abrir a mochila por cima) e WASD.
+                FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Tomar(
+                    FavelaAmarela.Core.Entrada.CamadaDeEntrada.Console);
             }
             else
             {
                 Time.timeScale = _escalaAnterior;
+
+                FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Devolver(
+                    FavelaAmarela.Core.Entrada.CamadaDeEntrada.Console);
             }
         }
 

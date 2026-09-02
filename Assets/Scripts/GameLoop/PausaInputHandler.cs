@@ -39,6 +39,14 @@ namespace FavelaAmarela.Runtime.GameLoop
             // Keyboard.current é nulo em builds sem teclado (e em alguns testes de PlayMode).
             if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame) return;
 
+            // Só com o jogo no comando (2026-09-02). Antes, um Esc com a mochila aberta
+            // PAUSAVA O JOGO POR BAIXO dela: duas telas empilhadas e dois donos disputando o
+            // Time.timeScale. Quem fecha o painel é o próprio painel; a pausa é do jogo.
+            //
+            // A exceção é despausar: já pausado, o comando é da pausa e o Esc tem de sair.
+            bool jogoNoComando = FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.JogoNoComando;
+            if (!jogoNoComando && _maquina.CurrentState != GameState.Pausado) return;
+
             if (_maquina.CurrentState == GameState.Gameplay)
                 _maquina.TryTransition(GameState.Pausado);
             else if (_maquina.CurrentState == GameState.Pausado)

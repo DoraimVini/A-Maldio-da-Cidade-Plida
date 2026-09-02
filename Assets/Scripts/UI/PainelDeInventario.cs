@@ -124,8 +124,25 @@ namespace FavelaAmarela.Runtime.UI
 
         private void Update()
         {
-            if (_acaoAbrir != null && _acaoAbrir.WasPressedThisFrame())
+            // ABRIR só com o jogo no comando; FECHAR sempre que ele estiver aberto. Sem a
+            // segunda metade o painel se auto-bloquearia -- ele toma o foco ao abrir, e o
+            // próprio Tab deixaria de responder.
+            bool podeAbrir = FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.JogoNoComando;
+
+            if (_acaoAbrir != null && _acaoAbrir.WasPressedThisFrame() && (podeAbrir || Aberto))
+            {
                 Alternar();
+                return;
+            }
+
+            // ESC FECHA A MOCHILA (2026-09-02). Antes ele não fazia nada aqui: caía no
+            // PausaInputHandler e PAUSAVA O JOGO POR BAIXO do inventário aberto, deixando dois
+            // donos do Time.timeScale e o jogador com duas telas empilhadas.
+            if (Aberto && UnityEngine.InputSystem.Keyboard.current != null &&
+                UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                Fechar();
+            }
         }
 
         /// <summary>Abre se fechado, fecha se aberto.</summary>
@@ -143,6 +160,12 @@ namespace FavelaAmarela.Runtime.UI
             Aberto = true;
             if (raizDoPainel != null) raizDoPainel.SetActive(true);
 
+            // Toma o comando do teclado. Sem isto -- e `Time.timeScale = 0` NÃO basta, porque
+            // Update continua rodando -- com a mochila aberta o Damião continuava esquivando,
+            // golpeando, queimando Artefatos em F1-F4 e consumindo itens em 1-8.
+            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Tomar(
+                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
+
             if (pausarAoAbrir)
             {
                 _escalaDeTempoAnterior = Time.timeScale;
@@ -159,6 +182,9 @@ namespace FavelaAmarela.Runtime.UI
 
             Aberto = false;
             if (raizDoPainel != null) raizDoPainel.SetActive(false);
+
+            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Devolver(
+                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
 
             // Restaura o valor anterior, não 1: uma cutscene em câmera lenta não pode ser
             // acelerada só porque o jogador abriu e fechou a mochila.

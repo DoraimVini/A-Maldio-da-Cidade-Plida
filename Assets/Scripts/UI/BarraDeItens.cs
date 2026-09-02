@@ -138,6 +138,12 @@ namespace FavelaAmarela.Runtime.UI
         {
             if (_fonte == null) return;
 
+            // As teclas 1-8 são lidas CRUAS, fora do sistema de ações -- então nem o
+            // `Time.timeScale = 0` nem painel aberto as impediam. Medido em 2026-09-02:
+            // digitar "3" no campo "Nível do item" do console de diagnóstico CONSUMIA o item
+            // do slot 3 da mochila, e com o inventário aberto as oito continuavam ativas.
+            if (!FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.JogoNoComando) return;
+
             var teclado = Keyboard.current;
             if (teclado == null) return;
 

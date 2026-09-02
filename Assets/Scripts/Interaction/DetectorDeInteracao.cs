@@ -133,7 +133,11 @@ namespace FavelaAmarela.Runtime.Interaction
 
         private void Update()
         {
-            if (_bloqueado) return;
+            // `Bloqueado` é a trava FINA, ligada à mão pelo PainelDeEscolha desde agosto -- e
+            // era o único bloqueio de input que este projeto tinha. O árbitro é a trava grossa:
+            // com o inventário ou o console abertos, o E continuava interagindo com o que
+            // estivesse sob a mira.
+            if (_bloqueado || !FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.JogoNoComando) return;
 
             AtualizarAlvo();
 
