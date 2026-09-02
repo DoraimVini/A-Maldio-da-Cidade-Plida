@@ -341,6 +341,29 @@ namespace FavelaAmarela.Runtime.GameLoop
                                      this);
             }
 
+            // O PAINEL DE ESCOLHA, pelo mesmo motivo. Ele vivia em duas cenas das seis, e
+            // quando falta o CassildaNPC pula a ramificação EM SILÊNCIO -- a conversa acontece
+            // pela metade e nada reclama.
+            var escolha = FindAnyObjectByType<FavelaAmarela.Runtime.UI.PainelDeEscolha>(
+                FindObjectsInactive.Include);
+
+            if (escolha != null)
+            {
+                var entrada = FindAnyObjectByType<UnityEngine.InputSystem.PlayerInput>(
+                    FindObjectsInactive.Include);
+                var movimento = FindAnyObjectByType<FavelaAmarela.Player.PlayerMovement>(
+                    FindObjectsInactive.Include);
+                var detectorDaEscolha = FindAnyObjectByType<
+                    FavelaAmarela.Runtime.Interaction.DetectorDeInteracao>(
+                        FindObjectsInactive.Include);
+
+                escolha.Bind(entrada, movimento, detectorDaEscolha);
+
+                if (entrada == null)
+                    Debug.LogWarning("[GameLoopBootstrap] Painel de escolha sem PlayerInput — " +
+                                     "as opções aparecem e não dá para navegar entre elas.", this);
+            }
+
             var pausa = GetComponent<PausaInputHandler>();
             if (pausa != null) pausa.Bind(StateMachine);
 

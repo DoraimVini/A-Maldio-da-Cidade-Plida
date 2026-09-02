@@ -69,8 +69,15 @@ namespace FavelaAmarela.Runtime.UI
                 Debug.LogError("[PainelDeEscolha] 'Raiz' não atribuída — o painel nunca aparecerá.", this);
             if (texto == null)
                 Debug.LogError("[PainelDeEscolha] 'Texto' não atribuído — nada será escrito.", this);
+            // Aviso, e nao erro (2026-09-02). Desde que este painel mora no HUD persistente,
+            // o campo NASCE vazio por construcao -- um prefab-asset nao referencia objeto de
+            // cena -- e quem o preenche e o GameLoopBootstrap, no Bind, depois do Awake. Um
+            // erro no caso NORMAL ensina a ignorar erro, e este chegou a deixar a suite
+            // PlayMode inteira vermelha.
             if (playerInput == null)
-                Debug.LogError("[PainelDeEscolha] PlayerInput não atribuído — a escolha não responde a input.", this);
+                Debug.LogWarning("[PainelDeEscolha] Sem PlayerInput ainda — esperando o Bind do " +
+                                 "GameLoopBootstrap. Se ele nao vier, a escolha aparece e nao " +
+                                 "responde a input.", this);
             if (movimentoDoJogador == null)
                 Debug.LogWarning("[PainelDeEscolha] PlayerMovement não atribuído — o Damião pode " +
                                  "andar enquanto o jogador navega as opções.", this);
@@ -82,6 +89,46 @@ namespace FavelaAmarela.Runtime.UI
             }
 
             Esconder();
+        }
+
+        /// <summary>
+        /// Instância corrente, para quem não pode receber a referência por Inspector.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> Este painel vivia em <b>duas cenas das
+        /// seis</b>. O <c>CassildaNPC.cs:284</c> pula a ramificação <b>em silêncio</b> quando
+        /// ele falta — então qualquer NPC de escolha posto no Deserto, nos Portões ou no
+        /// Castelo perderia a conversa sem ninguém notar. Mesmo contrato de
+        /// <c>TutorialHintUI.Instancia</c> e <c>HUDController.Instancia</c>.</para>
+        /// </summary>
+        public static PainelDeEscolha Instancia { get; private set; }
+
+        private void OnEnable()
+        {
+            if (Instancia == null) Instancia = this;
+        }
+
+        private void OnDisable()
+        {
+            if (Instancia == this) Instancia = null;
+        }
+
+        /// <summary>
+        /// Liga o painel ao jogador. Chamado pelo <c>GameLoopBootstrap</c>, pelo mesmo motivo do
+        /// <c>PromptDeInteracao</c> e do <c>PainelDeFicha</c>: morando no HUD persistente, que é
+        /// um prefab-asset, ele <b>não pode</b> referenciar objeto de cena por Inspector.
+        /// </summary>
+        public void Bind(PlayerInput input, PlayerMovement movimento,
+                         DetectorDeInteracao detector)
+        {
+            playerInput = input;
+            movimentoDoJogador = movimento;
+            detectorDeInteracao = detector;
+
+            if (playerInput != null && playerInput.actions != null)
+            {
+                _moveAction = playerInput.actions.FindAction("Move");
+                _interactAction = playerInput.actions.FindAction("Interact");
+            }
         }
 
         /// <summary>Se há uma escolha aberta aguardando confirmação.</summary>

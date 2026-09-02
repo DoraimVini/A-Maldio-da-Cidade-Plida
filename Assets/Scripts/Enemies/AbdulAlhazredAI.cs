@@ -79,6 +79,17 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Painel que apresenta as duas opções (Lutar / Concordar) após a última fala.")]
         [SerializeField] private PainelDeEscolha painelDeEscolha;
 
+        /// <summary>
+        /// O painel de escolha a usar: o do Inspector, ou a <b>instância global do HUD</b>.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> O painel vivia em duas cenas das seis, e
+        /// quando falta a ramificação é pulada <b>em silêncio</b> — a conversa acontece pela
+        /// metade e ninguém reclama. Resolve no momento do uso: a <c>Instancia</c> só existe
+        /// depois do <c>OnEnable</c> do HUD.</para>
+        /// </summary>
+        private PainelDeEscolha EscolhaEmUso =>
+            painelDeEscolha != null ? painelDeEscolha : PainelDeEscolha.Instancia;
+
         [Tooltip("Texto da opção que inicia a luta.")]
         [SerializeField] private string textoOpcaoLutar = "Lutar contra ele";
 
@@ -409,7 +420,7 @@ namespace FavelaAmarela.Runtime.Enemies
         /// </summary>
         private void ApresentarEscolha()
         {
-            if (painelDeEscolha == null)
+            if (EscolhaEmUso == null)
             {
                 Debug.LogWarning("[AbdulAlhazredAI] Painel de Escolha não atribuído — " +
                                  "iniciando a luta direto (sem opção de trégua).", this);
@@ -422,7 +433,7 @@ namespace FavelaAmarela.Runtime.Enemies
                 new OpcaoDeDialogo(textoOpcaoLutar, OpcaoLutar),
                 new OpcaoDeDialogo(textoOpcaoConcordar, OpcaoConcordar),
             };
-            painelDeEscolha.Mostrar(opcoes, ResolverEscolha);
+            EscolhaEmUso.Mostrar(opcoes, ResolverEscolha);
         }
 
         private void ResolverEscolha(int idDaOpcao)

@@ -72,35 +72,60 @@ namespace FavelaAmarela.Tests.EditMode
         /// <para>E <b>nenhum em cena</b>, não só "pelo menos um no HUD": dois prompts inscritos
         /// no mesmo detector escrevem a frase duas vezes.</para>
         /// </summary>
+        /// <summary>
+        /// Painéis de fala que <b>têm de morar no HUD persistente, e em cena nenhuma</b>, com o
+        /// que cada um custava quando faltava.
+        /// </summary>
+        private static readonly (string Script, string Custo)[] SoNoHud =
+        {
+            ("Assets/Scripts/UI/PromptDeInteracao.cs",
+             "existia em UMA cena das seis: nas outras cinco o jogador nunca via 'E — ...', e " +
+             "nada anunciava que baú, item ou NPC eram interagíveis"),
+
+            ("Assets/Scripts/UI/PainelDeEscolha.cs",
+             "existia em DUAS cenas das seis, e o CassildaNPC pula a ramificação EM SILÊNCIO " +
+             "quando ele falta — a conversa acontece pela metade e nada reclama"),
+        };
+
         [Test]
-        public void OPromptDeInteracao_MoraNoHudEEmCenaNenhuma()
+        public void OsPaineisDeFala_MoramNoHudEEmCenaNenhuma()
         {
             const string Hud = "Assets/FavelaAmarela/Resources/HUD_Gameplay.prefab";
-            const string Script = "Assets/Scripts/UI/PromptDeInteracao.cs";
-
-            Assert.IsTrue(File.Exists(Script), $"Script ausente: {Script}");
-
-            var guid = Regex.Match(File.ReadAllText(Script + ".meta"), @"guid: ([0-9a-f]{32})");
-            Assert.IsTrue(guid.Success, "PromptDeInteracao.cs.meta sem guid.");
-
-            string marca = "guid: " + guid.Groups[1].Value;
-
             Assert.IsTrue(File.Exists(Hud), $"HUD ausente: {Hud}");
-            StringAssert.Contains(marca, File.ReadAllText(Hud),
-                "O HUD persistente não tem PromptDeInteracao — em cena nenhuma o jogador vê " +
-                "'E — ...', e nada anuncia que baú, item ou NPC são interagíveis.");
 
-            var emCena = Directory
-                .GetFiles("Assets/Scenes", "*.unity", SearchOption.AllDirectories)
-                .Where(c => File.ReadAllText(c).Contains(marca))
-                .Select(Path.GetFileName)
-                .ToList();
+            string hud = File.ReadAllText(Hud);
+            var cenas = Directory.GetFiles("Assets/Scenes", "*.unity", SearchOption.AllDirectories);
 
-            Assert.IsEmpty(emCena,
-                "Prompt de interação encontrado em cena: " + string.Join(", ", emCena) +
-                Environment.NewLine +
-                "Quem anuncia é o HUD persistente. Dois inscritos no mesmo detector escrevem a " +
-                "mesma frase duas vezes, uma por cima da outra.");
+            var problemas = new System.Collections.Generic.List<string>();
+
+            foreach (var (script, custo) in SoNoHud)
+            {
+                Assert.IsTrue(File.Exists(script), $"Script ausente: {script}");
+
+                var guid = Regex.Match(File.ReadAllText(script + ".meta"), @"guid: ([0-9a-f]{32})");
+                Assert.IsTrue(guid.Success, $"{Path.GetFileName(script)}.meta sem guid.");
+
+                string marca = "guid: " + guid.Groups[1].Value;
+                string nome = Path.GetFileNameWithoutExtension(script);
+
+                if (!hud.Contains(marca))
+                    problemas.Add($"{nome} NÃO está no HUD persistente — {custo}");
+
+                var emCena = cenas.Where(c => File.ReadAllText(c).Contains(marca))
+                                  .Select(Path.GetFileName)
+                                  .ToList();
+
+                if (emCena.Count > 0)
+                    problemas.Add($"{nome} ainda está em cena ({string.Join(", ", emCena)}) — " +
+                                  "dois deles disputam a mesma Instancia e o jogador vê a coisa " +
+                                  "duas vezes");
+            }
+
+            Assert.IsEmpty(problemas,
+                "Painel(is) de fala fora do lugar:" + Environment.NewLine + "  " +
+                string.Join(Environment.NewLine + "  ", problemas) + Environment.NewLine +
+                "Um prefab-asset não referencia objeto de cena: quem entrega as referências do " +
+                "jogador é o GameLoopBootstrap, por Bind().");
         }
 
         /// <summary>

@@ -105,6 +105,17 @@ namespace FavelaAmarela.Runtime.Quests
                  "da conversa com Abdul). [CENA]")]
         [SerializeField] private PainelDeEscolha painelDeEscolha;
 
+        /// <summary>
+        /// O painel de escolha a usar: o do Inspector, ou a <b>instância global do HUD</b>.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> O painel vivia em duas cenas das seis, e
+        /// quando falta a ramificação é pulada <b>em silêncio</b> — a conversa acontece pela
+        /// metade e ninguém reclama. Resolve no momento do uso: a <c>Instancia</c> só existe
+        /// depois do <c>OnEnable</c> do HUD.</para>
+        /// </summary>
+        private PainelDeEscolha EscolhaEmUso =>
+            painelDeEscolha != null ? painelDeEscolha : PainelDeEscolha.Instancia;
+
         [TextArea(4, 10)]
         [Tooltip("Primeira fala ao abrir o recital, com o último fragmento entregue: por que " +
                  "ela pede versos que já foram dela.")]
@@ -281,7 +292,7 @@ namespace FavelaAmarela.Runtime.Quests
                 _saudacaoMostrada = true;
                 Falar(falaDeSaudacao);
 
-                if (painelDeEscolha == null || opcoesDoPrimeiroEncontro == null
+                if (EscolhaEmUso == null || opcoesDoPrimeiroEncontro == null
                     || opcoesDoPrimeiroEncontro.Length == 0)
                 {
                     // Nunca trava o jogo por peça de UI faltando — a escolha vira uma
@@ -306,7 +317,7 @@ namespace FavelaAmarela.Runtime.Quests
             for (int i = 0; i < opcoesDoPrimeiroEncontro.Length; i++)
                 opcoes[i] = new OpcaoDeDialogo(opcoesDoPrimeiroEncontro[i], i);
 
-            painelDeEscolha.Mostrar(opcoes, ResolverEscolhaDoPrimeiroEncontro);
+            EscolhaEmUso.Mostrar(opcoes, ResolverEscolhaDoPrimeiroEncontro);
         }
 
         private void ResolverEscolhaDoPrimeiroEncontro(int opcaoEscolhida)
@@ -409,7 +420,7 @@ namespace FavelaAmarela.Runtime.Quests
                     return;
             }
 
-            if (painelDeEscolha == null || opcoes == null || opcoes.Length == 0)
+            if (EscolhaEmUso == null || opcoes == null || opcoes.Length == 0)
             {
                 Debug.LogWarning("[CassildaNPC] Painel de Escolha ou opções da estrofe não " +
                                  "atribuídos — o recital não pode ser respondido.", this);
@@ -422,7 +433,7 @@ namespace FavelaAmarela.Runtime.Quests
                 opcoesDeDialogo[i] = new OpcaoDeDialogo(opcoes[i], i);
 
             Falar(pergunta);
-            painelDeEscolha.Mostrar(opcoesDeDialogo, idOpcao => ResolverRespostaDoRecital(estrofe, idOpcao));
+            EscolhaEmUso.Mostrar(opcoesDeDialogo, idOpcao => ResolverRespostaDoRecital(estrofe, idOpcao));
         }
 
         private void ResolverRespostaDoRecital(int estrofe, int opcaoEscolhida)
