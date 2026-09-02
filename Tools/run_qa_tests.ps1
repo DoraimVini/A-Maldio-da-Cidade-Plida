@@ -21,6 +21,10 @@
 .PARAMETER TestPlatform
     EditMode (padrão) ou PlayMode.
 
+.PARAMETER ComGraficos
+    Tira o -nographics. Necessário quando os testes de layout acusarem que não conseguiram
+    medir texto (sem gráficos a Unity pode não carregar métricas de fonte).
+
 .PARAMETER Detalhado
     Imprime também as últimas linhas do log da Unity. Útil quando o resultado não se
     encaixa em nenhum dos quatro estados.
@@ -28,7 +32,8 @@
 
 param(
     [string]$TestPlatform = "EditMode",
-    [switch]$Detalhado
+    [switch]$Detalhado,
+    [switch]$ComGraficos
 )
 
 $ErrorActionPreference = "Stop"
@@ -80,7 +85,13 @@ Set-Location $ProjectPath
 
 # -logFile manda a saída para arquivo em vez do console. Redirecionar com `*>` do
 # PowerShell grava em UTF-16 e foi exatamente isso que tornou o log ilegível em 2026-08-27.
-& "$unityEditor" -runTests -batchmode -nographics -projectPath "." `
+# -nographics e o padrao e economiza muito tempo. Mas SEM graficos a Unity pode nao
+# carregar metricas de fonte, e ai todo 'preferredWidth' devolve 0 -- o que faria os testes
+# de layout passarem verdes sem medir nada. O LayoutDaUiTests.AsMedidasFuncionam detecta
+# isso e manda rodar com -ComGraficos.
+$graficos = if ($ComGraficos) { @() } else { @("-nographics") }
+
+& "$unityEditor" -runTests -batchmode @graficos -projectPath "." `
     -testPlatform $TestPlatform -testResults "$resultsFile" -logFile "$logFile" | Out-Null
 
 $exitCode = $LASTEXITCODE

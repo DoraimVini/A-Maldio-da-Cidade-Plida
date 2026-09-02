@@ -90,7 +90,23 @@ namespace FavelaAmarela.EditorTools
                 return $"{onde}: campo 'botaoDeOpcoes' não existe em {menu.GetType().Name}";
 
             if (prop.objectReferenceValue != null)
-                return $"{onde}: já estava ligado";
+            {
+                // ANTES esta guarda fazia `return "já estava ligado"` e pronto -- e é por isso
+                // que o menu de pause ficou com "Opções" em cima de "Sair do jogo" durante
+                // semanas. O clone foi criado por uma versão deste script que ainda não tinha o
+                // DescerUmDegrau; quando o degrau chegou, a guarda de idempotência já impedia
+                // qualquer execução de alcançá-lo. A ferramenta sabia do defeito, tinha a cura,
+                // e não conseguia aplicá-la no estrago que ela mesma havia feito.
+                //
+                // Ligar a referência e POSICIONAR o botão são dois trabalhos: o primeiro é
+                // idempotente, o segundo é reparo. Separados.
+                var jaLigado = prop.objectReferenceValue as Button;
+
+                if (jaLigado == null)
+                    return $"{onde}: 'botaoDeOpcoes' aponta para algo que não é Button";
+
+                return $"{onde}: já estava ligado{Desempilhar(jaLigado, raiz)}";
+            }
 
             // Um botão que já exista com o nome (execução anterior interrompida).
             var existente = raiz.GetComponentsInChildren<Button>(includeInactive: true)
@@ -129,6 +145,41 @@ namespace FavelaAmarela.EditorTools
             EditorUtility.SetDirty(menu);
 
             return $"{onde}: '{NomeDoBotao}' criado e ligado";
+        }
+
+        /// <summary>
+        /// Se o botão estiver <b>em cima de um irmão</b>, desce um degrau. Roda mesmo quando a
+        /// referência já está ligada — é o reparo que a guarda de idempotência bloqueava.
+        ///
+        /// <para>Compara as <b>âncoras</b>, não os retângulos: neste projeto todo posicionamento
+        /// de UI é por âncora normalizada (não há um único <c>LayoutGroup</c> no HUD), então
+        /// âncoras iguais são a definição de "um em cima do outro".</para>
+        /// </summary>
+        /// <returns>Texto para o resumo — vazio quando não havia nada a consertar.</returns>
+        private static string Desempilhar(Button botao, GameObject raiz)
+        {
+            var meu = botao.GetComponent<RectTransform>();
+            if (meu == null || meu.parent == null) return "";
+
+            var colidido = raiz.GetComponentsInChildren<Button>(includeInactive: true)
+                .Where(b => b != botao)
+                .Select(b => b.GetComponent<RectTransform>())
+                .FirstOrDefault(r => r != null && r.parent == meu.parent &&
+                                     r.anchorMin == meu.anchorMin &&
+                                     r.anchorMax == meu.anchorMax);
+
+            if (colidido == null) return "";
+
+            var antes = meu.anchorMin;
+            DescerUmDegrau(meu, colidido, raiz);
+
+            if (meu.anchorMin == antes)
+                return $" — EMPILHADO em '{colidido.name}' e não consegui medir o degrau";
+
+            EditorUtility.SetDirty(botao);
+
+            return $" — estava EMPILHADO em '{colidido.name}' (âncoras idênticas); " +
+                   $"desceu de y {antes.y:0.###} para {meu.anchorMin.y:0.###}";
         }
 
         /// <summary>

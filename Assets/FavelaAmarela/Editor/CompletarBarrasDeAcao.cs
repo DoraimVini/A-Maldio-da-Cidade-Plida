@@ -53,6 +53,7 @@ namespace FavelaAmarela.EditorTools
             {
                 resumo.Add(CompletarArtefatos(raiz));
                 resumo.Add(CompletarAcoes(raiz));
+                resumo.Add(CaberRotulos(raiz));
 
                 PrefabUtility.SaveAsPrefabAsset(raiz, Hud, out bool gravou);
                 if (!gravou) resumo.Add("PREFAB: SaveAsPrefabAsset RECUSOU");
@@ -228,6 +229,59 @@ namespace FavelaAmarela.EditorTools
 
             return $"ações: {criados} objeto(s) criado(s), {ligados} referência(s) ligada(s) — " +
                    "slots[0] montado, então o Update() finalmente acha a recarga da habilidade";
+        }
+
+        // ── Rótulos que cabem ─────────────────────────────────────────────────
+
+        /// <summary>
+        /// Liga <c>BestFit</c> nos rótulos de tecla e nos rótulos de botão, com piso no
+        /// mínimo legível.
+        ///
+        /// <para><b>Medido em 2026-09-02</b> pelo <c>LayoutDaUiTests</c>, o primeiro teste deste
+        /// projeto a carregar o HUD e medir o layout de verdade: os rótulos "1".."8" da barra de
+        /// itens pedem <b>39 unidades</b> de altura e têm <b>31</b>. Estavam cortados desde que a
+        /// barra existe, e nenhum dos 129 testes EditMode podia ver isso — eles leem YAML, e
+        /// "não cabe" só existe depois do passo de layout.</para>
+        ///
+        /// <para>Crescer a caixa invadiria o ícone do slot; encolher a fonte sem piso a tornaria
+        /// ilegível. Piso de <b>24</b> porque é o mínimo na referência 1920×1080
+        /// (<c>TextoLegivelTests</c>); teto no próprio <c>fontSize</c>, para nunca aumentar.</para>
+        /// </summary>
+        private static string CaberRotulos(GameObject raiz)
+        {
+            const int MinimoLegivel = 24;
+
+            int n = 0, total = 0;
+
+            foreach (var txt in raiz.GetComponentsInChildren<Text>(true))
+            {
+                // Rótulo de tecla, ou rótulo DENTRO de um botão. Os dois têm caixa fixa
+                // desenhada por quem montou a tela, e texto que veio depois — é a receita de
+                // "não coube". O do Colapso ("Despertar no último refúgio", fonte 48 em 87
+                // unidades) foi o caso que a régua achou depois dos treze primeiros.
+                bool ehTecla = txt.name == "Tecla";
+                bool ehRotuloDeBotao = txt.transform.parent != null &&
+                                       txt.transform.parent.GetComponent<Selectable>() != null;
+
+                if (!ehTecla && !ehRotuloDeBotao) continue;
+                total++;
+
+                if (txt.resizeTextForBestFit && txt.resizeTextMinSize == MinimoLegivel) continue;
+
+                Undo.RecordObject(txt, "Rótulo de tecla que cabe");
+
+                txt.resizeTextForBestFit = true;
+                txt.resizeTextMinSize = MinimoLegivel;
+                txt.resizeTextMaxSize = Mathf.Max(MinimoLegivel, txt.fontSize);
+
+                EditorUtility.SetDirty(txt);
+                n++;
+            }
+
+            return n == 0
+                ? $"rótulos: {total} conferido(s), nada a mudar"
+                : $"rótulos: {n} de {total} com BestFit (piso {MinimoLegivel}) — " +
+                  "estavam cortados pela própria caixa";
         }
 
         // ── Utilidades ────────────────────────────────────────────────────────

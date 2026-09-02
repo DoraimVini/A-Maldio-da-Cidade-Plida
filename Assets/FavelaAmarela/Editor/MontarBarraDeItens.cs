@@ -171,6 +171,16 @@ namespace FavelaAmarela.EditorTools
             num.font = fonte;
             num.text = (indice + 1).ToString();
             num.fontSize = 36;
+
+            // BestFit com piso de 24: a caixa do rotulo e 43% da altura do slot, e fonte 36
+            // pede 39 unidades onde ha 31 -- o "1" saia cortado em cima. Crescer a caixa
+            // invadiria o icone; encolher a fonte sem piso a tornaria ilegivel (o
+            // TextoLegivelTests exige 24 na referencia 1920x1080). BestFit resolve os dois.
+            // Medido pelo LayoutDaUiTests.TodoTextoCabeNaPropriaCaixa em 2026-09-02.
+            num.resizeTextForBestFit = true;
+            num.resizeTextMinSize = 24;
+            num.resizeTextMaxSize = 36;
+
             num.alignment = TextAnchor.LowerLeft;
             num.color = new Color(0.9f, 0.86f, 0.65f, 0.55f);
             num.raycastTarget = false;
