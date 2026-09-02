@@ -6,6 +6,72 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-01 (fim de tarde) — A interface deixa de ser caixa cinza
+
+Pedido do Vini: *"vamos usar essa UI nas coisas que estão faltando."* Suíte: 983 → **987 testes**.
+
+### O pacote estava parado
+
+O **Dark Ages UI** (Hypnobius) está no repositório com **25 artes**. Estavam **fatiadas 3** e
+**referenciada 1** — o `painel_ornado`, em 4 painéis.
+
+Do outro lado, medido:
+
+| onde | estado |
+|---|---|
+| `HUD_Gameplay.prefab` | **37 Images no sprite padrão da Unity** |
+| `Cena_Menu` | 6 botões **sem sprite nenhum** |
+| Castelo | `Painel_Desfecho` sem fundo |
+| `Painel_Opcoes` | seletor de quadros sem fundo |
+
+Inventário, barra de itens, pause, tela de Colapso e a caixa onde **toda** conversa do jogo
+acontece: todos no retângulo branco arredondado genérico. E a **tela final do jogo** era texto
+sobre o vazio.
+
+### 4 recortes novos, 49 usos
+
+`slot_vazio`, `slot_cheio`, `botao`, `botao_realce` — 32×32, borda 8 para 9-slice, medidos por
+varredura de coluna e conferidos com as fronteiras de 32px desenhadas por cima do recorte. Ids
+derivados por **hash do nome**: refatiar não troca id nem quebra referência.
+
+- **21× `slot_vazio`** — mochila (12), barra de itens (8), seletor
+- **7× `moldura_slot`** — os slots de **equipamento**, ornados: o que está vestido tem de se
+  distinguir do que está guardado num relance
+- **11× `botao`** — menu (6), pause (3), Colapso (2)
+- **10× `painel_ornado`** — janela, ficha, caixa de diálogo, pause, Colapso, barra, desfecho
+
+### O que a ferramenta se recusa a tocar
+
+Os **27 `Icone`** dentro dos slots continuam **vazios**. Quem os preenche é o runtime, com o
+ícone do item que estiver ali — arte fixa desenharia um **item fantasma em cada slot vazio**. É
+exatamente o que uma varredura futura de *"consertar toda Image sem sprite"* faria achando que
+melhorou, e por isso virou teste.
+
+As `Barra_*` já têm arte autorada.
+
+### O pergaminho que não deu certo
+
+Eu tinha posto `painel_pergaminho` na ficha e no desfecho — a ficha é leitura, material diferente
+separaria as duas metades da janela sem precisar de legenda. **Medido depois:** o texto dos dois é
+dourado-pálido, luminância **0,84–0,89**, sobre pergaminho creme. Bonito e ilegível. Os dois
+voltaram para o painel escuro; trocar a cor do texto é decisão de design, não conserto. O
+`painel_pergaminho` fica fatiado e sem uso, à espera dessa decisão.
+
+E o `Viewport` do seletor usa `RectMask2D`, que recorta por retângulo e **não precisa de
+gráfico**: vesti-lo desenhava uma moldura ornada dentro da outra.
+
+### A armadilha do cache, quarta aparição nesta branch
+
+O cache da Library reverteu `m_MaxSize` 44 → 60 no `TutorialHintUI`. Corrigido no disco **depois**
+de toda ferramenta que abre prefab — a ordem que a armadilha exige.
+
+### E o Cortesão Pálido não era a parte fácil
+
+O Vini perguntou por começar pelo fácil, depois de eu ter sugerido os Cortesãos como fonte do T3
+fora do Rei. Lido o código: **ele não implementa `IDanificavel`** — não existe caminho no jogo que
+tire vida dele, e o comentário da própria classe diz o preço (`EnemyBase` + `Vitalidade` +
+`Hurtbox`). Não é o caminho fácil; é IA de inimigo.
+
 ## 2026-09-01 (tarde) — Espólio dos chefes, Baú de Yhtill, e os pisos placeholder
 
 Três pedidos do Vini, e um estrago meu no meio deles que vale mais que os três.
