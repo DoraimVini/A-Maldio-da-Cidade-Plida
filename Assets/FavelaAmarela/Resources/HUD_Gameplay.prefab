@@ -9282,10 +9282,10 @@ RectTransform:
   - {fileID: 4898590107659233725}
   m_Father: {fileID: 1652948372423135823}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.28, y: 0.115}
-  m_AnchorMax: {x: 0.72, y: 0.225}
+  m_AnchorMin: {x: 0.5, y: 0.15}
+  m_AnchorMax: {x: 0.5, y: 0.15}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 96, y: 96}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8458054285233053435
 MonoBehaviour:
@@ -10947,7 +10947,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -62, y: -62}
+  m_SizeDelta: {x: -48, y: -48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7699955468587161499
 CanvasRenderer:
@@ -10979,9 +10979,9 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 67e16fcad30c39648a8ff4701823420f, type: 3}
-    m_FontSize: 51
+    m_FontSize: 44
     m_FontStyle: 0
-    m_BestFit: 1
+    m_BestFit: 0
     m_MinSize: 38
     m_MaxSize: 51
     m_Alignment: 4
@@ -10990,7 +10990,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "E \u2014 "
+  m_Text: E
 --- !u!1 &6562655791683914692
 GameObject:
   m_ObjectHideFlags: 0
@@ -12577,7 +12577,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1089723763042107428, guid: 4c5c05e2de460ba4f9ac5c58d70daa9a, type: 3}
+  m_Sprite: {fileID: 120205828945923761, guid: 4c5c05e2de460ba4f9ac5c58d70daa9a, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -12586,7 +12586,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 3.125
+  m_PixelsPerUnitMultiplier: 1.5625
 --- !u!1 &7495522558870020247
 GameObject:
   m_ObjectHideFlags: 0

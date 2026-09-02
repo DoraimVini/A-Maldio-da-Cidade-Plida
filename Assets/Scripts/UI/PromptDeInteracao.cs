@@ -106,7 +106,11 @@ namespace FavelaAmarela.Runtime.UI
                 return;
             }
 
-            if (label != null) label.text = $"{tecla} — {alvo.RotuloDeInteracao}";
+            // So a TECLA. Decisao do Vini (2026-09-02), olhando o print: "se for para ser o
+            // botao de interacao, pode ser menor e so ter escrito um E". O rotulo da acao
+            // esticava o prompt numa barra atravessando a tela -- e num formato de janela
+            // ultra-largo ela parecia uma caixa de dialogo vazia esperando texto.
+            if (label != null) label.text = tecla;
             if (raiz != null) raiz.SetActive(true);
         }
 
