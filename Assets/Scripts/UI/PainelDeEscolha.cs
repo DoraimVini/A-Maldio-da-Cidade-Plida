@@ -155,6 +155,12 @@ namespace FavelaAmarela.Runtime.UI
                 Debug.LogWarning("[PainelDeEscolha] Abrindo escolha sem PlayerMovement — o " +
                                  "Damião pode andar enquanto o jogador navega as opções.", this);
 
+            // Reabrir por cima de um painel ja aberto tomaria uma SEGUNDA camada para um unico
+            // Devolver depois. O caso legitimo (o recital da Cassilda encadeando estrofes) passa
+            // pelo Confirmar(), que zera _aberto antes do callback -- ali isto e falso e a camada
+            // nova e tomada de verdade.
+            bool jaEstavaAberto = _aberto;
+
             _opcoes = opcoes;
             _navegador = new NavegadorDeOpcoes(opcoes.Length);
             _aoConfirmar = aoConfirmar;
@@ -166,8 +172,9 @@ namespace FavelaAmarela.Runtime.UI
             // de input que este projeto teve por meses, e são o que impede o Damião de andar
             // enquanto se navega as opções. O árbitro é o que impede tudo o mais -- Artefato,
             // esquiva, teclas 1-8, clique -- que aquelas duas nunca cobriram.
-            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Tomar(
-                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
+            if (!jaEstavaAberto)
+                FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Tomar(
+                    FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
 
             if (movimentoDoJogador != null) movimentoDoJogador.MovimentoBloqueado = true;
             if (detectorDeInteracao != null) detectorDeInteracao.Bloqueado = true;
@@ -220,6 +227,19 @@ namespace FavelaAmarela.Runtime.UI
             if (raiz != null) raiz.SetActive(false);
 
             callback?.Invoke(id);
+
+            // A camada que o Mostrar() tomou volta SEMPRE, e exatamente uma vez -- mesmo que o
+            // callback tenha aberto um painel novo, porque esse novo tomou uma camada PROPRIA.
+            //
+            // ISTO FALTAVA (2026-09-02, relatado pelo Vini na luta do Abdul: "o boneco não pode
+            // mais andar e morre parado"). Confirmar() repete o corpo do Esconder() aqui dentro,
+            // de proposito, para poder soltar os bloqueios DEPOIS do callback -- e quando eu
+            // acrescentei o arbitro, em agosto, pus o Devolver so no Esconder(). Escolher uma
+            // opcao e o caminho NORMAL deste painel, e ele nunca passa pelo Esconder(): cada
+            // escolha confirmada vazava uma camada de PainelModal, para sempre. Com o jogo preso
+            // em PainelModal, PlayerMovement, DetectorDeInteracao e BarraDeItens desligam todos.
+            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Devolver(
+                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
 
             // Só libera se nada reabriu o painel durante o callback — Mostrar() teria
             // religado _aberto (e os dois bloqueios) de novo.

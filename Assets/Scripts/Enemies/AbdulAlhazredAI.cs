@@ -362,7 +362,15 @@ namespace FavelaAmarela.Runtime.Enemies
         /// Começa a luta (chamado pelo gatilho de interação com o grimório). Tira Abdul
         /// do transe: a partir daqui o escudo sobe e ele passa a conjurar.
         /// </summary>
-        public void IniciarLuta() => _fsm.IniciarLuta();
+        public void IniciarLuta()
+        {
+            // A fala antes da luta some sozinha só depois de `duracaoDaFala` segundos, e a luta
+            // comeca ANTES disso -- a caixa ficava aberta com o chefe ja conjurando por baixo.
+            // Relatado pelo Vini em 2026-09-02.
+            if (caixaDeDialogo != null) caixaDeDialogo.Esconder();
+
+            _fsm.IniciarLuta();
+        }
 
         // ── IInteragivel: a conversa que desperta a Aparição ──────────────────
 

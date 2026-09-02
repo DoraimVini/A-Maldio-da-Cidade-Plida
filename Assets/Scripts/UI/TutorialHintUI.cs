@@ -83,6 +83,33 @@ namespace FavelaAmarela.Runtime.UI
             _rotina = StartCoroutine(SequenciaDeExibicao(duracaoVisivel, duracaoFade));
         }
 
+        /// <summary>
+        /// Tira a fala da tela agora, sem esperar o resto da duração pedida.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> O Vini, na luta do Abdul: "a janela de
+        /// diálogo demora a sumir". As falas antes da luta são mostradas com uma duração
+        /// autorada, e a luta começa <b>antes</b> dela acabar — o chefe já estava conjurando e
+        /// a caixa continuava aberta por cima. Não havia como dispensá-la: o único caminho para
+        /// o alpha zerar era a corrotina chegar ao fim sozinha.</para>
+        ///
+        /// <para>Quem mostra uma fala e depois muda o estado do jogo tem de a dispensar.</para>
+        /// </summary>
+        public void Esconder(float duracaoFade = 0.2f)
+        {
+            if (grupo == null) return;
+
+            if (_rotina != null) StopCoroutine(_rotina);
+
+            if (!isActiveAndEnabled)
+            {
+                grupo.alpha = 0f;
+                _rotina = null;
+                return;
+            }
+
+            _rotina = StartCoroutine(Fade(grupo.alpha, 0f, duracaoFade));
+        }
+
         private IEnumerator SequenciaDeExibicao(float duracaoVisivel, float duracaoFade)
         {
             yield return Fade(0f, 1f, duracaoFade);
