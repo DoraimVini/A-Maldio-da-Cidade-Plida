@@ -1,0 +1,20 @@
+Pacotes CraftPix (craftpix.net), gratuitos:
+  - Free Undead Tileset (Top Down Pixel Art)
+  - Free Cursed Land Tileset (Top Down Pixel Art)
+
+LICENCA: os pacotes trazem um LINK, nao o texto -- https://craftpix.net/file-licenses/
+O Vini contatou o artista em 2026-09-02 e obteve autorizacao explicita de uso.
+
+O QUE FOI IMPORTADO, e o que nao foi:
+  ENTRARAM  objetos soltos da direcao de sombra 1, e as folhas de animacao
+  FICARAM DE FORA:
+    PSD          36 MB cada; repositorio nao e lugar de fonte de arte
+    COUPON.*     material de marketing do vendedor
+    Tiled_files  .tmx/.tsx sao do editor Tiled, nao da Unity
+    shadow2/3    a MESMA arte com a luz de outro lado -- 3x os arquivos,
+                 zero arte nova. Se precisar de outra direcao, basta reimportar.
+    ground/water/bridges  sao tiles QUADRADOS top-down; o grid deste jogo e
+                 isometrico (celula 1 x 0,5) e eles nao encaixam sem redesenho.
+
+Import settings: PPU 32, Point (no filter), sem compressao -- herdados do
+sand_01.png.meta, que e o padrao da skill favela-pixelart-standards.
