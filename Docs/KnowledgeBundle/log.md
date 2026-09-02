@@ -6,6 +6,63 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-01 (noite) — O slot_cheio e o botao_realce passam a acontecer
+
+Suíte: 987 → **990 testes**, 967 passando, 0 falhas.
+
+### O caso mais puro do modo de falha assinado deste repositório
+
+O `PainelDeInventario` **já** tinha `molduraVazia`/`molduraCheia`. **Já** trocava as duas no
+`Pintar()` conforme o slot tivesse item. As **19 `Image`** de moldura **já** estavam ligadas aos
+slots, uma por casa.
+
+Faltavam **dois campos de Sprite**. A peça inteira existia, compilava, passava na suíte, e não
+acontecia — e o comentário do próprio `Pintar` explicava por que o mecanismo importava:
+*"antes disso, a única pista de 'tem item aqui' era o desbotamento do slot inteiro"*.
+
+### O que mudou no código
+
+**Par próprio para o corpo.** `molduraCorpoVazia`/`molduraCorpoCheia`. Sem isso o `Pintar`
+sobrescreveria **em runtime** a moldura ornada que os slots de equipamento receberam no prefab, e a
+distinção "vestido × guardado" existiria só no Editor — a forma mais irritante de um detalhe de UI
+não existir.
+
+**`BarraDeItens` não tinha moldura nenhuma.** `SlotDeItem` ganhou o campo, mais o par de sprites e
+a troca no `Redesenhar`. Ali importa mais que no inventário: a barra fica **sempre na tela**, e
+*"qual das oito casas tem consumível"* é pergunta feita no meio da luta, sem tempo de abrir nada.
+
+**`moldura_slot_cheia`** fatiada da folha em (304,272,64,64) — o par ornado do `moldura_slot`. O
+pacote usa **frio = inativo, quente = ativo**, e as duas molduras de 64 seguem a mesma lógica do
+`slot_vazio`/`slot_cheio`.
+
+### Os botões
+
+Os 11 estavam em `Transition.ColorTint` com o `SpriteState` **vazio**. ColorTint sobre arte de
+moldura dourada **escurece a moldura junto**: o botão sob o cursor lê como *desabilitado*, não como
+realçado.
+
+Agora `SpriteSwap` com `botao_realce` em `highlighted`, `pressed` e `selected`. O `disabledSprite`
+fica vazio **de propósito**: nenhum `Button` deste projeto é desabilitado — medido, não presumido
+(os únicos `interactable` do código são `CanvasGroup` e um `Dropdown`) —, e prometer um estado que
+nunca aparece é o começo de outro campo que não faz nada.
+
+### Conferido no disco
+
+| | |
+|---|---|
+| `PainelDeInventario` | 4 campos de sprite, 19 molduras |
+| `BarraDeItens` | 2 campos de sprite, 8 molduras |
+| Botões | 11 em SpriteSwap, 11 com realce, **0** em ColorTint |
+
+Três guardas novas, e a principal afirma que os **quatro campos de sprite têm arte** — porque campo
+vazio foi exatamente o que manteve isto mudo.
+
+### A armadilha do cache, quinta aparição
+
+`m_MaxSize` 44 → 60 no `TutorialHintUI`, de novo. Corrigido no disco depois da ferramenta. **Vale
+registrar o padrão:** toda ferramenta que abre o `HUD_Gameplay.prefab` em batch mode reverte esse
+campo, sem exceção nas cinco vezes.
+
 ## 2026-09-01 (fim de tarde) — A interface deixa de ser caixa cinza
 
 Pedido do Vini: *"vamos usar essa UI nas coisas que estão faltando."* Suíte: 983 → **987 testes**.
