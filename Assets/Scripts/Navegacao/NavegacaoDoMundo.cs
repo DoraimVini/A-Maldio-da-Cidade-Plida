@@ -86,14 +86,37 @@ namespace FavelaAmarela.Runtime.Navegacao
             ResolverGrade();
         }
 
+        /// <summary>
+        /// Se já reclamamos da falta de malha <b>nesta cena</b>. Reiniciado a cada carga.
+        /// </summary>
+        private bool _jaAvisouSemMalha;
+
         private void ResolverGrade()
         {
             _grade = FindAnyObjectByType<Grid>();
+            _jaAvisouSemMalha = false;
 
-            if (_grade == null)
-                Debug.LogWarning("[Navegacao] Nenhum Grid nesta cena — a busca de caminho não " +
-                                 "tem malha para percorrer, e quem depender dela vai andar em " +
-                                 "linha reta.", this);
+            // SEM AVISO AQUI (2026-09-02). Este método roda duas vezes onde não pode haver
+            // malha: no Awake, que acontece em BeforeSceneLoad -- não existe cena ainda --, e
+            // ao carregar o menu, que legitimamente não tem Grid nenhum. Avisar nos dois casos
+            // NORMAIS é ensinar a ignorar o log, e o log é o único canal de runtime que temos.
+            //
+            // Quem avisa é o primeiro uso real: ver AvisarSeSemMalha.
+        }
+
+        /// <summary>
+        /// Reclama da falta de malha <b>uma vez por cena</b>, e só quando alguém realmente tenta
+        /// navegar. Cena sem Grid e sem ninguém navegando — o menu — é caso legítimo.
+        /// </summary>
+        private void AvisarSeSemMalha()
+        {
+            if (_grade != null || _jaAvisouSemMalha) return;
+
+            _jaAvisouSemMalha = true;
+
+            Debug.LogWarning("[Navegacao] Pediram caminho e não há Grid nesta cena — a busca não " +
+                             "tem malha para percorrer, e quem depender dela vai andar em linha " +
+                             "reta.", this);
         }
 
         /// <summary>Se a navegação está utilizável nesta cena.</summary>
@@ -108,7 +131,12 @@ namespace FavelaAmarela.Runtime.Navegacao
         /// </summary>
         public Celula ParaCelula(Vector3 mundo)
         {
-            if (_grade == null) return new Celula(0, 0);
+            if (_grade == null)
+            {
+                AvisarSeSemMalha();
+                return new Celula(0, 0);
+            }
+
 
             var c = _grade.WorldToCell(mundo);
             return new Celula(c.x, c.y);

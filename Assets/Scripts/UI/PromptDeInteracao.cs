@@ -45,13 +45,14 @@ namespace FavelaAmarela.Runtime.UI
 
             if (raiz == null && label != null) raiz = label.gameObject;
 
-            // Aviso, e não erro: no HUD persistente este campo NASCE vazio por construção
-            // (prefab-asset não referencia cena) e quem o preenche é o GameLoopBootstrap, no
-            // Bind. Um erro no caso normal ensina a ignorar erro.
-            if (detector == null)
-                Debug.LogWarning("[PromptDeInteracao] Sem detector ainda — esperando o Bind do " +
-                                 "GameLoopBootstrap. Se ele não vier, o prompt nunca aparece.",
-                                 this);
+            // SEM AVISO por 'detector == null' (2026-09-02). No HUD persistente este campo
+            // NASCE vazio por construção -- prefab-asset não referencia objeto de cena --, e
+            // quem o preenche é o GameLoopBootstrap depois do Awake. Eu tinha trocado o erro
+            // por aviso e o Vini mandou o log: o aviso disparava em TODA inicialização, no
+            // caso normal. Aviso no caso normal tem a mesma doença do erro no caso normal.
+            //
+            // Quem avisa é o GameLoopBootstrap, que sabe se existe jogador nesta cena: um menu
+            // sem detector é correto, e ele não reclama ali.
 
             if (label == null)
                 Debug.LogError("[PromptDeInteracao] Label de texto não atribuído — " +

@@ -69,18 +69,15 @@ namespace FavelaAmarela.Runtime.UI
                 Debug.LogError("[PainelDeEscolha] 'Raiz' não atribuída — o painel nunca aparecerá.", this);
             if (texto == null)
                 Debug.LogError("[PainelDeEscolha] 'Texto' não atribuído — nada será escrito.", this);
-            // Aviso, e nao erro (2026-09-02). Desde que este painel mora no HUD persistente,
-            // o campo NASCE vazio por construcao -- um prefab-asset nao referencia objeto de
-            // cena -- e quem o preenche e o GameLoopBootstrap, no Bind, depois do Awake. Um
-            // erro no caso NORMAL ensina a ignorar erro, e este chegou a deixar a suite
-            // PlayMode inteira vermelha.
-            if (playerInput == null)
-                Debug.LogWarning("[PainelDeEscolha] Sem PlayerInput ainda — esperando o Bind do " +
-                                 "GameLoopBootstrap. Se ele nao vier, a escolha aparece e nao " +
-                                 "responde a input.", this);
-            if (movimentoDoJogador == null)
-                Debug.LogWarning("[PainelDeEscolha] PlayerMovement não atribuído — o Damião pode " +
-                                 "andar enquanto o jogador navega as opções.", this);
+            // SEM AVISO por campo vazio (2026-09-02). Desde que este painel mora no HUD
+            // persistente, playerInput e movimentoDoJogador NASCEM vazios por construção --
+            // prefab-asset não referencia objeto de cena --, e quem os preenche é o
+            // GameLoopBootstrap depois do Awake.
+            //
+            // Eu tinha trocado o erro por aviso, e o Vini mandou o log da sessão: os dois
+            // disparavam em TODA inicialização. Aviso no caso normal tem a mesma doença do erro
+            // no caso normal -- ensina a ignorar o log, que é o único canal de runtime que
+            // temos. Quem avisa agora é o Mostrar(), onde a falta DÓI de verdade.
 
             if (playerInput != null)
             {
@@ -145,6 +142,18 @@ namespace FavelaAmarela.Runtime.UI
                 Debug.LogError("[PainelDeEscolha] Mostrar chamado sem opções.", this);
                 return;
             }
+
+            // AQUI a falta dói: alguém pediu para o jogador escolher, e sem PlayerInput ele
+            // vê as opções e não consegue navegar. Um menu que abre e não responde é pior que
+            // menu nenhum.
+            if (playerInput == null)
+                Debug.LogError("[PainelDeEscolha] Abrindo escolha SEM PlayerInput — as opções " +
+                               "aparecem e o jogador não consegue navegar nem confirmar. Quem " +
+                               "deveria ter ligado é o GameLoopBootstrap, no Bind.", this);
+
+            else if (movimentoDoJogador == null)
+                Debug.LogWarning("[PainelDeEscolha] Abrindo escolha sem PlayerMovement — o " +
+                                 "Damião pode andar enquanto o jogador navega as opções.", this);
 
             _opcoes = opcoes;
             _navegador = new NavegadorDeOpcoes(opcoes.Length);
