@@ -57,7 +57,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
         {
             if (_instancia != null) return;
 
-            var go = new GameObject("ConsoleDeCarcosa (F1)");
+            var go = new GameObject("ConsoleDeCarcosa (F12)");
             go.AddComponent<ConsoleDeCarcosa>();   // o Awake faz o DontDestroyOnLoad
         }
 
@@ -99,7 +99,14 @@ namespace FavelaAmarela.Runtime.Diagnostico
             var teclado = Keyboard.current;
             if (teclado == null) return;
 
-            if (teclado.f1Key.wasPressedThisFrame) Alternar();
+            // F12, e nao F1 (2026-09-02). O F1 e a acao "HabilidadeArtefato1" do
+            // InputSystem_Actions (linha 608) e o Vini reclamou por nome: abrir o console
+            // QUEIMAVA o Artefato do slot 1, com o custo de Resiliencia Mental junto. Os dois
+            // liam a mesma tecla no mesmo frame, sem ordem definida entre eles.
+            //
+            // F12 nao aparece uma vez sequer no asset de acoes -- conferido, e guardado pelo
+            // TeclaDoConsoleTests.
+            if (teclado.f12Key.wasPressedThisFrame) Alternar();
 
             // Escape fecha, mas só quando o console é quem está aberto -- senão roubaria o
             // Escape do menu de pausa.
@@ -134,7 +141,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
             if (!_aberto) return;
 
             _janela = GUILayout.Window(GetInstanceID(), _janela, Desenhar,
-                                       "Carcosa Debugger — runtime (F1 fecha)");
+                                       "Carcosa Debugger — runtime (F12 fecha)");
         }
 
         private void Desenhar(int id)
@@ -630,7 +637,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
 
             if (m.QuadrosMedidos == 0)
             {
-                GUILayout.Label("Nada medido ainda. Feche o console (F1), jogue alguns " +
+                GUILayout.Label("Nada medido ainda. Feche o console (F12), jogue alguns " +
                                 "segundos e reabra.");
                 return;
             }
@@ -675,7 +682,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
             }
 
             GUILayout.Space(6f);
-            GUILayout.Label("Como usar: zere aqui, feche com F1, jogue o trecho difícil " +
+            GUILayout.Label("Como usar: zere aqui, feche com F12, jogue o trecho difícil " +
                             "(Deserto povoado com a tempestade, ou a luta do Byakhee), e " +
                             "reabra. O pior 1% é o número que o jogador sente.");
         }

@@ -158,7 +158,15 @@ namespace FavelaAmarela.EditorTools
 
             var texto = textoGO.AddComponent<Text>();
             texto.font = ObterFontePadrao();
-            texto.fontSize = 39;
+            // 26, e nao 39. Medido pelo LayoutDaUiTests em 2026-09-02: a coluna tem 236
+            // unidades uteis, e fonte 39 rende ~12 caracteres por linha -- "Vitalidade
+            // Corporea: 100" quebrava em tres pedacos, e qualquer palavra acima de 12 letras
+            // era partida no MEIO. Com 26 cabem ~18, e "Resistencia" (a maior palavra que a
+            // ficha escreve) para de ser cortada.
+            //
+            // 26 e nao menos porque 24 e o piso legivel na referencia 1920x1080
+            // (TextoLegivelTests) e nao convem raspar o piso.
+            texto.fontSize = 26;
             texto.color = new Color(0.93f, 0.90f, 0.75f);
             texto.alignment = TextAnchor.UpperLeft;
             texto.horizontalOverflow = HorizontalWrapMode.Wrap;

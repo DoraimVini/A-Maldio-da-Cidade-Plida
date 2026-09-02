@@ -91,8 +91,19 @@ namespace FavelaAmarela.Runtime.UI
                 // A mensagem diz o que fazer, não só o que faltou: a versão anterior ("sem
                 // VitalidadeBridge ligada") mandava o leitor procurar um campo de Inspector que
                 // é IMPOSSÍVEL de preencher, porque este painel vive num prefab-asset.
-                corpo.text = "Ficha indisponível: o GameLoopBootstrap não ligou o corpo de " +
-                             "Damião nesta cena.";
+                //
+                // SEM o nome da classe (2026-09-02). Isto aparece na TELA DO JOGADOR, e
+                // "GameLoopBootstrap" é jargão de quem escreveu o código, não informação para
+                // quem está jogando -- a skill favela-lore-enforcer existe justamente para isso.
+                // E media 252 unidades numa coluna de 236: a palavra era partida no meio, o
+                // que o LayoutDaUiTests pegou.
+                //
+                // SEM Debug.LogError aqui: este método é de REDESENHO e roda a cada mudança de
+                // ficha. Um erro num caminho desses vira enxurrada no console e afoga o que
+                // importa -- cheguei a acrescentar um e a suíte PlayMode inteira ficou vermelha
+                // por causa dele. Regra de Ouro 1 do CLAUDE.md.
+                corpo.text = "Ficha indisponível: o corpo de Damião não foi ligado a este " +
+                             "painel nesta cena.";
                 return;
             }
 

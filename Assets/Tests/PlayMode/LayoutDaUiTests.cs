@@ -238,6 +238,132 @@ namespace FavelaAmarela.Tests.PlayMode
                 "Conserto: caixa maior, fonte menor, ou BestFit ligado — nesta ordem.");
         }
 
+        // ── 3b. A caixa comporta a maior PALAVRA? ────────────────────────────
+
+        /// <summary>
+        /// Com <c>horizontalOverflow = Wrap</c>, a Unity quebra nos espaços — mas uma palavra
+        /// que não cabe sozinha é <b>partida no meio</b>. É isso que transforma "Peitoral" em
+        /// "Pe…" e "Vitalidade Corpórea" em pedaços de três letras.
+        ///
+        /// <para>Mede a maior palavra com o mesmo gerador que a Unity usa para o layout, e a
+        /// compara com a largura útil da caixa. Um teste de altura não pega isto: o texto
+        /// "cabe" empilhando dez linhas de três letras.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator NenhumaPalavraEPartidaNoMeio()
+        {
+            yield return MontarOHud();
+
+            var partidos = new List<string>();
+
+            foreach (var txt in _hud.GetComponentsInChildren<Text>(true))
+            {
+                if (string.IsNullOrWhiteSpace(txt.text)) continue;
+                if (txt.horizontalOverflow != HorizontalWrapMode.Wrap) continue;
+                if (txt.resizeTextForBestFit) continue;
+
+                float largura = txt.rectTransform.rect.width;
+                if (largura <= Folga) continue;
+
+                var ajustes = txt.GetGenerationSettings(Vector2.zero);
+                var gerador = txt.cachedTextGeneratorForLayout;
+
+                string pior = null;
+                float piorLargura = 0f;
+
+                foreach (var palavra in txt.text.Split())   // sem argumentos: quebra em todo espaco em branco
+                {
+                    if (string.IsNullOrWhiteSpace(palavra)) continue;
+
+                    float w = gerador.GetPreferredWidth(palavra, ajustes) /
+                              Mathf.Max(0.0001f, ajustes.scaleFactor);
+
+                    if (w <= piorLargura) continue;
+                    piorLargura = w;
+                    pior = palavra;
+                }
+
+                if (pior == null || piorLargura <= largura + Folga) continue;
+
+                partidos.Add(
+                    $"{Caminho(txt.transform)}: a palavra \"{pior}\" pede {piorLargura:0} un e " +
+                    $"a caixa tem {largura:0} (fonte {txt.fontSize})");
+            }
+
+            Assert.IsEmpty(partidos,
+                "Palavra(s) partidas no meio pela caixa:" + System.Environment.NewLine + "  " +
+                string.Join(System.Environment.NewLine + "  ", partidos) +
+                System.Environment.NewLine +
+                "Com Wrap ligado, palavra que não cabe é cortada no meio — é o \"Pe…\" e o " +
+                "\"Arm…\" da tela. Conserto: caixa mais larga, fonte menor, ou BestFit.");
+        }
+
+        // ── 4. O 9-slice cabe na caixa? ──────────────────────────────────────
+
+        /// <summary>
+        /// Uma <c>Image</c> fatiada cujas <b>bordas somam mais que a própria caixa</b> desenha
+        /// só moldura: as fatias de cima e de baixo se atravessam e não sobra centro. Na tela
+        /// vira uma caixa escura amassada, sem conteúdo aparente — foi assim que a
+        /// <c>BarraDeItens</c> apareceu no print do Vini.
+        ///
+        /// <para><b>A conta</b>, confirmada na doc da Unity 6.4 (<c>Canvas.referencePixelsPerUnit</c>:
+        /// <i>"for sprites that have the same Pixels Per Unit as the Reference Pixels Per Unit
+        /// in the Canvas, the pixel density will be one to one"</i>): a borda em unidades de UI é
+        /// <c>bordaEmPixels × referencePPU / (spritePPU × pixelsPerUnitMultiplier)</c>. Com o
+        /// <c>painel_ornado</c> (borda 23, PPU 32) num Canvas de referência 100 e multiplicador
+        /// 1, dá <b>71,9 unidades por lado</b> — 143,8 na vertical, numa caixa de 81.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator NenhumNoveFatiasEstouraAPropriaCaixa()
+        {
+            yield return MontarOHud();
+
+            var canvas = _hud.GetComponentInChildren<Canvas>(true);
+            Assert.IsNotNull(canvas, "O HUD não tem Canvas — sem ele não há referencePPU.");
+
+            float referencia = canvas.referencePixelsPerUnit;
+            var estourando = new List<string>();
+
+            foreach (var img in _hud.GetComponentsInChildren<Image>(true))
+            {
+                if (img.type != Image.Type.Sliced) continue;
+                if (img.sprite == null) continue;
+
+                var borda = img.sprite.border;
+                if (borda == Vector4.zero) continue;
+
+                float ppu = img.sprite.pixelsPerUnit * Mathf.Max(0.0001f,
+                                                                 img.pixelsPerUnitMultiplier);
+                float escala = referencia / ppu;
+
+                var caixa = img.rectTransform.rect;
+
+                float horizontal = (borda.x + borda.z) * escala;
+                float vertical = (borda.y + borda.w) * escala;
+
+                if (caixa.width <= Folga || caixa.height <= Folga) continue;
+
+                bool estouraX = horizontal >= caixa.width;
+                bool estouraY = vertical >= caixa.height;
+
+                if (!estouraX && !estouraY) continue;
+
+                estourando.Add(
+                    $"{Caminho(img.transform)} [{img.sprite.name}]: bordas somam " +
+                    $"{horizontal:0}×{vertical:0} un numa caixa de {caixa.width:0}×" +
+                    $"{caixa.height:0} — {(estouraX ? "estoura em X" : "")}" +
+                    $"{(estouraX && estouraY ? " e " : "")}{(estouraY ? "estoura em Y" : "")}");
+            }
+
+            Assert.IsEmpty(estourando,
+                "9-slice sem centro:" + System.Environment.NewLine + "  " +
+                string.Join(System.Environment.NewLine + "  ", estourando) +
+                System.Environment.NewLine +
+                "As fatias das bordas se atravessam e a arte do meio some. Conserto: subir o " +
+                "'pixelsPerUnitMultiplier' da Image (borda menor em unidades), ou um sprite de " +
+                "borda mais fina para caixas baixas.");
+        }
+
         private static string Encurtar(string s)
         {
             s = s.Replace("\n", " ").Trim();

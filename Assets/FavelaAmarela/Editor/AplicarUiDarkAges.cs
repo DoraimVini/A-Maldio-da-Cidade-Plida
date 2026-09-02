@@ -54,9 +54,27 @@ namespace FavelaAmarela.EditorTools
         {
             public readonly string Contem, Sprite, Razao;
 
-            public Regra(string contem, string sprite, string razao)
+            /// <summary>
+            /// <c>pixelsPerUnitMultiplier</c> da Image. Governa a <b>espessura da moldura</b>
+            /// no 9-slice, e não é cosmético: a borda em unidades de UI é
+            /// <c>bordaEmPixels × referencePPU / (spritePPU × multiplicador)</c>.
+            ///
+            /// <para>Com o <c>painel_ornado</c> (borda 23, PPU 32) num Canvas de referência 100
+            /// e multiplicador <b>1</b>, cada borda ocupa <b>71,9 unidades</b> — 143,8 na
+            /// vertical. Numa caixa de 94 de altura, as fatias de cima e de baixo se atravessam
+            /// e <b>não sobra centro</b>: na tela vira uma caixa escura amassada. Foi assim que
+            /// a barra de itens apareceu no print do Vini, e fui eu que apliquei o sprite.</para>
+            ///
+            /// <para><b>3,125</b> = 100/32 é a densidade 1:1 — cada pixel do sprite vira uma
+            /// unidade de UI, e a borda ocupa os 23 que o artista desenhou. É o teto sensato.
+            /// <b>1</b> deixa a moldura 3× mais grossa, o que só cabe em painel grande.</para>
+            /// </summary>
+            public readonly float Multiplicador;
+
+            public Regra(string contem, string sprite, string razao, float multiplicador = 1f)
             {
                 Contem = contem; Sprite = sprite; Razao = razao;
+                Multiplicador = multiplicador;
             }
         }
 
@@ -88,8 +106,19 @@ namespace FavelaAmarela.EditorTools
             new Regra("/Tela_Pause/Botao_", "botao", "os botões do pause"),
             new Regra("/Tela_Colapso/Painel/Opcoes/Botao_", "botao", "os botões do Colapso"),
             new Regra("/Tela_Colapso/Painel", "painel_ornado", "o painel do Colapso"),
-            new Regra("/Tela_Pause", "painel_ornado", "o fundo do pause"),
-            new Regra("/BarraDeItens", "painel_ornado", "o trilho da barra de itens"),
+            // O fundo do pause é um SCRIM, não um quadro: ele existe para escurecer a cena
+            // atrás. Vesti-lo com o painel_ornado esticava uma moldura dourada de 96×96 sobre
+            // 1920×1080 -- e o print do Vini mostra o cenário aparecendo através dele. Uma
+            // Image sem sprite desenha um retângulo sólido, que é exatamente o que um scrim é.
+            // A cor (0.02, 0.02, 0.015, 0.8) já estava certa e não se toca.
+            new Regra("/Tela_Pause", Limpar,
+                "o fundo do pause é scrim: retângulo sólido, não moldura"),
+            // MULTIPLICADOR 3,125 (densidade 1:1). Medido pelo LayoutDaUiTests em 2026-09-02:
+            // com multiplicador 1 as bordas somavam 144 unidades numa caixa de 94 de altura --
+            // as fatias se atravessavam e a barra virava uma caixa escura sem conteúdo.
+            new Regra("/BarraDeItens", "painel_ornado",
+                "o trilho da barra de itens, com a moldura na espessura em que foi desenhada",
+                multiplicador: 3.125f),
         };
 
         private const string OpcoesPrefab = "Assets/FavelaAmarela/Resources/Painel_Opcoes.prefab";
@@ -228,15 +257,15 @@ namespace FavelaAmarela.EditorTools
                     continue;
                 }
 
-                if (img.sprite == alvo && img.type == Image.Type.Sliced) continue;
+                if (img.sprite == alvo && img.type == Image.Type.Sliced &&
+                    Mathf.Approximately(img.pixelsPerUnitMultiplier, regra.Multiplicador))
+                    continue;
 
                 Undo.RecordObject(img, "Vestir UI");
 
                 img.sprite = alvo;
-                // Sliced com multiplicador 1: é exatamente como o painel_ornado já está
-                // configurado nos 4 lugares onde o pacote era usado.
                 img.type = Image.Type.Sliced;
-                img.pixelsPerUnitMultiplier = 1f;
+                img.pixelsPerUnitMultiplier = regra.Multiplicador;
                 img.fillCenter = true;
 
                 EditorUtility.SetDirty(img);
