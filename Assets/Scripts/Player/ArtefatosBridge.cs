@@ -88,6 +88,16 @@ namespace FavelaAmarela.Player
         // ── Consulta (a UI lê por aqui) ───────────────────────────────────────
 
         /// <summary>O <c>ArtefatoDef</c> encaixado no slot, ou <c>null</c>.</summary>
+        /// <summary>
+        /// O <see cref="ArtefatoDef"/> deste id, ou <c>null</c> se ele nao esta no catalogo.
+        ///
+        /// <para>Existe para quem precisa do <b>nome diegetico</b> de uma reliquia sem a ter
+        /// portada -- o ponto focal do Rei, ao dizer ao jogador o que falta.</para>
+        /// </summary>
+        public ArtefatoDef Def(string artefatoId)
+            => !string.IsNullOrEmpty(artefatoId) && _porId.TryGetValue(artefatoId, out var d)
+                ? d : null;
+
         public ArtefatoDef DefNoSlot(int slot)
         {
             string id = _inventario.IdNoSlot(slot);

@@ -2,6 +2,7 @@ using UnityEngine;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.Enemies;
 using FavelaAmarela.Runtime.Interaction;
+using FavelaAmarela.Runtime.UI;
 
 namespace FavelaAmarela.Runtime.Itens
 {
@@ -38,7 +39,26 @@ namespace FavelaAmarela.Runtime.Itens
         [SerializeField] private Sprite spriteInativo;
         [SerializeField] private Sprite spriteAtivo;
 
+        [Header("Fala")]
+        [Tooltip("Caixa onde o ponto focal responde ao jogador. Se vazia, usa a do HUD. [CENA]")]
+        [SerializeField] private TutorialHintUI caixaDeTexto;
+
         private bool _ativado;
+
+        /// <summary>
+        /// A caixa de fala em uso, resolvida NA HORA DO USO.
+        ///
+        /// <para>O campo nasce vazio em prefab-asset (nao referencia objeto de cena), e a caixa
+        /// vive no HUD persistente. Resolver no Awake pegaria um HUD que ainda nao subiu.</para>
+        /// </summary>
+        private TutorialHintUI CaixaDeFala
+            => caixaDeTexto != null ? caixaDeTexto : TutorialHintUI.Instancia;
+
+        private void Dizer(string texto)
+        {
+            var caixa = CaixaDeFala;
+            if (caixa != null) caixa.Mostrar(texto);
+        }
 
         private void Awake()
         {
@@ -70,10 +90,24 @@ namespace FavelaAmarela.Runtime.Itens
             if (_ativado || rei == null || string.IsNullOrWhiteSpace(artefatoId)) return;
 
             var artefatos = quemInterage.GetComponent<ArtefatosBridge>();
-            if (artefatos == null || !artefatos.Inventario.Contem(artefatoId))
+            if (artefatos == null) return;
+
+            // O NOME diegetico, e nao o id: "anel_sinal_amarelo" nao e coisa que se diga.
+            string nome = artefatos.Def(artefatoId)?.Nome ?? "a relíquia";
+
+            // TRES desfechos, TRES falas. Antes, os dois primeiros eram um Debug.Log -- que num
+            // build nao existe -- e o terceiro trocava um sprite que nao esta autorado. O
+            // jogador apertava E e a tela nao mudava em desfecho nenhum, o que e indistinguivel
+            // de um altar quebrado. Relatado pelo Vini em 2026-09-02.
+            if (!artefatos.Inventario.Contem(artefatoId))
             {
-                Debug.Log($"[PontoFocalDeReliquia] Damião não tem '{artefatoId}' equipado — " +
-                          "o ponto continua inerte.", this);
+                Dizer(artefatos.Inventario.Possui(artefatoId)
+                    // POSSUI mas nao PORTA. E a armadilha fina desta luta: sao quatro slots de
+                    // Artefato e tres reliquias, entao qualquer outro Artefato portado deixa uma
+                    // delas dormente -- e o ponto focal exige porte, nao posse.
+                    ? $"{nome} dorme na tua mochila. O ponto focal só responde ao que Damião " +
+                      "traz em mãos."
+                    : $"O ponto focal não responde. {nome} não está contigo.");
                 return;
             }
 
@@ -82,6 +116,11 @@ namespace FavelaAmarela.Runtime.Itens
             _ativado = true;
             if (spriteDoPonto != null && spriteAtivo != null)
                 spriteDoPonto.sprite = spriteAtivo;
+
+            int faltam = rei.ReliquiasFaltando;
+            Dizer(faltam > 0
+                ? $"O ponto focal desperta. Ainda faltam {faltam}."
+                : "O último ponto focal desperta. O rito de selamento começa.");
         }
 
         private void Start()

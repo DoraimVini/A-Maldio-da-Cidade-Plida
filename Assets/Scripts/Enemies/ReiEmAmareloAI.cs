@@ -44,6 +44,11 @@ namespace FavelaAmarela.Runtime.Enemies
         /// </summary>
         public IReadOnlyList<string> ReliquiasExigidas => idsDasReliquiasExigidas;
 
+        /// <summary>Quantas reliquias o rito ainda espera. Zero quando todas estao ativas.</summary>
+        public int ReliquiasFaltando =>
+            _fsm == null ? idsDasReliquiasExigidas.Length
+                         : _fsm.TotalDeReliquiasExigidas - _fsm.ReliquiasAtivas;
+
         [Header("Selamento")]
         [Tooltip("Quantas vezes o Rei se desvela até o rito se completar.")]
         [Min(1)]
@@ -138,6 +143,20 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_movimentoDoJogador == null)
                 Debug.LogError("[ReiEmAmarelo] Player sem PlayerMovement — sem LookDirection, " +
                                "a Máscara Pálida nunca poderia ser evitada.", this);
+
+            // O RITO COMEÇA AQUI (2026-09-02). Antes, `IniciarRitual()` tinha UM chamador em
+            // todo o projeto: o Carcosa Debugger, que é janela de Editor. Nada no jogo o
+            // chamava. A máquina ficava em Aguardando para sempre, e AtivarReliquia recusa
+            // fora de AtivandoReliquias -- então os três pontos focais do Trono recusavam TODA
+            // relíquia, em silêncio, e o Rei era impossível de selar.
+            //
+            // O Vini relatou como "os altares das relíquias não estão funcionando". Estava
+            // certo: eles não funcionavam. A causa era um passo acima deles.
+            //
+            // Start() é o gancho certo e não inventa design: AtivandoReliquias é um PORTÃO
+            // puro -- sem relógio, sem pressão, e o próprio Tick não avança nesse estado (ver
+            // ReiEmAmareloFSM.Tick). Quem carregou a cena do Trono já está na arena.
+            IniciarRitual();
         }
 
         private void OnDestroy()
