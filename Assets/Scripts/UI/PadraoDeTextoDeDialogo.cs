@@ -29,13 +29,13 @@ namespace FavelaAmarela.Runtime.UI
         /// Piso do Best Fit. Abaixo disto o texto deixa de ser legível a 1080p — e é melhor a
         /// caixa transbordar (visível) do que a letra encolher até sumir (silencioso).
         /// </summary>
-        public const int TamanhoMinimo = 24;
+        public const int TamanhoMinimo = 38;
 
         /// <summary>
         /// Teto do Best Fit, calibrado pelo pior caso real: a reação mais longa da Cassilda
         /// (278 caracteres) na caixa de diálogo da HUD (1613 × 259 px na referência 1920×1080)
         /// ocupa cerca de 4 linhas a 44. Acima disso, uma fala longa não teria como caber.
         /// </summary>
-        public const int TamanhoMaximo = 44;
+        public const int TamanhoMaximo = 70;
     }
 }
