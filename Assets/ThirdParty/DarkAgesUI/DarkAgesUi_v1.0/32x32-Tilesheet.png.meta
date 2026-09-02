@@ -215,6 +215,18 @@ TextureImporter:
   - first:
       213: -2426919387455327664
     second: moldura_slot
+  - first:
+      213: 120205828945923761
+    second: slot_vazio
+  - first:
+      213: 1140228742084782151
+    second: slot_cheio
+  - first:
+      213: 1140554978215312723
+    second: botao
+  - first:
+      213: 735719993273505570
+    second: botao_realce
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -401,6 +413,94 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: slot_vazio
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 224
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 8, y: 8, z: 8, w: 8}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb4697bb4ce8bb430800000000000000
+      internalID: 120205828945923761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: slot_cheio
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 224
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 8, y: 8, z: 8, w: 8}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea7707596fe9d9730800000000000000
+      internalID: 1140228742084782151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: botao
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 224
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 8, y: 8, z: 8, w: 8}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a5bb643722d8c4d0800000000000000
+      internalID: 1140554978215312723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: botao_realce
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 224
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 8, y: 8, z: 8, w: 8}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5499e485ef2cc02e0800000000000000
+      internalID: 735719993273505570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -483,6 +583,8 @@ TextureImporter:
       32x32-Tilesheet_7: 7434321578582838890
       32x32-Tilesheet_8: 477566060432752925
       32x32-Tilesheet_9: -3809253233554092125
+      botao: 1140554978215312723
+      botao_realce: 735719993273505570
       moldura_slot: -2426919387455327664
       painel_ornado: 1089723763042107428
       painel_pergaminho: -7308537856757825077
