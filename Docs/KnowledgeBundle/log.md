@@ -6,6 +6,90 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-02 (madrugada) — A régua, e as quatro fases que ela destravou
+
+O Vini mandou um print do jogo com os botões do pause empilhados e perguntou **por que eu não
+conseguia consertar a UI**. A resposta virou a primeira parte do trabalho.
+
+Suítes: EditMode 999 → **1018**; PlayMode 5 → **10**.
+
+### Por que eu não estava conseguindo — medido
+
+| | |
+|---|---|
+| Arquivos de teste EditMode | **129** |
+| ...que só leem YAML/fonte como **texto** | **73** |
+| ...que instanciam `GameObject` | **5** |
+| Arquivos de teste **PlayMode** | **1** |
+
+Nos 19 commits da branch eu escrevi *"conferido no disco"* **17 vezes**. Tudo que chamei de
+verificação foi leitura de dado serializado — e sobreposição, texto que não cabe, tecla disputada e
+clique que não chega **não existem no YAML**. **Eu conferia o arquivo e relatava o jogo.**
+
+Duas guardas minhas eram teatro: o `TextoLegivelTests` faz **regex no meu próprio código-fonte**, e
+o `MenuSemBotaoEscondidoTests` — que pegaria exatamente os botões empilhados — apontava **só** para
+`Cena_Menu.unity`. O gêmeo no `HUD_Gameplay.prefab` ficou quebrado o tempo todo.
+
+E havia `Editor.log`, `Player.log` e o save nesta máquina desde sempre. **Eu nunca abri nenhum.**
+
+### Fase 0 — a régua
+
+`LayoutDaUiTests` (PlayMode) carrega o HUD que o jogo usa, liga os painéis que nascem inativos,
+força o layout e mede `GetWorldCorners`. **Regra dura: se não conseguir medir, falha dizendo que
+não conseguiu.** Um teste que não mede e diz "ok" compra confiança sem lastro.
+
+Mais `Tools/ler_log_de_execucao.ps1`, e `-ComGraficos` no runner (medido: as métricas de fonte
+existem headless, não precisou).
+
+**A própria régua me corrigiu duas vezes:** a primeira versão comparava `preferredHeight` (unidades
+locais) com pixels de tela — acusou dois rótulos inocentes; e um `Debug.LogError` que acrescentei
+num caminho de **redesenho** deixou a suíte inteira vermelha (Regra de Ouro 1).
+
+### Fase 1 — sobreposto, cortado, amassado
+
+`Botao_Sair × Botao_Opcoes: 100% de sobreposição`. E o `LigarBotaoDeOpcoes.cs` **já sabia** do
+defeito (comentário na linha 109) e **já tinha a cura** — mas a guarda de idempotência fazia
+`return "já estava ligado"` antes de alcançá-la. **Ligar a referência e posicionar são dois
+trabalhos.**
+
+Dois estragos **meus** da sessão anterior: o `painel_ornado` com borda de 71,9 unidades numa caixa
+de 94 (as fatias se atravessavam — as "caixas escuras vazias"), e o scrim do pause vestido com uma
+moldura ornamentada. Mais 18 rótulos cortados e a Ficha com 12 caracteres por linha.
+
+E o **F1** saiu para o F12: ele era `HabilidadeArtefato1`, e abrir o console **queimava o Artefato
+do slot 1**.
+
+### Fase 2 — as falas que sumiam
+
+Três consumidores não caíam para a `TutorialHintUI.Instancia`, e o campo estava `{fileID: 0}` em
+**100% das instâncias**: **pegar qualquer item no Deserto não mostrava caixa nenhuma.**
+
+E o `PromptDeInteracao` existia em **uma cena das seis** — nas outras cinco o jogador **nunca via
+"E — ..."**, incluindo o Baú de Yhtill que eu tinha acabado de pôr no Santuário. Ele e o
+`PainelDeEscolha` foram para o HUD persistente.
+
+### Fase 3 — a camada de input que nunca existiu
+
+Sete disputas de tecla, e a causa não era nenhuma delas. **`Time.timeScale = 0` não engole tecla** —
+`Update()` continua rodando. Com a mochila aberta, F1–F4 queimavam Artefatos e 1–8 consumiam itens;
+**digitar "3" no console consumia o item do slot 3**; Esc pausava o jogo **por baixo** do
+inventário; clicar "Continuar" **dava o golpe**.
+
+`FocoDeEntrada` (POCO, 8 testes sem Unity) + `ArbitroDeFoco`. Pilha, não valor: o console abre por
+cima do inventário e fechá-lo devolve o comando ao inventário.
+
+E **correr voltou a existir**: `Sprint` e `Crouch` estavam na mesma tecla, com `if/else` — correr
+era inalcançável e o Vigor jamais era gasto correndo. Mecânica morta na build final.
+
+### Fase 4 — mexer nos itens
+
+As três camadas faltavam juntas. E o `BaseInventory.Swap` **já existia**, com um comentário dizendo
+que servia para "o arrastar da UI", com **zero chamadores**. `Desequipar` idem.
+
+Selecionar-e-clicar em vez de arrastar: 19 `Button` ligados, e a moldura **aceitando raycast** — com
+`raycastTarget = false` o botão existe, parece certo, e o clique atravessa. De quebra, os slots
+**8–11**, inalcançáveis por qualquer caminho, deixaram de ser.
+
 ## 2026-09-02 — Tipografia por último, e as duas barras que estavam pela metade
 
 Suíte: 990 → **994 testes**, 971 passando, 0 falhas.
