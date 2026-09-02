@@ -257,9 +257,26 @@ namespace FavelaAmarela.Runtime.Itens
             gameObject.SetActive(false);
         }
 
+        /// <summary>
+        /// A caixa a usar: a do Inspector, ou a <b>global do HUD persistente</b>.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> Este campo estava <c>{fileID: 0}</c> em
+        /// 100% das instâncias em disco, e sem esta queda a fala era simplesmente
+        /// <b>descartada</b> — sem erro, sem aviso. Dos 17 consumidores de
+        /// <c>TutorialHintUI</c>, catorze já caíam para a instância global; três não, e este
+        /// era um deles.</para>
+        ///
+        /// <para>Resolve no <b>momento do uso</b>, e não no <c>Awake</c>: a
+        /// <c>TutorialHintUI.Instancia</c> só existe depois do <c>OnEnable</c> dela, e quem
+        /// acorda antes guardaria nulo para sempre.</para>
+        /// </summary>
+        private TutorialHintUI CaixaDeFala =>
+            caixaDeTexto != null ? caixaDeTexto : TutorialHintUI.Instancia;
+
         private void Mostrar(string texto)
         {
-            if (caixaDeTexto != null) caixaDeTexto.Mostrar(texto);
+            var caixa = CaixaDeFala;
+            if (caixa != null) caixa.Mostrar(texto);
         }
     }
 }

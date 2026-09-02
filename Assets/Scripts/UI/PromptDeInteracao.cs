@@ -45,13 +45,44 @@ namespace FavelaAmarela.Runtime.UI
 
             if (raiz == null && label != null) raiz = label.gameObject;
 
+            // Aviso, e não erro: no HUD persistente este campo NASCE vazio por construção
+            // (prefab-asset não referencia cena) e quem o preenche é o GameLoopBootstrap, no
+            // Bind. Um erro no caso normal ensina a ignorar erro.
             if (detector == null)
-                Debug.LogError("[PromptDeInteracao] Detector de Interação não atribuído — " +
-                               "o prompt nunca aparecerá.", this);
+                Debug.LogWarning("[PromptDeInteracao] Sem detector ainda — esperando o Bind do " +
+                                 "GameLoopBootstrap. Se ele não vier, o prompt nunca aparece.",
+                                 this);
 
             if (label == null)
                 Debug.LogError("[PromptDeInteracao] Label de texto não atribuído — " +
                                "o prompt não terá o que escrever.", this);
+
+            Esconder();
+        }
+
+        /// <summary>
+        /// Liga o prompt ao detector de Damião. Chamado pelo <c>GameLoopBootstrap</c>.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> Este prompt vivia numa <b>cena só das
+        /// seis</b> do build — nas outras cinco o jogador <b>nunca via "E — ..."</b>, e portanto
+        /// não tinha como saber que baú, item ou NPC eram interagíveis. Ele agora mora no
+        /// <c>HUD_Gameplay.prefab</c>, que é um asset em <c>Resources</c>: um prefab-asset
+        /// <b>não pode</b> referenciar objeto de cena, então o campo do Inspector é impossível
+        /// de preencher e a injeção tem de vir de fora.</para>
+        ///
+        /// <para>É exatamente o caminho que o <c>PainelDeFicha</c> já percorreu — mesmo
+        /// problema, mesmo conserto (ver <c>GameLoopBootstrap</c>).</para>
+        ///
+        /// <para>Idempotente: re-bind troca a fonte sem deixar handler pendurado na anterior.</para>
+        /// </summary>
+        public void Bind(DetectorDeInteracao novoDetector)
+        {
+            if (detector != null) detector.OnAlvoMudou -= HandleAlvoMudou;
+
+            detector = novoDetector;
+
+            if (detector != null && isActiveAndEnabled)
+                detector.OnAlvoMudou += HandleAlvoMudou;
 
             Esconder();
         }

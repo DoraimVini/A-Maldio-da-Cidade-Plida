@@ -321,6 +321,26 @@ namespace FavelaAmarela.Runtime.GameLoop
                 Debug.LogWarning("[GameLoopBootstrap] Nenhum PainelDeFicha encontrado — a ficha " +
                                  "do inventário vai abrir vazia.", this);
 
+            // O PROMPT DE INTERAÇÃO, pelo mesmo motivo e pelo mesmo caminho da ficha acima.
+            // Ele existia numa cena só das seis do build: nas outras cinco o jogador NUNCA via
+            // "E — Abrir o baú", e portanto não tinha como saber que aquilo era interagível.
+            // Agora mora no HUD persistente, e o detector vem daqui.
+            var prompt = FindAnyObjectByType<FavelaAmarela.Runtime.UI.PromptDeInteracao>(
+                FindObjectsInactive.Include);
+
+            if (prompt != null)
+            {
+                var detector = FindAnyObjectByType<
+                    FavelaAmarela.Runtime.Interaction.DetectorDeInteracao>(
+                        FindObjectsInactive.Include);
+
+                if (detector != null) prompt.Bind(detector);
+                else
+                    Debug.LogWarning("[GameLoopBootstrap] Prompt de interação sem " +
+                                     "DetectorDeInteracao nesta cena — nada vai anunciar o 'E'.",
+                                     this);
+            }
+
             var pausa = GetComponent<PausaInputHandler>();
             if (pausa != null) pausa.Bind(StateMachine);
 

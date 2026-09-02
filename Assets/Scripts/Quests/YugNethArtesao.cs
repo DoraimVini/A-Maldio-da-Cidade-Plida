@@ -72,20 +72,38 @@ namespace FavelaAmarela.Runtime.Quests
             if (caixa != null) caixaDeTexto = caixa;
         }
 
+        /// <summary>
+        /// A caixa a usar: a do Inspector, ou a <b>global do HUD persistente</b>.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> Sem esta queda, a fala do Yug-Neth era
+        /// descartada em silêncio sempre que ninguém chamasse <c>Configurar()</c> — e a
+        /// interação parecia quebrada. Dos 17 consumidores de <c>TutorialHintUI</c>, catorze já
+        /// caíam para a instância global; três não, e este era um deles.</para>
+        ///
+        /// <para>Resolve no <b>momento do uso</b>: a <c>Instancia</c> só existe depois do
+        /// <c>OnEnable</c> do HUD, e quem acorda antes guardaria nulo para sempre.</para>
+        /// </summary>
+        private TutorialHintUI CaixaDeFala =>
+            caixaDeTexto != null ? caixaDeTexto : TutorialHintUI.Instancia;
+
         private void Awake()
         {
-            if (caixaDeTexto == null)
-                Debug.LogError("[YugNethArtesao] Sem caixa de texto — falar com ele não mostraria " +
-                               "nada, e a interação pareceria quebrada. Quem entrega é a " +
-                               "TravessiaDoCompanheiro, por Configurar().", this);
+            // O erro só vale se NEM a caixa própria NEM a global existirem. Antes ele disparava
+            // sempre que o campo estivesse vazio, o que era o caso normal -- e um erro que
+            // aparece no caso normal ensina a ignorar erro.
+            if (caixaDeTexto == null && TutorialHintUI.Instancia == null)
+                Debug.LogWarning("[YugNethArtesao] Sem caixa de texto e sem HUD persistente — " +
+                                 "falar com ele não mostraria nada. Quem entrega uma caixa " +
+                                 "própria é a TravessiaDoCompanheiro, por Configurar().", this);
         }
 
         /// <inheritdoc />
         public void Interagir(GameObject quemInterage)
         {
-            if (!PodeInteragir || caixaDeTexto == null) return;
+            var caixa = CaixaDeFala;
+            if (!PodeInteragir || caixa == null) return;
 
-            caixaDeTexto.Mostrar(falas[_proxima], duracaoDaFala);
+            caixa.Mostrar(falas[_proxima], duracaoDaFala);
 
             // Trava na última em vez de voltar ao começo: reler o fim é menos estranho do que o
             // NPC recomeçar a explicação sozinho toda vez que se aperta o botão.
