@@ -35,13 +35,36 @@ namespace FavelaAmarela.Runtime.GameLoop
         private bool _tocado;
         private TipoDeDerrota _tipoDeDerrota = TipoDeDerrota.Mental;
 
-        private void Awake()
+        private void Awake() => Repousar();
+
+        /// <summary>
+        /// Devolve a tela de Colapso ao repouso: invisivel, desligada, e pronta para tocar de novo.
+        ///
+        /// <para><b>Por que existe (2026-09-02).</b> O <c>Awake</c> era o unico lugar que zerava o
+        /// alpha -- e este componente vive no <c>HUD_Gameplay</c>, que e <c>DontDestroyOnLoad</c>.
+        /// <b>O <c>Awake</c> roda uma vez na vida do jogo, nao uma vez por cena.</b> Depois da
+        /// primeira morte o painel preto ficava em <c>alpha 1</c> para sempre: o jogador renascia,
+        /// a cena carregava por baixo, e a tela continuava preta por cima dela. Era o "erro para
+        /// renascer" que o Vini relatou.</para>
+        ///
+        /// <para>E <c>_tocado</c> era uma trava sem destravamento, o que escondia um segundo
+        /// defeito atras do primeiro: a <b>segunda</b> morte nao tocaria sequencia nenhuma. Os
+        /// dois nascem da mesma premissa errada -- a de que este objeto morre junto com a cena.
+        /// </para>
+        ///
+        /// <para>Quem chama e o <see cref="FavelaAmarela.Runtime.UI.RetornoDoColapso"/>, que vive
+        /// no mesmo objeto e ja escuta a maquina de estados: no <c>Bind</c> (uma vez por cena) e
+        /// ao <b>sair</b> do Colapso. Nunca durante ele.</para>
+        /// </summary>
+        public void Repousar()
         {
-            if (painelColapso != null)
-            {
-                painelColapso.alpha = 0f;
-                painelColapso.gameObject.SetActive(false);
-            }
+            StopAllCoroutines();
+            _tocado = false;
+
+            if (painelColapso == null) return;
+
+            painelColapso.alpha = 0f;
+            painelColapso.gameObject.SetActive(false);
         }
 
         /// <summary>Dispara a sequência de morte por Colapso Mental. Idempotente (só toca uma vez).</summary>

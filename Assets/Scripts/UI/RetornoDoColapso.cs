@@ -47,12 +47,16 @@ namespace FavelaAmarela.Runtime.UI
         [SerializeField] private Button botaoMenu;
 
         private GameLoopStateMachine _maquina;
+        private SequenciaDeColapso _sequencia;
         private float _tempoNoColapso;
         private bool _oferecendo;
         private bool _emColapso;
 
         private void Awake()
         {
+            // Vive no mesmo objeto (Tela_Colapso). E quem sabe apagar o painel escuro.
+            _sequencia = GetComponent<SequenciaDeColapso>();
+
             if (botaoRetomar != null) botaoRetomar.onClick.AddListener(Retomar);
             if (botaoMenu != null) botaoMenu.onClick.AddListener(NavegacaoDeCenas.IrParaMenu);
         }
@@ -78,7 +82,9 @@ namespace FavelaAmarela.Runtime.UI
             _maquina = maquina;
             _maquina.OnStateChanged += HandleEstadoMudou;
 
-            Esconder();
+            // Bind roda uma vez por cena, inclusive na que nasce do renascimento -- e e o unico
+            // gancho por cena que este objeto tem, ja que o Awake dele so roda uma vez na vida.
+            VoltarAoRepouso();
         }
 
         private void OnDestroy()
@@ -89,7 +95,9 @@ namespace FavelaAmarela.Runtime.UI
         private void HandleEstadoMudou(GameState anterior, GameState atual)
         {
             _emColapso = atual == GameState.Colapso;
+
             if (_emColapso) Esconder();
+            else VoltarAoRepouso();
         }
 
         private void Update()
@@ -126,6 +134,21 @@ namespace FavelaAmarela.Runtime.UI
             }
 
             if (grupoDeOpcoes != null) grupoDeOpcoes.SetActive(true);
+        }
+
+        /// <summary>
+        /// Esconde as opcoes <b>e</b> apaga o painel escuro, devolvendo a tela de Colapso ao
+        /// estado invisivel.
+        ///
+        /// <para><b>Por que o <c>Esconder</c> sozinho nao bastava (2026-09-02).</b> Ele so desliga
+        /// o <c>grupoDeOpcoes</c> -- os botoes. O retangulo preto e opaco e o <c>Painel</c>, que a
+        /// <see cref="SequenciaDeColapso"/> acende por <c>alpha</c> e nunca apagava de volta.
+        /// Renascer trocava a cena por baixo de uma tela preta que continuava la.</para>
+        /// </summary>
+        private void VoltarAoRepouso()
+        {
+            Esconder();
+            if (_sequencia != null) _sequencia.Repousar();
         }
 
         /// <summary>Zera o relógio e esconde as opções — chamado a cada nova morte.</summary>
