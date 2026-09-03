@@ -172,7 +172,7 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.AreEqual("elmo_de_farrapos", ReceitaDeItem.SugerirId("Elmo de Farrapos"));
             Assert.AreEqual("patua_das_luas_gemeas",
                             ReceitaDeItem.SugerirId("Patuá das Luas Gêmeas"));
-            Assert.AreEqual("cravo_de_aklo", ReceitaDeItem.SugerirId("  Cravo de Aklo  "));
+            Assert.AreEqual("maca_de_aklo", ReceitaDeItem.SugerirId("  Maça de Aklo  "));
         }
 
         [Test]

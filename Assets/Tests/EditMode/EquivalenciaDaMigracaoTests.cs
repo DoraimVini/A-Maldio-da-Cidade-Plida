@@ -10,7 +10,7 @@ namespace FavelaAmarela.Tests.EditMode
     /// Fixa os <b>números com que as três armas atravessaram a migração</b> para dado.
     ///
     /// <para><b>Como este arquivo nasceu.</b> A Fase 4 do plano de itemização deletou
-    /// <c>CravoDeAklo</c>, <c>EstileteDeIrem</c> e <c>AlfanjeDeAlhazred</c>, que estavam
+    /// <c>MacaDeAklo</c>, <c>EstileteDeIrem</c> e <c>AlfanjeDeAlhazred</c>, que estavam
     /// testadas e jogáveis. Antes de deletar, estes testes comparavam <b>campo a campo</b> o
     /// <c>ArmaResult</c> da arma a dado com o da classe — e passaram. Com as classes fora, eles
     /// passaram a afirmar os mesmos valores como números literais.</para>
@@ -74,28 +74,28 @@ namespace FavelaAmarela.Tests.EditMode
                * p.Precisao * (1f + p.ChanceCritica * (p.MultiplicadorCritico - 1f));
 
         [Test]
-        public void CravoDeAklo_MantemOsNumerosDaMigracao()
+        public void MacaDeAklo_MantemOsNumerosDaMigracao()
         {
-            var arma = Arma("BaseArma_Cravo");
-            Assert.AreEqual("Cravo de Aklo", arma.NomeDaArma);
-            Assert.AreEqual("Fincar o Aklo", arma.NomeHabilidade);
+            var arma = Arma("BaseArma_Maca");
+            Assert.AreEqual("Maça de Aklo", arma.NomeDaArma);
+            Assert.AreEqual("Calar o Aklo", arma.NomeHabilidade);
 
             var b = Basico(arma);
             Assert.AreEqual(40f, Esperado(arma.Perfil, b.PercentualDoDanoDaArma), 1.0f,
-                "O Cravo causava 40 fixos antes da migração. O valor ESPERADO do golpe tem de " +
+                "O Maca causava 40 fixos antes da migração. O valor ESPERADO do golpe tem de " +
                 "cair em cima disso — é o que separa 'mudei a textura' de 'rebalanceei sem " +
                 "querer'.");
             Assert.AreEqual(0.35f, b.DurationSeconds, 0.0001f, "duração do básico");
             Assert.AreEqual(0.5f, b.CooldownSeconds, 0.0001f, "cadência do básico");
-            Assert.IsFalse(b.InterrompeConjuracao, "o básico do Cravo não interrompe");
+            Assert.IsFalse(b.InterrompeConjuracao, "o básico do Maca não interrompe");
 
             var h = Habilidade(arma);
             Assert.AreEqual(30f, Esperado(arma.Perfil, h.PercentualDoDanoDaArma), 1.5f,
-                "Fincar o Aklo causava 30 fixos.");
+                "Calar o Aklo causava 30 fixos.");
             Assert.AreEqual(0.4f, h.DurationSeconds, 0.0001f);
             Assert.AreEqual(6f, h.CooldownSeconds, 0.0001f);
             Assert.IsTrue(h.InterrompeConjuracao,
-                "É o que faz o Cravo ser a arma anti-mago do arsenal.");
+                "É o que faz o Maca ser a arma anti-mago do arsenal.");
             Assert.AreEqual(0, h.AcumulosDeSangramento);
             Assert.AreEqual(0f, h.ForcaRepulsao, 0.0001f);
             Assert.IsFalse(h.Atordoou);
@@ -167,7 +167,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             foreach (var (item, esperado) in new[]
                      {
-                         ("Item_Arma_CravoDeAklo", "Cravo de Aklo"),
+                         ("Item_Arma_MacaDeAklo", "Maça de Aklo"),
                          ("Item_Arma_EstileteDeIrem", "Estilete de Irem"),
                          ("Item_Arma_AlfanjeDeAlhazred", "Alfanje de Alhazred"),
                      })

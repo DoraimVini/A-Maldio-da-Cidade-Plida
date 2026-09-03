@@ -17,4 +17,4 @@ Mostra a arma equipada na Mão Física e a habilidade dela, com **indicador de r
 que ele ainda não achou o baú.
 
 Observa o `MaoFisicaBridge`; os nomes exibidos são os diegéticos da arma
-("Cravo de Aklo" / "Fincar o Aklo"), conforme a skill `favela-lore-enforcer`.
+("Maça de Aklo" / "Calar o Aklo"), conforme a skill `favela-lore-enforcer`.

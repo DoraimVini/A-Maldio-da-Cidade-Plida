@@ -128,11 +128,11 @@ namespace FavelaAmarela.Tests.EditMode
         public void OAlfanje_AlcancaMaisEPerdoaMaisQueALaminaFina()
         {
             var fina = Base("Item_Arma_EstileteDeIrem");
-            var cravo = Base("Item_Arma_CravoDeAklo");
+            var maca = Base("Item_Arma_MacaDeAklo");
             var alfanje = Base("Item_Arma_AlfanjeDeAlhazred");
 
-            Assert.Less(fina.Alcance, cravo.Alcance, "O estilete tem de ser a arma mais curta.");
-            Assert.Less(cravo.Alcance, alfanje.Alcance, "O alfanje tem de ser a mais longa.");
+            Assert.Less(fina.Alcance, maca.Alcance, "O estilete tem de ser a arma mais curta.");
+            Assert.Less(maca.Alcance, alfanje.Alcance, "O alfanje tem de ser a mais longa.");
 
             Assert.Less(fina.Raio, alfanje.Raio,
                 "O alfanje varre um arco; o estilete fura um ponto.");

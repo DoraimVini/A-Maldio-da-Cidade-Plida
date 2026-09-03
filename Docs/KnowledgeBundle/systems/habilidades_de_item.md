@@ -26,7 +26,7 @@ tags: [arquitetura, habilidades, itens, armas, artefatos, poco]
 >
 > 2. **O passo 3 do caminho de migração NÃO foi seguido.** Ele dizia que as 3 armas existentes
 >    "continuam funcionando sem migrar — troca é opcional". O Vini decidiu o contrário
->    ("migram todas"), e as classes `CravoDeAklo`, `EstileteDeIrem` e `AlfanjeDeAlhazred` foram
+>    ("migram todas"), e as classes `MacaDeAklo`, `EstileteDeIrem` e `AlfanjeDeAlhazred` foram
 >    **deletadas**, junto da `WeaponFactory`. A troca só aconteceu depois de
 >    `EquivalenciaDaMigracaoTests` provar igualdade campo a campo nos doze campos do
 >    `ArmaResult` e cadência em nove pontos de tempo.
@@ -88,7 +88,7 @@ fazem e o que as passivas dos Artefatos precisam:
 - `EfeitoDeRepulsao` (força) — idem
 - `EfeitoDeSangramento` (acúmulo, duração) — o que o Estilete já faz (`Sangramento`,
   `ExplosaoDeSangramento` já são POCOs prontos, viram efeito sem reescrever nada)
-- `EfeitoDeInterrupcao` — o que o `CravoDeAklo` já faz (ver `Docs/KnowledgeBundle`)
+- `EfeitoDeInterrupcao` — o que o `MacaDeAklo` já faz (ver `Docs/KnowledgeBundle`)
 - `EfeitoDeDrenoDeRM` / `EfeitoDeCuraDeRM` — cobre a passiva do Patuá e possíveis Artefatos
 - `EfeitoDeBonusTemporario(StatType, valor, duração)` — buff/debuff passageiro
 
@@ -157,7 +157,7 @@ que o use, em vez de recontar a mesma asserção em cada classe de arma.
 Não é ruptura — é extração incremental:
 
 1. Escrever `IEfeitoDeHabilidade` + os efeitos que já existem em forma de lógica dentro do
-   Cravo/Estilete/Alfanje (extrair, não reescrever — `Sangramento` e
+   Maça/Estilete/Alfanje (extrair, não reescrever — `Sangramento` e
    `ExplosaoDeSangramento` já são reaproveitáveis como estão).
 2. Escrever `HabilidadeComposta` implementando as duas interfaces atuais.
 3. As 3 armas existentes **continuam funcionando sem migrar** — troca é opcional, não

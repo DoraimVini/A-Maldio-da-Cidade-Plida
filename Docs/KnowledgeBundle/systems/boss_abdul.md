@@ -76,7 +76,7 @@ mecânica é "não leve três seguidos", não uma punição inevitável. Regra e
 
 | Atributo | Valor | Porquê |
 |---|---|---|
-| VitalidadeMax | 300 | ~6 golpes de Alfanje, ~9 de Cravo — distribuídos entre janelas |
+| VitalidadeMax | 300 | ~6 golpes de Alfanje, ~9 de Maça — distribuídos entre janelas |
 | Ataque | 8 | dano físico baixo (o perigo real é mágico) |
 | Conjuração | 25 | dano dos Cones de Gelo |
 | Defesa | 5 | baixa de propósito (ver acima) |

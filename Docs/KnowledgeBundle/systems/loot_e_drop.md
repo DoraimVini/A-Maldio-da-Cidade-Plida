@@ -135,7 +135,7 @@ nenhum**. Era catálogo, não matemática.
 | Família | T1 | T2 | T3 |
 |---|---|---|---|
 | **Alfanje** — erra e explode | de Alhazred 40–61 | das Ruínas Pálidas 58–88 | do Rei 84–128 |
-| **Cravo** — equilibrado | de Aklo 33–49 | de Aldebaran 48–71 | do Sinal Amarelo 69–103 |
+| **Maça** — equilibrado | de Aklo 33–49 | de Aldebaran 48–71 | do Sinal Amarelo 69–103 |
 | **Estilete** — rápido e certeiro | de Irem 24–35 | de Yhtill 35–51 | da Máscara Pálida 50–74 |
 
 **O tier muda só a faixa de dano.** Crítico, precisão, alcance, raio e cadência são identidade da
@@ -376,7 +376,7 @@ Instrução explícita do Vini: **antes de a tabela crescer, pensar em que arma/
 no contexto** — Carcosa, os arquétipos de inimigo (Cultista, Sseth, Naga, Espectro), os
 locais (Tumba, Templo, Castelo). Não é gerar item por gerar; cada entrada nova da árvore
 precisa de motivo narrativo, igual às 3 armas da Tumba (cada uma tem lore própria em
-`armas_da_tumba.md`) — não um Cravo genérico "arma de dano médio nº 4".
+`armas_da_tumba.md`) — não um Maça genérico "arma de dano médio nº 4".
 
 ## Pendente de decisão do Vini
 

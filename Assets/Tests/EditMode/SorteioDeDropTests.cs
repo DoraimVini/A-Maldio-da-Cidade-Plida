@@ -181,7 +181,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             var tabela = new List<CandidatoDeDrop>
             {
-                Entrada("cravo", chance: 1f),
+                Entrada("maca", chance: 1f),
                 Entrada("estilete", chance: 1f),
                 Entrada("alfanje", chance: 1f)
             };
@@ -198,13 +198,13 @@ namespace FavelaAmarela.Tests.EditMode
         {
             var tabela = new List<CandidatoDeDrop>
             {
-                Entrada("cravo", chance: 1f),
+                Entrada("maca", chance: 1f),
                 Entrada("estilete", chance: 1f)
             };
 
             var escolhido = new SorteioDeDrop().SortearUm(tabela, nivelDoJogador: 1, new FonteFake(0f));
 
-            Assert.AreEqual("cravo", escolhido.Value.ItemDefId);
+            Assert.AreEqual("maca", escolhido.Value.ItemDefId);
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             var tabela = new List<CandidatoDeDrop>
             {
-                Entrada("cravo", chance: 1f, nivelMinimo: 9),
+                Entrada("maca", chance: 1f, nivelMinimo: 9),
                 Entrada("estilete", chance: 1f, nivelMinimo: 1)
             };
 
@@ -225,7 +225,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void SortearUm_SemElegiveis_DevolveNulo()
         {
-            var tabela = new List<CandidatoDeDrop> { Entrada("cravo", chance: 1f, nivelMinimo: 9) };
+            var tabela = new List<CandidatoDeDrop> { Entrada("maca", chance: 1f, nivelMinimo: 9) };
 
             var escolhido = new SorteioDeDrop().SortearUm(tabela, nivelDoJogador: 1, new FonteFake(0f));
 

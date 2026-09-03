@@ -14,7 +14,7 @@ namespace FavelaAmarela.Runtime.GameLoop
 {
     /// <summary>
     /// Camada Runtime (MonoBehaviour). Baú da Tumba de Alhazred: quando Damião o
-    /// <b>abre</b>, o baú <b>sorteia</b> uma das três armas seladas (Cravo de Aklo,
+    /// <b>abre</b>, o baú <b>sorteia</b> uma das três armas seladas (Maça de Aklo,
     /// Estilete de Irem, Alfanje de Alhazred) e a equipa na Mão Física. Não é escolha —
     /// é RNG, e é o que faz a build variar entre partidas.
     ///

@@ -27,7 +27,7 @@ Inspirado em *Source of Madness*, Damião pode carregar exatamente dois itens ou
    - Interface: IArma                               - Interface: IAnomalyPower
    - Categoria: Mundana                             - Categoria: Sobrenatural
    - Consumo: Apenas Cooldown                       - Consumo: Resiliência Mental + Cooldown
-   - Exemplos: Cravo de Aklo, Estilete             - Exemplos: (nenhum implementado hoje)
+   - Exemplos: Maça de Aklo, Estilete             - Exemplos: (nenhum implementado hoje)
      de Irem, Alfanje de Alhazred, Mão Vazia
 ```
 

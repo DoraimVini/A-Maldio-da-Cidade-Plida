@@ -58,7 +58,7 @@ namespace FavelaAmarela.EditorTools
             // Um degrau de arma, provavelmente. As três com o mesmo peso: qual sai é variedade
             // entre partidas. O teto de 3 impede que saiam as três.
             ("Item_Arma_AlfanjeDasRuinasPalidas", false, 0.45f, 1, 1),
-            ("Item_Arma_CravoDeAldebaran", false, 0.45f, 1, 1),
+            ("Item_Arma_MacaDeAldebaran", false, 0.45f, 1, 1),
             ("Item_Arma_EstileteDeYhtill", false, 0.45f, 1, 1),
 
             // A Raiz de Yhtill é daqui — o consumível leva o nome do lugar. Coerência barata

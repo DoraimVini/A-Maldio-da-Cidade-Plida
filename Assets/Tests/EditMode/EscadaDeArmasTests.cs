@@ -37,7 +37,7 @@ namespace FavelaAmarela.Tests.EditMode
         private static readonly (string Familia, string[] Degraus)[] Escada =
         {
             ("Alfanje", new[] { "BaseArma_Alfanje", "BaseArma_Alfanje_T2", "BaseArma_Alfanje_T3" }),
-            ("Cravo", new[] { "BaseArma_Cravo", "BaseArma_Cravo_T2", "BaseArma_Cravo_T3" }),
+            ("Maca", new[] { "BaseArma_Maca", "BaseArma_Maca_T2", "BaseArma_Maca_T3" }),
             ("Lâmina fina", new[] { "BaseArma_LaminaFina", "BaseArma_LaminaFina_T2",
                                     "BaseArma_LaminaFina_T3" }),
         };

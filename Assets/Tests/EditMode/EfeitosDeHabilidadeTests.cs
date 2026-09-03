@@ -115,7 +115,7 @@ namespace FavelaAmarela.Tests.EditMode
             new EfeitoDeInterrupcao().Aplicar(g);
 
             Assert.IsTrue(g.Construir().InterrompeConjuracao,
-                "É o que faz o Cravo de Aklo ser a arma anti-mago do arsenal.");
+                "É o que faz o Maça de Aklo ser a arma anti-mago do arsenal.");
         }
 
         [Test]

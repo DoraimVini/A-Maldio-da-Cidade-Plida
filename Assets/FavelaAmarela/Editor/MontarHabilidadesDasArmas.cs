@@ -31,7 +31,7 @@ namespace FavelaAmarela.EditorTools
 
             var resumo = new List<string>
             {
-                MontarCravo(),
+                MontarMaca(),
                 MontarEstilete(),
                 MontarAlfanje(),
             };
@@ -50,12 +50,12 @@ namespace FavelaAmarela.EditorTools
 
         // ── As três armas, com os números dos construtores ────────────────────
 
-        /// <summary>Cravo de Aklo — o anti-mago. Interrompe conjuração na habilidade.</summary>
-        private static string MontarCravo() => Montar(
-            arquivo: "Habilidade_CravoDeAklo",
-            baseDeArma: "BaseArma_Cravo",
-            nomeDaArma: "Cravo de Aklo",
-            nomeDaHabilidade: "Fincar o Aklo",
+        /// <summary>Maça de Aklo — o anti-mago. Interrompe conjuração na habilidade.</summary>
+        private static string MontarMaca() => Montar(
+            arquivo: "Habilidade_MacaDeAklo",
+            baseDeArma: "BaseArma_Maca",
+            nomeDaArma: "Maça de Aklo",
+            nomeDaHabilidade: "Calar o Aklo",
             duracaoBasico: 0.35f, cooldownBasico: 0.5f,
             duracaoHabilidade: 0.4f, cooldownHabilidade: 6f,
             basico: new[] { Dano(40f) },

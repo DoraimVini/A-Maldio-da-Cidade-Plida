@@ -92,6 +92,12 @@ Damião começa a jornada desarmado. O golpe desarmado (`MaoVazia`) possui **Dan
 
 Logo após a entrada da Tumba de Alhazred, Damião encontra a **Câmara do Baú (Zona 6b)**. Abrir o Baú da Tumba realiza um sorteio uniforme (RNG) de uma entre três armas rituais com habilidades próprias equilibradas para combate de chefes:
 
+> ⚠️ **Esta tabela é o desenho ORIGINAL e está superada.** Mantida como registro. O estado
+> vigente vive em `Docs/KnowledgeBundle/systems/armas_da_tumba.md`. Duas mudanças desde então:
+> o **Cravo de Ferro** virou **Cravo de Aklo** (a habilidade deixou de ser mitigação e passou a
+> interromper conjuração) e, em **2026-09-02**, a família inteira virou **Maça**, com a
+> habilidade ***Calar o Aklo***. A ideia do Cravo ficou guardada para a expansão de itens.
+
 | Arma Ritual             | Dano Bruto | Defesa | Efeito / Habilidade Especial                                               |
 | :---------------------- | :--------: | :----: | :------------------------------------------------------------------------- |
 | **Cravo de Ferro**      |     40     |   30   | Arma pesada com alto poder de mitigação física.                            |

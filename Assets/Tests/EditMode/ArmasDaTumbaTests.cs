@@ -7,15 +7,15 @@ using FavelaAmarela.Inventario;
 namespace FavelaAmarela.Tests.EditMode
 {
     /// <summary>
-    /// Suite das 3 armas da Tumba de Alhazred (Cravo de Aklo, Estilete de Irem, Alfanje de
+    /// Suite das 3 armas da Tumba de Alhazred (Maça de Aklo, Estilete de Irem, Alfanje de
     /// Alhazred).
     ///
     /// <para>Cobre: ataque básico aplica dano; cada habilidade tem seu efeito-assinatura
-    /// (Cravo interrompe, Estilete sangra, Alfanje repele + atordoa); cooldown do básico e da
+    /// (Maca interrompe, Estilete sangra, Alfanje repele + atordoa); cooldown do básico e da
     /// habilidade são validados e independentes.</para>
     ///
     /// <para><b>Mudou de fonte em 2026-08-27, não de contrato.</b> Estes testes instanciavam
-    /// as classes C# direto (<c>new CravoDeAklo()</c>). As três armas migraram para dado
+    /// as classes C# direto (<c>new MacaDeAklo()</c>). As três armas migraram para dado
     /// (<c>HabilidadeDef</c>) e as classes saíram, então a suíte passou a montar as armas a
     /// partir dos <b>assets que o jogo realmente usa</b>. As asserções são as mesmas — e agora
     /// valem mais, porque testam o que está no disco em vez de um default de construtor que
@@ -66,7 +66,7 @@ namespace FavelaAmarela.Tests.EditMode
         private static ArmaResult Habilidade(IArmaComHabilidade arma)
             => ResolucaoDeGolpe.Resolver(arma.ExecuteHabilidade(), arma.Perfil);
 
-        private static IArmaComHabilidade Cravo() => Arma("BaseArma_Cravo");
+        private static IArmaComHabilidade Maca() => Arma("BaseArma_Maca");
         private static IArmaComHabilidade Estilete() => Arma("BaseArma_LaminaFina");
         private static IArmaComHabilidade Alfanje() => Arma("BaseArma_Alfanje");
 
@@ -75,7 +75,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void Basico_DasTresArmas_AplicaDanoESucesso()
         {
-            foreach (IArmaComHabilidade arma in new[] { Cravo(), Estilete(), Alfanje() })
+            foreach (IArmaComHabilidade arma in new[] { Maca(), Estilete(), Alfanje() })
             {
                 var r = Basico(arma);
                 Assert.IsTrue(r.Success, $"{arma.NomeDaArma}: básico deveria ter sucesso.");
@@ -86,7 +86,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void Basico_NaoCarregaEfeitosDeOutrasArmas()
         {
-            // O básico do Estilete NÃO interrompe conjuração (Cravo) nem repele (Alfanje).
+            // O básico do Estilete NÃO interrompe conjuração (Maça) nem repele (Alfanje).
             var r = Estilete().Execute();
             Assert.IsFalse(r.InterrompeConjuracao);
             Assert.AreEqual(0f, r.ForcaRepulsao, 0.0001f);
@@ -106,9 +106,9 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void OutrasArmas_NaoAcumulamSangramento()
         {
-            // Sangramento é a assinatura do Estilete — Cravo e Alfanje não o aplicam.
-            Assert.AreEqual(0, Cravo().Execute().AcumulosDeSangramento);
-            Assert.AreEqual(0, Cravo().ExecuteHabilidade().AcumulosDeSangramento);
+            // Sangramento é a assinatura do Estilete — Maca e Alfanje não o aplicam.
+            Assert.AreEqual(0, Maca().Execute().AcumulosDeSangramento);
+            Assert.AreEqual(0, Maca().ExecuteHabilidade().AcumulosDeSangramento);
             Assert.AreEqual(0, Alfanje().Execute().AcumulosDeSangramento);
             Assert.AreEqual(0, Alfanje().ExecuteHabilidade().AcumulosDeSangramento);
         }
@@ -125,11 +125,11 @@ namespace FavelaAmarela.Tests.EditMode
         // ── Habilidades-assinatura ───────────────────────────────────────────
 
         [Test]
-        public void CravoDeAklo_Habilidade_InterrompeConjuracao()
+        public void MacaDeAklo_Habilidade_InterrompeConjuracao()
         {
-            var r = Habilidade(Cravo());
+            var r = Habilidade(Maca());
             Assert.IsTrue(r.Success);
-            Assert.IsTrue(r.InterrompeConjuracao, "Fincar o Aklo deve interromper a conjuração.");
+            Assert.IsTrue(r.InterrompeConjuracao, "Calar o Aklo deve interromper a conjuração.");
             Assert.Greater(r.Dano, 0f);
         }
 
@@ -161,7 +161,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void NenhumaDasTres_EInutilNoBasico()
         {
-            foreach (var arma in new[] { Cravo(), Estilete(), Alfanje() })
+            foreach (var arma in new[] { Maca(), Estilete(), Alfanje() })
             {
                 var r = Basico(arma);
                 Assert.Greater(r.Dano, 0f, $"{arma.NomeDaArma} não causa dano no básico.");
@@ -226,7 +226,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void CooldownBasico_BloqueiaAntesELiberaDepois()
         {
-            var arma = Cravo();   // cooldown do básico: 0,5 s no asset
+            var arma = Maca();   // cooldown do básico: 0,5 s no asset
             Assert.IsFalse(arma.CanActivate(0.49f), "Não deveria liberar antes do cooldown.");
             Assert.IsTrue(arma.CanActivate(0.5f), "Deveria liberar exatamente no cooldown.");
         }
@@ -234,7 +234,7 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void CooldownHabilidade_EIndependenteDoBasico()
         {
-            var arma = Cravo();   // básico 0,5 s · habilidade 6 s
+            var arma = Maca();   // básico 0,5 s · habilidade 6 s
 
             // Passou tempo suficiente pro básico, mas não pra habilidade.
             Assert.IsTrue(arma.CanActivate(1f));

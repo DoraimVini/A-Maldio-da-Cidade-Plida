@@ -12,7 +12,7 @@ timestamp: 2026-07-30T00:00:00Z
 **Namespace:** `FavelaAmarela.Runtime.GameLoop`
 **Tipo:** `public sealed class` (`MonoBehaviour`, implementa `IInteragivel`)
 
-Ao ser aberto (**botão E**, "Abrir o baú"), **sorteia** uma das três armas seladas (Cravo de
+Ao ser aberto (**botão E**, "Abrir o baú"), **sorteia** uma das três armas seladas (Maça de
 Aklo, Estilete de Irem, Alfanje de Alhazred) e a equipa na Mão Física. **Não é escolha — é RNG**,
 e é o que faz a build variar entre partidas.
 

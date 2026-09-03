@@ -1,7 +1,7 @@
 ---
 type: Game System
 title: As Três Armas da Tumba
-description: Cravo de Aklo, Estilete de Irem e Alfanje de Alhazred — ataque básico, habilidade própria e o sangramento por acúmulo.
+description: Maça de Aklo, Estilete de Irem e Alfanje de Alhazred — ataque básico, habilidade própria e o sangramento por acúmulo.
 tags: [combat, weapons, tumba, sangramento]
 ---
 
@@ -9,7 +9,7 @@ tags: [combat, weapons, tumba, sangramento]
 
 
 > ⚠️ **Os números de dano deste documento estão DEFASADOS, e a divergência é conhecida.** A
-> tabela de panorama abaixo diz **40/25/60** (Cravo/Estilete/Alfanje) para o dano básico; o
+> tabela de panorama abaixo diz **40/25/60** (Maça/Estilete/Alfanje) para o dano básico; o
 > código sempre disse **40/30/45**. O `CLAUDE.md` §3.1 regra 4 manda seguir o código para "como
 > funciona", então a migração para dado de 2026-08-27 preservou **40/30/45** — os valores estão
 > agora fixados em `EquivalenciaDaMigracaoTests`, e mexer neles é decisão de balanceamento
@@ -32,7 +32,7 @@ vencível com qualquer uma das três.** Nenhuma pode ser obrigatória, e nenhuma
 
 | Arma | Básico | Habilidade | Papel |
 |---|---|---|---|
-| **Cravo de Aklo** | 40 | *Fincar o Aklo* — **interrompe conjuração** | Ferramenta anti-mago |
+| **Maça de Aklo** | 40 | *Calar o Aklo* — **interrompe conjuração** | Ferramenta anti-mago |
 | **Estilete de Irem** | 25 | *Ferida de Aklo* — **+3 acúmulos de sangramento** | Dano por permanência |
 | **Alfanje de Alhazred** | 60 | *Golpe do Deserto* — **repele + atordoa** | Força bruta e espaço |
 
@@ -107,3 +107,51 @@ Ver [Luta contra Abdul](boss_abdul.md).
 > **Pendência conhecida:** `EsqueletoInvocado` ainda **não** sangra — ele é frágil e expira
 > sozinho, então o acúmulo dificilmente chegaria ao teto; mas por consistência vale ligar
 > quando houver folga.
+
+---
+
+## Guardado para a expansão: o Cravo de Aklo
+
+**Decisão do Vini, 2026-09-02.** A família do meio virou **Maça** (morning star). A ideia
+anterior — o **Cravo** — **não foi descartada**: fica reservada para a expansão de itens.
+
+### O que era, e por que vale guardar
+
+O *cravo* é um espigão. Em português, **cravar é fincar** — e a habilidade se chamava
+literalmente **"Fincar o Aklo"**. A arma era um espigão **gravado com glifos de Aklo**, a
+língua pré-humana que o Necronomicon traduz, que Aldaron era o único a ler, e em que está
+escrita a última linha indecifrável da carta da Cassilda.
+
+Fincá-lo num conjurador **interrompia a canalização**. Ou seja: a arma anti-mago do jogo
+funcionava **escrevendo no inimigo**. Era a única das três cuja força não era corte nem
+sangue, e sim linguagem — o que, num jogo sobre uma peça de teatro que enlouquece quem a
+lê, é bom demais para se perder num rename.
+
+### Por que saiu agora
+
+Duas razões, ambas medidas:
+
+1. **O nome era um fóssil.** Ele nasceu na v1.0 do GDD como *"Cravo de Ferro"*, quando a
+   arma era de **mitigação pesada** (Defesa 30, um espigão grosso com que se apara pancada).
+   A habilidade depois virou interrupção de conjuração, e o nome ficou — carregando um
+   sentido que a mecânica já não tinha.
+2. **Não se distinguia no inventário.** As três famílias eram Alfanje (corte curvo), Cravo
+   (estocada) e Lâmina fina (picada): duas delas lâmina diagonal. Com maça, a tríade vira
+   **corte / impacto / perfuração**, que se lê de relance.
+
+### Como ele voltaria
+
+Como **quarta família**, e não como substituto — a geometria dele já está definida e é
+distinta da maça:
+
+| | Alcance | Raio | Janela |
+|---|---|---|---|
+| Alfanje | 1,6 | 0,85 | 0,15 |
+| Maça | 1,2 | 0,6 | 0,1 |
+| Lâmina fina | 0,95 | 0,42 | 0,07 |
+| **Cravo (futuro)** | ~1,2 | ~0,35 | ~0,08 | estocada estreita, mais rápida que a maça |
+
+A habilidade **"Fincar o Aklo"** volta com ele. O que a maça herdou foi só o *efeito* de
+interromper conjuração, com nome de impacto (**"Calar o Aklo"** — silenciar a boca que
+conjura). Se o Cravo voltar, vale decidir se os dois dividem o papel anti-mago ou se a maça
+troca de efeito.

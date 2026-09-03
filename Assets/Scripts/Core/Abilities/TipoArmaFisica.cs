@@ -9,7 +9,7 @@ namespace FavelaAmarela.Core.Abilities
     public enum TipoArmaFisica
     {
         MaoVazia = 0,
-        CravoDeAklo = 1,
+        MacaDeAklo = 1,
         EstileteDeIrem = 2,
         AlfanjeDeAlhazred = 3
     }

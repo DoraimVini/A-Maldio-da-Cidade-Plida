@@ -73,6 +73,12 @@ namespace FavelaAmarela.Tests.EditMode
                 // erro no console. É placeholder declarado: quando houver pintura, ele sai desta
                 // lista junto com a troca.
                 "Icone_CartaDasAreias",
+
+                // Raven Fantasy Icons, importados em 2026-09-02: pixel art AUTORADA a 32×32,
+                // não pintura reduzida — por isso Point, e não Bilinear como os do CraftPix.
+                // Foi este teste que me corrigiu: importei os três copiando o .meta do
+                // sand_01 sem perguntar de que espécie de arte eles eram.
+                "Icone_MacaDeAklo", "Icone_MacaDeAldebaran", "Icone_MacaDoSinalAmarelo",
             };
 
             Assert.IsTrue(Directory.Exists(pasta), $"Pasta de ícones ausente: {pasta}");

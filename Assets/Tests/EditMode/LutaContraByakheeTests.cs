@@ -16,7 +16,7 @@ namespace FavelaAmarela.Tests.EditMode
     /// "equilíbrio levemente puxado para o difícil" (pedido do Vini, 2026-08-11).
     ///
     /// <para><b>O que mudou em 2026-08-28.</b> Este arquivo carregava as armas como constantes
-    /// escritas à mão (<c>Cravo 40</c>, <c>Estilete 25</c>, <c>Alfanje 45</c>) e
+    /// escritas à mão (<c>Maca 40</c>, <c>Estilete 25</c>, <c>Alfanje 45</c>) e
     /// <b>reimplementava a fórmula de mitigação</b> numa linha própria. As duas coisas se
     /// provaram exatamente o que se temia: o <b>Estilete valia 30 no asset</b> e 25 aqui, e o
     /// teste passava verde defendendo um número que o jogo não usava. Agora ele lê os assets e
@@ -54,11 +54,11 @@ namespace FavelaAmarela.Tests.EditMode
                 $"Assets/FavelaAmarela/Config/Ficha_{nome}.asset");
 
         /// <summary>As 3 armas da Tumba, pelo nome da família que as autora.</summary>
-        private static readonly string[] ArmasDaTumba = { "Alfanje", "Cravo", "LaminaFina" };
+        private static readonly string[] ArmasDaTumba = { "Alfanje", "Maca", "LaminaFina" };
 
         /// <summary>
         /// Quanto do dano da arma o ataque básico aproveita. É o <c>TipoDeEfeito.DanoDaArma</c>
-        /// autorado na habilidade — 90% no Alfanje, 75% no Cravo, 50% no Estilete, que é o que
+        /// autorado na habilidade — 90% no Alfanje, 75% no Maça, 50% no Estilete, que é o que
         /// dá identidade às três sem que nenhuma seja "a errada".
         /// </summary>
         private static float PercentualDoBasico(BaseDeArma familia)
@@ -193,7 +193,7 @@ namespace FavelaAmarela.Tests.EditMode
         // ── Vencível com as três, no nível esperado ───────────────────────────
 
         [TestCase("Alfanje")]
-        [TestCase("Cravo")]
+        [TestCase("Maca")]
         [TestCase("LaminaFina")]
         public void NoNivelEsperado_JogoPerfeitoVenceComQualquerArma(string arma)
         {
@@ -216,7 +216,7 @@ namespace FavelaAmarela.Tests.EditMode
         /// Exposição entrega, vence.</b>
         /// </summary>
         [TestCase("Alfanje")]
-        [TestCase("Cravo")]
+        [TestCase("Maca")]
         [TestCase("LaminaFina")]
         public void ANivelDoItem_MudaOResultadoDaLuta(string arma)
         {
@@ -233,7 +233,7 @@ namespace FavelaAmarela.Tests.EditMode
         // ── E continua custando caro ──────────────────────────────────────────
 
         [TestCase("Alfanje")]
-        [TestCase("Cravo")]
+        [TestCase("Maca")]
         [TestCase("LaminaFina")]
         public void JogoPerfeito_CustaResilienciaDeVerdade(string arma)
         {
@@ -252,7 +252,7 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         [TestCase("Alfanje")]
-        [TestCase("Cravo")]
+        [TestCase("Maca")]
         [TestCase("LaminaFina")]
         public void Fase3_AconteceDeVerdade(string arma)
         {
@@ -278,7 +278,7 @@ namespace FavelaAmarela.Tests.EditMode
         /// Mão Secundária e consumíveis cobrem.</para>
         /// </summary>
         [TestCase("Alfanje")]
-        [TestCase("Cravo")]
+        [TestCase("Maca")]
         [TestCase("LaminaFina")]
         public void ATrocaDeGolpes_NaoEhDesigual(string arma)
         {

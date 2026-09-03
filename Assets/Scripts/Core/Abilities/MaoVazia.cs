@@ -6,7 +6,7 @@ namespace FavelaAmarela.Core.Abilities
     ///
     /// <b>Causa dano zero por decisão de design</b> (não é placeholder esquecido): o gesto
     /// existe para o jogador aprender o verbo de combate e para fazer barulho — matar exige
-    /// uma das armas da Tumba (Cravo de Aklo, Estilete de Irem, Alfanje de Alhazred). É
+    /// uma das armas da Tumba (Maça de Aklo, Estilete de Irem, Alfanje de Alhazred). É
     /// rápido de propósito, para não parecer que "não funcionou".
     ///
     /// Implementa apenas <see cref="IArma"/>, não <see cref="IArmaComHabilidade"/> — sem

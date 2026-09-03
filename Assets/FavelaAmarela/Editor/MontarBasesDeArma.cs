@@ -16,7 +16,7 @@ namespace FavelaAmarela.EditorTools
     /// arma <b>não era sentido</b>, só lido na ficha.</para>
     ///
     /// <para><b>Os números saem do design que já estava escrito</b>, em
-    /// <c>armas_da_tumba.md</c>: Cravo é o anti-mago de cadência média; Estilete é
+    /// <c>armas_da_tumba.md</c>: Maca é o anti-mago de cadência média; Estilete é
     /// <i>"lâmina fina e rápida"</i> de dano por permanência; Alfanje é <i>"força bruta e
     /// espaço"</i>. Alcance, raio e janela traduzem essas três frases em geometria.</para>
     ///
@@ -40,7 +40,7 @@ namespace FavelaAmarela.EditorTools
              0.95f, 0.42f, 0.07f,
              "fura um ponto: curta, estreita e sem perdão de mira — quem erra o passo não acerta"),
 
-            ("BaseArma_Cravo", "Item_Arma_CravoDeAklo", "Cravo",
+            ("BaseArma_Maca", "Item_Arma_MacaDeAklo", "Maca",
              1.20f, 0.60f, 0.10f,
              "o meio-termo do arsenal: é a referência contra a qual as outras duas são lidas"),
 

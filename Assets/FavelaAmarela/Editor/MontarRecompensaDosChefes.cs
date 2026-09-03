@@ -49,7 +49,7 @@ namespace FavelaAmarela.EditorTools
                     // do baú, e sai com uma de tier acima. Os três entram com a mesma chance --
                     // qual deles cai vira variedade entre partidas, em vez de um roteiro.
                     "Item_Arma_AlfanjeDasRuinasPalidas",
-                    "Item_Arma_CravoDeAldebaran",
+                    "Item_Arma_MacaDeAldebaran",
                     "Item_Arma_EstileteDeYhtill",
                 }, 3,
                 "fecha a Fase 1: peitoral e o PRIMEIRO DEGRAU de arma, para o jogador entrar no " +
@@ -72,7 +72,7 @@ namespace FavelaAmarela.EditorTools
                 new[]
                 {
                     "Item_Arma_AlfanjeDoRei",
-                    "Item_Arma_CravoDoSinalAmarelo",
+                    "Item_Arma_MacaDoSinalAmarelo",
                     "Item_Arma_EstileteDaMascaraPalida",
                 }, 3,
                 "o desfecho do Vertical Slice deixa de largar nada: o degrau T3 inteiro, " +
@@ -80,7 +80,7 @@ namespace FavelaAmarela.EditorTools
                 garantido: true, chance: 1f, piso: GrauDeImpregnacao.Impregnado),
 
             new Recompensa("Drop_Abdul", "Abdul_Alhazred",
-                new[] { "Item_Arma_CravoDeAklo", "Item_Armadura_CapuzDeFarrapos" }, 2,
+                new[] { "Item_Arma_MacaDeAklo", "Item_Armadura_CapuzDeFarrapos" }, 2,
                 "primeiro chefe do jogo: a recompensa tem de ser sentida no Cultista seguinte"),
         };
 

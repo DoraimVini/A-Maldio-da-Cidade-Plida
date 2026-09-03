@@ -31,7 +31,7 @@ namespace FavelaAmarela.Tests.EditMode
         /// </summary>
         /// <remarks>
         /// <b>Vazia desde 2026-09-01, e isso é a notícia.</b> As três armas T3 (Alfanje do Rei,
-        /// Cravo do Sinal Amarelo, Estilete da Máscara Pálida) ficaram aqui declaradas como
+        /// Maça do Sinal Amarelo, Estilete da Máscara Pálida) ficaram aqui declaradas como
         /// inalcançáveis com uma razão real: <i>"o Rei em Amarelo é SELADO por rito, não abatido
         /// — ele não dispara OnAbatido, então não larga espólio pelo caminho normal"</i>.
         ///
@@ -130,7 +130,7 @@ namespace FavelaAmarela.Tests.EditMode
             var t2 = new[]
             {
                 "Item_Arma_AlfanjeDasRuinasPalidas",
-                "Item_Arma_CravoDeAldebaran",
+                "Item_Arma_MacaDeAldebaran",
                 "Item_Arma_EstileteDeYhtill",
             };
 
@@ -163,7 +163,7 @@ namespace FavelaAmarela.Tests.EditMode
             var t3 = new[]
             {
                 "Item_Arma_AlfanjeDoRei",
-                "Item_Arma_CravoDoSinalAmarelo",
+                "Item_Arma_MacaDoSinalAmarelo",
                 "Item_Arma_EstileteDaMascaraPalida",
             };
 

@@ -58,7 +58,7 @@ namespace FavelaAmarela.Runtime.Combat
             if (_instancia == null) return;
             if (dano <= 0f) return;
 
-            // 40 de dano (o Cravo) é a referência de "golpe cheio".
+            // 40 de dano (o Maca) é a referência de "golpe cheio".
             float duracao = Mathf.Clamp(dano / 40f * 0.06f, 0.02f, DuracaoMaxima);
             _instancia.Congelar(duracao);
         }

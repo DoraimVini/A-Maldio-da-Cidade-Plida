@@ -118,11 +118,11 @@ Leituras que saltam:
 
 | arma | dano básico | cooldown | dano da habilidade | cooldown hab. |
 |---|---|---|---|---|
-| **Cravo de Aklo** | 40 | 0.5s | 30 | 6s |
+| **Maça de Aklo** | 40 | 0.5s | 30 | 6s |
 | **Estilete de Irem** | 30 | 0.3s | 15 | 5s |
 | **Alfanje de Alhazred** | 45 | 0.7s | 40 | 5s |
 
-Perfil claro: Estilete rápido e fraco, Alfanje lento e forte, Cravo no meio. O `StatType.TraumaFisico`
+Perfil claro: Estilete rápido e fraco, Alfanje lento e forte, Maça no meio. O `StatType.TraumaFisico`
 de itens **soma** a esses valores.
 
 ---

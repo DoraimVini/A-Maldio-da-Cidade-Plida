@@ -9,7 +9,7 @@ description: Sistema de combate focado em armas e tipos de dano (Priming), adapt
 > ⚠️ **VISÃO ASPIRACIONAL — NÃO É O QUE ESTÁ SENDO CONSTRUÍDO.** Este documento descreve
 > um sistema de combate maximalista (famílias de dano, *Priming* de combos, defesas em
 > camadas, hibridização, `DamageManager`) que **diverge da decisão real** tomada para a
-> Tumba de Alhazred. O combate decidido é **enxuto**: 3 armas nomeadas (Cravo de Aklo,
+> Tumba de Alhazred. O combate decidido é **enxuto**: 3 armas nomeadas (Maça de Aklo,
 > Estilete de Irem, Alfanje de Alhazred), cada uma com ataque básico + uma habilidade em
 > botão separado, sem sistema de famílias/Priming/hibridização. A verdade corrente do
 > combate está em [Vitalidade](vitalidade.md) e [Ficha de Atributos](ficha_de_atributos.md),

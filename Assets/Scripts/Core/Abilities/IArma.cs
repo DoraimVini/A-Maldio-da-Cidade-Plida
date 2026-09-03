@@ -23,7 +23,7 @@ namespace FavelaAmarela.Core.Abilities
 
         /// <summary>
         /// Se este golpe cancela a canalização anômala do alvo (habilidade do
-        /// Cravo de Aklo). Usado contra as conjurações do Abdul (ventos congelantes,
+        /// Maça de Aklo). Usado contra as conjurações do Abdul (ventos congelantes,
         /// círculos de dreno) na janela de conjuração.
         /// </summary>
         public readonly bool InterrompeConjuracao;
@@ -181,7 +181,7 @@ namespace FavelaAmarela.Core.Abilities
     /// Arma física que, além do ataque básico (<see cref="IArma"/>), tem uma
     /// <em>habilidade</em> em botão separado, com cooldown próprio. Cada arma da
     /// Tumba de Alhazred define a sua — é o que muda a build do jogador conforme
-    /// a arma que ele dropou do baú (Cravo interrompe, Estilete sangra, Alfanje
+    /// a arma que ele dropou do baú (Maca interrompe, Estilete sangra, Alfanje
     /// repele). A habilidade é a "ferramenta de boss": os Vultos/Aparições
     /// Primordiais são imunes a crítico furtivo, então a furtividade não resolve
     /// a luta — a habilidade da arma sim.

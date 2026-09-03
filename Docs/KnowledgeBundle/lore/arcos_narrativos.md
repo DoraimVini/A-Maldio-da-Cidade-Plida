@@ -114,11 +114,20 @@ genérica), **Colapso** (não "Game Over"), **Ancorar** (não "curar"), **Cultis
   21 e `favela-pixelart-standards/SKILL.md`, que já exigem 32 de forma explícita). O
   `CLAUDE.md` raiz tinha duas menções residuais de "PPU 16" que sobraram de antes dessa
   promoção — já corrigidas nesta mesma sessão. PPU real e vigente do projeto é **32**.
-- **Arma "Cravo de Ferro" (GDD) = `CravoDeAklo` (código):** dano bruto bate (40), mas a
-  habilidade mudou de "alto poder de mitigação física" (GDD) para **"Fincar o Aklo"** —
-  interrompe a canalização anômala do alvo (código). O nome também mudou de tema (Ferro →
-  Aklo, ligando à lore do Necronomicon). GDD desatualizado no texto, código é a versão
-  vigente.
+- ~~**Arma "Cravo de Ferro" (GDD) = `CravoDeAklo` (código)**~~ — **divergência RESOLVIDA em
+  2026-09-02.** Ela registrava que o GDD dizia *"Cravo de Ferro"*, o código dizia
+  `CravoDeAklo`, e a habilidade tinha mudado de "alto poder de mitigação física" para
+  interrupção de conjuração. Nada disso existe mais: a família virou **Maça**, e a
+  habilidade, **"Calar o Aklo"**.
+
+  **O que motivou** foi o Vini perguntar *"por que um cravo, e de onde a gente tirou essa
+  ideia?"*. A resposta que o repositório deu é que o nome era um **fóssil**: nasceu quando a
+  arma era um espigão de mitigação pesada e sobreviveu à troca da habilidade para
+  anti-conjurador. Com maça, as três famílias passam a ser **corte / impacto / perfuração** —
+  antes, Cravo e Lâmina fina eram as duas lâminas diagonais, indistinguíveis no inventário.
+
+  **A ideia do Cravo não foi descartada**, e sim guardada para a expansão de itens: ver
+  [armas_da_tumba.md](../systems/armas_da_tumba.md), seção *Guardado para a expansão*.
 - **Consumíveis do GDD (Chá Calmante, Frasco de Incenso, Sino de Estática, Frasco de
   Veneno de Yig, Fragmento de Yuggoth):** nenhum existe como item autorado no código — só a
   fundação genérica de inventário (`Inventario`, `ItemConfig`) existe. São 100% design,

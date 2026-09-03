@@ -86,14 +86,14 @@ namespace FavelaAmarela.Tests.EditMode
         public void IdaEVolta_PreservaTodasAsChaves()
         {
             var original = new RegistroDeSave();
-            original.Definir(ChavesDeSave.ArmaEquipada, "CravoDeAklo");
+            original.Definir(ChavesDeSave.ArmaEquipada, "MacaDeAklo");
             original.Definir(ChavesDeSave.VitalidadeAtual, "42.5");
             original.Definir(ChavesDeSave.YugNethLibertado, "true");
 
             var recuperado = RegistroDeSave.DeEstado(original.ParaEstado());
 
             Assert.AreEqual(3, recuperado.Contagem);
-            Assert.AreEqual("CravoDeAklo", recuperado.ObterOuPadrao(ChavesDeSave.ArmaEquipada));
+            Assert.AreEqual("MacaDeAklo", recuperado.ObterOuPadrao(ChavesDeSave.ArmaEquipada));
             Assert.AreEqual("42.5", recuperado.ObterOuPadrao(ChavesDeSave.VitalidadeAtual));
             Assert.AreEqual("true", recuperado.ObterOuPadrao(ChavesDeSave.YugNethLibertado));
         }

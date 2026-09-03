@@ -146,7 +146,7 @@ namespace FavelaAmarela.EditorTools
             def.Id = a.Id;
 
             // 'Rotulo' e nao 'Nome': e o texto VISIVEL ao jogador, que aparece colado ao nome
-            // do item ("Alfanje Afiado", "Cravo do Augurio"). Segue o lore-enforcer.
+            // do item ("Alfanje Afiado", "Maça do Augurio"). Segue o lore-enforcer.
             def.Rotulo = a.Nome;
             def.Tipo = a.Tipo;
             def.Stat = a.Stat;

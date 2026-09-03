@@ -43,7 +43,7 @@ sanidade, não contra a vida.
 ## A dependência que o design tem e o jogo não
 
 A fase 3 prevê **cortar a asa com a Lâmina do Sinal** para forçar o pouso. **Essa arma não
-existe** — as da Tumba são Cravo de Aklo, Estilete de Irem e Alfanje de Alhazred.
+existe** — as da Tumba são Maça de Aklo, Estilete de Irem e Alfanje de Alhazred.
 
 `ByakheeFSM.CortarAsa()` está implementado e exposto em `ByakheeAI.TentarCortarAsa()` para
 quando ela existir. O caminho real hoje é o **pouso espontâneo a cada 30 s**, que o próprio
@@ -86,7 +86,7 @@ janelas de dano):
 
 | Arma | 100% de acerto | 85% | 70% |
 |---|---|---|---|
-| Cravo de Aklo | vence, 42% RM restante | vence, 42% | vence, 26% |
+| Maça de Aklo | vence, 42% RM restante | vence, 42% | vence, 26% |
 | Estilete de Irem | vence, **25%** | vence, **14%** (raspando) | **colapsa** |
 | Alfanje de Alhazred | vence, 29% | vence, 29% | **colapsa** |
 

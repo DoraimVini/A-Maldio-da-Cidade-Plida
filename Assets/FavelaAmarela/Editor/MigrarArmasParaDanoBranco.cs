@@ -29,7 +29,7 @@ namespace FavelaAmarela.EditorTools
     /// <list type="bullet">
     ///   <item><b>Estilete de Irem</b> — lâmina fina: erra pouco (95%), critica muito (12%),
     ///   multiplica pouco (1,6). Dano confiável, morte por mil cortes.</item>
-    ///   <item><b>Cravo de Aklo</b> — perfurante: o meio-termo em tudo.</item>
+    ///   <item><b>Maça de Aklo</b> — perfurante: o meio-termo em tudo.</item>
     ///   <item><b>Alfanje de Alhazred</b> — peso e arco: erra bastante (85%), critica pouco
     ///   (5%), mas <b>dobra</b> quando critica. Alto risco, alto retorno.</item>
     /// </list>
@@ -55,7 +55,7 @@ namespace FavelaAmarela.EditorTools
                      danoAntigo: 45f, habilidadeAntiga: 40f,
                      leitura: "peso e arco: erra, mas quando pega, dobra"),
 
-            new Arma("BaseArma_Cravo", "Habilidade_CravoDeAklo",
+            new Arma("BaseArma_Maca", "Habilidade_MacaDeAklo",
                      danoMin: 33f, danoMax: 49f,
                      chanceCritica: 0.08f, multiplicador: 1.7f, precisao: 0.92f,
                      danoAntigo: 40f, habilidadeAntiga: 30f,

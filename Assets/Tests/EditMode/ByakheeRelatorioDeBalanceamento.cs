@@ -79,7 +79,7 @@ namespace FavelaAmarela.Tests.EditMode
             // disputa por dano-por-janela. Ignorá-lo aqui subestimava a arma inteira.
             var armas = new Arma[]
             {
-                new Arma("Cravo de Aklo", 40f, 0.5f),
+                new Arma("Maça de Aklo", 40f, 0.5f),
                 new Arma("Estilete de Irem", 30f, 0.3f, sangraPorSeg: 4f, duracaoSangra: 5f, acumulos: 1),
                 new Arma("Alfanje de Alhazred", 45f, 0.7f),
             };

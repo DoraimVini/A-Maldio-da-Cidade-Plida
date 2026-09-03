@@ -55,7 +55,7 @@ combate: com `ResilienciaMax` = 0, o `EnemyBase` simplesmente não instancia o o
 > (faz barulho, entra no estado Atacando) mas não mata. Para os inimigos, o `Ataque` da
 > ficha **é** o dano do golpe.
 >
-> ⚠️ **Este bloco dizia "Cravo 40, Estilete 25, Alfanje 60" e os três estavam errados.** O
+> ⚠️ **Este bloco dizia "Maça 40, Estilete 25, Alfanje 60" e os três estavam errados.** O
 > Alfanje nunca valeu 60 (o asset dizia 45) e o Estilete nunca valeu 25 (dizia 30). Um
 > teste — `LutaContraByakheeTests` — chegou a copiar o 25 daqui e passou meses verde
 > defendendo um número que o jogo não usava.
@@ -172,7 +172,7 @@ mais forte ou mais fraca na média; o que mudou foi a textura:
 | Arma | Faixa (nv 1) | Crítico | Precisão | Esperado | Cadência |
 |---|---|---|---|---|---|
 | Alfanje de Alhazred | 40 – 61 | 5% × 2,0 | 85% | **45,1** | 0,70 s |
-| Cravo de Aklo | 33 – 49 | 8% × 1,7 | 92% | **39,8** | 0,50 s |
+| Maça de Aklo | 33 – 49 | 8% × 1,7 | 92% | **39,8** | 0,50 s |
 | Estilete de Irem | 24 – 35 | 12% × 1,6 | 95% | **30,0** | 0,30 s |
 
 O Alfanje é a arma que erra e explode; o Estilete quase nunca erra e quase nunca dói. É a
@@ -240,7 +240,7 @@ Defesa de 4 que o Damião não tem desde 2026-08-12, e os danos de arma errados 
   Colapso. Punitivo o suficiente para empurrar ao stealth, com janela de fuga. No nível 3 o
   Damião aguenta **12** — a progressão se sente contra a tropa que ele já conhece.
 - Armas contra o Cultista (defesa 5), no valor esperado e no nível 1: Alfanje `45,1−5=40,1`
-  → **3 golpes**; Cravo `39,8−5=34,8` → **3 golpes**; Estilete `30,0−5=25,0` → **4 golpes**,
+  → **3 golpes**; Maça `39,8−5=34,8` → **3 golpes**; Estilete `30,0−5=25,0` → **4 golpes**,
   mas batendo 2,3× mais rápido que o Alfanje.
 - **Byakhee, o encontro que estava quebrado.** O Vini jogou e relatou: *"não tem como ganhar
   da Byakhee, os itens são fracos demais."* Estava certo, e a causa não era o número do
@@ -250,7 +250,7 @@ Defesa de 4 que o Damião não tem desde 2026-08-12, e os danos de arma errados 
   | Arma (nv 3) | Faixa | Esperado | vs Defesa 8 | Golpes |
   |---|---|---|---|---|
   | Alfanje | 60,0 – 91,5 | 67,6 | 59,6 | **9** |
-  | Cravo | 49,5 – 73,5 | 59,8 | 51,8 | **10** |
+  | Maça | 49,5 – 73,5 | 59,8 | 51,8 | **10** |
   | Estilete | 36,0 – 52,5 | 45,1 | 37,1 | **14** *(cadência 0,30 s)* |
 
   E o Byakhee precisa de **9** garradas contra o Damião nível 3 (26 → 18,2 contra Defesa

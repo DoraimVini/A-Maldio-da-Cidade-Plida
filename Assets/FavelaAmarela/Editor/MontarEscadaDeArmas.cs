@@ -71,13 +71,13 @@ namespace FavelaAmarela.EditorTools
                        "Item_Arma_AlfanjeDoRei", "Alfanje do Rei",
                        "Castelo de Carcosa"),
 
-            // ── Cravo: equilibrado ────────────────────────────────────────────
-            new Degrau("BaseArma_Cravo", 2, "BaseArma_Cravo_T2",
-                       "Item_Arma_CravoDeAldebaran", "Cravo de Aldebaran",
+            // ── Maca: equilibrado ────────────────────────────────────────────
+            new Degrau("BaseArma_Maca", 2, "BaseArma_Maca_T2",
+                       "Item_Arma_MacaDeAldebaran", "Maça de Aldebaran",
                        "Fases 2–4"),
 
-            new Degrau("BaseArma_Cravo", 3, "BaseArma_Cravo_T3",
-                       "Item_Arma_CravoDoSinalAmarelo", "Cravo do Sinal Amarelo",
+            new Degrau("BaseArma_Maca", 3, "BaseArma_Maca_T3",
+                       "Item_Arma_MacaDoSinalAmarelo", "Maça do Sinal Amarelo",
                        "Castelo de Carcosa"),
 
             // ── Lâmina fina: rápida, precisa, pouco dano por golpe ────────────

@@ -15,7 +15,7 @@ timestamp: 2026-07-07T11:00:00Z
 | `FavelaAmarela.Core.Combat` | `Assets/Scripts/Core/Combat/` | Resiliência Mental (HP diegético) |
 | `FavelaAmarela.Core.Enemies` | `Assets/Scripts/Core/Enemies/` | FSM e patrulha dos Cultistas |
 | `FavelaAmarela.Core.Stealth` | `Assets/Scripts/Core/Stealth/` | Propagação sonora |
-| `FavelaAmarela.Core.Abilities` | `Assets/Scripts/Core/Abilities/` | Esquiva, armas físicas (`IArma`/`IArmaComHabilidade`: Cravo de Aklo, Estilete de Irem, Alfanje de Alhazred, Mão Vazia) e o contrato `IAnomalyPower` (hoje sem implementações) |
+| `FavelaAmarela.Core.Abilities` | `Assets/Scripts/Core/Abilities/` | Esquiva, armas físicas (`IArma`/`IArmaComHabilidade`: Maça de Aklo, Estilete de Irem, Alfanje de Alhazred, Mão Vazia) e o contrato `IAnomalyPower` (hoje sem implementações) |
 | `FavelaAmarela.Core.GameLoop` | `Assets/Scripts/Core/GameLoop/` | Máquina de estados do loop do jogo |
 | `FavelaAmarela.Core.Environment` | `Assets/Scripts/Core/Environment/` | Estado do ambiente |
 | `FavelaAmarela.Runtime.*` | `Assets/Scripts/` (raiz Runtime) | Adaptadores MonoBehaviour |

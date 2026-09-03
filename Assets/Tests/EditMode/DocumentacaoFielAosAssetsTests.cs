@@ -126,7 +126,7 @@ namespace FavelaAmarela.Tests.EditMode
             var familias = new Dictionary<string, string>
             {
                 ["Alfanje"] = "Alfanje",
-                ["Cravo"] = "Cravo",
+                ["Maça"] = "Maca",          // doc leva cedilha; o arquivo do asset, não
                 ["Estilete"] = "LaminaFina",
             };
 

@@ -11,7 +11,7 @@ namespace FavelaAmarela.Player
     /// <summary>
     /// Bridge da Mão Física: conecta a arma equipada (um <see cref="IArmaComHabilidade"/>)
     /// à Unity. A arma <b>não é mais fixa</b> — Damião começa desarmado e equipa uma
-    /// arma da Tumba em runtime (o baú sorteia entre Cravo de Aklo, Estilete de Irem e
+    /// arma da Tumba em runtime (o baú sorteia entre Maça de Aklo, Estilete de Irem e
     /// Alfanje de Alhazred). Expõe <see cref="TryAtacar"/> (ataque básico) e
     /// <see cref="TryUsarHabilidade"/> (habilidade, botão separado) para o
     /// <c>PlayerMovement</c>, e resolve o golpe contra qualquer <see cref="IDanificavel"/>

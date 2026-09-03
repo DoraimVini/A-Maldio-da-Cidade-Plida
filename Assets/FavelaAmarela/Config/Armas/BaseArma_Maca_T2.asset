@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80cb255e30bcd9b4aa4d084503bb20cc, type: 3}
-  m_Name: BaseArma_Cravo_T2
+  m_Name: BaseArma_Maca_T2
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.BaseDeArma
-  NomeDaFamilia: Cravo
+  NomeDaFamilia: Maça
   Alcance: 1.2
   Raio: 0.6
   JanelaAtiva: 0.1

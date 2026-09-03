@@ -119,7 +119,7 @@ namespace FavelaAmarela.Tests.EditMode
         /// a identidade dele.</para>
         /// </summary>
         [TestCase("Alfanje", 3)]
-        [TestCase("Cravo", 3)]
+        [TestCase("Maca", 3)]
         [TestCase("LaminaFina", 4)]
         public void CadaArmaDaTumba_AbateOCultistaNoRitmoDela(string arma, int teto)
         {
