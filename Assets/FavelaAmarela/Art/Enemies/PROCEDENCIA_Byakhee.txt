@@ -1,0 +1,70 @@
+Arte do Byakhee -- trocada em 2026-09-03.
+
+DECISAO, E A RECOMENDACAO CONTRARIA
+-----------------------------------
+Eu recomendei NAO trocar. Os motivos, medidos:
+
+  - A arte anterior NAO era placeholder: 160x164 desenhados, 26 sprites fatiados,
+    6 animacoes nomeadas, e o AnimadorDoByakhee populado com elas. Um demonio alado
+    roxo/cinza, com sombra no chao.
+  - A gargula esta PEGANDO FOGO -- laranja e vermelho vivos. O Byakhee e um voador de
+    Hali: couro, silencio.
+  - A paleta que estava convergindo no mesmo dia (altar amarelo de Carcosa, magia do
+    Abdul azul-gelo a 198 graus, aura da Pedra roxa) ganha um monstro de fogo no meio.
+  - Ganho de 36 quadros contra 26, e perda da silhueta certa.
+
+O Vini leu os motivos e escolheu trocar. Fica registrado dos dois lados: a arte anterior
+esta no historico do git, e voltar atras e restaurar um PNG.
+
+O QUE ENTROU
+------------
+gargoyle_red.png (C:\\Users\\Vini\\Downloads), 1080x1260 = 6 colunas x 7 linhas de
+180x180, 36 quadros desenhados, resolucao nativa (nao e pixel art ampliada).
+
+A folha NAO e organizada por linha, como a do esqueleto. Sao poses de voo misturadas com
+um EFEITO DE ERUPCAO DE FOGO que nao tem corpo nenhum (linhas 2 a 5, colunas 4 e 5).
+
+O MAPA, e o porque de cada um:
+
+    espreita  4   linha 0, col 0-3       pairando, asas em batida curta
+    rasante   6   linha 1 col 0-3
+                  + linha 6 col 2-3      as poses baixas, de planeio
+    garras    4   linha 4, col 0-3       agachar, e o ARCO de golpe nos col 2-3
+    grito     6   linha 2 col 0-3
+                  + linha 5 col 2-3      asas abertas, no maior volume
+    dano      2   linha 3, col 0-1
+    derrota   4   linha 3 col 4-5
+                  + linha 5 col 4-5      a ERUPCAO, e a dissipacao dela em brasas
+
+A derrota usa os quadros SEM CORPO de proposito: uma criatura de fogo que morre virando
+uma erupcao que depois se apaga em brasas le melhor que qualquer pose de queda -- que
+esta folha nao tem.
+
+COMO A TROCA FOI FEITA
+----------------------
+So os BYTES DO PNG mudaram. O meta nao foi tocado: as celulas continuam 164x164 nas
+mesmas posicoes, entao nome, spriteID, internalID, rect e a internalIDToNameTable dos 26
+sprites ficaram intactos. Os 6 clipes, o AnimadorDoByakhee e a ByakheeFSM nao percebem a
+troca.
+
+Isso e ainda mais limpo que a troca do Abdul (onde os rects tiveram de mudar de 112x48
+para 72x92), e pelo mesmo motivo: neste projeto, nao desligar nada vale mais que qualquer
+elegancia.
+
+ENCAIXE: os quadros da gargula sao 180x180 e as celulas do Byakhee sao 164x164, mas o
+DESENHO dentro deles vai de 107x75 a 151x155 -- cabe sem redimensionar. Cada quadro foi
+recortado no proprio conteudo e colado no CENTRO-BASE da celula, porque o pivo dos 26
+sprites e (0.5, 0) -- alignment 9, Custom.
+
+A COR ficou como veio, laranja de fogo. Rodar para o amarelo de Carcosa e mudar
+MATIZ_ALVO no trocar_byakhee.py e rodar de novo: a funcao ja esta la, desligada.
+
+LICENCA
+-------
+O arquivo veio solto, sem pacote e sem termos, e o nome do autor nao e recuperavel do
+material. Em uso sob a autorizacao geral do Vini para os assets baixados. Mesma pendencia
+do Rei em Amarelo, do Abdul e do pacote de shader -- capturar autor e termos da pagina de
+origem antes da submissao do edital.
+
+IMPORT: o meta anterior foi preservado inteiro, entao PPU, filtro e compressao continuam
+como estavam.

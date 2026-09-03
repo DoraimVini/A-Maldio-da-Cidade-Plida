@@ -256,6 +256,54 @@ o padrão não casou, o `re.sub` não trocou nada, e como eu não conferi a cont
 nasceu desenhando **o próprio Abdul por cima do Abdul**. Compila, abre no Inspector, e só
 aparece jogando. `OEscudo_DesenhaUmQuadroDoEscudo_ENaoOutroSprite` é essa conferência.
 
+### 8. O Byakhee vira gárgula — contra a minha recomendação, e registrado assim
+
+O Vini perguntou se a `gargoyle_red.png` servia para o Byakhee. **Eu recomendei que não**, com
+os motivos medidos:
+
+- A arte anterior **não era placeholder**: 160×164 desenhados, 26 sprites fatiados, 6 animações
+  nomeadas e o `AnimadorDoByakhee` populado. Um demônio alado roxo/cinza, com sombra no chão.
+- A gárgula **está pegando fogo** — laranja e vermelho vivos. O Byakhee é um voador de Hali:
+  couro, silêncio.
+- A paleta que estava convergindo no mesmo dia (altar amarelo, magia do Abdul azul-gelo a 198°,
+  aura da Pedra roxa) ganharia um monstro de fogo no meio.
+- Ganho de 36 quadros contra 26, e perda da silhueta certa.
+
+Ele leu e escolheu trocar. Fica registrado dos dois lados, aqui e no
+`PROCEDENCIA_Byakhee.txt`: a arte anterior está no histórico do git, e voltar atrás é restaurar
+um PNG.
+
+**A troca é a mais limpa das três desta rodada: só os bytes do PNG mudaram.** As células
+continuam 164×164 nas mesmas posições, então nome, `spriteID`, `internalID`, `rect` e a
+`internalIDToNameTable` dos 26 sprites ficaram **intactos** — o meta não foi tocado. Os 6
+clipes, o `AnimadorDoByakhee` e a `ByakheeFSM` não percebem.
+
+**A folha não é organizada por linha**, como a do esqueleto: são poses de voo misturadas com um
+**efeito de erupção de fogo que não tem corpo nenhum** (linhas 2–5, colunas 4–5). O mapa:
+
+| clipe | quadros | de onde |
+|---|---|---|
+| espreita | 4 | linha 0, col 0–3 — pairando |
+| rasante | 6 | linha 1 col 0–3 + linha 6 col 2–3 — as poses baixas, de planeio |
+| garras | 4 | linha 4, col 0–3 — agachar, e o **arco de golpe** nos col 2–3 |
+| grito | 6 | linha 2 col 0–3 + linha 5 col 2–3 — asas abertas, maior volume |
+| dano | 2 | linha 3, col 0–1 |
+| derrota | 4 | linha 3 col 4–5 + linha 5 col 4–5 — a **erupção**, e a dissipação em brasas |
+
+A derrota usa os quadros **sem corpo** de propósito: uma criatura de fogo que morre virando uma
+erupção que depois se apaga em brasas lê melhor que qualquer pose de queda — que esta folha não
+tem.
+
+**Os colisores foram conferidos e NÃO mudaram** — diferente do Abdul e do Esqueleto. Medido no
+maior quadro de **todos** os clipes, e não só no parado: a criatura foi de 5,09 × 5,12 para
+4,22 × 4,59 unidades, ~10% menor no extremo. A hurtbox cobre y 0,36 a 4,77 e a maior altura
+desenhada é 4,59; a largura dela (3,69) segue menor que a envergadura (4,22), que está certo —
+ponta de asa não é alvo. Medir só o quadro parado daria 3,34 de altura e teria me feito
+encolher a hurtbox sem motivo.
+
+A cor ficou como veio. Rodar para o amarelo de Carcosa é mudar `MATIZ_ALVO` no script e rodar de
+novo; a função já está lá, desligada.
+
 ### Testes
 
 - **`AltaresRespondemNaTelaTests`** (novo, 2): campos de sprite preenchidos em todo ponto focal;
