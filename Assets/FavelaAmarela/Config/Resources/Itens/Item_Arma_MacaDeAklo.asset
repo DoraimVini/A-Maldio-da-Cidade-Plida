@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: 4a3de7951b884046a800dc2b14b4acca
   Nome: Maça de Aklo
-  Icone: {fileID: 21300000, guid: 209ccd988f5640ada17eb198ae002ace, type: 3}
+  Icone: {fileID: 21300000, guid: aae3548830b34640b9ec96be0bcaeb39, type: 3}
   Descricao: 
   Tipo: 0
   SlotEquipamento: 1

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ArtefatoDef
   Id: coroa_de_ossos
   Nome: Coroa de Ossos
-  Icone: {fileID: 21300000, guid: 32c035a0a1f47e948b11ab1a44308304, type: 3}
+  Icone: {fileID: 21300000, guid: 06861fc14e9a46ca89f3d1dac965df2f, type: 3}
   Descricao: "Tomada da cabe\xE7a de Nagaraja, o Sacerdote do Sinal Escamado. As
     escamas ainda reconhecem quem a veste \u2014 e hesitam."
   Item: {fileID: 11400000, guid: 3e7c928988e24160bcaeac8265ce7d5c, type: 2}

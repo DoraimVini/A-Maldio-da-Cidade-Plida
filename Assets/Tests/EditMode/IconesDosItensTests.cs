@@ -94,7 +94,10 @@ namespace FavelaAmarela.Tests.EditMode
 
                 // Importado sem destino: o Vini vai decidir a arma depois. Um ícone solto no
                 // projeto é barato; reencontrar o número numa folha de 2.192, não.
-                "Icone_Reservado_1683",
+                "Icone_Reservado_1683", "Icone_Reservado_1706_MarteloLendario",
+
+                // Terceira leva: os artefatos que faltavam.
+                "Icone_PatuaArtefato", "Icone_CoroaDeOssosArtefato",
             };
 
             Assert.IsTrue(Directory.Exists(pasta), $"Pasta de ícones ausente: {pasta}");
