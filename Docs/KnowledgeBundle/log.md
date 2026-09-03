@@ -6,11 +6,11 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
-## 2026-09-03 (madrugada) — Os altares acendem, e o Abdul cresce
+## 2026-09-03 (madrugada) — Os altares acendem, o Abdul cresce, e a magia dele vira gelo
 
 Duas tarefas pedidas antes de o Vini dormir: **começar pelos altares** e **trocar o Abdul**.
 
-Suítes: EditMode 1030 → **1033** (1010 passando, 23 aposentados); PlayMode **23/23**.
+Suítes: EditMode 1030 → **1035** (1012 passando, 23 aposentados); PlayMode **23/23**.
 
 ### 1. Os altares estavam mudos, não quebrados
 
@@ -97,6 +97,86 @@ sido preenchidos certo.
 Só conferir objeto por objeto revelou. O script foi refeito com parser de bloco, e a
 conferência virou `OFeixeEstaNoMesmoObjetoDoPontoFocal`.
 
+### 5. O pacote de shader nas magias do Abdul
+
+O Vini perguntou: *"não era para usar esses efeitos para as magias do Abdul?"*. Conferido no
+transcript: fui **eu** que propus o shader para a coluna do altar, e ele aprovou (*"sim, começa
+pelos altares"*). Não houve desvio — mas a pergunta expôs duas coisas.
+
+**O pacote não consegue fazer o Cone de Gelo.** As 60 folhas são todas volumes **verticais de
+simetria radial** — cilindros, cones, fusos, orbes, colunas. O Cone de Gelo é uma lasca de
+**30×12 px** que voa de lado. Não há projétil horizontal no pacote; o vocabulário dele é "coisa
+que fica de pé e pulsa", que é exatamente por que serviu para o altar.
+
+**Mas eu tinha criado um choque de cor.** A folha nova do Abdul traz a conjuração em **âmbar**, e
+o golpe dele é o **Cone de Gelo**, com acúmulo de congelamento e Stun em 3 acúmulos. O
+conjurador brilhava laranja e disparava azul.
+
+#### O erro de medição que quase decidiu isso errado
+
+Minha primeira leitura de matiz das bandas do pacote deu `0-9 = 136°, 10-19 = 195°, 20-29 = 272°`
+— ou seja, a primeira banda seria **verde**. A folha renderizada é laranja gritante.
+
+A causa: **média aritmética de ângulo**. Cor de fogo tem pixels dos dois lados do zero (355° e
+15°), e a média dá 185° — ciano. Refeito com **média circular** (soma vetorial pesada pela
+saturação):
+
+| banda | matiz | cor |
+|---|---|---|
+| 0–9 | **13°** | laranja de fogo |
+| 10–19 | **198°** | azul gelo, sat 0.88 |
+| 20–29 | **267°** | roxo |
+| 30–39 | 160°, val 0.50 | verde-azulado |
+
+E aí a resposta à pergunta do Vini (*"já não tem no pacote algo como gelo?"*) virou medição:
+
+| | matiz |
+|---|---|
+| `ConeDeGelo.png`, arte que o projeto **já usava** | **198°** |
+| banda azul do pacote | **198°** |
+| `PedraDePoder.png` (cristal) | **264°** |
+| banda roxa do pacote | **267°** |
+
+O azul do pacote é, **no grau**, o gelo que o jogo já usa. Nenhuma cor foi inventada.
+
+#### O que entrou
+
+**A energia do Abdul virou gelo.** Sigilos da máscara, sigilos do cajado, a carga e os arcos
+rodados para 198°, preservando saturação e valor. O manto vermelho-escuro não foi tocado (valor
+0,18, abaixo do piso do filtro) nem as mãos cinzas (saturação 0).
+
+> Custou uma rodada: o filtro era `r > 120 && r > b + 50 && g > b` e deixava passar **uma** cor —
+> `(119, 81, 36)`, o meio-tom do sigilo, com `r` um ponto abaixo do corte. Sobravam 75 pixels
+> bege na carga do quadro 5. Limiar de canal era um *proxy* do que eu queria dizer; matiz é o que
+> eu queria dizer. Trocado por um teste de matiz (8–65°, sat > 0,20, val > 0,35).
+
+**A Pedra de Poder ganhou aura.** Não é enfeite: ela sustenta o Escudo Mágico da Fase 1, e
+quebrá-la é a **única** forma de causar dano ali — o próprio doc do componente diz que é o que
+*"transforma a Fase 1 numa luta de arena (procurar e quebrar)"*. Ela era uma imagem parada de
+27×44 px: nada na tela dizia **quais** pedras ainda seguravam o escudo.
+
+Folha 397, banda roxa **nativa, sem recolorir**, alfa 58%. A forma foi escolhida montando 10
+candidatas **com o cristal junto**: as colunas altas viram torre sobre um cristal de 44 px e os
+orbes engolem a pedra — e a pedra é o **alvo**, o jogador precisa vê-la para mirar. O anel de
+segmentos deixa o cristal inteiro visível.
+
+> **Segundo erro de medição, mesma família.** Assumi que todas as 60 folhas tinham 10 quadros por
+> banda. Não têm: as de **2560 px são 40 colunas (4×10)** e as de **3072 px são 48 (4×12)**. A
+> 397 é de 48. Peguei as colunas 20–29 e o anel **começava ciano e terminava roxo**, atravessando
+> a fronteira entre duas bandas. Agora a primeira coluna sai da **largura** da folha.
+
+**O tamanho em jogo não mudou:** o sprite foi de 32×48 para 64×96, mas o cristal está colado no
+centro-base e o pivô dos dois é BottomCenter — mesmos pixels, mesmo ponto do chão, mesmo
+`m_LocalScale 0.9`.
+
+#### Uma nota de roadmap que estava vencida há um mês
+
+O roadmap dizia que *"Pedra de Poder, Esqueleto, Cone de Gelo e Necronomicon usam o **sprite
+built-in do Unity** (retângulos coloridos)"* e que *"o Abdul tem spritesheet mas **sem
+Animator**"*. Re-medido resolvendo cada `m_Sprite` por GUID: **os quatro têm arte autorada** (30×12,
+27×44, 20×46, 15×15), nenhum usa o built-in, e o Abdul tem `Animator` desde 19/08. O que era
+verdade e ninguém tinha escrito: nenhuma das quatro era **animada**.
+
 ### Testes
 
 - **`AltaresRespondemNaTelaTests`** (novo, 2): campos de sprite preenchidos em todo ponto focal;
@@ -111,6 +191,12 @@ conferência virou `OFeixeEstaNoMesmoObjetoDoPontoFocal`.
   `commercial`. Depois da troca de arte o arquivo continuou lá, continuou dizendo `commercial`,
   e o teste **continuaria verde descrevendo arte que não está mais no projeto**. Um arquivo de
   licença que sobrevive à arte que ele cobre é pior que nenhum: passa por prova numa submissão.
+- **`AuraDaPedraDePoderTests`** (novo, 2): o animador está no **mesmo GameObject** da Pedra e com
+  quadros; o `SpriteRenderer` nasce no primeiro quadro da aura, e não no cristal solto.
+- **`ArteDosPlaceholdersTests`** apontava para `PedraDePoder.png` e **pegou a troca de sprite** —
+  exatamente o que ele existe para fazer. Atualizado para o quadro da aura, com o porquê escrito
+  na entrada. Escala e volume de colisor não mudaram, então os outros dois testes do arquivo
+  passaram sem toque.
 
 ### Licença — pendências para o edital
 

@@ -21,17 +21,38 @@ PEDRA: Ruin_3 do tileset Undead da CraftPix, ja no projeto em
 FEIXE: pacote "Shader Cylinder 64x96 All Free", folha Part 1 / 01.png.
        Baixado pelo Vini; ver LICENCA abaixo.
 
-       O que o pacote e, medido: cada folha de 2560x192 tem 40 colunas de 64x96, e elas
-       sao QUATRO VARIANTES DE COR do MESMO efeito de 10 quadros -- vermelho (0-9),
-       azul (10-19), roxo (20-29), ciano (30-39). NAO sao 80 quadros de animacao, como
-       o tamanho da folha sugere. Isso custou uma medicao errada antes de aparecer.
+       O que o pacote e, medido: cada folha traz QUATRO VARIANTES DE COR do MESMO
+       efeito, lado a lado. NAO sao dezenas de quadros de animacao, como a largura da
+       folha sugere. Isso custou uma medicao errada antes de aparecer.
 
-       Nenhuma das quatro e amarela, e Carcosa e amarela. Usada a VERMELHA (a mais
-       quente, menos matiz a percorrer) e rodada para 50 graus, com saturacao a 70% e
-       alfa a 62%. Amarelo puro e opaco vira uma mancha que engole o altar -- o feixe
-       tem de ler como LUZ, com a pedra aparecendo atras.
+       CUIDADO: o numero de quadros por banda NAO e o mesmo em todas as folhas.
+       As de 2560 px sao 40 colunas (4 bandas de 10); as de 3072 px sao 48 (4 de 12).
+       Eu tambem errei ISTO: generalizei 10 quadros a partir da folha 01 e, ao montar a
+       aura da Pedra de Poder na folha 397, peguei colunas que atravessavam duas bandas
+       -- o anel comecava ciano e terminava roxo. A primeira coluna de uma banda tem de
+       sair da LARGURA da folha, nao de um numero fixo.
 
-       Sobram 59 folhas com outras formas de coluna. Trocar custa mudar um caminho no
+       A ordem das bandas e sempre a mesma. Matizes medidos com media CIRCULAR de
+       angulo (media aritmetica de matiz mente quando as cores cruzam o zero: fogo tem
+       pixels em 355 e em 15 graus e a media da 185, ciano -- foi assim que eu li 131
+       graus numa folha laranja):
+
+           banda 0   ~13 graus    laranja de fogo
+           banda 1  ~198 graus    azul gelo, saturacao 0.88
+           banda 2  ~266 graus    roxo
+           banda 3  ~160 graus    verde-azulado, valor mais baixo
+
+       Nenhuma e amarela, e Carcosa e amarela. Usada a banda 0 e rodada para 50 graus,
+       com saturacao a 70% e alfa a 62%. Amarelo puro e opaco vira uma mancha que engole
+       o altar -- o feixe tem de ler como LUZ, com a pedra aparecendo atras.
+
+       As outras bandas ja acharam uso, e sem recolorir: a banda 1 (198 graus) e, no
+       grau, o matiz do ConeDeGelo.png que o projeto ja usava, e virou a energia do
+       Abdul; a banda 2 (266) e o matiz do cristal da Pedra de Poder (264), e virou a
+       aura dela. Ver Art/Enemies/PedraDePoder/PROCEDENCIA.txt e
+       Art/Enemies/Abdul/PROCEDENCIA_Abdul.txt.
+
+       Sobram 59 folhas com outras formas. Trocar custa mudar um caminho no
        montar_altar.py e rodar de novo.
 
 COMO FOI MONTADO

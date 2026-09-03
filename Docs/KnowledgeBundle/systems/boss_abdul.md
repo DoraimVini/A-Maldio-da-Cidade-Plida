@@ -144,9 +144,29 @@ normal). Ver `AbdulAlhazredAI.ReceberGolpe`.
   sem tempo de vida, uma luta longa viraria uma multidão impossível.
 
 **Pendente:**
-- **Arte real** de todos os prefabs acima (hoje são retângulos coloridos) e as
+- ~~**Arte real** de todos os prefabs acima (hoje são retângulos coloridos) e as
   AnimationClips do Abdul (os 28 frames estão fatiados e nomeados por animação, mas não há
-  Animator — ele usa o frame `transe` estático).
+  Animator — ele usa o frame `transe` estático).~~
+
+  ⚠️ **Vencido. Re-medido em 2026-09-03**, resolvendo cada `m_Sprite` por GUID: os quatro
+  prefabs têm arte autorada — Cone de Gelo 30×12 px, Pedra de Poder 27×44, Esqueleto 20×46,
+  Necronomicon 15×15. **Nenhum usa o sprite embutido da Unity.** E o Abdul tem `Animator`
+  com `Abdul_AC_Mage` (5 estados, 5 clipes, estado default) desde 2026-08-19.
+
+  **O que era verdade e ninguém tinha escrito:** nenhuma das quatro peças era *animada*.
+  A **Pedra de Poder** ganhou aura girando em 2026-09-03 (12 quadros, anel roxo do pacote
+  *Shader Cylinder*, matiz 267° contra os 264° do próprio cristal). Isso importa para a
+  legibilidade da Fase 1: a Pedra sustenta o Escudo Mágico e quebrá-la é a única forma de
+  causar dano ali — sem sinal na tela, "procurar e quebrar" era palpite. Guarda:
+  `AuraDaPedraDePoderTests`.
+
+  **A arte do Abdul foi trocada** na mesma data (pacote *sorcerer villain*): o desenho
+  anterior ocupava 16×31 px — 38% da altura do Damião. Agora dá 50×66 parado. A energia da
+  conjuração vinha em âmbar e foi rodada para **198°**, que é no grau o matiz do
+  `ConeDeGelo.png` que este documento descreve — o conjurador brilhava laranja e disparava
+  gelo. Ver `Art/Enemies/Abdul/PROCEDENCIA_Abdul.txt`.
+
+  **Segue pendente:** arte animada de Esqueleto, Cone de Gelo e Necronomicon.
 - **Efeito do Necronomicon** ao ser coletado.
 - **Necronomicon como pickup:** confirmado que é um item a coletar depois da derrota (padrão `IInteragivel`, como o baú), não um efeito automático. `HandleDerrotado` instancia `prefabNecronomicon`, que ainda não existe.
 

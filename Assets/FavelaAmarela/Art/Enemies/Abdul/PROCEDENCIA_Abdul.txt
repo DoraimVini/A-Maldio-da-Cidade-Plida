@@ -57,6 +57,31 @@ O pacote traz UMA animacao de 10 quadros. O Abdul precisa de 5 clipes.
     hit      2   quadro 0 clareado e recuado
     death    9   quadro 0 afundando no chao, sigilos se apagando
 
+A ENERGIA DELE E GELO, e nao ambar
+----------------------------------
+O pacote entrega a conjuracao em AMBAR. Mas o golpe do Abdul e o CONE DE GELO, com
+acumulo de congelamento e Stun em 3 acumulos -- mecanica com teste proprio
+(AcumuloDeCongelamentoTests). Do jeito que veio, o chefe brilhava laranja e disparava
+azul: o conjurador e a magia dele nao combinavam.
+
+Entao os sigilos da mascara, os do cajado, a carga e os arcos foram todos rodados para
+198 graus. Esse numero nao foi escolhido a olho -- ele e, ao mesmo tempo:
+
+    o matiz do ConeDeGelo.png que o projeto JA usava .......... 198
+    o matiz da banda azul do pacote Shader Cylinder .......... 198
+
+Batem no grau. Saturacao e valor de cada pixel ficam como estavam, entao o volume do
+efeito nao muda; so o matiz.
+
+O manto vermelho-escuro nao foi tocado: o filtro exige valor acima de 0,35, e o manto
+nao passa de 0,18. As maos cinzas tambem nao, por saturacao zero.
+
+DETALHE QUE CUSTOU UMA RODADA: o filtro original era "r > 120 and r > b + 50 and g > b".
+Ele deixava passar exatamente uma cor -- (119, 81, 36), o meio-tom do sigilo, com r um
+ponto abaixo do corte -- e sobravam 75 pixels bege na carga do quadro 5 depois de tudo
+virar gelo. Limiar de canal e um proxy do que eu queria dizer; matiz e o que eu queria
+dizer. Trocado por um teste de matiz (8..65 graus, saturacao > 0,20, valor > 0,35).
+
 DIVIDA HONESTA: 19 dos 29 quadros sao derivados de uma pose so. O que salva a
 troca e QUAL clipe e autoral -- o ataque, que e a unica coisa que o jogador
 precisa LER para sobreviver, e tem 5 quadros de telegrafo (ergue o cajado,

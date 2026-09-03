@@ -176,6 +176,18 @@ nenhum dos 14 itens, mas está essencialmente **jogável de ponta a ponta**:
 e Necronomicon usam o **sprite built-in do Unity** (retângulos coloridos). O Abdul tem
 spritesheet real fatiado em 28 frames, mas **sem Animator** (usa um frame estático).
 
+> ⚠️ **O parágrafo acima é de 2026-08-10 e está inteiramente vencido. Re-medido em
+> 2026-09-03, resolvendo cada `m_Sprite` por GUID:** os quatro têm arte autorada de verdade
+> — Cone de Gelo 30×12, Pedra de Poder 27×44, Esqueleto 20×46, Necronomicon 15×15. Nenhum
+> usa o sprite built-in. E o Abdul tem `Animator` com `Abdul_AC_Mage` (5 estados, 5 clipes,
+> estado default) desde 2026-08-19.
+>
+> **O que continua sendo pendência de arte na Tumba, medido hoje:** nenhuma das quatro era
+> **animada**. A Pedra de Poder ganhou aura girando em 2026-09-03 (12 quadros) — importa
+> porque ela sustenta o Escudo Mágico da Fase 1 e quebrá-la é a única forma de causar dano
+> ali: sem sinal na tela, "procurar e quebrar" era palpite. **Esqueleto, Cone de Gelo e
+> Necronomicon seguem estáticos.**
+
 ### Acrescentado depois desta auditoria (2026-08-10 / 08-11)
 
 Nada disto está nos 14 itens, mas passou a existir:

@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 3382909184089458476}
   - component: {fileID: 1598484724622969807}
   - component: {fileID: 2655615333717871800}
+  - component: {fileID: 7900000000000000000}
   m_Layer: 6
   m_Name: PedraDePoder
   m_TagString: Untagged
@@ -178,7 +179,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 6c70d2c4c9e617540a72b7fa3e0023a8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0338d958f5b8433e9223f6180dd706dc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -279,3 +280,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 1
+--- !u!114 &7900000000000000000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7635651438898051546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7ebcff7873f4ae2a49861a7dbe64314, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.AnimadorDaPedraDePoder
+  quadros:
+  - {fileID: 21300000, guid: 0338d958f5b8433e9223f6180dd706dc, type: 3}
+  - {fileID: 21300000, guid: 65bc3190184642ae96de82176dd1a561, type: 3}
+  - {fileID: 21300000, guid: 20dc10bd074c4c91b6aa14cf254df19d, type: 3}
+  - {fileID: 21300000, guid: 4d0f1cdea7b74256bd8b9318d9064c7a, type: 3}
+  - {fileID: 21300000, guid: 3d30134da4084a94a683635797123852, type: 3}
+  - {fileID: 21300000, guid: abf0c24fed4847c7b6bd160cd2dc252e, type: 3}
+  - {fileID: 21300000, guid: dee3c430eee4418f9553ec0b280216e9, type: 3}
+  - {fileID: 21300000, guid: 3c5e6f50064c40148893601401e935b9, type: 3}
+  - {fileID: 21300000, guid: 2956772350e144f9923f67a9808ee722, type: 3}
+  - {fileID: 21300000, guid: 911b686d692943249a7dc79210e10a29, type: 3}
+  - {fileID: 21300000, guid: c6a5c1cdc23848c2834c79458a7ee453, type: 3}
+  - {fileID: 21300000, guid: b0a1aeebfea241299eedfb159cc4701d, type: 3}
+  quadrosPorSegundo: 10

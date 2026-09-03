@@ -1,0 +1,39 @@
+Aura da Pedra de Poder -- 12 quadros de 64x96. Montada em 2026-09-03.
+
+A Pedra sustenta o Escudo Magico do Abdul na Fase 1, e quebra-la e a unica forma de
+causar dano ali. Antes disto ela era uma imagem estatica de 27x44 px: nada na tela dizia
+quais pedras ainda seguravam o escudo, e "procurar e quebrar" virava palpite.
+
+CRISTAL: PedraDePoder.png, o mesmo de antes, colado sem um pixel de retoque.
+AURA:    pacote "Shader Cylinder 64x96", folha Part 4 / 397.png, banda ROXA
+         (colunas 24-35 das 48), alfa a 58%. Sem recolorir.
+
+A cor nao foi escolhida a olho. Medida com media CIRCULAR de angulo de matiz:
+
+    cristal ....................... 264 graus
+    banda roxa do pacote .......... 267 graus
+
+Tres graus. (Media aritmetica de matiz mente quando as cores cruzam o zero: fogo tem
+pixels em 355 e em 15 graus, e a media da 185 -- ciano. Errei assim uma vez, e foi o que
+me fez ler 131 graus numa folha laranja.)
+
+CUIDADO COM O NUMERO DE QUADROS. As folhas do pacote nao tem todas o mesmo. As de
+2560 px sao 40 colunas (4 bandas de 10); as de 3072 px sao 48 (4 bandas de 12). A ordem
+das bandas e sempre fogo, azul, roxo, verde-azulado. Assumi 10 para todas, peguei as
+colunas 20-29 desta folha, e o anel comecava ciano e terminava roxo -- atravessando a
+fronteira entre duas bandas. Agora a primeira coluna sai da LARGURA da folha.
+
+FORMA: a 397 e um anel de segmentos que gira. Escolhida contra 9 outras montadas com o
+cristal junto: as colunas altas viram torre sobre um cristal de 44 px, e os orbes engolem
+a pedra -- e a pedra e o ALVO, o jogador precisa ve-la para mirar.
+
+O TAMANHO EM JOGO NAO MUDOU: o sprite foi de 32x48 para 64x96, mas o cristal esta colado
+no centro-base e o pivo dos dois e BottomCenter (alignment 7). Mesmos pixels, mesmo ponto
+do chao, mesmo m_LocalScale 0.9 do prefab. So a aura entrou em volta.
+
+Quebrar nao precisa de estado: Estilhacar() faz gameObject.SetActive(false), entao a aura
+some junto com a pedra.
+
+Licenca do pacote: ver Art/Props/AltarDeReliquia/PROCEDENCIA.txt -- mesma pendencia.
+
+IMPORT: PPU 32, Point, sem compressao. Pivo no pe.

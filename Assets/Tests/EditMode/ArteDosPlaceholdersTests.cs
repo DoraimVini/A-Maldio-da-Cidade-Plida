@@ -48,7 +48,15 @@ namespace FavelaAmarela.Tests.EditMode
                            Alinhamento = PivoBottomCenter, Escala = 0.5f, ColisorX = 0.6f, ColisorY = 0.6f },
             new Esperado { Prefab = Enemies + "EsqueletoInvocado.prefab", Sprite = Enemies + "EsqueletoInvocado.png",
                            Alinhamento = PivoBottomCenter, Escala = 0.5f, ColisorX = 0.416f, ColisorY = 0.544f },
-            new Esperado { Prefab = Enemies + "PedraDePoder.prefab", Sprite = Enemies + "PedraDePoder.png",
+            // A Pedra parte do PRIMEIRO QUADRO DA AURA, e não do cristal solto (2026-09-03).
+            // O quadro é o mesmo cristal, sem um pixel de retoque, com o anel roxo composto
+            // atrás — ver Art/Enemies/PedraDePoder/PROCEDENCIA.txt. Apontar para o cristal solto
+            // faria a Pedra nascer sem anel e só ganhá-lo no primeiro tique do animador.
+            // A escala e o volume de colisor abaixo NÃO mudaram: o cristal está colado no
+            // centro-base da tela de 64×96 e o pivô dos dois é BottomCenter, então ele ocupa os
+            // mesmos pixels, no mesmo ponto do chão.
+            new Esperado { Prefab = Enemies + "PedraDePoder.prefab",
+                           Sprite = Enemies + "PedraDePoder/PedraDePoder_Aura_00.png",
                            Alinhamento = PivoBottomCenter, Escala = 0.9f, ColisorX = 1.0f, ColisorY = 1.35f },
             new Esperado { Prefab = Enemies + "ConeDeGelo.prefab", Sprite = Enemies + "ConeDeGelo.png",
                            Alinhamento = PivoCenter, Escala = 0.4f, ColisorX = 0.6f, ColisorY = 0.3f },
