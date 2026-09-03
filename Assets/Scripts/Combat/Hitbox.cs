@@ -208,6 +208,11 @@ namespace FavelaAmarela.Runtime.Combat
 
         private void Consultar()
         {
+            // Mostra a geometria EXATA que a física acabou de receber. A chamada some do
+            // binário em build de release (ConditionalAttribute), então não custa nada aqui.
+            Diagnostico.VisualizadorDeGolpes.RegistrarCirculo(
+                Centro, raio, Diagnostico.VisualizadorDeGolpes.CorDeGolpe);
+
             int total = Physics2D.OverlapCircle(Centro, raio, _filtro, _buffer);
 
             for (int i = 0; i < total; i++)

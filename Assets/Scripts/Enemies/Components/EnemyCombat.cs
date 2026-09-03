@@ -89,6 +89,13 @@ namespace FavelaAmarela.Runtime.Enemies
                 else if (_alvoCache is IDanificavel && !((MonoBehaviour)_alvoCache).enabled) _alvoCache = null;
             }
 
+            // Golpe INSTANTANEO e RADIAL: sem janela e sem direcao, entao estar atras do
+            // Cultista nao protege. A marca aparece por um piso de tempo justamente para
+            // esse quadro unico ser visivel. Ver systems/auditoria_hitbox_hurtbox.md.
+            FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.RegistrarCirculo(
+                transform.position, alcanceDeGolpe,
+                FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.CorDeGolpe);
+
             int total = Physics2D.OverlapCircle(transform.position, alcanceDeGolpe, _filtroAlvo, _bufferAlvo);
             if (total <= 0) { _alvoCache = null; return false; }
 

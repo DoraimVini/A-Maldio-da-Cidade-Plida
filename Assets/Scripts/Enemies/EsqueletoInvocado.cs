@@ -149,6 +149,14 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_tempoDesdeUltimoGolpe < cadenciaDeAtaque) return;
 
             _tempoDesdeUltimoGolpe = 0f;
+            // NAO HA GEOMETRIA no golpe: o dano sai na cadencia, e a unica condicao e o
+            // Distance <= alcanceDeGolpe la em cima, no FixedUpdate. Desenho o alcance para
+            // a tela mostrar o que o codigo realmente usa -- um raio, sem direcao nem janela,
+            // apesar de o golpe ter 5 quadros de animacao com arco de lamina.
+            FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.RegistrarCirculo(
+                transform.position, alcanceDeGolpe,
+                FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.CorDeGolpe);
+
             // A mitigação pela Defesa do alvo acontece dentro do VitalidadeBridge.
             _vitalidadeDoAlvo?.ReceberDanoFisico(ataque);
 

@@ -147,6 +147,11 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void CacarAlvo()
         {
+            // Golpe por DISTANCIA pura: radial, instantaneo, sem janela.
+            FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.RegistrarCirculo(
+                transform.position, _alcanceDeGolpe,
+                FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.CorDeGolpe);
+
             if (Vector2.Distance(transform.position, _alvo.position) <= _alcanceDeGolpe)
             {
                 _enemyMovement.Parar();

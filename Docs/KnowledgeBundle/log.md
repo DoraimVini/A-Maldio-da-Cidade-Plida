@@ -6,7 +6,7 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
-## 2026-09-03 — Altares, o Abdul inteiro, e o que a arte nova obrigou a medir de novo
+## 2026-09-03 — Altares, o Abdul inteiro, e a auditoria de onde o combate realmente acontece
 
 Duas tarefas pedidas antes de o Vini dormir: **começar pelos altares** e **trocar o Abdul**.
 
@@ -304,6 +304,69 @@ encolher a hurtbox sem motivo.
 A cor ficou como veio. Rodar para o amarelo de Carcosa é mudar `MATIZ_ALVO` no script e rodar de
 novo; a função já está lá, desligada.
 
+### 9. Auditoria de hitbox/hurtbox, e a ferramenta para vê-la
+
+O Vini trouxe o vocabulário (hitbox causa, hurtbox recebe) e as cinco formas de "feel off".
+Medi o projeto contra as cinco em vez de opinar. Resultado completo em
+[systems/auditoria_hitbox_hurtbox.md](systems/auditoria_hitbox_hurtbox.md).
+
+**O achado principal: a migração para hitbox com janela ativa parou no Byakhee.** O `Hitbox`
+existe, está correto, e o doc dele descreve o defeito palavra por palavra — *"não há janela…
+não há direção. Estar atrás do Byakhee, a 1,4 unidade, levava garrada igual"*. Mas só o
+**jogador** e o **Byakhee** o usam. O Cultista, que é o inimigo mais encontrado do jogo, ainda
+acerta por `OverlapCircle` centrado nele mesmo, num instante: sem janela para esquivar, e sem
+direção, então estar atrás dele não protege.
+
+**O Esqueleto é o caso extremo, e piorou hoje.** `TentarGolpear` chama `ReceberDanoFisico`
+direto na cadência — não há forma, direção nem janela. E hoje mesmo eu dei a ele um golpe
+animado de 5 quadros com arco de lâmina: **a animação agora promete uma janela que o código não
+tem.**
+
+**Hurtboxes, ao contrário, estão em ordem** — 90% a 104% de cobertura da arte, em todo o elenco.
+Três delas eu consertei hoje.
+
+> **Correção do meu próprio método.** A primeira varredura acusou Byakhee em 15% e Pedra em 49%.
+> As duas eram artefato: medi a **folha inteira** em vez do quadro, e na Pedra medi a aura
+> composta em vez do cristal. Quase reportei duas hurtboxes quebradas que não existiam.
+
+**Também conferido e falso:** o doc do `Hurtbox` afirma que as camadas `PlayerHitbox` (11) e
+`EnemyHitbox` (12) *"estavam declaradas desde sempre"*. **As camadas 11 e 12 estão vazias.**
+Inofensivo — a hitbox daqui é consulta, não colisor — mas engana quem for procurar.
+
+#### A ferramenta
+
+`Diagnostico/VisualizadorDeGolpes.cs`, **F11**. Verde recebe dano, **amarelo é hurtbox com o
+colisor desligado (i-frames acontecendo)**, vermelho causa, azul é gatilho.
+
+Ele precisa de uma API de registro porque **a hitbox daqui não é um colisor**: varrer
+`Collider2D` acha todas as hurtboxes e **zero hitboxes**. `RegistrarCirculo` é chamado de dentro
+de `Hitbox.Consultar`, `EnemyCombat`, `EsqueletoInvocado` e `SsethFarejadorAI`, com a geometria
+exata que foi para a física.
+
+**As marcas expiram por tempo, não por quadro.** Limpar a cada quadro era o desenho óbvio e
+esconde justamente o que interessa: um golpe instantâneo existe por **um** quadro, e um quadro a
+60 fps é invisível.
+
+Três armadilhas que a documentação local evitou:
+
+1. **`KeyCode` não funciona aqui** — `activeInputHandler: 1`, só Input System novo.
+2. **`Collider2D.bounds` fica vazio com o colisor desligado**, então usá-lo faria a hurtbox do
+   Damião sumir **justamente durante os i-frames**.
+3. **`FindObjectsByType(Type, FindObjectsSortMode)` está ela própria obsoleta** na 6000.4.
+
+#### Duas guardas do projeto me pegaram, e uma terceira fui eu
+
+- **`LeitorDeTeclaRespeitaOFocoTests`**: li `Keyboard.current` cru. O conserto é uma linha
+  (`if (!ArbitroDeFoco.JogoNoComando) return;`). Pensei em declarar dispensa — F11 não é tecla
+  de texto — mas dispensar por conveniência enfraquece a guarda.
+- **`LigacaoDoJogoTests`**: a auditoria de ligação pegou a **minha própria API morta**,
+  `RegistrarCaixa` sem chamador. Declarada na linha de base com o motivo: é a assinatura que o
+  Vini pediu, e nenhum golpe do projeto consulta `OverlapBox`.
+- E ao consertar a primeira eu criei a terceira: o `return` do árbitro pulava a poda da lista,
+  então com um painel aberto as marcas nunca expirariam. O comentário que eu mesmo tinha escrito
+  no código avisava disso. Poda movida para antes de qualquer `return`.
+
+
 ### Testes
 
 - **`AltaresRespondemNaTelaTests`** (novo, 2): campos de sprite preenchidos em todo ponto focal;
@@ -330,6 +393,9 @@ novo; a função já está lá, desligada.
 - **`ArteDosPlaceholdersTests`** pegou as DUAS trocas de sprite desta rodada (Pedra e
   Esqueleto) — é exatamente o que ele existe para fazer. Atualizado com o porquê em cada
   entrada; para o Esqueleto, escala e volume de colisor mudaram junto e estão anotados.
+- **`VisualizadorDeGolpes`** não é teste, mas fecha a mesma lacuna: os sete gizmos que o
+  projeto já tinha desenham em `OnDrawGizmosSelected` — só aparecem para o objeto selecionado
+  no Inspector, um de cada vez, e nunca durante uma luta.
 
 ### Licença — pendências para o edital
 

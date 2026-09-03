@@ -53,3 +53,4 @@ divida evento Sangramento.OnTerminou | Fim do Sangramento sem aviso.
 divida evento VitalidadeBridge.OnGolpeAparado | APARAR um golpe não dá retorno nenhum. É a defesa ativa do jogo, e ela é invisível.
 divida evento YugNethAI.OnIncapacitado | O companheiro cai sem aviso.
 divida evento YugNethAI.OnReanimado | E levanta sem aviso.
+ok metodo VisualizadorDeGolpes.RegistrarCaixa | E a assinatura que o Vini pediu (RegisterHitbox com Vector2 size). Nenhum golpe do projeto consulta OverlapBox hoje -- so a navegacao, que nao e combate -- entao ela fica exposta para o dia em que houver um. A irma RegistrarCirculo esta ligada nos quatro caminhos de dano.
