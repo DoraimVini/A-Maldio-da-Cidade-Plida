@@ -48,5 +48,26 @@ MonoBehaviour:
     QuantidadeMin: 1
     QuantidadeMax: 2
     NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: 46cc4cb050944e549d4643b1be328f86, type: 2}
+    Grau: 2
+    Garantido: 0
+    Chance: 0.4
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 3
+  - Item: {fileID: 11400000, guid: 5c26b87f320942728732bb288a7bb568, type: 2}
+    Grau: 2
+    Garantido: 0
+    Chance: 0.4
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 3
+  - Item: {fileID: 11400000, guid: 6258a189da44426a94eef3d82307cd3f, type: 2}
+    Grau: 2
+    Garantido: 0
+    Chance: 0.4
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 3
   tetoDeItens: 3
   nivelDoItem: 3
