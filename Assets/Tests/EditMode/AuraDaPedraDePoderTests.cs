@@ -26,7 +26,7 @@ namespace FavelaAmarela.Tests.EditMode
     {
         private const string Prefab = "Assets/FavelaAmarela/Art/Enemies/PedraDePoder.prefab";
         private const string Pedra = "PedraDePoder";
-        private const string Animador = "AnimadorDaPedraDePoder";
+        private const string Animador = "AnimadorEmLaco";
 
         /// <summary>12 quadros na banda roxa da folha 397. Piso, não número exato.</summary>
         private const int QuadrosMinimos = 8;

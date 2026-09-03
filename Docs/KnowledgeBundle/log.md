@@ -6,11 +6,11 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
-## 2026-09-03 (madrugada) — Os altares acendem, o Abdul cresce, e a magia dele vira gelo
+## 2026-09-03 — Altares, o Abdul inteiro, e o que a arte nova obrigou a medir de novo
 
 Duas tarefas pedidas antes de o Vini dormir: **começar pelos altares** e **trocar o Abdul**.
 
-Suítes: EditMode 1030 → **1035** (1012 passando, 23 aposentados); PlayMode **23/23**.
+Suítes: EditMode 1030 → **1038** (1015 passando, 23 aposentados); PlayMode **23/23**.
 
 ### 1. Os altares estavam mudos, não quebrados
 
@@ -177,6 +177,85 @@ Animator**"*. Re-medido resolvendo cada `m_Sprite` por GUID: **os quatro têm ar
 27×44, 20×46, 15×15), nenhum usa o built-in, e o Abdul tem `Animator` desde 19/08. O que era
 verdade e ninguém tinha escrito: nenhuma das quatro era **animada**.
 
+### 6. O esqueleto invocado tinha 28% da altura do jogador
+
+O Vini perguntou se os esqueletos precisavam de sprite. **Eles tinham uma** — o problema era
+outro, e pior:
+
+| | desenhado | escala do prefab | em mundo |
+|---|---|---|---|
+| Esqueleto (antes) | 20×46 px | **0,5** | **0,31 × 0,72** |
+| Damião | 32×81 px | — | 1,00 × 2,53 |
+| Esqueleto (agora) | ~37×67 px | 1,0 | **1,16 × 2,09** |
+
+Ele existe para dar **pressão** enquanto o jogador procura Pedras de Poder. Um boneco parado de
+0,72 unidade não pressiona ninguém.
+
+**`som-sprite-sheet.png`**: 480×576 = 5 × 6 células de 96×96, 28 quadros desenhados, em **duas
+variantes** (escudo dourado estampado e escudo escuro). Lido quadro a quadro:
+
+| linha | conteúdo |
+|---|---|
+| 0 | guarda, guarda, cambaleio, **deitado (morte)**, guarda |
+| 1 | **caminhada** — ciclo limpo de 5 |
+| 2 | **golpe** — ergue, arco branco, acompanhamento, recupera, guarda |
+
+Usada a variante dourada: é a **Tumba de Alhazred, o Árabe Louco**, e um esqueleto de cimitarra
+e escudo redondo em tons de osso pertence ali.
+
+**Novo `AnimadorDoEsqueleto`.** Ele não lê FSM porque o Esqueleto não tem uma — as três
+situações estão legíveis no `Rigidbody2D.linearVelocity`: parado (colado no alvo, entre golpes)
+ou andando. O golpe é o único que precisa ser **avisado**, porque acontece num instante e não
+muda a velocidade; `TentarGolpear` chama `_animador?.Golpear()`.
+
+**O espelhamento virou obrigatório.** A arte antiga era uma pose frontal simétrica, então nada
+no projeto virava o Esqueleto. A folha nova olha para a direita: sem `flipX`, metade das
+perseguições seria ele andando de ré.
+
+**Colisores, os dois fora do padrão.** A pegada era `0,832 × 1,088` local — uma caixa mais
+**alta que larga**, com metade abaixo do chão. Virou a `PegadaHumana` calibrada (`0,60 × 0,30`
+em `ColisoresDoElencoTests`): ele é um humano de osso. E a Hurtbox de `0,36 × 0,645` em mundo
+cobria bem um boneco de 0,72 — com 2,09, cabeça, tronco e braço do golpe ficariam
+**inatingíveis**. Refeita no molde do Cultista: `1,30 × 1,95` em y 1,00.
+
+**Ficou disponível e não usado:** a morte (linha 0, coluna 3) e a variante de escudo escuro.
+A morte não entrou porque `ReceberGolpe` faz `Destroy(gameObject)` direto — tocá-la exigiria
+segurar o objeto vivo, o que muda o jogo (corpos acumulando na arena) e não foi pedido.
+
+### 7. O Escudo Mágico do Abdul não existia
+
+`visualDoEscudo: {fileID: 0}` — **nulo**. `AbdulAlhazredAI.AplicarVisualDeEscudo` chama
+`visualDoEscudo.SetActive(ativo)` a cada mudança de estado da FSM, e não havia objeto para
+ligar. O único retorno era um tint na sprite — e o prefab ainda o havia trocado para **creme**
+`(1, 0.907, 0.549)` por cima do **azul** que o próprio script declara como padrão
+`(0.55, 0.75, 1)`.
+
+Não é cosmético: o Escudo **é** a Fase 1. Enquanto ele está de pé o Abdul não toma dano, e a
+única forma de derrubá-lo é quebrar uma Pedra. Escudo invisível transforma a fase em *"bater e
+ver se o número de dano aparece"*.
+
+**A cúpula**: folha 453 — uma **gaiola** de barras verticais e horizontais. Escolhida contra 7
+outras montadas por cima do Abdul: os orbes e as colunas **tapam** o chefe, e o jogador precisa
+vê-lo para ler o telegrafo de 5 quadros da conjuração. Banda **azul nativa** (198°), a mesma da
+magia dele. E o `corProtegido` voltou ao azul do script.
+
+**`DynamicYSort` com `offsetPes: -1.15`.** O componente escreve `round(-(y + offsetPes) * 10)` e
+só mexe no próprio objeto. O Abdul, com pivô no pé, dá `round(-y*10)`; o filho está em `y+1.05`,
+então com `-1.15` ele dá `round(-y*10 + 1)` — sempre exatamente **uma unidade acima**,
+acompanhando o chefe. Um `sortingOrder` fixo ficaria para trás assim que ele andasse.
+
+**Renomeado `AnimadorDaPedraDePoder` → `AnimadorEmLaco`.** Ele ganhou o segundo dono no mesmo
+dia, e um componente chamado "AnimadorDaPedraDePoder" dentro do prefab do Abdul seria mentira no
+YAML — que é onde se vai procurar quando algo não liga.
+
+#### O erro que virou o terceiro teste
+
+Ao criar a cúpula, moldei o `SpriteRenderer` no do Abdul e troquei o `m_Sprite` com o padrão
+`fileID: \d+`. **O sprite do Abdul vem de uma folha Multiple e o `fileID` dele é negativo** —
+o padrão não casou, o `re.sub` não trocou nada, e como eu não conferi a contagem, a cúpula
+nasceu desenhando **o próprio Abdul por cima do Abdul**. Compila, abre no Inspector, e só
+aparece jogando. `OEscudo_DesenhaUmQuadroDoEscudo_ENaoOutroSprite` é essa conferência.
+
 ### Testes
 
 - **`AltaresRespondemNaTelaTests`** (novo, 2): campos de sprite preenchidos em todo ponto focal;
@@ -197,6 +276,12 @@ verdade e ninguém tinha escrito: nenhuma das quatro era **animada**.
   exatamente o que ele existe para fazer. Atualizado para o quadro da aura, com o porquê escrito
   na entrada. Escala e volume de colisor não mudaram, então os outros dois testes do arquivo
   passaram sem toque.
+- **`AuraDaPedraDePoderTests`** e **`EscudoDoAbdulTests`** (novo, 3): o animador no mesmo
+  GameObject do dono e com quadros; o `SpriteRenderer` nascendo no quadro certo; e a cúpula
+  sortando na frente do Abdul em qualquer posição, e não só parada.
+- **`ArteDosPlaceholdersTests`** pegou as DUAS trocas de sprite desta rodada (Pedra e
+  Esqueleto) — é exatamente o que ele existe para fazer. Atualizado com o porquê em cada
+  entrada; para o Esqueleto, escala e volume de colisor mudaram junto e estão anotados.
 
 ### Licença — pendências para o edital
 

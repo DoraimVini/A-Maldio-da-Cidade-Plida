@@ -1,0 +1,55 @@
+Esqueleto Invocado -- caminhada e golpe, 5 quadros cada, 96x96.
+Trocado em 2026-09-03.
+
+O QUE SAIU, e por que
+---------------------
+EsqueletoInvocado.png: 32x48 de tela, 20x46 desenhado, e o prefab AINDA reduzia a 0,5.
+Resultado em mundo: 0,31 x 0,72 unidades, contra 1,00 x 2,53 do Damiao. O invocado do
+segundo chefe tinha 28% da altura do jogador -- e era uma imagem PARADA.
+
+Ele existe para dar pressao enquanto o jogador procura Pedras de Poder. Um boneco de
+0,72 unidade parado nao pressiona ninguem.
+
+O QUE ENTROU
+------------
+Pacote: som-sprite-sheet.png (C:\Users\Vini\Downloads), importado em 2026-09-03.
+480x576 = 5 colunas x 6 linhas de 96x96, 28 quadros desenhados, resolucao nativa
+(nao e pixel art ampliada -- conferido por varredura de blocos).
+
+Sao DUAS VARIANTES do mesmo esqueleto:
+    linhas 0-2   escudo dourado estampado   <- usada
+    linhas 3-5   escudo escuro              <- disponivel
+
+Usada a dourada: e a Tumba de Alhazred, o Arabe Louco, e um esqueleto de cimitarra e
+escudo redondo em tons de osso e ouro pertence ali.
+
+O QUE CADA LINHA E, lido quadro a quadro:
+    linha 0   guarda, guarda, cambaleio, DEITADO (morte), guarda
+    linha 1   CAMINHADA -- ciclo limpo de 5
+    linha 2   GOLPE -- ergue, arco branco, acompanhamento, recupera, guarda
+
+DISPONIVEL E NAO USADO: a morte (linha 0, coluna 3) e a variante de escudo escuro
+(linhas 3-5). A morte nao entrou porque EsqueletoInvocado.ReceberGolpe faz
+Destroy(gameObject) direto ao abater -- toca-la exigiria segurar o objeto vivo, o que
+muda o jogo (corpos acumulando na arena) e nao foi pedido.
+
+MEDIDAS
+-------
+Quadro desenhado ~37-48 x 60-81 px. Em unidades a escala 1: cerca de 1,16 x 2,09 --
+um pouco mais baixo que o Damiao (2,53), que e o que se quer de um invocado: ameaca
+de verdade, sem competir com o jogador.
+
+DESLOCAMENTO DE 3 px: os pes caem em y 88..93 dentro da celula de 96, e com pivo no PE
+isso deixaria o esqueleto flutuando ~4 px. Todos os quadros descem 3 px JUNTOS --
+constante, para nao matar o balanco natural do ciclo. O arco de golpe perde 2 px de
+cauda na borda de baixo.
+
+ESPELHAMENTO: a arte olha para a DIREITA. A sprite antiga era frontal e simetrica, entao
+nada no projeto espelhava o esqueleto. O AnimadorDoEsqueleto passa a escrever flipX pela
+direcao do movimento -- sem isso ele andaria de re para a esquerda.
+
+Licenca: o pacote veio sem arquivo de termos; em uso sob a autorizacao geral do Vini
+para os assets baixados. Mesma pendencia do Rei em Amarelo e do Abdul -- capturar autor
+e termos da pagina de origem antes da submissao do edital.
+
+IMPORT: PPU 32, Point, sem compressao. Pivo no PE (alignment 7).

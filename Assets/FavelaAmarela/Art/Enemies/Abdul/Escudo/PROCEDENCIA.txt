@@ -1,0 +1,34 @@
+Cupula do Escudo Magico do Abdul. Montada em 2026-09-03.
+
+O QUE ESTAVA AQUI: NADA. O campo visualDoEscudo do Abdul_Alhazred.prefab estava em
+{fileID: 0}. AbdulAlhazredAI.AplicarVisualDeEscudo chama visualDoEscudo.SetActive()
+conforme a FSM, e nao havia objeto nenhum para ligar. O unico retorno do escudo era um
+tint na sprite -- e o prefab ainda o havia trocado para creme (1, 0.907, 0.549) por cima
+do padrao AZUL que o proprio script declara (0.55, 0.75, 1).
+
+Isso importa porque o Escudo Magico E a Fase 1: enquanto ele esta de pe o Abdul nao toma
+dano, e a unica forma de derruba-lo e quebrar uma Pedra de Poder. Escudo invisivel
+transforma a fase em "bater e ver se o numero de dano aparece".
+
+ORIGEM: pacote "Shader Cylinder 64x96", folha Part 4 / 453.png, banda AZUL, alfa 50%.
+Sem recolorir.
+
+A COR NAO FOI ESCOLHIDA A OLHO. A banda azul mede 198 graus (media circular de angulo de
+matiz) -- o mesmo matiz do ConeDeGelo.png que o projeto ja usava, e da energia do proprio
+Abdul, rodada para 198 no mesmo dia. O escudo dele passa a ser feito da mesma coisa que a
+magia dele.
+
+A FORMA: a 453 e uma GAIOLA de barras verticais e horizontais. Escolhida contra 7 outras
+montadas por cima do Abdul (302, 306, 463, 480, 495, 104, 96): os orbes e as colunas
+TAPAM o chefe, e o jogador precisa ve-lo para ler o telegrafo de 5 quadros da conjuracao.
+A gaiola envolve e deixa ver atraves.
+
+PIVO NO CENTRO (alignment 0), diferente do resto do projeto: e um efeito que envolve o
+conjurador, nao um objeto que se apoia no chao. O GameObject filho fica em (0, 1.05) --
+meio do corpo do Abdul, que tem 2,06 de altura -- e a cupula de 2x3 unidades o cobre
+inteiro. Desenhada NA FRENTE (sortingOrder acima do Abdul) e semitransparente, que e como
+uma bolha de energia le.
+
+Licenca do pacote: ver Art/Props/AltarDeReliquia/PROCEDENCIA.txt -- mesma pendencia.
+
+IMPORT: PPU 32, Point, sem compressao.

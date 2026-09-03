@@ -46,8 +46,17 @@ namespace FavelaAmarela.Tests.EditMode
         {
             new Esperado { Prefab = MiGo + "YugNeth.prefab", Sprite = MiGo + "yug_neth_idle.png",
                            Alinhamento = PivoBottomCenter, Escala = 0.5f, ColisorX = 0.6f, ColisorY = 0.6f },
-            new Esperado { Prefab = Enemies + "EsqueletoInvocado.prefab", Sprite = Enemies + "EsqueletoInvocado.png",
-                           Alinhamento = PivoBottomCenter, Escala = 0.5f, ColisorX = 0.416f, ColisorY = 0.544f },
+            // O Esqueleto ganhou folha animada em 2026-09-03, e os três números mudaram juntos.
+            // ANTES: sprite de 32×48 com 20×46 desenhado, e o prefab AINDA reduzia a 0,5 —
+            // 0,31 × 0,72 unidades de mundo, contra 1,00 × 2,53 do Damião. O invocado do
+            // segundo chefe tinha 28% da altura do jogador, e era uma imagem parada.
+            // A escala foi a 1,0 porque a folha nova já nasce no tamanho certo (~1,16 × 2,09).
+            // A pegada era 0,416 × 0,544 — mais ALTA que larga, com metade abaixo do chão, e
+            // sem parentesco com a pegada chata do resto do elenco. Agora é a `PegadaHumana`
+            // de `ColisoresDoElencoTests` (0,60 × 0,30): ele é um humano de osso.
+            new Esperado { Prefab = Enemies + "EsqueletoInvocado.prefab",
+                           Sprite = Enemies + "EsqueletoInvocado/Esqueleto_Parado_00.png",
+                           Alinhamento = PivoBottomCenter, Escala = 1.0f, ColisorX = 0.6f, ColisorY = 0.3f },
             // A Pedra parte do PRIMEIRO QUADRO DA AURA, e não do cristal solto (2026-09-03).
             // O quadro é o mesmo cristal, sem um pixel de retoque, com o anel roxo composto
             // atrás — ver Art/Enemies/PedraDePoder/PROCEDENCIA.txt. Apontar para o cristal solto

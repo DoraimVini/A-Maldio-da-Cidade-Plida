@@ -71,9 +71,20 @@ namespace FavelaAmarela.Runtime.Enemies
         /// <summary>Esqueleto comum, não é boss — leva crítico furtivo normalmente.</summary>
         public bool EhAparicaoPrimordial => false;
 
+        /// <summary>
+        /// Animador, se este Esqueleto tiver um.
+        ///
+        /// <para>Resolvido por <c>GetComponent</c> e não por campo serializado: assim ligar a
+        /// animação num prefab é <b>acrescentar o componente</b>, sem referência a mais para
+        /// alguém esquecer de arrastar. Campo de cena vazio é o modo de falha número um deste
+        /// projeto.</para>
+        /// </summary>
+        private AnimadorDoEsqueleto _animador;
+
         private void Awake()
         {
             _seguidorDeCaminho = GetComponent<FavelaAmarela.Runtime.Navegacao.SeguidorDeCaminho>();
+            _animador = GetComponent<AnimadorDoEsqueleto>();
 
             // Área atingível derivada do sprite — invocado em runtime: sem isto nasceria sem área atingível.
             // A garantia vive aqui, no código, e não numa lista de prefabs: listas
@@ -140,6 +151,10 @@ namespace FavelaAmarela.Runtime.Enemies
             _tempoDesdeUltimoGolpe = 0f;
             // A mitigação pela Defesa do alvo acontece dentro do VitalidadeBridge.
             _vitalidadeDoAlvo?.ReceberDanoFisico(ataque);
+
+            // O golpe acontece num instante e não muda a velocidade do corpo — é a única das
+            // três situações do Esqueleto que o animador não consegue ler sozinho.
+            _animador?.Golpear();
         }
 
         /// <inheritdoc />
