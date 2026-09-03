@@ -1,0 +1,34 @@
+Pacote "Characters" (Characters.zip), importado em 2026-09-02.
+
+O QUE ENTROU, e onde foi ligado:
+
+  Character_01  robe preto, encapuzado   -> CASSILDA
+                (Cassilda.prefab; substituiu o Cassilda_Sprite anterior)
+
+  Character_02  cavaleiro de placas      -> CORTESAO PALIDO
+                (os 2 de Castelo_Carcosa.unity, que estavam com
+                 SpriteRenderer SEM SPRITE -- invisiveis em jogo)
+
+  Character_03  figura leve, de couro    -> RESERVADO
+                (o Vini decide o destino depois; candidato a Eco de Carcosa)
+
+De cada um vieram 3 poses (Front/Back/Side) e 2 armas soltas. Hoje so a
+pose Front esta ligada -- as outras duas e as armas ficam disponiveis para
+quando houver troca de direcao.
+
+IMPORT: PPU 32, Point (no filter), sem compressao -- skill
+favela-pixelart-standards. PIVO NO PE (alignment 7, BottomCenter), e nao no
+centro: o jogo ordena a profundidade por -worldCenter.y, entao personagem
+ancorado no meio "flutua" meio corpo acima do ponto que decide quem passa
+na frente de quem. A convencao ja era essa no Cassilda_Sprite antigo.
+
+O QUE NAO FOI USADO, e por que:
+
+  Estes sprites sao POSES ESTATICAS -- uma imagem por direcao, zero quadro
+  de animacao, ~51 px de altura. O Damiao tem 9 folhas / 39 sprites, 88 px,
+  com idle, corrida nas 4 direcoes e golpe nas 4. Trocar o protagonista por
+  eles custaria toda a animacao e 40% do tamanho. Medido em 2026-09-02.
+
+LICENCA: nao acompanha o zip. O Vini declarou em 2026-09-02 que os assets
+baixados sao de licenca aberta e autorizados. Se o pacote for de uma loja
+com termos proprios, vale anexar o texto aqui antes de publicar a build.
