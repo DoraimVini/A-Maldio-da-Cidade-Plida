@@ -98,6 +98,16 @@ namespace FavelaAmarela.Tests.EditMode
 
                 // Terceira leva: os artefatos que faltavam.
                 "Icone_PatuaArtefato", "Icone_CoroaDeOssosArtefato",
+
+                // As 9 armas passaram a ter icone PROPRIO: antes os tres Alfanjes dividiam
+                // um so, e as tres Laminas finas outro -- o nivel nao se via.
+                "Icone_AlfanjeDasRuinasPalidas", "Icone_AlfanjeDeAlhazred",
+                "Icone_EstileteDeYhtill", "Icone_EstileteDeIrem",
+                "Icone_Reservado_1737_Lendaria", "Icone_Reservado_1758_Lendaria",
+
+                // Os dois tiers do meio de armadura, que nao existiam.
+                "Icone_SepultoElmo", "Icone_SepultoPeitoral", "Icone_SepultoGrevas",
+                "Icone_YhtillElmo", "Icone_YhtillPeitoral", "Icone_YhtillGrevas",
             };
 
             Assert.IsTrue(Directory.Exists(pasta), $"Pasta de ícones ausente: {pasta}");

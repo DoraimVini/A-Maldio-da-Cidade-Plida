@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 254c99bc08b9e1f41bd77fea72f06c9f, type: 3}
-  m_Name: Item_Arma_AlfanjeDeAlhazred
+  m_Name: Item_Armadura_SepultoGrevas
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
-  Id: a56ffb4e4c154feea0cf7b0cd72c8537
-  Nome: Alfanje de Alhazred
-  Icone: {fileID: 21300000, guid: dfc330f34d734ce49a1bb76e239df116, type: 3}
-  Descricao: 
-  Tipo: 0
-  SlotEquipamento: 1
+  Id: sepulto_grevas
+  Nome: Grevas do Sepulto
+  Icone: {fileID: 21300000, guid: 013dd5af434f4eafaffef19dea7111a6, type: 3}
+  Descricao: "Andaram muito antes de voce. As solas guardam a forma de um passo que nao era o seu."
+  Tipo: 1
+  SlotEquipamento: 4
   EmpilhamentoMaximo: 1
-  ArmaFisica: 3
-  Base: {fileID: 11400000, guid: 36ab0166e1e2cd4429236b30703d6213, type: 2}
+  ArmaFisica: 0
   Empunhadura: 0
-  Funcao: 0
-  PotenciaDaMaoSecundaria: 0
-  ReducaoAoBloquear: 0.5
-  Modificadores: []
+  Modificadores:
+  - Stat: 7
+    Valor: 2
+  - Stat: 0
+    Valor: 3
