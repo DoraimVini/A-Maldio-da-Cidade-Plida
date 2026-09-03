@@ -74,6 +74,10 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Animator com o ReiEmAmarelo_AC. Vazio: o Rei desenha o quadro parado.")]
         [SerializeField] private Animator animator;
 
+        [Header("Fala")]
+        [Tooltip("Caixa onde o rito fala com Damião. Se vazia, usa a do HUD. [CENA]")]
+        [SerializeField] private FavelaAmarela.Runtime.UI.TutorialHintUI caixaDeTexto;
+
         private ReiEmAmareloFSM _fsm;
         private SpriteRenderer _sprite;
         private Transform _jogador;
@@ -118,6 +122,8 @@ namespace FavelaAmarela.Runtime.Enemies
             _fsm.OnStateChanged += HandleEstadoMudou;
             _fsm.OnSelado += HandleSelado;
             _fsm.OnReliquiaAtivada += HandleReliquiaAtivada;
+            _fsm.OnComecouADesvelar += HandleComecouADesvelar;
+            _fsm.OnCicloSobrevivido += HandleCicloSobrevivido;
         }
 
         private void Start()
@@ -165,6 +171,8 @@ namespace FavelaAmarela.Runtime.Enemies
             _fsm.OnStateChanged -= HandleEstadoMudou;
             _fsm.OnSelado -= HandleSelado;
             _fsm.OnReliquiaAtivada -= HandleReliquiaAtivada;
+            _fsm.OnComecouADesvelar -= HandleComecouADesvelar;
+            _fsm.OnCicloSobrevivido -= HandleCicloSobrevivido;
         }
 
         /// <summary>
@@ -213,6 +221,52 @@ namespace FavelaAmarela.Runtime.Enemies
                 limiarDeCostas);
         }
 
+        /// <summary>
+        /// A caixa de fala em uso, resolvida na hora do uso (o HUD é persistente e o campo nasce
+        /// vazio em prefab-asset).
+        /// </summary>
+        private FavelaAmarela.Runtime.UI.TutorialHintUI CaixaDeFala
+            => caixaDeTexto != null ? caixaDeTexto
+                                    : FavelaAmarela.Runtime.UI.TutorialHintUI.Instancia;
+
+        private void Dizer(string texto, float duracao = 3f)
+        {
+            var caixa = CaixaDeFala;
+            if (caixa != null) caixa.Mostrar(texto, duracao);
+        }
+
+        /// <summary>
+        /// O Rei se desvelou: a janela de reação abriu AGORA.
+        ///
+        /// <para><b>Por que isto é som, e não é polimento (2026-09-02).</b> O telegrafo desta
+        /// luta era só visual — cor e animação, trocadas por
+        /// <see cref="HandleEstadoMudou"/>. Mas a ação correta é <b>não olhar</b>: quem está
+        /// jogando certo tem Damião de costas e <b>não pode ver</b> o aviso. Uma luta cujo único
+        /// sinal exige olhar, e cuja resposta certa é não olhar, é invencível por construção.
+        /// O canal sonoro é o único que atravessa a mecânica.</para>
+        ///
+        /// <para>O evento existia desde que a FSM foi escrita e tinha <b>zero assinantes</b> —
+        /// encontrado pela auditoria de ligação (<c>LigacaoDoJogoTests</c>).</para>
+        /// </summary>
+        private void HandleComecouADesvelar()
+        {
+            FavelaAmarela.Runtime.Audio.MixerDeAudio.Instancia?.Tocar(
+                FavelaAmarela.Runtime.Audio.SomDoJogo.EntrouEmPanico, transform.position);
+        }
+
+        /// <summary>
+        /// Sobreviveu a um ciclo. Sem isto o jogador não sabe se acertou nem quanto falta — o
+        /// rito seria três esperas idênticas no escuro.
+        /// </summary>
+        private void HandleCicloSobrevivido()
+        {
+            int faltam = Mathf.Max(0, ciclosDeSelamento - _fsm.CiclosSobrevividos);
+
+            Dizer(faltam > 0
+                ? $"O selo aperta. Ainda faltam {faltam}."
+                : "O último selo se fecha.");
+        }
+
         private void HandleEstadoMudou(ReiEmAmareloState anterior, ReiEmAmareloState atual)
         {
             if (_sprite == null) return;
@@ -230,6 +284,13 @@ namespace FavelaAmarela.Runtime.Enemies
             // morte súbita (ColapsoTrigger, CoisaDoCemiterioAI). A proteção de cutscene é
             // respeitada DENTRO da ResilienciaBridge, num lugar só, em vez de replicada aqui.
             if (atual == ReiEmAmareloState.Colapso) _mente?.ForcarColapso();
+
+            // A regra da luta não está escrita em lugar nenhum que o jogador alcance, e ela é
+            // contraintuitiva: dar as costas ao chefe. Sem esta linha, os três primeiros ciclos
+            // são adivinhação — e cada erro é morte súbita.
+            if (atual == ReiEmAmareloState.Selando && anterior != ReiEmAmareloState.Selando)
+                Dizer("As relíquias arderam. Não o encares — dá-lhe as costas quando ele se " +
+                      "desvelar.", 5f);
 
             TocarAnimacaoDo(atual);
         }

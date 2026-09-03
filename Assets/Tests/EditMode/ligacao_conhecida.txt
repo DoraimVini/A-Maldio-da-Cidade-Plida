@@ -1,0 +1,55 @@
+# Linha de base da auditoria de ligação — LigacaoDoJogoTests
+#
+# Formato:  <marca> <tipo> <chave> | <motivo>
+#   marca   ok      = ligação legítima, não precisa existir. Fica aqui para sempre.
+#           divida  = ligação que FALTA fazer. Apague a linha quando ligar.
+#   tipo    metodo | evento | campo
+#
+# O teste falha em duas situações:
+#   1. apareceu um caso NOVO que não está aqui;
+#   2. um caso listado aqui SUMIU do código — ou foi consertado (apague a linha),
+#      ou o membro foi renomeado e esta isenção passou a proteger um fantasma.
+#
+# Semeado em 2026-09-02 com 15 métodos e 16 eventos. As linhas 'divida' são a lista
+# de trabalho e devem encolher.
+
+
+# ── MÉTODOS ──────────────────────────────────────────────────────────────────
+
+ok metodo ArtefatosBridge.EquiparNoPrimeiroSlotLivre | O doc do próprio método diz: é o que o Carcosa Debugger usa para conceder relíquias de teste.
+ok metodo ByakheeAI.TentarCortarAsa | O doc diz: exposto para quando a Lâmina do Sinal existir. Hoje o pouso da fase 3 vem do intervalo espontâneo da FSM.
+ok metodo CameraController.SetTarget | Quem liga a câmera ao alvo são as ferramentas de montagem de cena; em jogo o alvo vem serializado.
+ok metodo GerenciadorDeSave.AplicarTudo | A persistência deste projeto é PULL: cada IPersistente se registra E aplica o próprio estado no Start (ver EstadoPersistenteDoJogador:50). Este é o caminho de push, alternativo e não usado. Conferido em 2026-09-02.
+ok metodo HUDController.DefinirTelasDeFluxo | Usado pela ferramenta que monta o HUD, não pelo jogo.
+ok metodo ItemDatabase.ClearInstanceForTesting | O nome diz. Existe para o rig de teste.
+ok metodo ItemDatabase.InitializeForTesting | O nome diz. Existe para o rig de teste.
+ok metodo PortalDeCena.DefinirCenaDestino | As ferramentas de Editor montam os portais; em jogo o destino vem serializado.
+ok metodo PortalDeCena.DefinirChegada | Idem.
+
+divida metodo AbdulAlhazredAI.MirarEm | A mira das conjurações do Abdul existe e nada a aciona — ele conjura sem apontar.
+divida metodo CameraController.SetZoom | Nenhum momento do jogo aproxima ou afasta a câmera. Candidato natural: o desvelar do Rei e a morte.
+divida metodo GerenciadorDeVigor.PodeExecutarAcao | Ninguém pergunta se há Vigor antes de agir — as ações se pagam por caminhos próprios.
+divida metodo GerenciadorDeVigor.RestaurarCompletamente | O Refúgio de Luz devolve Vitalidade e Resiliência e NÃO devolve Vigor. Provável esquecimento.
+divida metodo NavegacaoDoMundo.Reavaliar | A malha de navegação nunca é reavaliada. Quando os Portões abrem ou uma tranca de arena cai, o mundo muda e os inimigos continuam com o mapa velho.
+divida metodo PlayerMovement.MascararOdor | A Coisa do Cemitério caça por FARO, e a tempestade não protege contra ela. Mascarar o odor é o contra-jogo previsto — e nada o oferece ao jogador.
+
+
+# ── EVENTOS ──────────────────────────────────────────────────────────────────
+
+ok evento ReiEmAmareloFSM.OnColapso | O Colapso já é aplicado por HandleEstadoMudou na transição de estado (ReiEmAmareloAI:232). O evento é o mesmo fato por outro canal.
+
+divida evento ByakheeFSM.OnLevantouVoo | Sem som nem aviso quando o chefe alça voo.
+divida evento ByakheeFSM.OnPousou | Sem som nem aviso no pouso — que é a abertura da fase 3, a janela de ataque.
+divida evento CancaoIncompleta.OnConcluida | A Canção completa não anuncia nada.
+divida evento CancaoIncompleta.OnFragmentoEntregue | Entregar um fragmento não dá retorno próprio.
+divida evento CultistaFSM.OnGolpeDesferido | O Cultista golpeia sem som próprio de golpe.
+divida evento EnemyBase.OnTraumaAnomaloSofrido | Dano à mente do inimigo não tem retorno visual.
+divida evento EnemyCombat.OnAtaqueDesferido | Sem telegrafo de ataque de inimigo comum.
+divida evento EnemyPerception.OnSuspeitaChanged | A suspeita do inimigo sobe e desce sem NENHUM indicador. O jogador não tem como saber que foi ouvido — e a furtividade é 100% sonora.
+divida evento RecitalDaCancao.OnAcerto | O recital da Cassilda não diz se a estrofe foi certa.
+divida evento RecitalDaCancao.OnErro | Idem para o erro.
+divida evento Sangramento.OnExplodiu | O estouro do Sangramento (10 acúmulos) não tem retorno visual.
+divida evento Sangramento.OnTerminou | Fim do Sangramento sem aviso.
+divida evento VitalidadeBridge.OnGolpeAparado | APARAR um golpe não dá retorno nenhum. É a defesa ativa do jogo, e ela é invisível.
+divida evento YugNethAI.OnIncapacitado | O companheiro cai sem aviso.
+divida evento YugNethAI.OnReanimado | E levanta sem aviso.

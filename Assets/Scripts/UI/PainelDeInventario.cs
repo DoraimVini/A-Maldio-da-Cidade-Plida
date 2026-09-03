@@ -93,6 +93,9 @@ namespace FavelaAmarela.Runtime.UI
         private InventoryManager _inventario;
         private float _escalaDeTempoAnterior = 1f;
 
+        /// <summary>Slot cujo descarte já foi pedido uma vez. -1 = nenhum pedido pendente.</summary>
+        private int _descarteConfirmadoDoSlot = -1;
+
         /// <summary>Se a tela está aberta agora.</summary>
         public bool Aberto { get; private set; }
 
@@ -153,6 +156,65 @@ namespace FavelaAmarela.Runtime.UI
             {
                 Fechar();
             }
+
+            if (Aberto) OuvirDescarte();
+        }
+
+        /// <summary>
+        /// Descarta o item selecionado da mochila, com <b>confirmação de dois toques</b>.
+        ///
+        /// <para><b>Por que confirmação (2026-09-02).</b> O doc de
+        /// <c>InventoryManager.Descartar</c> exige: o item <b>não cai no chão</b>, ele some — e
+        /// item que reaparece aos pés do jogador convida a usar o descarte como depósito. Some
+        /// de verdade pede um passo a mais antes.</para>
+        ///
+        /// <para>Dois toques em vez de um painel novo: a caixa de fala já existe, já é a voz do
+        /// jogo, e o segundo Delete é uma confirmação tão real quanto um botão "Sim" — com a
+        /// vantagem de não precisar de foco, de layout nem de mais uma peça para ligar errado.</para>
+        ///
+        /// <para>O método existia desde que eu o escrevi, com <b>zero chamadores fora de
+        /// teste</b>, até a auditoria de ligação o encontrar.</para>
+        /// </summary>
+        private void OuvirDescarte()
+        {
+            var teclado = UnityEngine.InputSystem.Keyboard.current;
+            if (teclado == null || !teclado.deleteKey.wasPressedThisFrame) return;
+
+            if (_origemSelecionada != Origem.Mochila || _inventario == null)
+            {
+                LimparConfirmacaoDeDescarte();
+                return;
+            }
+
+            var item = _inventario.Main.GetSlot(_indiceSelecionado);
+            if (item == null)
+            {
+                LimparConfirmacaoDeDescarte();
+                return;
+            }
+
+            string nome = item.Def != null ? item.Def.Nome : "isto";
+
+            if (_descarteConfirmadoDoSlot != _indiceSelecionado)
+            {
+                _descarteConfirmadoDoSlot = _indiceSelecionado;
+                Falar($"Abandonar {nome}? Não o verás de novo. Delete outra vez para largá-lo.");
+                return;
+            }
+
+            if (_inventario.Descartar(_indiceSelecionado))
+                Falar($"{nome} ficou para trás.");
+
+            LimparConfirmacaoDeDescarte();
+            LimparSelecao();
+        }
+
+        private void LimparConfirmacaoDeDescarte() => _descarteConfirmadoDoSlot = -1;
+
+        private void Falar(string texto)
+        {
+            var caixa = FavelaAmarela.Runtime.UI.TutorialHintUI.Instancia;
+            if (caixa != null) caixa.Mostrar(texto, 4f);
         }
 
         /// <summary>Abre se fechado, fecha se aberto.</summary>
@@ -291,6 +353,7 @@ namespace FavelaAmarela.Runtime.UI
         {
             _origemSelecionada = Origem.Nenhuma;
             _indiceSelecionado = -1;
+            _descarteConfirmadoDoSlot = -1;
             Redesenhar();
         }
 
