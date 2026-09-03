@@ -1,0 +1,90 @@
+Altar de Reliquia -- 1 sprite de pedra + 10 quadros de feixe aceso, 96x96.
+Montado em 2026-09-03.
+
+O BURACO QUE FECHOU
+-------------------
+Os tres Ponto_Focal_* de Castelo_Carcosa.unity estavam com spriteInativo: {fileID: 0}
+e spriteAtivo: {fileID: 0} -- os DOIS campos vazios, nos TRES. Ativar uma reliquia nao
+mudava um pixel na tela.
+
+O proprio doc do PontoFocalDeReliquia ja registrava: "trocava um sprite que nao esta
+autorado". O Vini relatou como "os altares nao estao funcionando". Eles funcionavam --
+aceitavam a reliquia, chamavam o Rei, contavam o que faltava. Eram MUDOS.
+
+DE ONDE VEIO A ARTE
+-------------------
+PEDRA: Ruin_3 do tileset Undead da CraftPix, ja no projeto em
+       Assets/ThirdParty/CraftPix/Undead/Objetos/. Licenca em
+       Art/Items/Icones/LICENCA_CraftPix_UndeadLoot.txt e ThirdParty/CraftPix/PROCEDENCIA.txt.
+       64x64 de tela, 55x54 desenhado: entulho com UMA coluna de pe.
+
+FEIXE: pacote "Shader Cylinder 64x96 All Free", folha Part 1 / 01.png.
+       Baixado pelo Vini; ver LICENCA abaixo.
+
+       O que o pacote e, medido: cada folha de 2560x192 tem 40 colunas de 64x96, e elas
+       sao QUATRO VARIANTES DE COR do MESMO efeito de 10 quadros -- vermelho (0-9),
+       azul (10-19), roxo (20-29), ciano (30-39). NAO sao 80 quadros de animacao, como
+       o tamanho da folha sugere. Isso custou uma medicao errada antes de aparecer.
+
+       Nenhuma das quatro e amarela, e Carcosa e amarela. Usada a VERMELHA (a mais
+       quente, menos matiz a percorrer) e rodada para 50 graus, com saturacao a 70% e
+       alfa a 62%. Amarelo puro e opaco vira uma mancha que engole o altar -- o feixe
+       tem de ler como LUZ, com a pedra aparecendo atras.
+
+       Sobram 59 folhas com outras formas de coluna. Trocar custa mudar um caminho no
+       montar_altar.py e rodar de novo.
+
+COMO FOI MONTADO
+----------------
+Feixe ATRAS, pedra na frente, no mesmo PNG. A coluna se recorta contra a luz em vez de
+sumir dentro dela.
+
+ALINHAMENTO: o Ruin_3 nao e simetrico -- a coluna de pe fica em x 40..52 da tela de 64,
+centro em 46, ou seja 14 px a direita do meio. A pedra e posicionada para a COLUNA cair
+no centro da tela de 96, e o feixe e centrado nela. Alinhar pelo centro da imagem
+deixaria o feixe subindo do entulho, ao lado da coluna.
+
+BANHO DE LUZ NA PEDRA: o ganho e pesado pelo brilho do proprio pixel. A primeira versao
+somava em direcao ao branco (r + (255-r)*f), o que desloca um pixel escuro muito mais,
+em termos relativos, que um claro -- a sombra do entulho (23,20,21) virava (46,34,19),
+com o vermelho DOBRANDO, e a pedra inteira ficava marrom. Luz nao faz isso: quem esta na
+sombra nao recebe.
+
+POR QUE UM SPRITE COMPOSTO, e nao um GameObject filho com o feixe: compondo, o altar
+inteiro e um SpriteRenderer so. Um filho obrigaria a criar tres objetos novos no YAML da
+cena, cada um com Transform, SpriteRenderer e fileID unico. Compor custa 11 PNGs e nao
+mexe na arvore da cena.
+
+COMO ESTA LIGADO
+----------------
+    spriteInativo -> Altar_Reliquia_Inativo    (a pedra)
+    spriteAtivo   -> Altar_Reliquia_Aceso_00   (primeiro quadro)
+    AnimadorDeAltarDeReliquia com os 10 quadros, NO MESMO GameObject
+
+O PontoFocalDeReliquia acha o animador por GetComponent, de proposito: ligar o feixe num
+altar novo e ACRESCENTAR o componente, sem uma referencia a mais para alguem esquecer de
+arrastar. Neste projeto, campo de cena vazio e o modo de falha numero um -- e este altar
+era a prova.
+
+Guardado por Assets/Tests/EditMode/AltaresRespondemNaTelaTests.cs.
+
+IMPORT: PPU 32, Point (no filter), sem compressao -- skill favela-pixelart-standards.
+Pivo no PE (alignment 7, BottomCenter), pela mesma razao do resto do elenco: o jogo
+ordena profundidade por -worldCenter.y.
+
+Ao 96x96 e PPU 32 o altar da 3,0 x 3,0 unidades de mundo. O Damiao tem 2,53 de altura,
+entao o feixe passa um pouco da cabeca dele -- visivel do outro lado da sala sem dominar
+a tela.
+
+LICENCA
+-------
+O zip "Shader Cylinder 64x96 All Free.zip" NAO CONTEM arquivo de termos (conferido em
+2026-09-03). A arte esta em uso sob a autorizacao geral do Vini para os assets baixados
+("todos os assets baixados podem ser usados, sao de licenca aberta"), mesma situacao do
+Rei em Amarelo e do Abdul.
+
+ANTES DA SUBMISSAO DO EDITAL: capturar o nome do autor e os termos da pagina de origem
+e salvar o texto aqui. Um link nao basta.
+
+GUIDS.txt nesta pasta lista o guid de cada sprite -- e o que o montar_altar.py escreve
+e o ligar_altares.py le.

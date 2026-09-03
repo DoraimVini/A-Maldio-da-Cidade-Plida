@@ -46,6 +46,16 @@ namespace FavelaAmarela.Runtime.Itens
         private bool _ativado;
 
         /// <summary>
+        /// Feixe do altar, se este ponto focal tiver um.
+        ///
+        /// <para>Resolvido por <c>GetComponent</c> de propósito, e não por campo serializado:
+        /// assim ligar o feixe num altar é <b>acrescentar o componente</b>, sem uma referência
+        /// a mais para alguém esquecer de arrastar. Neste projeto, campo de cena vazio é o modo
+        /// de falha número um.</para>
+        /// </summary>
+        private AnimadorDeAltarDeReliquia _feixe;
+
+        /// <summary>
         /// A caixa de fala em uso, resolvida NA HORA DO USO.
         ///
         /// <para>O campo nasce vazio em prefab-asset (nao referencia objeto de cena), e a caixa
@@ -62,6 +72,8 @@ namespace FavelaAmarela.Runtime.Itens
 
         private void Awake()
         {
+            _feixe = GetComponent<AnimadorDeAltarDeReliquia>();
+
             if (rei == null)
                 Debug.LogError("[PontoFocalDeReliquia] Sem referência ao Rei em Amarelo — " +
                                "este ponto nunca vai conseguir ativar o rito.", this);
@@ -117,6 +129,11 @@ namespace FavelaAmarela.Runtime.Itens
             if (spriteDoPonto != null && spriteAtivo != null)
                 spriteDoPonto.sprite = spriteAtivo;
 
+            // O feixe assume o renderer a partir daqui. A troca acima continua importando: ela
+            // e o desfecho minimo, para um altar sem AnimadorDeAltarDeReliquia ainda mudar de
+            // cara. Com o feixe, o sprite estatico e so o primeiro quadro do ciclo.
+            if (_feixe != null) _feixe.Acender(spriteDoPonto);
+
             int faltam = rei.ReliquiasFaltando;
             Dizer(faltam > 0
                 ? $"O ponto focal desperta. Ainda faltam {faltam}."
@@ -125,6 +142,8 @@ namespace FavelaAmarela.Runtime.Itens
 
         private void Start()
         {
+            if (_feixe != null) _feixe.Apagar();
+
             if (spriteDoPonto != null && spriteInativo != null)
                 spriteDoPonto.sprite = spriteInativo;
         }

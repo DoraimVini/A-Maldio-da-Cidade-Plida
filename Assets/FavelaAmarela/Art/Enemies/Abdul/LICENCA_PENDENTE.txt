@@ -1,0 +1,24 @@
+LICENCA PENDENTE - pacote "sorcerer villain", autor nao identificado
+====================================================================
+
+O pacote baixado (sorcerer villain (1).zip) NAO CONTEM arquivo de licenca.
+Conferido no zip em 2026-09-03: sao 12 arquivos, todos .png, nenhum .txt,
+.md ou .pdf com termos.
+
+O nome do autor tambem NAO e recuperavel a partir do material: nao ha nome no
+zip, nos nomes de arquivo, nem metadado nos PNG. A marca no rodape da imagem
+de capa foi ampliada e conferida -- e sombra, nao assinatura legivel.
+
+A arte esta em uso sob a autorizacao geral do Vini para os assets baixados
+("todos os assets baixados podem ser usados, sao de licenca aberta").
+
+O QUE FALTA ANTES DA SUBMISSAO DO EDITAL:
+capturar o nome do autor e os termos da pagina de origem (itch.io) e salvar o
+texto AQUI, do mesmo jeito que foi feito com LICENCA_AshDeal.txt. Um link nao
+basta: pode sair do ar, mudar, ou nao valer como prova na submissao.
+
+Enquanto este arquivo existir com este conteudo, a arte do Abdul Alhazred e
+um placeholder de licenca nao comprovada -- mesma situacao do Rei em Amarelo
+(Art/Enemies/ReiEmAmarelo/) e do Damiao animado (Art/Characters/Damiao/Animado/).
+
+Ver PROCEDENCIA_Abdul.txt para o que a arte substituiu e como.

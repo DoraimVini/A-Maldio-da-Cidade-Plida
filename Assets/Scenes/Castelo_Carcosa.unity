@@ -43497,6 +43497,7 @@ GameObject:
   - component: {fileID: 753043328}
   - component: {fileID: 753043327}
   - component: {fileID: 753043326}
+  - component: {fileID: 800000000}
   m_Layer: 0
   m_Name: Ponto_Focal_patua_luas_gemeas
   m_TagString: Untagged
@@ -43535,8 +43536,8 @@ MonoBehaviour:
   rotulo: "Ativar a rel\xEDquia"
   rei: {fileID: 191097147}
   spriteDoPonto: {fileID: 753043328}
-  spriteInativo: {fileID: 0}
-  spriteAtivo: {fileID: 0}
+  spriteInativo: {fileID: 21300000, guid: bf6a933ff3f749e8b87b080879aa9322, type: 3}
+  spriteAtivo: {fileID: 21300000, guid: a9f6d5249edf43adbc96706f621379fb, type: 3}
 --- !u!58 &753043327
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -44896,6 +44897,7 @@ GameObject:
   - component: {fileID: 1192290022}
   - component: {fileID: 1192290021}
   - component: {fileID: 1192290020}
+  - component: {fileID: 800000001}
   m_Layer: 0
   m_Name: Ponto_Focal_necronomicon
   m_TagString: Untagged
@@ -44934,8 +44936,8 @@ MonoBehaviour:
   rotulo: "Ativar a rel\xEDquia"
   rei: {fileID: 191097147}
   spriteDoPonto: {fileID: 1192290022}
-  spriteInativo: {fileID: 0}
-  spriteAtivo: {fileID: 0}
+  spriteInativo: {fileID: 21300000, guid: bf6a933ff3f749e8b87b080879aa9322, type: 3}
+  spriteAtivo: {fileID: 21300000, guid: a9f6d5249edf43adbc96706f621379fb, type: 3}
 --- !u!58 &1192290021
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -45669,6 +45671,7 @@ GameObject:
   - component: {fileID: 1459513189}
   - component: {fileID: 1459513188}
   - component: {fileID: 1459513187}
+  - component: {fileID: 800000002}
   m_Layer: 0
   m_Name: Ponto_Focal_anel_sinal_amarelo
   m_TagString: Untagged
@@ -45707,8 +45710,8 @@ MonoBehaviour:
   rotulo: "Ativar a rel\xEDquia"
   rei: {fileID: 191097147}
   spriteDoPonto: {fileID: 1459513189}
-  spriteInativo: {fileID: 0}
-  spriteAtivo: {fileID: 0}
+  spriteInativo: {fileID: 21300000, guid: bf6a933ff3f749e8b87b080879aa9322, type: 3}
+  spriteAtivo: {fileID: 21300000, guid: a9f6d5249edf43adbc96706f621379fb, type: 3}
 --- !u!58 &1459513188
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -70673,3 +70676,75 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   identificador: Refugio_DosPortoes
+--- !u!114 &800000000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753043324}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3cc4f924155405397e39e2058d488d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.AnimadorDeAltarDeReliquia
+  quadros:
+  - {fileID: 21300000, guid: a9f6d5249edf43adbc96706f621379fb, type: 3}
+  - {fileID: 21300000, guid: fb9a30c5620649b8a54b73150253cc7b, type: 3}
+  - {fileID: 21300000, guid: 3af1b50e380e4186a56390ac21376e9d, type: 3}
+  - {fileID: 21300000, guid: 1bac58c0a5e94734ad7c06a3bb6ce988, type: 3}
+  - {fileID: 21300000, guid: 722d3fee14124e3b98180810d8291d68, type: 3}
+  - {fileID: 21300000, guid: 1a2f9a1de9fc4f5dbd8cdb069e389a8d, type: 3}
+  - {fileID: 21300000, guid: d80bef964a0241ce9bb0f3765cdb9e72, type: 3}
+  - {fileID: 21300000, guid: 4f274f95a4f04b4bab6589e1f544c44a, type: 3}
+  - {fileID: 21300000, guid: bc8910bb50e046a9ba4119bd9fae2d47, type: 3}
+  - {fileID: 21300000, guid: a526a321b9454b5dabef4ebaea8b8d80, type: 3}
+  quadrosPorSegundo: 12
+--- !u!114 &800000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192290018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3cc4f924155405397e39e2058d488d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.AnimadorDeAltarDeReliquia
+  quadros:
+  - {fileID: 21300000, guid: a9f6d5249edf43adbc96706f621379fb, type: 3}
+  - {fileID: 21300000, guid: fb9a30c5620649b8a54b73150253cc7b, type: 3}
+  - {fileID: 21300000, guid: 3af1b50e380e4186a56390ac21376e9d, type: 3}
+  - {fileID: 21300000, guid: 1bac58c0a5e94734ad7c06a3bb6ce988, type: 3}
+  - {fileID: 21300000, guid: 722d3fee14124e3b98180810d8291d68, type: 3}
+  - {fileID: 21300000, guid: 1a2f9a1de9fc4f5dbd8cdb069e389a8d, type: 3}
+  - {fileID: 21300000, guid: d80bef964a0241ce9bb0f3765cdb9e72, type: 3}
+  - {fileID: 21300000, guid: 4f274f95a4f04b4bab6589e1f544c44a, type: 3}
+  - {fileID: 21300000, guid: bc8910bb50e046a9ba4119bd9fae2d47, type: 3}
+  - {fileID: 21300000, guid: a526a321b9454b5dabef4ebaea8b8d80, type: 3}
+  quadrosPorSegundo: 12
+--- !u!114 &800000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459513185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3cc4f924155405397e39e2058d488d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.AnimadorDeAltarDeReliquia
+  quadros:
+  - {fileID: 21300000, guid: a9f6d5249edf43adbc96706f621379fb, type: 3}
+  - {fileID: 21300000, guid: fb9a30c5620649b8a54b73150253cc7b, type: 3}
+  - {fileID: 21300000, guid: 3af1b50e380e4186a56390ac21376e9d, type: 3}
+  - {fileID: 21300000, guid: 1bac58c0a5e94734ad7c06a3bb6ce988, type: 3}
+  - {fileID: 21300000, guid: 722d3fee14124e3b98180810d8291d68, type: 3}
+  - {fileID: 21300000, guid: 1a2f9a1de9fc4f5dbd8cdb069e389a8d, type: 3}
+  - {fileID: 21300000, guid: d80bef964a0241ce9bb0f3765cdb9e72, type: 3}
+  - {fileID: 21300000, guid: 4f274f95a4f04b4bab6589e1f544c44a, type: 3}
+  - {fileID: 21300000, guid: bc8910bb50e046a9ba4119bd9fae2d47, type: 3}
+  - {fileID: 21300000, guid: a526a321b9454b5dabef4ebaea8b8d80, type: 3}
+  quadrosPorSegundo: 12

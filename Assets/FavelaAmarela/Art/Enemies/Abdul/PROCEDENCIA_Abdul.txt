@@ -1,0 +1,107 @@
+Arte do Abdul Alhazred -- trocada em 2026-09-03.
+
+O QUE ESTAVA AQUI, e por que saiu
+---------------------------------
+O "Mage" do Horror Pixel Art Enemy Pack (AshDeal). Medido antes da troca: a
+celula e 112x48 e o desenho dentro dela ocupava 16x31 px -- 0,50 x 0,97
+unidades de mundo.
+
+O Damiao tem 32x81 px = 1,00 x 2,53 unidades.
+
+Ou seja: o SEGUNDO CHEFE DO JOGO tinha 38% da altura do jogador e metade da
+largura. Nao era questao de gosto. Um chefe menor que o proprio jogador nao
+le como chefe, e o Vini vinha relatando a luta do Abdul como quebrada.
+
+O QUE ENTROU
+------------
+Pacote: "sorcerer villain (1).zip" (C:\Users\Vini\Downloads), importado em
+2026-09-03. Conteudo: 1 imagem de capa (sorcerer villain.png, 2000x200),
+1 pose solta (villain.png) e 10 quadros de uma animacao de conjuracao.
+
+O pacote e pixel art AMPLIADA x2 -- verificado por varredura de blocos: todo
+bloco 2x2 e uniforme, e nenhum bloco maior e. Foi reduzido a metade (NEAREST)
+para voltar a resolucao autoral, que e a unica forma de a densidade de pixel
+bater com o resto do jogo. Em resolucao nativa a figura da 60x87 px.
+
+Medidas depois da troca, em unidades de mundo:
+
+    parado           1,56 x 2,06     (era 0,50 x 0,97)
+    pico da conjuracao      2,78 de altura, com o cajado erguido
+
+Continua um pouco mais baixo que o Damiao (2,53) parado, e mais alto que ele
+no meio do golpe. E consideravelmente mais largo. Nao da para melhorar isso
+sem ampliar a sprite por um fator nao inteiro, o que destroi a grade de pixel.
+
+COMO A TROCA FOI FEITA, e por que assim
+---------------------------------------
+Os 29 sprites do Abdul_Mage_Sheet.png.meta ja tinham nome (abdul_idle_0 ...
+abdul_death_8), spriteID e internalID proprios, e sao ESSES ids que os 5
+clipes referenciam.
+
+Entao mudaram DUAS coisas, e so elas: os bytes do PNG e os 29 blocos "rect"
+(de 112x48 para 72x92). Nome, spriteID, internalID, a internalIDToNameTable e
+o guid da folha ficaram intactos -- e com eles os 5 clipes, o Abdul_AC_Mage,
+o Animator do prefab e a AbdulAlhazredAI seguem ligados sem uma linha de
+diferenca.
+
+Num projeto cujo modo de falha dominante e "a peca existe, nao da erro, e a
+ligacao nao acontece", nao desligar nada vale mais que qualquer elegancia.
+
+OS 29 QUADROS: o que e autoral e o que e derivado
+-------------------------------------------------
+O pacote traz UMA animacao de 10 quadros. O Abdul precisa de 5 clipes.
+
+    attack  10   os 10 quadros do pacote, diretos e sem retoque
+    idle     4   quadro 0 + flutuacao de 1 px e pulso nos sigilos
+    walk     4   quadro 0 + balanco de 2 px
+    hit      2   quadro 0 clareado e recuado
+    death    9   quadro 0 afundando no chao, sigilos se apagando
+
+DIVIDA HONESTA: 19 dos 29 quadros sao derivados de uma pose so. O que salva a
+troca e QUAL clipe e autoral -- o ataque, que e a unica coisa que o jogador
+precisa LER para sobreviver, e tem 5 quadros de telegrafo (ergue o cajado,
+o sigilo incha, estoura, os arcos varrem). O Abdul antigo tinha 10 quadros de
+ataque tambem, mas de uma figura de 31 px que ninguem enxergava.
+
+Se aparecer um pacote com o conjunto completo, trocar de novo custa rodar o
+mesmo script: Tools/ (scratchpad) trocar_abdul.py.
+
+A capa (villain.png / sorcerer villain.png) NAO foi usada. Ela carrega a tira
+de paleta do artista (y 5..9) e uma marca no rodape. Os 10 quadros de ataque
+estao limpos dos dois -- conferido por analise de componentes conexos: cada
+quadro tem exatamente o corpo mais os 3 sigilos do cajado, nada solto.
+
+COLISORES -- duas correcoes que a troca obrigou
+-----------------------------------------------
+Ao medir o elenco inteiro, o Abdul era o unico fora do padrao nas DUAS caixas:
+
+    ator        pegada (trigger 0)      hurtbox (trigger 1)
+    Damiao      (0, 0)    0.72x0.36     (0, 1.254)  0.84x2.27
+    Cultista    (0, 0)    0.70x0.35     (0, 1.281)  1.76x2.31
+    Espectro    (0, 0)    0.46x0.23     --
+    Abdul       (0, 0.80) 0.60x0.30     (0, 0.750)  2.54x1.29   <-- os dois
+    Byakhee     (0, 2.56) 2.00x3.00     (0, 2.563)  3.69x4.41
+
+1. A pegada dele estava em y 0,80 -- o corpo fisico flutuava na cintura,
+   enquanto o de todo o resto do elenco esta nos pes. Movida para y 0.
+   O TAMANHO nao mudou: 0.60x0.30 e calibrado e guardado por
+   ColisoresDoElencoTests.PegadaHumana.
+
+2. A hurtbox era uma laje HORIZONTAL de 2,54 de largura por 1,29 de altura,
+   numa figura de 0,50 de largura -- o jogador acertava 1,27 unidades de ar
+   de cada lado. Pior: ela terminava em y 1,395, entao com a sprite nova de
+   2,06 a cabeca e o braco do cajado ficariam INATINGIVEIS.
+   Refeita no molde do Cultista (mesmo rig humano): 1,40 x 2,00 em y 1,03.
+
+   Isso muda o toque da luta e o Vini vai sentir: a area caiu de 3,28 para
+   2,80 unidades quadradas (-15%). Em troca, os golpes passam a acertar onde
+   o chefe esta desenhado, e o corpo inteiro dele passa a ser alvo.
+
+LICENCA
+-------
+Ver LICENCA_PENDENTE.txt nesta pasta. O pacote veio sem arquivo de termos.
+
+LICENCA_AshDeal.txt continua aqui de proposito, e NAO cobre mais nenhuma arte
+em uso: nenhum sprite da AshDeal restou no projeto depois desta troca
+(varrido em 2026-09-03). Ficou porque o pacote esteve no historico de build
+do repositorio e o rastro importa para a submissao do edital.

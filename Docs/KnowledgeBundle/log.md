@@ -6,6 +6,123 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 
 
+## 2026-09-03 (madrugada) — Os altares acendem, e o Abdul cresce
+
+Duas tarefas pedidas antes de o Vini dormir: **começar pelos altares** e **trocar o Abdul**.
+
+Suítes: EditMode 1030 → **1033** (1010 passando, 23 aposentados); PlayMode **23/23**.
+
+### 1. Os altares estavam mudos, não quebrados
+
+O Vini relatou *"os altares das relíquias não estão funcionando"*. Medido no YAML da cena:
+
+| Ponto focal | `spriteInativo` | `spriteAtivo` |
+|---|---|---|
+| `Ponto_Focal_patua_luas_gemeas` | `{fileID: 0}` | `{fileID: 0}` |
+| `Ponto_Focal_necronomicon` | `{fileID: 0}` | `{fileID: 0}` |
+| `Ponto_Focal_anel_sinal_amarelo` | `{fileID: 0}` | `{fileID: 0}` |
+
+Os três, os dois campos. Eles **funcionavam** — aceitavam a relíquia, chamavam
+`rei.AtivarReliquia`, contavam quantas faltavam. Não mudavam um pixel. O próprio doc do
+`PontoFocalDeReliquia` já registrava o buraco: *"trocava um sprite que não está autorado"*.
+
+**A arte.** Base: `Ruin_3` do tileset Undead da CraftPix, já no projeto — entulho com uma
+coluna de pé. Feixe: pacote *Shader Cylinder 64x96*.
+
+Medição que custou uma leitura errada antes de aparecer: cada folha de 2560×192 tem 40 colunas
+de 64×96, e elas são **quatro variantes de cor do mesmo efeito de 10 quadros** (vermelho, azul,
+roxo, ciano) — não 80 quadros de animação, como o tamanho sugere. Nenhuma é amarela; a vermelha
+foi rodada para 50°, saturação a 70% e alfa a 62%.
+
+Composto num sprite só (feixe atrás, pedra na frente) em vez de um GameObject filho: assim o
+altar inteiro é um `SpriteRenderer`, e a árvore da cena não muda.
+
+**Um erro de luz, corrigido por medição.** O banho de âmbar na pedra somava em direção ao
+branco (`r + (255-r)*f`), que desloca pixel escuro muito mais, em termos relativos, do que
+claro: a sombra do entulho `(23,20,21)` virava `(46,34,19)` — o vermelho **dobrava** e a pedra
+inteira ficava marrom. Refeito com ganho pesado pelo brilho do próprio pixel. Quem está na
+sombra não recebe luz.
+
+**Novo:** `AnimadorDeAltarDeReliquia` — 10 quadros a 12 fps, no padrão dos `AnimadorDo*`
+(escreve `SpriteRenderer.sprite` direto, sem `AnimatorController`). O `PontoFocalDeReliquia` o
+acha por `GetComponent`, de propósito: ligar o feixe num altar novo é **acrescentar o
+componente**, sem uma referência a mais para esquecer de arrastar.
+
+### 2. O segundo chefe do jogo tinha 38% da altura do jogador
+
+| | desenhado | em unidades |
+|---|---|---|
+| Abdul (Mage da AshDeal) | 16×31 px | 0,50 × 0,97 |
+| Damião | 32×81 px | 1,00 × 2,53 |
+| **Abdul (feiticeiro)** | **50×66 px** | **1,56 × 2,06** |
+
+O pacote novo é pixel art ampliada ×2 (verificado por varredura de blocos: todo bloco 2×2 é
+uniforme, nenhum maior é). Reduzido à metade, a densidade de pixel bate com o resto do jogo.
+
+**A troca não desligou nada.** Os 29 sprites do meta já tinham nome, `spriteID` e `internalID`
+próprios, e são esses ids que os clipes referenciam. Mudaram **duas** coisas: os bytes do PNG e
+os 29 blocos `rect` (112×48 → 72×92). Os 5 clipes, o `Abdul_AC_Mage`, o `Animator` do prefab e
+a `AbdulAlhazredAI` seguem ligados sem uma linha de diferença.
+
+**Dívida honesta:** o pacote traz uma animação de 10 quadros. O `attack` é ela, direta, com 5
+quadros de telegrafo. Os outros 19 quadros (idle, walk, hit, death) são derivados de uma pose
+só. O que salva é qual clipe é autoral — o ataque é a única coisa que o jogador precisa *ler*
+para sobreviver.
+
+### 3. Colisores: o Abdul era o único fora do padrão nas duas caixas
+
+| ator | pegada | hurtbox |
+|---|---|---|
+| Damião | `(0, 0)` 0,72×0,36 | `(0, 1,254)` 0,84×2,27 |
+| Cultista | `(0, 0)` 0,70×0,35 | `(0, 1,281)` 1,76×2,31 |
+| **Abdul, antes** | **`(0, 0,80)`** 0,60×0,30 | **`(0, 0,75)` 2,54×1,29** |
+| **Abdul, agora** | `(0, 0)` 0,60×0,30 | `(0, 1,03)` 1,40×2,00 |
+
+A pegada dele flutuava na cintura. E a hurtbox era uma **laje horizontal** de 2,54 de largura
+numa figura de 0,50 — o jogador acertava 1,27 unidades de ar de cada lado — que terminava em
+y 1,395: com a sprite nova de 2,06, a cabeça e o braço do cajado ficariam **inatingíveis**.
+
+O tamanho da pegada **não** mudou: 0,60×0,30 é calibrado e guardado por
+`ColisoresDoElencoTests.PegadaHumana`.
+
+### 4. Uma cicatriz que virou teste
+
+Ao escrever os três componentes no YAML da cena eu usei um regex com `(?:.*\n)*?` para saltar
+do cabeçalho `--- !u!114 &N` até o `m_EditorClassIdentifier`. **Esse salto atravessa o
+separador de documento.** O regex colheu o `m_GameObject` de outro objeto vários blocos
+adiante: os três animadores nasceram grudados em GameObjects sem relação, os pontos focais
+ficaram sem feixe, e o script **relatou sucesso** — porque os campos de sprite, esses, tinham
+sido preenchidos certo.
+
+Só conferir objeto por objeto revelou. O script foi refeito com parser de bloco, e a
+conferência virou `OFeixeEstaNoMesmoObjetoDoPontoFocal`.
+
+### Testes
+
+- **`AltaresRespondemNaTelaTests`** (novo, 2): campos de sprite preenchidos em todo ponto focal;
+  feixe no mesmo GameObject do ponto focal e com quadros. Regra dura nos dois: sem achar nada,
+  falha dizendo que não mediu.
+- **`AnimacaoDoAbdulTests.OChefeNaoEhMenorQueOJogador`** (novo): piso de 64 px de altura
+  desenhada. O defeito antigo passava por *cinco* testes verdes — folha com transparência,
+  clipes ligados, controller com default, Animator apontando, IA dirigindo — e mesmo assim
+  entregava um chefe de 31 px.
+- **`AnimacaoDoAbdulTests.ProcedenciaDaArte_NomeiaOPacoteEmUso`** (substitui
+  `LicencaDoPacote_EstaNoRepositorio`): a versão anterior exigia `LICENCA_AshDeal.txt` contendo
+  `commercial`. Depois da troca de arte o arquivo continuou lá, continuou dizendo `commercial`,
+  e o teste **continuaria verde descrevendo arte que não está mais no projeto**. Um arquivo de
+  licença que sobrevive à arte que ele cobre é pior que nenhum: passa por prova numa submissão.
+
+### Licença — pendências para o edital
+
+`sorcerer villain (1).zip` e `Shader Cylinder 64x96 All Free.zip` **não trazem arquivo de
+termos**, e o nome do autor não é recuperável do material (a marca no rodapé da capa do
+feiticeiro foi ampliada e conferida: é sombra, não assinatura). Ambos ficaram com
+`LICENCA_PENDENTE.txt` / `PROCEDENCIA.txt` no padrão já usado no Rei em Amarelo.
+
+`LICENCA_AshDeal.txt` continua na pasta do Abdul de propósito, e **não cobre mais nenhuma arte
+em uso** — nenhum sprite da AshDeal restou no projeto. O `PROCEDENCIA_Abdul.txt` diz isso.
+
+
 ## 2026-09-02 (madrugada) — A régua, e as quatro fases que ela destravou
 
 O Vini mandou um print do jogo com os botões do pause empilhados e perguntou **por que eu não

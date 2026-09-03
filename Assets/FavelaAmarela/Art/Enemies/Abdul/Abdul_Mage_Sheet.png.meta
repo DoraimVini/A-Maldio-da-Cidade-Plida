@@ -452,8 +452,8 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -472,10 +472,10 @@ TextureImporter:
       name: abdul_idle_1
       rect:
         serializedVersion: 2
-        x: 112
+        x: 72
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -494,10 +494,10 @@ TextureImporter:
       name: abdul_idle_2
       rect:
         serializedVersion: 2
-        x: 224
+        x: 144
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -516,10 +516,10 @@ TextureImporter:
       name: abdul_idle_3
       rect:
         serializedVersion: 2
-        x: 336
+        x: 216
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -538,10 +538,10 @@ TextureImporter:
       name: abdul_walk_0
       rect:
         serializedVersion: 2
-        x: 448
+        x: 288
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -560,10 +560,10 @@ TextureImporter:
       name: abdul_walk_1
       rect:
         serializedVersion: 2
-        x: 560
+        x: 360
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -582,10 +582,10 @@ TextureImporter:
       name: abdul_walk_2
       rect:
         serializedVersion: 2
-        x: 672
+        x: 432
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -604,10 +604,10 @@ TextureImporter:
       name: abdul_walk_3
       rect:
         serializedVersion: 2
-        x: 784
+        x: 504
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -626,10 +626,10 @@ TextureImporter:
       name: abdul_attack_0
       rect:
         serializedVersion: 2
-        x: 896
+        x: 576
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -648,10 +648,10 @@ TextureImporter:
       name: abdul_attack_1
       rect:
         serializedVersion: 2
-        x: 1008
+        x: 648
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -670,10 +670,10 @@ TextureImporter:
       name: abdul_attack_2
       rect:
         serializedVersion: 2
-        x: 1120
+        x: 720
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -692,10 +692,10 @@ TextureImporter:
       name: abdul_attack_3
       rect:
         serializedVersion: 2
-        x: 1232
+        x: 792
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -714,10 +714,10 @@ TextureImporter:
       name: abdul_attack_4
       rect:
         serializedVersion: 2
-        x: 1344
+        x: 864
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -736,10 +736,10 @@ TextureImporter:
       name: abdul_attack_5
       rect:
         serializedVersion: 2
-        x: 1456
+        x: 936
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -758,10 +758,10 @@ TextureImporter:
       name: abdul_attack_6
       rect:
         serializedVersion: 2
-        x: 1568
+        x: 1008
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -780,10 +780,10 @@ TextureImporter:
       name: abdul_attack_7
       rect:
         serializedVersion: 2
-        x: 1680
+        x: 1080
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -802,10 +802,10 @@ TextureImporter:
       name: abdul_attack_8
       rect:
         serializedVersion: 2
-        x: 1792
+        x: 1152
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -824,10 +824,10 @@ TextureImporter:
       name: abdul_attack_9
       rect:
         serializedVersion: 2
-        x: 1904
+        x: 1224
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -846,10 +846,10 @@ TextureImporter:
       name: abdul_hit_0
       rect:
         serializedVersion: 2
-        x: 2016
+        x: 1296
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -868,10 +868,10 @@ TextureImporter:
       name: abdul_hit_1
       rect:
         serializedVersion: 2
-        x: 2128
+        x: 1368
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -890,10 +890,10 @@ TextureImporter:
       name: abdul_death_0
       rect:
         serializedVersion: 2
-        x: 2240
+        x: 1440
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -912,10 +912,10 @@ TextureImporter:
       name: abdul_death_1
       rect:
         serializedVersion: 2
-        x: 2352
+        x: 1512
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -934,10 +934,10 @@ TextureImporter:
       name: abdul_death_2
       rect:
         serializedVersion: 2
-        x: 2464
+        x: 1584
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -956,10 +956,10 @@ TextureImporter:
       name: abdul_death_3
       rect:
         serializedVersion: 2
-        x: 2576
+        x: 1656
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -978,10 +978,10 @@ TextureImporter:
       name: abdul_death_4
       rect:
         serializedVersion: 2
-        x: 2688
+        x: 1728
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1000,10 +1000,10 @@ TextureImporter:
       name: abdul_death_5
       rect:
         serializedVersion: 2
-        x: 2800
+        x: 1800
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1022,10 +1022,10 @@ TextureImporter:
       name: abdul_death_6
       rect:
         serializedVersion: 2
-        x: 2912
+        x: 1872
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1044,10 +1044,10 @@ TextureImporter:
       name: abdul_death_7
       rect:
         serializedVersion: 2
-        x: 3024
+        x: 1944
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1066,10 +1066,10 @@ TextureImporter:
       name: abdul_death_8
       rect:
         serializedVersion: 2
-        x: 3136
+        x: 2016
         y: 0
-        width: 112
-        height: 48
+        width: 72
+        height: 92
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
