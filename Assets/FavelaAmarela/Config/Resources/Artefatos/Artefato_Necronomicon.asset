@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ArtefatoDef
   Id: necronomicon
   Nome: Necronomicon
-  Icone: {fileID: 21300000, guid: d2df88cf4aab3fa42af6c4b5f619ac98, type: 3}
+  Icone: {fileID: 21300000, guid: 1a0c133b276e43f2a5dc69451af5b622, type: 3}
   Descricao: "O Al-Azif. Quem o carrega l\xEA o Aklo sem querer \u2014 e o que se
     l\xEA n\xE3o se desl\xEA."
   Item: {fileID: 11400000, guid: b7e3c1a94f2d08e4a91c65d3f807be21, type: 2}

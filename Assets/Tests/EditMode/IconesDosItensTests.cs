@@ -88,6 +88,13 @@ namespace FavelaAmarela.Tests.EditMode
                 // acusa — que é o ponto.
                 "Icone_CapuzDeFarrapos", "Icone_ColeteDeSucata", "Icone_CaneleirasDeFerro",
                 "Icone_ElmoDeSet", "Icone_PeitoralDeSet", "Icone_GrevasDeSet",
+
+                // Segunda leva, também Raven.
+                "Icone_PatuaItem", "Icone_EstileteDaMascaraPalida", "Icone_AlfanjeDoRei",
+
+                // Importado sem destino: o Vini vai decidir a arma depois. Um ícone solto no
+                // projeto é barato; reencontrar o número numa folha de 2.192, não.
+                "Icone_Reservado_1683",
             };
 
             Assert.IsTrue(Directory.Exists(pasta), $"Pasta de ícones ausente: {pasta}");
