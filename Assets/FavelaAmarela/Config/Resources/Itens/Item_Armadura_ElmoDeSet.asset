@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: set_elmo
   Nome: Elmo de Set
-  Icone: {fileID: 21300000, guid: c2f8d06b6b6d7824ab22581c31d7b9cb, type: 3}
+  Icone: {fileID: 21300000, guid: dcde6efa013543b5aebc99ad88f8dceb, type: 3}
   Descricao: "Arrancado do Avatar quando ele desabou. O metal ainda guarda o calor
     de um deus preso \u2014 e olha de volta por dentro."
   Tipo: 1

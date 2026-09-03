@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: colete_sucata
   Nome: Colete de Sucata
-  Icone: {fileID: 21300000, guid: b020372dd863f1e4e9fb1191c0d5a3b1, type: 3}
+  Icone: {fileID: 21300000, guid: 1721f8d586674cdd89d7d0e791b00bb1, type: 3}
   Descricao: Placas de metal amarradas com fios de couro requeimado. Range a cada
     passo, mas segura o primeiro golpe.
   Tipo: 1

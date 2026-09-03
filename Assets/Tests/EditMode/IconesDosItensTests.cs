@@ -74,11 +74,20 @@ namespace FavelaAmarela.Tests.EditMode
                 // lista junto com a troca.
                 "Icone_CartaDasAreias",
 
-                // Raven Fantasy Icons, importados em 2026-09-02: pixel art AUTORADA a 32×32,
-                // não pintura reduzida — por isso Point, e não Bilinear como os do CraftPix.
-                // Foi este teste que me corrigiu: importei os três copiando o .meta do
-                // sand_01 sem perguntar de que espécie de arte eles eram.
+                // Raven Fantasy Icons, escolhidos pelo Vini em 2026-09-02: pixel art AUTORADA
+                // a 32×32, não pintura reduzida — por isso Point, e não Bilinear como os do
+                // CraftPix. Foi este teste que me corrigiu na primeira leva: importei copiando
+                // o .meta do sand_01 sem perguntar de que espécie de arte eles eram.
                 "Icone_MacaDeAklo", "Icone_MacaDeAldebaran", "Icone_MacaDoSinalAmarelo",
+                "Icone_AnelArtefato", "Icone_AnelItem", "Icone_BroquelDeCouro",
+                "Icone_EstilhacoDeAldebaran",
+
+                // Os do CraftPix que estes substituíram foram APAGADOS, e por isso mudaram de
+                // espécie sem mudar de nome: eram pintura reduzida (Bilinear), agora são pixel
+                // art (Point). Se alguém reintroduzir os antigos com o mesmo nome, este teste
+                // acusa — que é o ponto.
+                "Icone_CapuzDeFarrapos", "Icone_ColeteDeSucata", "Icone_CaneleirasDeFerro",
+                "Icone_ElmoDeSet", "Icone_PeitoralDeSet", "Icone_GrevasDeSet",
             };
 
             Assert.IsTrue(Directory.Exists(pasta), $"Pasta de ícones ausente: {pasta}");

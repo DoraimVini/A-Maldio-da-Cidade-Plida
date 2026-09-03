@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: capuz_farrapos
   Nome: Capuz de Farrapos
-  Icone: {fileID: 21300000, guid: 9aba136cddb8ad74bb4abe8c39b345b7, type: 3}
+  Icone: {fileID: 21300000, guid: 3aee5331d4634e488bc05e98148ee4ca, type: 3}
   Descricao: "Tecido rasgado de quem n\xE3o sobreviveu \xE0 travessia. Ainda cheira
     a poeira do Deserto de Hali."
   Tipo: 1

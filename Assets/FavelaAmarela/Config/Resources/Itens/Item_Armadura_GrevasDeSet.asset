@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ItemDef
   Id: set_grevas
   Nome: Grevas de Set
-  Icone: {fileID: 21300000, guid: ef1d2b29c7aed5147a1f17f059e40b11, type: 3}
+  Icone: {fileID: 21300000, guid: b211d9c2672a4f5996a572c305a4471c, type: 3}
   Descricao: "Pesam menos do que deveriam. O deserto que engoliu o Templo n\xE3o
     deixa marca de passo em quem as cal\xE7a."
   Tipo: 1
