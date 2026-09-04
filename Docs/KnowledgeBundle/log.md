@@ -4,6 +4,42 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Limpeza, e dois quase-erros meus
+
+Removidos: `Assets/Sprites` (continha **um** arquivo, um `.meta` órfão de uma pasta que não
+existe mais) e `Assets/_Recovery/0.unity` (blockout de 10 de agosto — `Zona2_VilaDasCasas`,
+`Casa_1/2/3`, paredes; GUID não referenciado por nada).
+
+EditMode segue em **1052 (1029 passando, 0 falhando)**.
+
+### Os dois importers de `Assets/Editor` NÃO foram removidos, e eu quase os removi
+
+Eu os havia classificado como código morto porque *"não têm chamador"*. **O teste estava
+errado para a classe deles:** são `AssetPostprocessor`, e quem os chama é a Unity, em todo
+import de textura. Nenhum script os invoca — e nem deveria.
+
+- **`KenneyImporter`** aplica PPU 32, `FilterMode.Point` e compressão `Uncompressed` em tudo
+  sob `ThirdParty/Kenney` — **4.565 arquivos**. É a skill `favela-pixelart-standards` executada
+  automaticamente. Apagá-lo removeria a guarda e o efeito só apareceria em asset **novo**,
+  como blur de pixel art que ninguém sabe de onde veio.
+- **`TempSpriteImporter`** faz o mesmo para um arquivo só, `Cassilda_Sprite.png`. Fica, mas
+  merece atenção: cobre **1 de 6** sprites da Cassilda, e o nome diz "Temp".
+
+Conferido: os seis `.meta` da Cassilda já carregam `filterMode: 0` e `textureCompression: 0`,
+então o valor está persistido — os postprocessors são rede para o que vier depois, não para o
+que já está importado.
+
+### O que ficou medido e não feito
+
+- **`Assets/Arte/Inbox`** — 34 MB, 22 assets, **zero referenciados**. É matéria-prima
+  (`.aseprite`, `.jpeg`, concepts). Guardar é certo; guardar dentro de `Assets/` faz a Unity
+  reimportar 34 MB. Recomendação: mover para fora de `Assets/`. **Aguarda decisão do Vini.**
+- **`Assets/ThirdParty`** — 228 MB, 5.148 arquivos (Kenney 97 MB/4.565, CraftPix_UndeadTileset
+  85 MB/274, CraftPix_CursedLand 46 MB/156). Maior ganho possível e maior risco. **Não tocar
+  sem medir antes** quais GUIDs são referenciados por cena, prefab, controller ou material.
+  Engatilhado para depois do playteste.
+
+
 ## 2026-09-04 — Os dois gatilhos órfãos do Byakhee saíram
 
 A instância do Byakhee na `Portoes_Das_Ruinas` carregava um `CircleCollider2D` e um
