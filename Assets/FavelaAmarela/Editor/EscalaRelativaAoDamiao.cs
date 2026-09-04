@@ -38,10 +38,20 @@ namespace FavelaAmarela.EditorTools
         private static readonly Dictionary<string, (float Vezes, float CorpoEmEscala1)> Alvos =
             new Dictionary<string, (float, float)>
             {
-                // 1,8× é o que separa "chefe" de "inimigo grande". A Byakhee é a Aparição da
-                // Fase 1 e chega voando: se ela não domina a tela na entrada, a luta perde o
-                // susto antes de começar.
-                ["Byakhee"] = (1.8f, 2.50f),
+                // 2,7x, escolhido pelo Vini: "aumente mais ainda", partindo do 1,8x que ela
+                // ja tinha. Ela e a Aparicao da Fase 1 e chega voando -- se nao domina a tela
+                // na entrada, a luta perde o susto antes de comecar. A 2,7x ela fica em 5,72
+                // unidades, praticamente do tamanho do Abdul (5,50), que e o outro chefe.
+                ["Byakhee"] = (2.7f, 2.50f),
+
+                // 2,2x: acima do Byakhee (1,8x) e abaixo do Abdul (2,59x). Ele estava em
+                // 1,03x -- o tamanho do Damiao, e MENOR que a Cassilda, que e NPC de dialogo.
+                // A hierarquia estava invertida: quanto mais tarde o chefe, menor ele ficava.
+                //
+                // Ele nao leva dano por design ("um rito que se sobrevive"), mas presenca de
+                // tela e outra coisa: a ultima luta precisa dominar a sala como a penultima ja
+                // domina.
+                ["ReiEmAmarelo"] = (2.2f, 2.19f),
             };
 
         [MenuItem("Tools/FavelaAmarela/Cena: escala dos chefes relativa ao Damião")]

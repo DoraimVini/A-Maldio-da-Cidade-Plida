@@ -49436,11 +49436,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4186377105747419951, guid: dba62f518e811f04f983f215af641836, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.5263999
+      value: 2.2896
       objectReference: {fileID: 0}
     - target: {fileID: 4186377105747419951, guid: dba62f518e811f04f983f215af641836, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.5263999
+      value: 2.2896
       objectReference: {fileID: 0}
     - target: {fileID: 4186377105747419951, guid: dba62f518e811f04f983f215af641836, type: 3}
       propertyPath: m_LocalPosition.x

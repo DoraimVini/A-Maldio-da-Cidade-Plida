@@ -400,6 +400,14 @@ PrefabInstance:
       value: ReiEmAmarelo
       objectReference: {fileID: 0}
     - target: {fileID: 5510025001677826721, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.1296804
+      objectReference: {fileID: 0}
+    - target: {fileID: 5510025001677826721, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.1296804
+      objectReference: {fileID: 0}
+    - target: {fileID: 5510025001677826721, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}

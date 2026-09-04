@@ -185,6 +185,47 @@ A Byakhee foi para **1,8× o Damião** (escala 0,938 → 1,526; corpo 2,35 → 3
 > (5,12 unidades a PPU 32) e o bicho ocupa 2,50 delas — o resto é margem transparente. Escalar
 > pela célula daria um chefe com menos da metade do tamanho pedido.
 
+### 3.4 Tamanho do elenco contra o Damião
+
+O Vini perguntou se o ajuste da Byakhee tinha valido para todo o mapa. **Não tinha** — a
+uniformização (x = y) preserva a altura que cada um já tem e não pergunta se ela faz sentido.
+Só a Byakhee havia sido comparada ao protagonista.
+
+Medido para o elenco inteiro, pelo **corpo desenhado** e pela escala **efetiva em cena**:
+
+| ator | no mundo | × Damião |
+|---|---|---|
+| Abdul (Tumba) | 5,50 un | 2,59× |
+| **Byakhee** (Portões) | **5,72 un** | **2,70×** ← ajustado |
+| **Rei em Amarelo** (Castelo) | **4,66 un** | **2,20×** ← ajustado |
+| Cassilda (NPC) | 3,06 un | 1,44× |
+| Pedra de Poder | 2,94 un | 1,39× |
+| Esqueleto Invocado | 2,09 un | 0,99× |
+| Cultista (Deserto) | 2,08 un | 0,98× |
+| Cultista (Tumba) | 1,96 un | 0,93× |
+| Coisa do Cemitério | 1,16 un | 0,55× |
+| Cone de Gelo (projétil) | 0,15 un | 0,07× |
+
+**A hierarquia estava invertida.** O Rei em Amarelo — chefe final do Vertical Slice — media
+**1,03×**, o tamanho do Damião e **menor que a Cassilda**, que é NPC de diálogo. Quanto mais
+tarde o chefe, menor ele ficava.
+
+Ele não leva dano por design (*"um rito que se sobrevive"*), mas presença de tela é outra
+coisa: a última luta precisa dominar a sala como a penúltima já domina. Foi para **2,2×**.
+
+A Byakhee foi para **2,7×** a pedido do Vini, partindo do 1,8× anterior.
+
+> **Por que o Abdul está em 2,59× e o Rei estava em 1,03×.** O Abdul foi escalado numa sessão
+> anterior, a pedido, e a escala foi aplicada **só em Y** (1,162 × 2,671) — daí ele ser ao
+> mesmo tempo o maior do elenco e o único que resistiu à uniformização. O Rei nunca foi
+> escalado: estava na escala 1,0 do prefab desde que foi montado.
+
+> **As quatro Pedras de Poder continuam cabendo.** O anel de fallback do Abdul já é isométrico
+> (`dx = 4,5`, `dy = 2,25`, nas diagonais), e o Abdul tem ~2,6 unidades de largura — as Pedras
+> caem bem fora dele. O risco que o Vini levantou foi medido e não se confirma.
+
+---
+
 ### 3.3 Materiais físicos: não existe nenhum
 
 | o quê | resultado |
