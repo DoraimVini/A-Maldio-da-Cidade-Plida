@@ -184,6 +184,53 @@ usa `Find*` (proibido em produção por `Assets/Scripts/CLAUDE.md`), vive atrás
 3. **`FindObjectsByType(Type, FindObjectsSortMode)` está ela própria obsoleta na 6000.4.** Só a
    sobrecarga genérica de dois parâmetros sobrevive.
 
+## A suíte que mede rodando: `HitboxAuditTests`
+
+`Assets/Tests/PlayMode/HitboxAuditTests.cs`, 10 testes. Tudo acima nesta página foi lido do
+YAML e do código; esta suíte mede o **comportamento**, com física rodando.
+
+Cobre: alcance no limite e além dele (+0,1); as quatro direções; o golpe **não** acertando pelas
+costas; o chão como controle negativo de máscara; o golpe do inimigo no jogador, dentro e fora
+do alcance; os i-frames antes e depois; e um teste que **só registra** a geometria medida.
+
+Saída do registro, na rodada de 2026-09-03:
+
+```
+[HitboxAudit] medido em jogo, célula isométrica 1 x 0,5
+  golpe do jogador : alcance 1,2  raio 0,6  janela 0,1 s (5 ticks de física)
+  cobre de 0,6 a 1,8 à frente = 1,8 larguras de célula
+  hurtbox do alvo  : 0,72 x 1,72 em (0,00, 1,00)
+  hurtbox do Damião: 0,72 x 1,72 em (0,00, 1,01)
+  acerto máximo de centro a centro: 2,16
+```
+
+### Três coisas que escrever esta suíte ensinou
+
+**1. A mão vazia causa dano ZERO.** O log do próprio `MaoFisicaBridge` diz
+`arma=DESARMADO (mão vazia) ... dano=0`. A primeira versão media *dano* e reprovava todo golpe
+correto. Uma auditoria de **geometria** mede **acerto** — quanto dói é balanceamento, e muda.
+
+**2. A ordem de `AddComponent` importa.** `PlayerMovement.Awake` resolve as bridges por
+`GetComponent` e injeta nelas a `PlayerStateMachine` **que ele mesmo tica**. Montando o rig com
+ele primeiro, ele não acha ninguém, ninguém recebe FSM, e uma FSM injetada por fora nunca
+avança: o primeiro golpe entra em `Atacando` e o ator fica preso ali para sempre.
+
+**3. `VitalidadeBridge.Awake` chama `Hurtbox.GarantirPara(gameObject, "PlayerHurtbox")` sem
+condição.** No jogo está certo — ela só existe no Damião e no Yug-Neth, os dois aliados. Mas
+num inimigo ela criaria a hurtbox na camada do JOGADOR, e a chamada seguinte com `EnemyHurtbox`
+devolveria a que já existe, na camada errada. Por isso o rig usa um `AlvoDeTeste` próprio.
+
+> **As três falhas eram do rig, não do jogo** — que é o resultado mais provável quando um teste
+> novo falha num sistema que já roda. Vale duvidar do teste antes de duvidar do código.
+
+### O que o limite de acerto realmente é
+
+Não é `alcance + raio`. A hitbox é um círculo cuja borda externa fica ali, mas a hurtbox do alvo
+é uma caixa que se estende **para trás** pela metade da própria largura — o contato acontece
+quando as duas bordas se encostam. O teste mede a meia-largura do colisor que o jogo criou, em
+vez de assumir, e lê alcance/raio/janela do componente **por reflexão**: uma cópia dos números
+passaria a medir a cópia depois de alguém mexer na arma.
+
 ## Próximo passo recomendado
 
 Migrar `EnemyCombat` (Cultista) e `EsqueletoInvocado` para `Hitbox` com janela e direção. É a

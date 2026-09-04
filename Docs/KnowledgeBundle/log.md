@@ -10,7 +10,7 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 Duas tarefas pedidas antes de o Vini dormir: **começar pelos altares** e **trocar o Abdul**.
 
-Suítes: EditMode 1030 → **1038** (1015 passando, 23 aposentados); PlayMode **23/23**.
+Suítes: EditMode 1030 → **1038** (1015 passando, 23 aposentados); PlayMode 23 → **33/33**.
 
 ### 1. Os altares estavam mudos, não quebrados
 
@@ -367,6 +367,70 @@ Três armadilhas que a documentação local evitou:
   no código avisava disso. Poda movida para antes de qualquer `return`.
 
 
+### 10. `HitboxAuditTests`: a auditoria que mede rodando
+
+O Vini pediu uma suíte PlayMode que ponha o combate para rodar e meça quem acerta quem. Dez
+testes: alcance no limite e além (+0,1), as quatro direções, o golpe **não** acertando pelas
+costas, o chão como controle negativo de máscara, o golpe do inimigo dentro e fora do alcance,
+os i-frames antes e depois, e um teste que **só registra** a geometria medida.
+
+Suíte PlayMode: **23 → 33**.
+
+```
+[HitboxAudit] medido em jogo, célula isométrica 1 × 0,5
+  golpe do jogador : alcance 1,2  raio 0,6  janela 0,1 s (5 ticks de física)
+  cobre de 0,6 a 1,8 à frente = 1,8 larguras de célula
+  hurtbox do alvo  : 0,72 × 1,72 em (0,00, 1,00)
+  hurtbox do Damião: 0,72 × 1,72 em (0,00, 1,01)
+  acerto máximo de centro a centro: 2,16
+```
+
+**2,16 não é `1,2 + 0,6`.** A hurtbox do alvo se estende para trás pela metade da própria
+largura, e o contato acontece quando as duas bordas se encostam. O teste mede a meia-largura do
+colisor que o jogo criou em vez de assumir, e lê alcance/raio/janela do componente **por
+reflexão** — copiar os números faria o teste medir a cópia depois de alguém mexer na arma.
+
+#### Cinco guardas me pegaram, e as falhas eram todas do rig
+
+| guarda | o que pegou |
+|---|---|
+| `LeitorDeTeclaRespeitaOFocoTests` | leitura crua de `Keyboard.current` no visualizador |
+| `LigacaoDoJogoTests` | a **minha própria** API morta, `RegistrarCaixa` |
+| Test Framework | `LogError` de ficha ausente não declarado |
+| `GolpeAlcancaAHurtboxTests` | `AlvoDeTeste` sem garantir hurtbox |
+| (eu, relendo) | o conserto da anterior **não funcionava** |
+
+**As três falhas de comportamento eram do rig, não do jogo** — que é o resultado mais provável
+quando um teste novo falha num sistema que já roda. Vale duvidar do teste antes do código.
+
+**1. A mão vazia causa dano ZERO.** O log do próprio `MaoFisicaBridge` diz
+`arma=DESARMADO (mão vazia) ... dano=0`. Eu media *dano* e reprovava todo golpe correto. Uma
+auditoria de **geometria** mede **acerto**.
+
+**2. A ordem de `AddComponent` importa.** `PlayerMovement.Awake` resolve as bridges por
+`GetComponent` e injeta nelas a `PlayerStateMachine` **que ele mesmo tica**. Montei o rig com ele
+primeiro: não achou ninguém, ninguém recebeu FSM, e a que injetei por fora nunca avançava — o
+primeiro golpe entrava em `Atacando` e o ator ficava preso ali.
+
+**3. `VitalidadeBridge.Awake` chama `Hurtbox.GarantirPara(…, "PlayerHurtbox")` sem condição.**
+No jogo está certo (ela só existe no Damião e no Yug-Neth, os dois aliados). Num inimigo, criaria
+a hurtbox na camada do jogador e a chamada seguinte devolveria a errada.
+
+#### A guarda cujo conserto óbvio não funcionava
+
+`TodoDanificavel_GaranteASuaHurtbox` detecta procurando um `MonoScript` cujo **nome de arquivo**
+seja o nome do tipo. `AlvoDeTeste` era classe **aninhada** — não existe arquivo com esse nome, a
+busca não achava nada, e **nenhuma chamada escrita lá dentro a salvaria**. Acrescentei o `Awake`
+com `GarantirPara` e a guarda reprovou exatamente igual.
+
+Dava para isentar assembly de teste. Não fiz: enfraquecer uma guarda para acomodar o meu teste é
+o caminho errado. Extraí o dublê para arquivo próprio, o que custou menos e o deixou **mais**
+parecido com um inimigo real.
+
+> **E o `exit code 0` mentiu de novo.** Rodei as duas suítes num comando só; o PlayMode passou,
+> o EditMode falhou, e o código de saída veio do último. Só reler a saída pegou.
+
+
 ### Testes
 
 - **`AltaresRespondemNaTelaTests`** (novo, 2): campos de sprite preenchidos em todo ponto focal;
@@ -396,6 +460,8 @@ Três armadilhas que a documentação local evitou:
 - **`VisualizadorDeGolpes`** não é teste, mas fecha a mesma lacuna: os sete gizmos que o
   projeto já tinha desenham em `OnDrawGizmosSelected` — só aparecem para o objeto selecionado
   no Inspector, um de cada vez, e nunca durante uma luta.
+- **`HitboxAuditTests`** (novo, 10, PlayMode) e o dublê `AlvoDeTeste`: a primeira suíte que
+  mede o combate com física rodando. As outras leem YAML; esta põe o golpe para sair.
 
 ### Licença — pendências para o edital
 
