@@ -26,7 +26,7 @@ namespace FavelaAmarela.EditorTools
 
         private static readonly string[] CenasJogaveis =
         {
-            "Assets/Scenes/Playtest_RuinasPalidas.unity",
+            "Assets/Scenes/Tumba_De_Alhazred.unity",
             "Assets/Scenes/Deserto_Hali.unity",
         };
 

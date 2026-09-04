@@ -44,7 +44,7 @@ namespace FavelaAmarela.Tests.EditMode
         private static readonly string[] CenasComHud =
         {
             PastaDeCenas + "Deserto_Hali.unity",
-            PastaDeCenas + "Playtest_RuinasPalidas.unity",
+            PastaDeCenas + "Tumba_De_Alhazred.unity",
             PastaDeCenas + "Santuario_Yhtill.unity",
             PastaDeCenas + "Cena_ArenaDeTestes.unity",
             // Acrescentadas em 2026-08-20. A ausência delas escondia um defeito real: as duas

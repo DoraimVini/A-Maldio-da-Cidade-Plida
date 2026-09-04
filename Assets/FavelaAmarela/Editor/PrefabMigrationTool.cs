@@ -207,7 +207,7 @@ namespace FavelaAmarela.Editor
         [MenuItem("Favela Amarela/Migração/4 — Montar Cena Playtest")]
         public static void MontarCenaPlaytest()
         {
-            const string scenePath = "Assets/Scenes/Playtest_RuinasPalidas.unity";
+            const string scenePath = "Assets/Scenes/Tumba_De_Alhazred.unity";
 
             // Criar cena nova
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

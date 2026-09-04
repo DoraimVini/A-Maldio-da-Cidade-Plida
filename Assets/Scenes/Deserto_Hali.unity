@@ -2054,7 +2054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28fe62f7327c66f428b5ae8e5a57a87e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.GameLoop.PortalDeCena
-  cenaDestino: Playtest_RuinasPalidas
+  cenaDestino: Tumba_De_Alhazred
   chegarEm: 
   carenciaAoCarregar: 0.5
   logarContatos: 1

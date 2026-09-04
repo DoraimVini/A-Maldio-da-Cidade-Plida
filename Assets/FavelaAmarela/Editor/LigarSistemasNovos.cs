@@ -28,7 +28,7 @@ namespace FavelaAmarela.EditorTools
         private static readonly string[] Cenas =
         {
             "Assets/Scenes/Deserto_Hali.unity",
-            "Assets/Scenes/Playtest_RuinasPalidas.unity",
+            "Assets/Scenes/Tumba_De_Alhazred.unity",
             "Assets/Scenes/Santuario_Yhtill.unity",
             // Acrescentadas em 2026-08-20. Sem elas, Portões e Castelo ficavam SEM os
             // estados persistentes — o jogador chegava ao Byakhee e ao Rei sem

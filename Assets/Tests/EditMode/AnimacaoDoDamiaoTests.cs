@@ -197,7 +197,7 @@ namespace FavelaAmarela.Tests.EditMode
                 @"m_LocalScale:\s*\{x:\s*([\d.eE+-]+),\s*y:\s*([\d.eE+-]+)");
 
             var cenas = new[] { "Assets/Scenes/Deserto_Hali.unity",
-                                 "Assets/Scenes/Playtest_RuinasPalidas.unity" };
+                                 "Assets/Scenes/Tumba_De_Alhazred.unity" };
             var falhas = new System.Collections.Generic.List<string>();
 
             foreach (var caminho in cenas)

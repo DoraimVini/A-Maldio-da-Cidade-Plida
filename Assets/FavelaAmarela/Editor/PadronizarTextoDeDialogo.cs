@@ -20,7 +20,7 @@ namespace FavelaAmarela.EditorTools
     /// (<c>PainelDeEscolha</c>) autorado à mão em cada cena:</para>
     ///
     /// <list type="table">
-    ///   <item><term>Playtest_RuinasPalidas (Abdul)</term><description>fonte <b>14</b> e <b>16</b></description></item>
+    ///   <item><term>Tumba_De_Alhazred (Abdul)</term><description>fonte <b>14</b> e <b>16</b></description></item>
     ///   <item><term>Santuario_Yhtill (Cassilda)</term><description>fonte <b>60</b></description></item>
     ///   <item><term>HUD_Gameplay / CaixaDeDialogo</term><description>fonte <b>60</b></description></item>
     /// </list>

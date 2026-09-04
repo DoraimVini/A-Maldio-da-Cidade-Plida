@@ -21,7 +21,7 @@ namespace FavelaAmarela.EditorTools
     public static class BuildDesertOverworld
     {
         private const string ScenePath = "Assets/Scenes/Deserto_Hali.unity";
-        private const string PlaytestPath = "Assets/Scenes/Playtest_RuinasPalidas.unity";
+        private const string PlaytestPath = "Assets/Scenes/Tumba_De_Alhazred.unity";
         private const string PlayerPrefabPath = "Assets/FavelaAmarela/Art/Characters/Damiao/Player_Damiao.prefab";
 
         private const string TileDir = "Assets/FavelaAmarela/Art/Tiles";
@@ -188,7 +188,7 @@ namespace FavelaAmarela.EditorTools
             }
             AssetDatabase.SaveAssets();
 
-            // Grid ISOMÉTRICO idêntico ao da dungeon (Playtest_RuinasPalidas:
+            // Grid ISOMÉTRICO idêntico ao da dungeon (Tumba_De_Alhazred:
             // m_CellSize {1, 0.5, 1}, m_CellLayout: 2). É daqui que vem a angulação
             // isométrica do chão — losangos 2:1, não quadrados top-down.
             var gridGO = new GameObject("DesertFloorGrid", typeof(Grid));

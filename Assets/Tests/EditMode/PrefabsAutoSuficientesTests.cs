@@ -14,7 +14,7 @@ namespace FavelaAmarela.Tests.EditMode
     /// <para><b>O que a auditoria de 2026-08-29 encontrou.</b> O prefab do Abdul tinha
     /// <c>prefabEsqueleto</c>, <c>prefabConeDeGelo</c>, <c>prefabPedraDePoder</c> e
     /// <c>prefabNecronomicon</c> <b>todos nulos</b>. A luta funciona porque a instância em
-    /// <c>Playtest_RuinasPalidas</c> sobrescreve os quatro — então não era bug ativo, era um
+    /// <c>Tumba_De_Alhazred</c> sobrescreve os quatro — então não era bug ativo, era um
     /// prefab que só funciona num lugar.</para>
     ///
     /// <para><b>Por que isso importa mais do que parece.</b> Pôr o Abdul em outra cena — ou

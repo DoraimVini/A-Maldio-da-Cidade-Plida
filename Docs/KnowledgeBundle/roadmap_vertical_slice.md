@@ -135,7 +135,7 @@ Templo do Povo-Serpente. Contado sobre o estado medido, sobram **cinco** itens �
 muda e virou o guarda `NavegacaoEntreCenasTests`):
 
 ```
-Cena_Menu → Deserto_Hali ⇄ Playtest_RuinasPalidas
+Cena_Menu → Deserto_Hali ⇄ Tumba_De_Alhazred
                          ⇄ Santuario_Yhtill
                          → Portoes_Das_Ruinas → Castelo_Carcosa
 ```
@@ -144,7 +144,7 @@ O que separa isto de uma build entregue é **playtest**, não construção: nada
 foi jogado de ponta a ponta por um humano ainda.
 
 > ✅ **O Build Settings tem as 6 cenas do caminho** (`Cena_Menu`, `Deserto_Hali`,
-> `Playtest_RuinasPalidas`, `Santuario_Yhtill`, `Portoes_Das_Ruinas`,
+> `Tumba_De_Alhazred`, `Santuario_Yhtill`, `Portoes_Das_Ruinas`,
 > `Castelo_Carcosa`). O aviso anterior — "o jogo compila sem o desfecho" — deixou de
 > valer em 2026-08-19/20. `Cena_ArenaDeTestes` segue fora, de propósito: é cena de dev.
 

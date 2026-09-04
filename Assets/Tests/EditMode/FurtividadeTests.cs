@@ -121,7 +121,7 @@ namespace FavelaAmarela.Tests.EditMode
         /// Toda cena do build precisa de <b>exatamente um</b> <c>AudioListener</c>.
         ///
         /// <para>Três cenas não tinham nenhum — incluindo <c>Deserto_Hali</c> e
-        /// <c>Playtest_RuinasPalidas</c>, que juntas são metade do Vertical Slice. Elas tinham
+        /// <c>Tumba_De_Alhazred</c>, que juntas são metade do Vertical Slice. Elas tinham
         /// <c>MixerDeAudio</c> e <c>AudioDeStealth</c> montados: tudo tocava e <b>nada era
         /// ouvido</b>. A Unity vinha avisando no console a cada som, e ninguém tinha olhado.</para>
         ///

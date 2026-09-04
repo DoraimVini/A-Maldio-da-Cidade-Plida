@@ -23,7 +23,7 @@ namespace FavelaAmarela.Tests.EditMode
         private static readonly string[] CenasJogaveis =
         {
             PastaDeCenas + "Deserto_Hali.unity",
-            PastaDeCenas + "Playtest_RuinasPalidas.unity",
+            PastaDeCenas + "Tumba_De_Alhazred.unity",
             PastaDeCenas + "Santuario_Yhtill.unity",
         };
 

@@ -24,7 +24,7 @@ namespace FavelaAmarela.EditorTools
     public static class AdicionarBarraDeVitalidadeAoHUD
     {
         private const string PrefabHUD = "Assets/FavelaAmarela/Art/UI/HUD_ResilienciaBar.prefab";
-        private const string CenaTumba = "Assets/Scenes/Playtest_RuinasPalidas.unity";
+        private const string CenaTumba = "Assets/Scenes/Tumba_De_Alhazred.unity";
         private const string NomeDaBarra = "Barra_Vitalidade";
 
         [MenuItem("Tools/FavelaAmarela/Adicionar barra de Vitalidade ao HUD")]

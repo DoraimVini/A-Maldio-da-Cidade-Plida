@@ -181,7 +181,7 @@ namespace FavelaAmarela.EditorTools
         }
 
         /// <summary>
-        /// <c>Deserto_Hali</c> e <c>Playtest_RuinasPalidas</c> sobrescrevem a escala do
+        /// <c>Deserto_Hali</c> e <c>Tumba_De_Alhazred</c> sobrescrevem a escala do
         /// Player_Damiao com valores <b>não-uniformes</b> e específicos de cada cena
         /// (<c>0.677×0.749</c> e <c>0.841×0.949</c> — nenhum dos dois é o <c>0.5</c> do prefab).
         /// Calibrados para o sprite antigo (32×48), aplicados à arte nova eles esticariam o
@@ -195,7 +195,7 @@ namespace FavelaAmarela.EditorTools
         private static string CorrigirInstanciasEmCena()
         {
             var cenas = new[] { "Assets/Scenes/Deserto_Hali.unity",
-                                 "Assets/Scenes/Playtest_RuinasPalidas.unity" };
+                                 "Assets/Scenes/Tumba_De_Alhazred.unity" };
             var linhas = new List<string>();
 
             foreach (var caminho in cenas)

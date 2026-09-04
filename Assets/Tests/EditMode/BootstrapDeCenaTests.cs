@@ -29,13 +29,12 @@ namespace FavelaAmarela.Tests.EditMode
 
         /// <summary>
         /// Cenas jogáveis do Build Settings. <c>Cena_Menu</c> fica de fora de propósito: é só
-        /// menu, não tem mundo para montar. <c>cena_1</c> também — ver
-        /// <see cref="Cena1_EhLegadoAbandonado_NaoEntraNoGuarda"/>.
+        /// menu, não tem mundo para montar.
         /// </summary>
         private static readonly string[] CenasJogaveis =
         {
             PastaDeCenas + "Deserto_Hali.unity",
-            PastaDeCenas + "Playtest_RuinasPalidas.unity",
+            PastaDeCenas + "Tumba_De_Alhazred.unity",
             PastaDeCenas + "Santuario_Yhtill.unity",
         };
 
@@ -174,23 +173,16 @@ namespace FavelaAmarela.Tests.EditMode
                 "traga o campo de volta ao GameStatePresenter:\n" + string.Join("\n", religados));
         }
 
-        // ── cena_1: legado, fora do guarda de propósito ──────────────────────
-
-        [Test]
-        public void Cena1_EhLegadoAbandonado_NaoEntraNoGuarda()
-        {
-            const string cena1 = PastaDeCenas + "cena_1.unity";
-            if (!File.Exists(cena1)) return; // já removida: ótimo
-
-            string buildSettings = File.ReadAllText("ProjectSettings/EditorBuildSettings.asset");
-
-            // Se cena_1 entrar no Build Settings, ela deixou de ser legado e precisa passar a
-            // valer para o guarda — a serialização dela está obsoleta (o campo sequenciaColapso
-            // nem aparece, sinal de que foi salva antes de o campo existir).
-            Assert.IsFalse(buildSettings.Contains("cena_1.unity"),
-                "cena_1 entrou no Build Settings. Ela é legado com serialização obsoleta — " +
-                "acrescente-a a CenasJogaveis e rode o bootstrap nela antes de embarcá-la.");
-        }
+        // A cena_1 foi apagada em 2026-09-04. O teste que a guardava
+        // (Cena1_EhLegadoAbandonado_NaoEntraNoGuarda) saiu junto: ele começava com
+        // "if (!File.Exists(cena1)) return;", então sem o arquivo passaria a afirmar NADA --
+        // um teste verde que não mede coisa alguma é pior que teste nenhum, porque conta como
+        // cobertura.
+        //
+        // Quem cobre o bootstrap é CenaJogavel_TemOBootstrap, por TestCaseSource sobre
+        // CenasJogaveis -- uma lista ESCRITA À MÃO, não uma varredura do Build Settings. Uma
+        // cena nova que entre na build e não nesta lista não é coberta por ele; quem varre a
+        // pasta inteira e obriga a justificar cada ausência é CenasNaoFicamParaTrasTests.
 
         // ── Apoio ────────────────────────────────────────────────────────────
 

@@ -12,7 +12,7 @@ namespace FavelaAmarela.EditorTools
     /// Move o <b>prompt de interação</b> ("E — Abrir o baú") para o HUD persistente.
     ///
     /// <para><b>O que isto conserta (2026-09-02).</b> O <c>PromptDeInteracao</c> existia em
-    /// <b>uma cena das seis</b> do build — só no <c>Playtest_RuinasPalidas</c>. Nas outras cinco
+    /// <b>uma cena das seis</b> do build — só no <c>Tumba_De_Alhazred</c>. Nas outras cinco
     /// o jogador <b>nunca via "E — ..."</b> em nada: nem no baú da Tumba, nem nos consumíveis do
     /// Deserto, nem na Cassilda, nem no Baú de Yhtill que eu mesmo pus no Santuário na sessão
     /// passada. O objeto era interagível e não anunciava isso.</para>

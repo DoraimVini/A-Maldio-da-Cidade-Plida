@@ -82,7 +82,7 @@ Medido por quadro (não pela folha inteira) em 2026-09-03.
 >
 > | ator | escala da instância | esticamento em Y |
 > |---|---|---|
-> | Abdul (`Playtest_RuinasPalidas`) | 1,162 × 2,671 | **2,30×** |
+> | Abdul (`Tumba_De_Alhazred`) | 1,162 × 2,671 | **2,30×** |
 > | Cultista (10 no `Deserto_Hali`) | 0,630 × 0,804 | 1,28× |
 > | Cultista (2 na `Playtest`) | ~0,588 × ~0,755 | 1,27–1,30× |
 > | Cassilda (`Santuario_Yhtill`) | 1,478 × 1,925 | 1,30× |

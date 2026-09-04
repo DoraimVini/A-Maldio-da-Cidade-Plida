@@ -17,7 +17,7 @@ namespace FavelaAmarela.EditorTools
     /// <list type="bullet">
     /// <item><c>Deserto_Hali</c> — <b>ConstantPixelSize</b>: a UI é desenhada em pixels fixos e
     /// <b>não acompanha o viewport</b>, então as barras da HUD estouram a borda.</item>
-    /// <item><c>Playtest_RuinasPalidas</c> e <c>Santuario_Yhtill</c> — <b>sem CanvasScaler
+    /// <item><c>Tumba_De_Alhazred</c> e <c>Santuario_Yhtill</c> — <b>sem CanvasScaler
     /// nenhum</b>, que é o mesmo comportamento do ConstantPixelSize, só que implícito.</item>
     /// <item><c>Cena_ArenaDeTestes</c> — ScaleWithScreenSize, mas com referência <b>640×360</b>
     /// contra 1920×1080 do menu: a mesma UI aparece em escalas diferentes conforme a cena.</item>

@@ -9,7 +9,7 @@ namespace FavelaAmarela.Tests.EditMode
     /// Guarda os baús do mundo: todo <c>BauDaTumba</c> em cena precisa ter <b>alguma</b> fonte de
     /// arma ligada.
     ///
-    /// <para><b>Por que existe (2026-08-14):</b> o baú de <c>Playtest_RuinasPalidas</c> estava com
+    /// <para><b>Por que existe (2026-08-14):</b> o baú de <c>Tumba_De_Alhazred</c> estava com
     /// <c>tabela</c> em <c>fileID: 0</c>, sem <c>forcarArma</c>. O código estava correto, o asset
     /// <c>Drop_BauDaTumba</c> existia e era válido — só ninguém tinha ligado os dois. Abrir o baú
     /// gastava a interação, registrava erro no console e não entregava nada; para quem joga, "a
@@ -69,7 +69,7 @@ namespace FavelaAmarela.Tests.EditMode
         private static readonly string[] CenasQueComecamDesarmadas =
         {
             PastaDeCenas + "Deserto_Hali.unity",
-            PastaDeCenas + "Playtest_RuinasPalidas.unity",
+            PastaDeCenas + "Tumba_De_Alhazred.unity",
             PastaDeCenas + "Santuario_Yhtill.unity",
         };
 

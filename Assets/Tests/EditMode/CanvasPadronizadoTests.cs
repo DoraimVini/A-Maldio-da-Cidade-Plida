@@ -29,7 +29,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             "Assets/Scenes/Cena_Menu.unity",
             "Assets/Scenes/Deserto_Hali.unity",
-            "Assets/Scenes/Playtest_RuinasPalidas.unity",
+            "Assets/Scenes/Tumba_De_Alhazred.unity",
             "Assets/Scenes/Santuario_Yhtill.unity",
             "Assets/Scenes/Cena_ArenaDeTestes.unity",
         };
@@ -50,7 +50,7 @@ namespace FavelaAmarela.Tests.EditMode
 
         /// <param name="exigirScaler">
         /// Só para prefabs. <b>Cena sem CanvasScaler não é defeito por si só</b>:
-        /// <c>Playtest_RuinasPalidas</c> e <c>Santuario_Yhtill</c> não têm <c>Canvas</c> próprio —
+        /// <c>Tumba_De_Alhazred</c> e <c>Santuario_Yhtill</c> não têm <c>Canvas</c> próprio —
         /// toda a UI delas vem do <c>HUD_ResilienciaBar.prefab</c>, que carrega o seu. Uma versão
         /// anterior deste teste exigia scaler em toda cena e reprovava as duas por algo que não
         /// deve existir; o que importa é que <b>todo scaler que existir</b> esteja no padrão.
@@ -111,7 +111,7 @@ namespace FavelaAmarela.Tests.EditMode
             var jogaveis = new[]
             {
                 "Assets/Scenes/Deserto_Hali.unity",
-                "Assets/Scenes/Playtest_RuinasPalidas.unity",
+                "Assets/Scenes/Tumba_De_Alhazred.unity",
                 "Assets/Scenes/Santuario_Yhtill.unity",
             };
 

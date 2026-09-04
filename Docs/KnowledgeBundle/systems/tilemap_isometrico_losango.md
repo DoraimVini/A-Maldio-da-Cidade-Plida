@@ -161,5 +161,5 @@ outro). Sala nova = pintar tile seguindo esta receita, nunca mexer no planner.
 | Cena | Ferramenta | Nome do Grid |
 |---|---|---|
 | `Deserto_Hali` | `BuildDesertTilemap` (código desatualizado — cena é a verdade) + `BuildIsoCollisionFromFloor` | `DesertFloorGrid` |
-| `Playtest_RuinasPalidas` (Tumba) | mesmas ferramentas, reexecutadas nessa cena | `DesertFloorGrid` (nome reaproveitado, não específico do deserto) |
+| `Tumba_De_Alhazred` (Tumba) | mesmas ferramentas, reexecutadas nessa cena | `DesertFloorGrid` (nome reaproveitado, não específico do deserto) |
 | `Santuario_Yhtill` | `BuildSantuarioIsoFloor` (2026-08-02) | `SantuarioFloorGrid` |

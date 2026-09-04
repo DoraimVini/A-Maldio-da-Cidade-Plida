@@ -32,7 +32,7 @@ namespace FavelaAmarela.EditorTools
         private const string CaminhoPrefabCassilda = "Assets/FavelaAmarela/Art/Characters/Cassilda/Cassilda.prefab";
 
         private const string CenaDeserto = "Assets/Scenes/Deserto_Hali.unity";
-        private const string CenaTumba = "Assets/Scenes/Playtest_RuinasPalidas.unity";
+        private const string CenaTumba = "Assets/Scenes/Tumba_De_Alhazred.unity";
 
         /// <summary>
         /// Cassilda mora <b>dentro</b> do Santuário desde que ele virou cena própria

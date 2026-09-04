@@ -25,8 +25,8 @@ todos.
 | # | Fragmento | Onde | Cena |
 |---|---|---|---|
 | 0 | Diário de Lady Seraphel | Deserto, perto da chegada (−10, −12) | `Deserto_Hali` |
-| 1 | Anotações de Lord Morthis | Tumba (12, 4) | `Playtest_RuinasPalidas` |
-| 2 | Carta de Lady Vaine | Tumba, perto da Câmara do Baú (30, −12) | `Playtest_RuinasPalidas` |
+| 1 | Anotações de Lord Morthis | Tumba (12, 4) | `Tumba_De_Alhazred` |
+| 2 | Carta de Lady Vaine | Tumba, perto da Câmara do Baú (30, −12) | `Tumba_De_Alhazred` |
 
 > Os textos dos fragmentos 4 e 5 continuam no doc de lore, prontos para quando a Dungeon 2
 > existir. Aumentar `totalDeFragmentos` na Cassilda e criar mais dois `FragmentoDeYhtill` é

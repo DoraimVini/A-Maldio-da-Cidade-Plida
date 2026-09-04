@@ -207,7 +207,7 @@ namespace FavelaAmarela.Tests.EditMode
 
             // O Byakhee mora em Portoes_Das_Ruinas; ele próprio não conta (é o que se vai
             // enfrentar). As duas cenas anteriores do caminho crítico, sim.
-            foreach (var cena in new[] { "Deserto_Hali", "Playtest_RuinasPalidas" })
+            foreach (var cena in new[] { "Deserto_Hali", "Tumba_De_Alhazred" })
             {
                 foreach (var ator in new[] { "Cultista", "Abdul_Alhazred" })
                 {

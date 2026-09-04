@@ -109,7 +109,7 @@ namespace FavelaAmarela.Tests.EditMode
 
         /// <summary>
         /// O achado que a razão existe para pegar: a instância do Abdul na
-        /// <c>Playtest_RuinasPalidas</c> media <b>0,3 × 2,54</b> — uma parede em pé no lugar de
+        /// <c>Tumba_De_Alhazred</c> media <b>0,3 × 2,54</b> — uma parede em pé no lugar de
         /// uma área de chão, enquanto o prefab dele media 0,60 × 0,30.
         /// </summary>
         [Test]

@@ -31,7 +31,7 @@ namespace FavelaAmarela.EditorTools
         private static readonly string[] Cenas =
         {
             "Assets/Scenes/Deserto_Hali.unity",
-            "Assets/Scenes/Playtest_RuinasPalidas.unity",
+            "Assets/Scenes/Tumba_De_Alhazred.unity",
             "Assets/Scenes/Santuario_Yhtill.unity",
             // Acrescentadas em 2026-08-22. Sem elas, as DUAS lutas de chefe do Vertical Slice
             // ficavam sem menu de pause e sem tela de Colapso: na arena do Byakhee e no Trono

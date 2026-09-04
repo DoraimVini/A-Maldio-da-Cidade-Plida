@@ -13,8 +13,9 @@ namespace FavelaAmarela.Tests.EditMode
     /// <para><b>Por que existe (2026-08-21):</b> o Vini relatou <i>"uma coisa muito estranha nos
     /// mobs e até no boss"</i> e apontou a causa: <b>freeze rotation</b>. A auditoria achou
     /// quatro corpos <c>Dynamic</c> sem <c>FreezeRotation</c> — <c>Byakhee.prefab</c> (o chefe),
-    /// <c>Cortesao_Palido_0</c> e <c>_1</c> (os mobs do Castelo), e o Damião da <c>cena_1</c>
-    /// (legado). Casamento exato com o relato: os mobs e o boss.</para>
+    /// <c>Cortesao_Palido_0</c> e <c>_1</c> (os mobs do Castelo), e o Damião de uma cena de
+    /// legado (<c>cena_1</c>, apagada em 2026-09-04). Casamento exato com o relato: os mobs e
+    /// o boss.</para>
     ///
     /// <para><b>O que acontece sem isso:</b> corpo <c>Dynamic</c> que leva impulso fora do
     /// centro ganha velocidade angular; com <c>gravityScale 0</c> nada a zera depressa. O
@@ -38,10 +39,14 @@ namespace FavelaAmarela.Tests.EditMode
         private const int BitFreezeRotation = 4;
 
         /// <summary>
-        /// <c>cena_1</c> é legado abandonado, anterior à Tumba, e está fora do Build Settings —
-        /// já documentado em <c>BootstrapDeCenaTests</c>. Não vale gastar correção nela.
+        /// Cenas que o guarda de física não cobre. <b>Vazia desde 2026-09-04</b>, quando a
+        /// <c>cena_1</c> — a única entrada que havia, legado anterior à Tumba — foi apagada.
+        ///
+        /// <para>Fica declarada em vez de removida porque a lista é o lugar certo para uma
+        /// exceção futura: apagá-la faria a próxima exceção nascer como um <c>if</c> solto no
+        /// meio do laço, sem obrigação de justificar-se.</para>
         /// </summary>
-        private static readonly string[] CenasIgnoradas = { "cena_1.unity" };
+        private static readonly string[] CenasIgnoradas = System.Array.Empty<string>();
 
         [Test]
         public void TodoCorpoDinamico_TravaARotacao()

@@ -84,7 +84,7 @@ LEGENDA:
 
 > **Decisão de design (2026-07-28):** A tempestade de areia é **removida da Dungeon 1 (Tumba de Alhazred)** e **relocada para o Overworld do Deserto de Hali**. Subterrâneos não têm tempestade de areia. A dungeon passa a ter StormIntensity = 0 por padrão.
 >
-> **Impacto de código — **FEITO em 2026-07-30:** todos os triggers de tempestade (incluindo o `Z5_Nula`) e o `TempestadeAmbiente`/overlay foram **removidos da cena** `Playtest_RuinasPalidas.unity`, junto com o resto do legado das Ruínas Pálidas — a Tumba virou uma dungeon única e fechada. Os scripts continuam no projeto, prontos para o Overworld.
+> **Impacto de código — **FEITO em 2026-07-30:** todos os triggers de tempestade (incluindo o `Z5_Nula`) e o `TempestadeAmbiente`/overlay foram **removidos da cena** `Tumba_De_Alhazred.unity`, junto com o resto do legado das Ruínas Pálidas — a Tumba virou uma dungeon única e fechada. Os scripts continuam no projeto, prontos para o Overworld.
 
 | Setor | Intensidade | Visibilidade | Impacto Mecânico |
 | :--- | :---: | :---: | :--- |
@@ -117,7 +117,7 @@ No Overworld, a tempestade cria **stealth passivo** na região central: o vento 
 
 ### 4.2 TUMBA DE ALHAZRED — Dungeon 1
 
-- **Tipo:** Dungeon obrigatória — área implementada em `Playtest_RuinasPalidas.unity`
+- **Tipo:** Dungeon obrigatória — área implementada em `Tumba_De_Alhazred.unity`
 - **Conexão:** Visível da Entrada. Depressão no solo com escadaria de pedra.
 - **Retorno ao Overworld:** Damião emerge por saída diferente da entrada, mais ao norte. A dungeon funciona também como **atalho geográfico** do overworld.
 - **Pós-dungeon:** Necronomicon **reage ao ambiente** — páginas vibram na direção do leste (hint para Dungeon 2).

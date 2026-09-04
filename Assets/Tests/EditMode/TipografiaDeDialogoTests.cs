@@ -17,7 +17,7 @@ namespace FavelaAmarela.Tests.EditMode
     /// lugar:</para>
     ///
     /// <list type="bullet">
-    ///   <item><c>Playtest_RuinasPalidas</c> · <c>PainelDeEscolha</c> — fonte <b>16</b></item>
+    ///   <item><c>Tumba_De_Alhazred</c> · <c>PainelDeEscolha</c> — fonte <b>16</b></item>
     ///   <item><c>Santuario_Yhtill</c> · <c>PainelDeEscolha</c> — fonte <b>60</b></item>
     ///   <item><c>HUD_Gameplay</c> · <c>CaixaDeDialogo</c> — fonte <b>60</b></item>
     /// </list>

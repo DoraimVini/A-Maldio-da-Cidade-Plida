@@ -112,7 +112,7 @@ namespace FavelaAmarela.Level.Core
 
         [Header("Cenas destino dos portais")]
         [Tooltip("Cena da Tumba de Alhazred (o S-Path reaproveitado).")]
-        public string CenaTumbaAlhazred = "Playtest_RuinasPalidas";
+        public string CenaTumbaAlhazred = "Tumba_De_Alhazred";
         [Tooltip("Cena da próxima fase (Portões). Vazio enquanto não existir.")]
         public string CenaPortoes = "";
     }

@@ -28,7 +28,7 @@ Reaproveita a mesma fonte de estímulo do [Cultista](cultista_ai.md) (`SoundBroa
 
 ## Posicionamento em cena
 
-Na cena `Playtest_RuinasPalidas`, a `CoisaDoCemiterio` foi posicionada na transição entre o **fim da Zona 2 (Vila das Casas)** e o **meio da Zona 3 (Beco do Vento)** — decisão de design (2026-07-10): força o jogador a usar furtividade sonora na passagem entre zonas, e como ela caça por som, naturalmente pode persegui-lo até a Zona 4 (Praça do Cerco) se ele fizer barulho ali perto.
+Na cena `Tumba_De_Alhazred`, a `CoisaDoCemiterio` foi posicionada na transição entre o **fim da Zona 2 (Vila das Casas)** e o **meio da Zona 3 (Beco do Vento)** — decisão de design (2026-07-10): força o jogador a usar furtividade sonora na passagem entre zonas, e como ela caça por som, naturalmente pode persegui-lo até a Zona 4 (Praça do Cerco) se ele fizer barulho ali perto.
 
 ## Status de implementação
 - ✅ `CoisaDoCemiterioFSM` (Core, testado — 9 testes NUnit)

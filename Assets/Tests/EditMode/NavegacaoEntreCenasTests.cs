@@ -32,10 +32,11 @@ namespace FavelaAmarela.Tests.EditMode
         private const string BuildSettings = "ProjectSettings/EditorBuildSettings.asset";
 
         /// <summary>
-        /// Cenas de desenvolvimento, fora do grafo do jogo. <c>Cena_ArenaDeTestes</c> é a arena do
-        /// Carcosa Debugger e <c>cena_1</c> é legado — nenhuma das duas entra em build.
+        /// Cenas de desenvolvimento, fora do grafo do jogo. <c>Cena_ArenaDeTestes</c> é a arena
+        /// do Carcosa Debugger e não entra em build. (<c>cena_1</c> saía por aqui até
+        /// 2026-09-04, quando foi apagada.)
         /// </summary>
-        private static readonly string[] ForaDoJogo = { "Cena_ArenaDeTestes", "cena_1" };
+        private static readonly string[] ForaDoJogo = { "Cena_ArenaDeTestes" };
 
         [Test]
         public void TodoPortal_LevaAUmaCenaQueExisteEEstaNaBuild()

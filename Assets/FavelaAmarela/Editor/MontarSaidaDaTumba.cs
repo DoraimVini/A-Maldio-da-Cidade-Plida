@@ -25,7 +25,7 @@ namespace FavelaAmarela.EditorTools
     /// </summary>
     public static class MontarSaidaDaTumba
     {
-        private const string CenaTumba = "Assets/Scenes/Playtest_RuinasPalidas.unity";
+        private const string CenaTumba = "Assets/Scenes/Tumba_De_Alhazred.unity";
         private const string CenaDeserto = "Assets/Scenes/Deserto_Hali.unity";
         private const string NomeCenaDeserto = "Deserto_Hali";
 

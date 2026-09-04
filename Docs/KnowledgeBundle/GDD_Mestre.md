@@ -244,7 +244,7 @@ As **"Ruínas Pálidas"** — hoje a **Tumba de Alhazred, Dungeon 1 da Fase 1 (D
 ### 5.4 Lista de Fases / Regiões
 
 #### Dungeon 1 — Tumba de Alhazred (Zonas 1-9, S-Path)
-> Implementado em `Assets/Scenes/Playtest_RuinasPalidas.unity`. Zonas 1-5 documentadas abaixo; Z6-9 implementadas mas pendentes de documentação textual.
+> Implementado em `Assets/Scenes/Tumba_De_Alhazred.unity`. Zonas 1-5 documentadas abaixo; Z6-9 implementadas mas pendentes de documentação textual.
 
 * **Zona 1 (Rua de Entrada):** Trecho de subida com 2 Cultistas Errantes. Introdução aos postes de luz. **[Fragmento de Yhtill nº1 não está aqui — está no Overworld: Garganta de Pedra Pálida]**
 * **Zona 2 (Vila das Casas):** Área ampla com 3 casas modulares. **Fragmento de Yhtill nº2 (Lord Morthis)** escondido sob soleira.

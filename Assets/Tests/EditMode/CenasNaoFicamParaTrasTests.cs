@@ -39,8 +39,6 @@ namespace FavelaAmarela.Tests.EditMode
             new Dictionary<string, string>
             {
                 ["Cena_Menu"] = "Menu principal: não tem mundo, jogador nem estado a persistir.",
-                ["cena_1"] = "Legado abandonado, anterior à Tumba. Já documentado em " +
-                             "BootstrapDeCenaTests.Cena1_EhLegadoAbandonado_NaoEntraNoGuarda.",
                 ["Cena_ArenaDeTestes"] = "Arena de calibragem de chefe, fora do caminho do " +
                                           "jogador. Nasce e morre numa sessão; persistir estado " +
                                           "dela poluiria o save de verdade.",

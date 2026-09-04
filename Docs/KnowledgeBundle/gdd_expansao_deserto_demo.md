@@ -12,7 +12,7 @@ Documento Mestre de Arquitetura Narrativa, Game Design e Isometria 2D Real (32 P
 
 > **Nota de escopo (2026-07-28):** esta numeração (Fase 1/Fase 2) é local a este Vertical Slice/demo. É diferente da ambição de "jogo completo com 6 fases" registrada no `GDD_Mestre.md` §1.8 — as duas contagens não foram reconciliadas e não devem ser lidas como a mesma coisa.
 >
-> **Revisão v4.0:** a antiga "Fase 2: As Ruínas Pálidas" (v3.0) deixou de ser uma fase própria. Seu conteúdo (S-Path, stealth urbano, queda Z4→Z5) foi absorvido como o miolo da Dungeon 1 (Tumba de Alhazred) da Fase 1 — a área já construída em `Assets/Scenes/Playtest_RuinasPalidas.unity` foi repropositada, não descartada. O que era "Fase 3" virou "Fase 2".
+> **Revisão v4.0:** a antiga "Fase 2: As Ruínas Pálidas" (v3.0) deixou de ser uma fase própria. Seu conteúdo (S-Path, stealth urbano, queda Z4→Z5) foi absorvido como o miolo da Dungeon 1 (Tumba de Alhazred) da Fase 1 — a área já construída em `Assets/Scenes/Tumba_De_Alhazred.unity` foi repropositada, não descartada. O que era "Fase 3" virou "Fase 2".
 
 ---
 
@@ -35,7 +35,7 @@ O Vertical Slice é composto por **2 Fases contínuas** de progressão narrativa
 
 ### 🏜️ FASE 1: O DESERTO DE HALI (Área Inicial Aberta)
 * **Estilo de Jogo:** Navegação livre no deserto em 32 PPU, exploração de masmorras e coleta de relíquias.
-* **Dungeon 1 (Tumba de Alhazred):** a área já construída (S-Path, Zonas 1-9 da cena `Playtest_RuinasPalidas`), repropositada como dungeon dentro do Deserto. Furtividade urbana tensa, gestão de ruído físico, tempestades de areia, a Queda da Zona 4 para a Zona 5 (Cerco dos Cultistas, colapso do chão, travessia subterrânea) e o clímax: Miniboss **Abdul Alhazred** ➔ Drop: **O Necronomicon**.
+* **Dungeon 1 (Tumba de Alhazred):** a área já construída (S-Path, Zonas 1-9 da cena `Tumba_De_Alhazred`), repropositada como dungeon dentro do Deserto. Furtividade urbana tensa, gestão de ruído físico, tempestades de areia, a Queda da Zona 4 para a Zona 5 (Cerco dos Cultistas, colapso do chão, travessia subterrânea) e o clímax: Miniboss **Abdul Alhazred** ➔ Drop: **O Necronomicon**.
 * **Dungeon 2 (Templo da Serpente - Opcional):** Chefe Guardião ➔ Drop: **Coroa de Ossos do Rei em Amarelo** (efeito/build a definir — aguardando fechamento do roteiro).
 * **Santuário de Yhtill:** Rainha Cassilda recita a Canção de Cassilda + Quest ➔ Recompensa: **Patuá das Luas Gêmeas**.
 * **Portões das Ruínas (Fim da Fase 1):** Miniboss **Byakhee** ➔ Drop: **Anel do Sinal Amarelo** ➔ Abertura dos Portões ➔ Transição para a Fase 2.

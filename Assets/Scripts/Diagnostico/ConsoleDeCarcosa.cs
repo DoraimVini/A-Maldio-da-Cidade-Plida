@@ -492,7 +492,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
         private static readonly (string Cena, string Rotulo)[] Destinos =
         {
             ("Deserto_Hali", "Deserto de Hali — 11 Cultistas, a tempestade"),
-            ("Playtest_RuinasPalidas", "Tumba de Alhazred — o Baú e o Abdul"),
+            ("Tumba_De_Alhazred", "Tumba de Alhazred — o Baú e o Abdul"),
             ("Portoes_Das_Ruinas", "Portões das Ruínas — o BYAKHEE"),
             ("Santuario_Yhtill", "Santuário de Yhtill"),
             ("Castelo_Carcosa", "Castelo de Carcosa — o Rei em Amarelo"),

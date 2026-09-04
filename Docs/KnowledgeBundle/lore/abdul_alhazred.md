@@ -12,7 +12,7 @@ timestamp: 2026-07-30T13:00:00-03:00
 Abdul Alhazred é o lendário poeta e erudito de Sanaa que passou anos explorando os desertos da Arábia e as ruínas de Nameless City, onde traduziu os segredos dos Antigos no tomo *Al-Azif* (*O Necronomicon*). Enlouquecido pela estática de Carcosa, ele se isolou na Tumba Mururat — onde mantém aprisionado **Yug-Neth**, um Mi-Go filhote, como chave dimensional para os Portões das Ruínas.
 
 ## Função no Jogo
-* **Localização:** Clímax da Tumba de Alhazred (Dungeon 1 do Deserto de Hali), em `Assets/Scenes/Playtest_RuinasPalidas.unity` (S-Path, Zona 9 — Tumba de Abdul).
+* **Localização:** Clímax da Tumba de Alhazred (Dungeon 1 do Deserto de Hali), em `Assets/Scenes/Tumba_De_Alhazred.unity` (S-Path, Zona 9 — Tumba de Abdul).
 * **Drop condicional:** *O Necronomicon* — **apenas no Caminho B (luta)**. Ver seção abaixo.
 * **Companion libertado:** Yug-Neth — em ambos os caminhos.
 

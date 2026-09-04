@@ -13,7 +13,8 @@ namespace FavelaAmarela.EditorTools
     /// estranha nos mobs e até no boss, você não trabalha freeze rotation"</i>. Auditando os
     /// <c>Rigidbody2D</c>, <b>quatro corpos dinâmicos estavam sem <c>FreezeRotation</c></b>:
     /// <c>Byakhee.prefab</c> (o chefe), <c>Cortesao_Palido_0</c> e <c>_1</c> (os mobs do
-    /// Castelo) e o Damião da <c>cena_1</c> (legado, fora da build). O casamento com o relato é
+    /// Castelo) e o Damião de uma cena de legado (<c>cena_1</c>, apagada em 2026-09-04, fora
+    /// da build). O casamento com o relato é
     /// exato: os mobs e o boss.</para>
     ///
     /// <para><b>Por que gira:</b> um corpo <c>Dynamic</c> que leva impulso de colisão fora do
@@ -40,7 +41,7 @@ namespace FavelaAmarela.EditorTools
         private static readonly string[] Cenas =
         {
             "Assets/Scenes/Deserto_Hali.unity",
-            "Assets/Scenes/Playtest_RuinasPalidas.unity",
+            "Assets/Scenes/Tumba_De_Alhazred.unity",
             "Assets/Scenes/Santuario_Yhtill.unity",
             "Assets/Scenes/Portoes_Das_Ruinas.unity",
             "Assets/Scenes/Castelo_Carcosa.unity",

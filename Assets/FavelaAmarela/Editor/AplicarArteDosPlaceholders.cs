@@ -252,7 +252,7 @@ namespace FavelaAmarela.EditorTools
 
         /// <summary>
         /// O Yug-Neth é o único dos cinco que está <b>colocado</b> numa cena
-        /// (<c>Playtest_RuinasPalidas</c>) — os outros quatro nascem por <c>Instantiate</c> em
+        /// (<c>Tumba_De_Alhazred</c>) — os outros quatro nascem por <c>Instantiate</c> em
         /// runtime, então corrigir o prefab basta para eles.
         ///
         /// <para>E aquela instância <b>sobrescreve a escala</b> (1.0348, 1.2947). Override de
@@ -262,10 +262,10 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static string CorrigirInstanciaDoYugNeth()
         {
-            const string caminhoDaCena = "Assets/Scenes/Playtest_RuinasPalidas.unity";
+            const string caminhoDaCena = "Assets/Scenes/Tumba_De_Alhazred.unity";
 
             if (!System.IO.File.Exists(caminhoDaCena))
-                return "Playtest_RuinasPalidas: cena ausente";
+                return "Tumba_De_Alhazred: cena ausente";
 
             var cena = EditorSceneManager.OpenScene(caminhoDaCena, OpenSceneMode.Single);
 
@@ -286,7 +286,7 @@ namespace FavelaAmarela.EditorTools
                 EditorSceneManager.SaveScene(cena);
             }
 
-            return $"Playtest_RuinasPalidas: {ajustados} instância(s) de YugNeth com escala 0.5";
+            return $"Tumba_De_Alhazred: {ajustados} instância(s) de YugNeth com escala 0.5";
         }
     }
 }

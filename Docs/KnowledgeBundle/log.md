@@ -4,6 +4,74 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — `Tumba_De_Alhazred`, e a `cena_1` sai do projeto
+
+Pedido do Vini: renomear a cena de playtest, apagar a `cena_1`, deixar o projeto o mais limpo
+possível.
+
+Suítes: EditMode **1049 (1026 passando, 0 falhando)** — um teste a menos que antes, de
+propósito (ver abaixo). PlayMode segue em 47/47.
+
+### `Playtest_RuinasPalidas` → `Tumba_De_Alhazred`
+
+O nome dizia "playtest" e a cena é a **Tumba**: contém `TumbaDeAbdul_Conteudo`,
+`TrancaDeArena_Abdul`, `Bau_DaTumba` e `Fragmento_2`. O novo nome casa com a convenção das
+irmãs (`Portoes_Das_Ruinas`, `Santuario_Yhtill`, `Castelo_Carcosa`).
+
+**126 ocorrências em 62 arquivos**, todas por string — incluindo duas que quebrariam calado se
+ficassem para trás:
+
+- `ProjectSettings/EditorBuildSettings.asset` (o `path:`; o `guid:` não muda);
+- **`cenaDestino: Playtest_RuinasPalidas` dentro do `Deserto_Hali.unity`** — o `PortalDeCena`
+  que leva o jogador do Deserto para a Tumba.
+
+Conferido antes de mexer: **as chaves de save não usam nome de cena** (`ChavesDeSave` monta por
+GUID de objeto), então nenhum save existente foi invalidado.
+
+### `cena_1` apagada
+
+Legado anterior à Tumba, fora do Build Settings, 169 KB, último toque em 27 de agosto. Estava
+citada em quatro lugares, e cada um foi tratado pelo que ele era:
+
+| lugar | o que foi feito |
+|---|---|
+| `BootstrapDeCenaTests.Cena1_EhLegadoAbandonado_NaoEntraNoGuarda` | **apagado** |
+| `CenasNaoFicamParaTrasTests.ForaDoMundo` | entrada removida |
+| `NavegacaoEntreCenasTests.ForaDoJogo` | entrada removida |
+| `FisicaDosAtoresTests.CenasIgnoradas` | lista esvaziada, e mantida declarada |
+
+**Por que o teste foi apagado em vez de mantido.** Ele começava com
+`if (!File.Exists(cena1)) return;`. Sem o arquivo, passaria a afirmar **nada** — um teste verde
+que não mede coisa alguma é pior que teste nenhum, porque conta como cobertura.
+
+A `CenasIgnoradas` ficou declarada e vazia de propósito: apagar a lista faria a próxima exceção
+nascer como um `if` solto no meio do laço, sem obrigação de justificar-se.
+
+**A história de *por que* as regras existem foi preservada** nos docs de `FisicaDosAtoresTests`
+e `PadronizarFisicaDosAtores` — o Damião da `cena_1` foi um dos quatro corpos sem
+`FreezeRotation` em 2026-08-21, e esse é o motivo de o guarda existir.
+
+### Correção de uma afirmação minha, dentro do próprio commit
+
+Ao remover o teste, escrevi no comentário que a cobertura ficava com
+`TodaCenaJogavel_TemBootstrap`, *"que varre o Build Settings de verdade"*. **As duas metades
+eram falsas.** O teste não existe com esse nome, e a varredura não é do Build Settings. O real
+é `CenaJogavel_TemOBootstrap`, por `TestCaseSource` sobre `CenasJogaveis` — uma **lista escrita
+à mão**. Consequência que agora está registrada no código: uma cena nova que entre na build e
+não nessa lista **não é coberta** por ele; quem varre a pasta inteira é
+`CenasNaoFicamParaTrasTests`.
+
+### A Unity abrindo em "Untitled"
+
+Não estava travada: o `Editor.log` da sessão mostra `Opening scene 'Assets/Scenes/cena_1.unity'`
+seguido de `Loaded scene`, com 363 ms de integração. A `Untitled` é a cena vazia que a Unity
+mantém enquanto o pipeline de assets roda — a captura pegou esse intervalo (barra de status em
+*"Updating assets search index"*).
+
+O que ela restaura vem de `Library/LastSceneManagerSetup.txt`, que apontava para a `cena_1`.
+Como a cena foi apagada, o arquivo foi reapontado para `Tumba_De_Alhazred.unity`.
+
+
 ## 2026-09-04 — Portão de profundidade: o golpe deixa de alcançar três células
 
 Decisão do Vini: **uma célula**.
@@ -164,7 +232,7 @@ A ferramenta acusou, e a varredura do YAML confirmou:
 
 | ator | escala da instância | esticado em Y |
 |---|---|---|
-| **Abdul** (`Playtest_RuinasPalidas`) | 1,162 × 2,671 | **2,30×** |
+| **Abdul** (`Tumba_De_Alhazred`) | 1,162 × 2,671 | **2,30×** |
 | Cultista (10 no `Deserto_Hali`) | 0,630 × 0,804 | 1,28× |
 | Cultista (2 na `Playtest`) | ~0,588 × ~0,755 | 1,27–1,30× |
 | Cassilda (`Santuario_Yhtill`) | 1,478 × 1,925 | 1,30× |
@@ -1105,7 +1173,7 @@ célula vazia** e **inclusive com o `sand_01`**, que funciona há meses. `SetTil
 guarda do (2) pegou o estrago sozinha na execução seguinte — que é o ponto de existir.
 
 De carona, o cache da Library reverteu `m_MaxSize` 44 → 60 no Santuário e tocou o
-`Playtest_RuinasPalidas`, **que nenhuma ferramenta abriu**. Os dois revertidos, e a correção de
+`Tumba_De_Alhazred`, **que nenhuma ferramenta abriu**. Os dois revertidos, e a correção de
 disco feita **por último**, depois de toda ferramenta que abre cena — a ordem que a armadilha exige.
 
 ### Achado de passagem
@@ -1470,7 +1538,7 @@ onde o `Sprite` é sub-asset e `LoadAssetAtPath<Sprite>` devolve `null`.
 ### O prefab do Abdul não carregava as próprias conjurações
 
 `prefabPedraDePoder`, `prefabEsqueleto`, `prefabConeDeGelo` e `prefabNecronomicon` **todos
-nulos**. A luta funciona porque a instância de `Playtest_RuinasPalidas` sobrescreve os quatro —
+nulos**. A luta funciona porque a instância de `Tumba_De_Alhazred` sobrescreve os quatro —
 não era bug ativo, era um prefab que só funciona num lugar. Perder o override apagaria as
 Pedras de Poder, e sem pedras o escudo é permanente: **o chefe fica invencível**.
 
@@ -2493,7 +2561,7 @@ Três me pegaram em sequência, e **nenhum era falso positivo**:
 ### Estado do caminho crítico
 
 ```
-Cena_Menu → Deserto_Hali ⇄ Playtest_RuinasPalidas
+Cena_Menu → Deserto_Hali ⇄ Tumba_De_Alhazred
                          ⇄ Santuario_Yhtill
                          → Portoes_Das_Ruinas → Castelo_Carcosa
 ```
@@ -2862,7 +2930,7 @@ altura humana. O sprite novo só passou a ocupar o volume que o colisor sempre t
 ### O único que estava numa cena
 
 Quatro dos cinco **nascem por `Instantiate` em runtime** — corrigir o prefab basta. Só o
-Yug-Neth está colocado em `Playtest_RuinasPalidas`, e aquela instância **sobrescrevia a
+Yug-Neth está colocado em `Tumba_De_Alhazred`, e aquela instância **sobrescrevia a
 escala** (1.0348, 1.2947). Override de instância ganha do prefab: sem tratar isso, a
 correção não apareceria na única cena onde ele está, e o Mi-Go entraria com mais de 2
 unidades de altura. A ferramenta ajusta a instância junto.
@@ -3319,7 +3387,7 @@ delas teria sobrevivido à correção das outras duas.
 
 | sintoma | causa | camada |
 |---|---|---|
-| Arma aparece na mão ao entrar | `armaInicialParaTeste` sobrescrito para `EstileteDeIrem` em `Playtest_RuinasPalidas` | cena |
+| Arma aparece na mão ao entrar | `armaInicialParaTeste` sobrescrito para `EstileteDeIrem` em `Tumba_De_Alhazred` | cena |
 | Baú não entrega arma | `tabela` em `fileID: 0` — `Drop_BauDaTumba` nunca ligada | cena |
 | Arma some ao sair | `MaoFisicaBridge.Start()` assinava `OnSlotChanged` sem aplicar o slot corrente | **código** |
 
@@ -3512,7 +3580,7 @@ Feito por leitura de YAML:
 | cena | maxResiliencia | fracaoPanico | telaPause | sequenciaColapso |
 |---|---|---|---|---|
 | `Deserto_Hali` | 100 | 0.25 | ligada | ligada |
-| `Playtest_RuinasPalidas` | 100 | 0.25 | ligada | ligada |
+| `Tumba_De_Alhazred` | 100 | 0.25 | ligada | ligada |
 | `Santuario_Yhtill` | 100 | 0.25 | ligada | ligada |
 | `Cena_ArenaDeTestes` | 100 | 0.25 | — | — |
 | `cena_1` | 100 | 0.25 | — | **chave ausente** |
@@ -4954,7 +5022,7 @@ funcionais depois da 2ª rodada. Bug novo relatado: quest da Cassilda não fecha
 parte das páginas perdidas".
 
 Os 3 fragmentos ("páginas perdidas") estão espalhados um por cena: índice 0 no
-`Deserto_Hali`, índices 1 e 2 no `Playtest_RuinasPalidas`. O Deserto tinha exatamente o
+`Deserto_Hali`, índices 1 e 2 no `Tumba_De_Alhazred`. O Deserto tinha exatamente o
 mesmo problema corrigido para o Santuário na rodada anterior — `DetectorDeInteracao` só
 existia como override manual no Playtest, nunca ali —, só que ninguém tinha notado porque
 o fragmento 0 é opcional para *começar* a quest (só bloqueia *terminar*). Como
@@ -6194,7 +6262,7 @@ Fecha a última fatia do roadmap do Vertical Slice. QA: **258/258 testes EditMod
 - **Testes do planner atualizados:** 10 salas (era 9), nomes na ordem nova, e **2 testes novos** que travam justamente o que importa: a câmara é lateral (mesmo Y da Cripta, X maior) e a descida segue alinhada em X com a Zona 5 — ou seja, nada foi deslocado.
 
 ### Cena povoada
-- **`SetupArenaDoAbdul.cs` (novo, Editor):** posiciona Abdul (com o sprite `transe` e a `Ficha_Abdul`), **4 Pedras de Poder** nos cantos da arena (forçam deslocamento sob pressão dos esqueletos, que é o ponto da Fase 1) e o **Baú** na Câmara. As posições vêm do `LevelBlockoutPlanner`, não de coordenadas chutadas — se o layout mudar, rodar de novo recoloca tudo. Idempotente. Executado em `Playtest_RuinasPalidas`: Abdul na layer Enemy (as armas o acertam), com `DynamicYSort`.
+- **`SetupArenaDoAbdul.cs` (novo, Editor):** posiciona Abdul (com o sprite `transe` e a `Ficha_Abdul`), **4 Pedras de Poder** nos cantos da arena (forçam deslocamento sob pressão dos esqueletos, que é o ponto da Fase 1) e o **Baú** na Câmara. As posições vêm do `LevelBlockoutPlanner`, não de coordenadas chutadas — se o layout mudar, rodar de novo recoloca tudo. Idempotente. Executado em `Tumba_De_Alhazred`: Abdul na layer Enemy (as armas o acertam), com `DynamicYSort`.
 - Baú e Pedras usam sprite placeholder (quadrado colorido) até a arte real existir — visível e funcional, não invisível.
 
 ## 2026-07-29 — Vertical Slice: morte do Damião, HUD completo, baú RNG e boss Abdul
@@ -6213,7 +6281,7 @@ raridade/níveis fica para **depois** da entrega (ver `CLAUDE.md` §1.1).
 - **`BarraDeAcoes.cs` (novo):** barra de ações da Mão Física — arma empunhada, habilidade e **recarga** da habilidade. Antes disso a habilidade disparava às cegas.
 - **`MaoFisicaBridge`:** novos `ProgressoCooldownHabilidade`, `HabilidadePronta` e evento `OnArmaTrocada` (a UI se redesenha por evento, não por polling).
 - **`HUDController`:** `InjetarVitalidade` e `InjetarMaoFisica`; `GameManager` alimenta os dois no bootstrap.
-- **`BuildHUDCompleto.cs` (novo, Editor):** monta o HUD na cena aberta e liga as views. Construir por código (não YAML na mão) deixa a Unity resolver anchors/fonte — mesmo padrão dos outros builders da pasta. Executado em `Playtest_RuinasPalidas`: o HUD já existia como instância de prefab e foi reaproveitado.
+- **`BuildHUDCompleto.cs` (novo, Editor):** monta o HUD na cena aberta e liga as views. Construir por código (não YAML na mão) deixa a Unity resolver anchors/fonte — mesmo padrão dos outros builders da pasta. Executado em `Tumba_De_Alhazred`: o HUD já existia como instância de prefab e foi reaproveitado.
 
 ### Golpe desarmado
 - **`MaoVazia.cs` (novo, Core):** o golpe de mão vazia como `IArma` com **dano 0** — a regra vive no Core, não no adaptador. `MaoFisicaBridge.TryAtacar` agora aceita desarmado (entra em Atacando, faz barulho, não mata).
@@ -6349,7 +6417,7 @@ Fundação em código do overworld da Fase 1. QA: compilação limpa, testes Edi
 - **`PortalDeCena.cs` (novo):** porta de trigger que carrega uma cena por nome via `SceneManager.LoadScene` — carregamento mínimo e pontual (não é a infra completa de multi-cena). Usada na entrada da Tumba para levar ao S-Path.
 
 ### Editor
-- **`BuildDesertOverworld.cs` (novo):** menu `Tools/FavelaAmarela/Build Desert Overworld` — gera do zero `Assets/Scenes/Deserto_Hali.unity` jogável (câmera-seguidora, GameManager, prefab do Damião no spawn, chão-tilemap de areia, limites e marcadores dos pontos de interesse; a entrada da Tumba vira `PortalDeCena`→Playtest_RuinasPalidas). Registra as duas cenas em Build Settings.
+- **`BuildDesertOverworld.cs` (novo):** menu `Tools/FavelaAmarela/Build Desert Overworld` — gera do zero `Assets/Scenes/Deserto_Hali.unity` jogável (câmera-seguidora, GameManager, prefab do Damião no spawn, chão-tilemap de areia, limites e marcadores dos pontos de interesse; a entrada da Tumba vira `PortalDeCena`→Tumba_De_Alhazred). Registra as duas cenas em Build Settings.
 
 ### Testes
 - **`DesertOverworldPlannerTests.cs` (novo):** 8 testes EditMode — estrutura (1 chão + 4 limites), 5 pontos de interesse sem categoria duplicada e dentro do chão, portais com/sem cena destino, robustez do perímetro.
@@ -6392,7 +6460,7 @@ Criado o documento de Level Design do overworld da Fase 1 (`systems/level_design
 ### Decisões de design registradas
 
 - **Mapa topológico:** 5 setores geográficos separados pelo Lago de Hali (barreira natural impassável). Setor sul: Entrada + Tumba de Alhazred. Setor norte: Santuário de Yhtill + Portões das Ruínas. Setor leste (oculto): Templo da Serpente.
-- **Tempestade relocada:** A tempestade de areia sai da Dungeon 1 (Tumba de Alhazred) e passa a pertencer ao Overworld do Deserto de Hali, com zonas de intensidade variável por setor. A Dungeon 1 ficará com StormIntensity = 0 permanente. Os triggers `Z1_Spawn`, `Z2_Rajadas`, `Z3Z4_Forte` em `Playtest_RuinasPalidas.unity` são candidatos a remoção em fatia futura de código.
+- **Tempestade relocada:** A tempestade de areia sai da Dungeon 1 (Tumba de Alhazred) e passa a pertencer ao Overworld do Deserto de Hali, com zonas de intensidade variável por setor. A Dungeon 1 ficará com StormIntensity = 0 permanente. Os triggers `Z1_Spawn`, `Z2_Rajadas`, `Z3Z4_Forte` em `Tumba_De_Alhazred.unity` são candidatos a remoção em fatia futura de código.
 - **Tempestade como stealth invertido:** No overworld, a tempestade forte abafa completamente os passos de Damião (stealth passivo) e cega os Byakhee — mas também drena RM na zona máxima (leste) e oculta o caminho do Templo da Serpente.
 - **Inimigos no overworld:** Cada inimigo tem função de design específica (sem spawns genéricos). Cultistas errantes em pares no deserto central, Byakhee como sentinelas aéreos, Coisa do Cemitério como foreshadowing de terror, Sementes de Hastur na borda do Lago, Cultista do Templo como guia opcional. Zona de Entrada e Santuário ficam livres de inimigos (zonas de respiro).
 - **3 formas de descoberta do Templo da Serpente:** Necronomicon reage ao ambiente, marco visual na tempestade, Cultista especial com mapa fragmentado. Quantas implementar: decisão pendente.
@@ -6424,7 +6492,7 @@ Primeira fatia de código da reestruturação. Remove o estado terminal de "Vit�
 ### Runtime
 - `GameManager.cs`: `TriggerVitoria()` → `TriggerTransicaoDeFase()`; campo serializado `telaVitoria` → `telaTransicaoDeFase`; lógica de timescale/telas ajustada.
 - `VitoriaTrigger.cs` removido; criado `TransicaoDeFaseTrigger.cs` (mesmo padrão de trigger, agora reaproveitável em qualquer ponto de saída, ex. Portões das Ruínas). Verificado antes: o trigger antigo não estava anexado a nenhum GameObject e `telaVitoria` era referência nula nas duas cenas — rename sem perda de dado.
-- Cenas `Playtest_RuinasPalidas.unity` e `cena_1.unity`: campo serializado do GameManager atualizado (era `{fileID: 0}` nas duas).
+- Cenas `Tumba_De_Alhazred.unity` e `cena_1.unity`: campo serializado do GameManager atualizado (era `{fileID: 0}` nas duas).
 
 ### Testes
 - `GameLoopStateMachineTests.cs`: +3 testes (Gameplay→TransicaoDeFase válida, TransicaoDeFase→Menu válida, TransicaoDeFase→Gameplay rejeitada).
@@ -6437,7 +6505,7 @@ Primeira fatia de código da reestruturação. Remove o estado terminal de "Vit�
 ## 2026-07-28 — Reestruturação Fase 1 (Deserto de Hali) — documentação
 
 ### Decisão de design
-A área jogável já construída (`Assets/Scenes/Playtest_RuinasPalidas.unity`, Zonas 1-9) passa a ser a **Dungeon 1 (Tumba de Alhazred)** dentro de uma nova **Fase 1: "O Deserto de Hali"** — overworld aberto (32 PPU) com duas dungeons, o Santuário de Yhtill (quest de Cassilda) e os Portões das Ruínas (checkpoint de saída). O que era "Fase 3: Castelo de Carcosa" no GDD de expansão renumerou para "Fase 2". Nenhum código foi alterado nesta rodada — só reconciliação de documentação (OKF) antes de qualquer implementação, conforme CLAUDE.md §3.1.
+A área jogável já construída (`Assets/Scenes/Tumba_De_Alhazred.unity`, Zonas 1-9) passa a ser a **Dungeon 1 (Tumba de Alhazred)** dentro de uma nova **Fase 1: "O Deserto de Hali"** — overworld aberto (32 PPU) com duas dungeons, o Santuário de Yhtill (quest de Cassilda) e os Portões das Ruínas (checkpoint de saída). O que era "Fase 3: Castelo de Carcosa" no GDD de expansão renumerou para "Fase 2". Nenhum código foi alterado nesta rodada — só reconciliação de documentação (OKF) antes de qualquer implementação, conforme CLAUDE.md §3.1.
 
 ### Lore (`Docs/KnowledgeBundle/lore/`)
 - `reliquias_cosmicas.md`: "Portões de Carcosa" → "Portões das Ruínas"; Coroa renomeada de "Coroa da Serpente" (Valusia) para **"Coroa de Ossos do Rei em Amarelo"**, obtenção mantida (drop do Chefe Guardião do Templo da Serpente), efeito marcado como "a definir" (roteiro em fechamento, sem especular habilidades de item).
@@ -6514,7 +6582,7 @@ A área jogável já construída (`Assets/Scenes/Playtest_RuinasPalidas.unity`, 
 ## 2026-07-10 — Cena da Tempestade de Areia + Prefab da Coisa do Cemitério
 - Criado o POCO `AgendadorDeRajada` (Core/Environment) — decide quando uma rajada forte acontece, RNG injetável (padrão de `BarraEnferrujada`); 6 testes NUnit
 - Criado o adapter Runtime `TempestadeRajadaAleatoria` — variante do `TempestadeZonaTrigger` que tica o `AgendadorDeRajada` só enquanto o jogador está no trigger e alterna a faixa da tempestade entre calmaria e rajada
-- Colocados 4 GameObjects de trigger na cena `Playtest_RuinasPalidas`: `TempestadeTrigger_Z1_Spawn` (moderada), `TempestadeTrigger_Z2_Rajadas` (calma + rajadas aleatórias), `TempestadeTrigger_Z3Z4_Forte` (forte, cobre as duas zonas contíguas), `TempestadeTrigger_Z5_Nula` (nula, subterrâneo)
+- Colocados 4 GameObjects de trigger na cena `Tumba_De_Alhazred`: `TempestadeTrigger_Z1_Spawn` (moderada), `TempestadeTrigger_Z2_Rajadas` (calma + rajadas aleatórias), `TempestadeTrigger_Z3Z4_Forte` (forte, cobre as duas zonas contíguas), `TempestadeTrigger_Z5_Nula` (nula, subterrâneo)
 - Criado o prefab `Assets/FavelaAmarela/Art/Enemies/CoisaDoCemiterio.prefab` (espelhando `Cultista.prefab`, com `Collider2D.isTrigger = true` — diferença crítica pro toque→Colapso) e posicionado na transição Zona2→Zona3
 - Corrigida divergência no OKF: `coisa_do_cemiterio.md` ainda listava `CoisaDoCemiterioAI` como não implementada (já existia desde 2026-07-08)
 - Adicionado o utilitário de Editor `WireStormTriggers.cs` (`Tools/FavelaAmarela/Wire Storm Triggers`) — mesmo padrão do `WireConfigAssets.cs`, contornando a limitação do MCP `update_component` pra referências de objeto de cena
@@ -6522,7 +6590,7 @@ A área jogável já construída (`Assets/Scenes/Playtest_RuinasPalidas.unity`, 
 
 ## 2026-07-10 — Slice 3: assets de Config dos bridges do Player
 - Criados os 4 assets `.asset` em `Assets/FavelaAmarela/Config/` a partir dos ScriptableObjects de config (`LocomocaoConfig`, `EsquivaConfig`, `SaltoDimensionalConfig`, `BarraEnferrujadaConfig`), com os valores default dos `[SerializeField]`
-- Atribuídos aos bridges do `Player_Damiao` na cena `Playtest_RuinasPalidas` (`PlayerMovement.locomocaoConfig`, `EsquivaBridge.config`, `AnomalyPowerBridge.config`, `MaoFisicaBridge.config`)
+- Atribuídos aos bridges do `Player_Damiao` na cena `Tumba_De_Alhazred` (`PlayerMovement.locomocaoConfig`, `EsquivaBridge.config`, `AnomalyPowerBridge.config`, `MaoFisicaBridge.config`)
 - Adicionado o utilitário de Editor `WireConfigAssets.cs` (`Tools/FavelaAmarela/Wire Config Assets`) — atribui via `SerializedObject`, contornando a limitação do MCP `update_component` (não resolve referência de asset para campo tipado de `ScriptableObject`)
 - Recompile limpo + 146/146 testes EditMode verdes
 

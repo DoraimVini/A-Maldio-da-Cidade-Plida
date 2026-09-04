@@ -16,7 +16,7 @@ data: 2026-08-20
 As **6 cenas do caminho** estão no Build Settings e ligadas ponta a ponta:
 
 ```
-Cena_Menu → Deserto_Hali ⇄ Playtest_RuinasPalidas
+Cena_Menu → Deserto_Hali ⇄ Tumba_De_Alhazred
                          ⇄ Santuario_Yhtill
                          → Portoes_Das_Ruinas → Castelo_Carcosa
 ```
@@ -64,7 +64,7 @@ automatizado, e nenhuma suíte substitui.
 Roteiro mínimo:
 
 1. Menu → Deserto. Damião anda, faz barulho, é caçado por Cultista.
-2. Tumba (`Playtest_RuinasPalidas`): pegar arma, resolver Abdul, **libertar Yug-Neth**.
+2. Tumba (`Tumba_De_Alhazred`): pegar arma, resolver Abdul, **libertar Yug-Neth**.
 3. Voltar ao Deserto. Yug-Neth segue. Santuário: quest da Cassilda, Patuá.
 4. Portões: o portal **exige a Tumba resolvida** (trava nova) — conferir que a linha de recusa
    aparece se tentar antes.

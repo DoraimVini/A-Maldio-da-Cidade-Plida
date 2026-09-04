@@ -11,7 +11,7 @@ namespace FavelaAmarela.EditorTools
     /// bugs distintos e eram wiring de cena:</para>
     /// <list type="number">
     ///   <item>Uma arma aparecia na mão de Damião ao entrar na Tumba — <c>armaInicialParaTeste</c>
-    ///   estava sobrescrito para <c>EstileteDeIrem</c> em <c>Playtest_RuinasPalidas</c>, sobra do
+    ///   estava sobrescrito para <c>EstileteDeIrem</c> em <c>Tumba_De_Alhazred</c>, sobra do
     ///   balanceamento do Byakhee. O prefab está correto em <c>Nenhuma</c>.</item>
     ///   <item>O baú não entregava arma — <c>tabela</c> em <c>fileID: 0</c>, sem
     ///   <c>Drop_BauDaTumba</c> ligada.</item>
