@@ -116,6 +116,23 @@ namespace FavelaAmarela.Runtime.Diagnostico
             public string Composicao;
 
             public string Material;
+
+            /// <summary>
+            /// Atrito e elasticidade <b>efetivos</b>, lidos de <c>Collider2D.friction</c> e
+            /// <c>.bounciness</c>.
+            ///
+            /// <para><b>Por que não se lê o material.</b> A doc da 6000.4 diz que o valor pode
+            /// vir de <b>quatro</b> lugares: <c>Collider2D.sharedMaterial</c>,
+            /// <i>indiretamente</i> do <c>Rigidbody2D.sharedMaterial</c>, do padrão global do
+            /// Physics2D, ou do built-in quando não há material nenhum. Olhar só o
+            /// <c>sharedMaterial</c> do colisor — que era o que esta classe fazia — reporta
+            /// "sem material" para um colisor que herdou um do corpo. Estas duas propriedades
+            /// já entregam o valor resolvido.</para>
+            /// </summary>
+            public float Atrito;
+
+            /// <inheritdoc cref="Atrito"/>
+            public float Elasticidade;
             public bool TemSprite;
             public Vector2 TamanhoDoSprite;
             public Vector2 CentroDoSprite;
@@ -160,6 +177,8 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 EhTrigger = col.isTrigger,
                 Composicao = col.compositeOperation.ToString(),
                 Material = col.sharedMaterial != null ? col.sharedMaterial.name : "—",
+                Atrito = col.friction,
+                Elasticidade = col.bounciness,
             };
 
             Vector3 escala = col.transform.lossyScale;
@@ -273,6 +292,15 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 queixas.Add($"escala não uniforme {escala.x:0.###} × {escala.y:0.###} " +
                             $"(esticado {escala.y / escala.x:0.##}× em Y)");
             }
+
+            // ATRITO E ELASTICIDADE. Padrão do projeto (decisão do Vini, 2026-09-04):
+            // elasticidade 0 e atrito moderado (0,4). Num isométrico de cima, corpo que quica
+            // desliza para fora da célula e a pegada some do lugar onde o jogador a viu.
+            if (m.Elasticidade > 0f)
+                queixas.Add($"elasticidade {m.Elasticidade:0.##} — o padrão é 0");
+
+            if (m.Atrito > 1f)
+                queixas.Add($"atrito {m.Atrito:0.##} — acima de 1");
 
             // Polygon / Edge / Composite desligado devolve bounds vazio (doc da 6000.4). Zero
             // aqui é "não medido", e acusar -100% de um número que não foi medido é ruído.

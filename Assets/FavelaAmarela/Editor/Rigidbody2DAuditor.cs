@@ -411,8 +411,9 @@ namespace FavelaAmarela.EditorTools
                           "escala); offset é local, como aparece no Inspector.");
             md.AppendLine();
             md.AppendLine("| origem | objeto | tipo | papel | tam. (L×A) | raio | offset | " +
-                          "centro | trigger | composição | material | sprite (L×A) |");
-            md.AppendLine("|---|---|---|---|---|---|---|---|---|---|---|---|");
+                          "centro | trigger | composição | material | atrito | elast. | " +
+                          "sprite (L×A) |");
+            md.AppendLine("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|");
 
             foreach (var c in colisores.OrderBy(x => x.Origem).ThenBy(x => x.M.Caminho))
             {
@@ -425,6 +426,7 @@ namespace FavelaAmarela.EditorTools
                     $"{m.CentroMundo.x:0.##}, {m.CentroMundo.y:0.##} | " +
                     $"{(m.EhTrigger ? "sim" : "não")} | " +
                     $"{m.Composicao} | {m.Material} | " +
+                    $"{m.Atrito:0.##} | {m.Elasticidade:0.##} | " +
                     $"{(m.TemSprite ? $"{m.TamanhoDoSprite.x:0.##}×{m.TamanhoDoSprite.y:0.##}" : "—")} |");
             }
 

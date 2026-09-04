@@ -4,6 +4,60 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Materiais de física: não existe nenhum, e o padrão vale por acidente
+
+Pedido: listar os `PhysicsMaterial2D` do projeto com atrito e elasticidade, e apontar colisor
+com elasticidade > 0 ou atrito > 1. Padrão declarado pelo Vini: **elasticidade 0, atrito 0,4**.
+
+Suítes: EditMode 1049 → **1052 (1029 passando, 0 falhando)**.
+
+### O levantamento
+
+| o quê | resultado |
+|---|---|
+| assets `.physicsMaterial2D` no projeto | **0** |
+| componentes com `m_Material` atribuído (135 varridos) | **0** |
+| `m_DefaultMaterial` do Physics2D | **vazio** (`fileID: 0`) |
+| colisores com elasticidade > 0 | **0** |
+| colisores com atrito > 1 | **0** |
+
+**Os 141 colisores medem atrito `0,4` e elasticidade `0`** — exatamente o padrão pedido.
+
+### A lacuna que a doc revelou na auditoria
+
+`Collider2D.friction` na Script Reference offline diz que o material chega por **quatro**
+caminhos:
+
+> *"…either directly via the `Collider2D.sharedMaterial`, **indirectly via the attached
+> `Rigidbody2D.sharedMaterial`**, the global default or if no `PhysicsMaterial2D` is assigned
+> then a default value is used."*
+
+A `AuditoriaDeColisores` lia **só o primeiro**. Um material posto no `Rigidbody2D` e herdado
+pelos colisores apareceria no relatório como "sem material" — o efeito no colisor, a causa no
+corpo, e o relatório mudo. Corrigido: a auditoria passou a reportar
+`Collider2D.friction`/`.bounciness`, que já entregam o valor **resolvido** pelos quatro
+caminhos, e a queixar-se de elasticidade > 0 e atrito > 1.
+
+### O que o número esconde
+
+O padrão **vale por acidente**: não há material nenhum, então todo colisor cai no built-in da
+Unity. Ninguém escreveu 0,4 em lugar algum. Padrão que se cumpre sozinho é padrão que ninguém
+percebe quando deixa de valer — e o caminho mais silencioso é o `m_DefaultMaterial` global, que
+muda atrito e elasticidade do jogo inteiro sem tocar em um único prefab.
+
+`MateriaisDeFisicaTests` guarda os **três caminhos autorados** (o quarto é da engine): nenhum
+material atribuído em colisor ou corpo, o padrão global vazio, e nenhum asset de material sem
+declaração. Não proíbe material — proíbe material **silencioso**: quando uma superfície
+precisar quicar de propósito, o teste falha e o conserto é registrar o motivo em
+`MateriaisIntencionais`, hoje vazia.
+
+### Arquivos
+
+- `Assets/Scripts/Diagnostico/AuditoriaDeColisores.cs` — atrito e elasticidade efetivos.
+- `Assets/FavelaAmarela/Editor/Rigidbody2DAuditor.cs` — duas colunas novas.
+- `Assets/Tests/EditMode/MateriaisDeFisicaTests.cs` — **novo**, 3 testes.
+
+
 ## 2026-09-04 — Auditoria de gatilhos: 84 triggers, e zero `OnCollisionEnter2D`
 
 Pedido: listar todo `Collider2D` com `isTrigger`, identificar o propósito de cada um, apontar
