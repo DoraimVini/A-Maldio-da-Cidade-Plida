@@ -335,6 +335,118 @@ namespace FavelaAmarela.Tests.PlayMode
                 "A hitbox está resolvendo por distância radial em vez de por direção.");
         }
 
+        // ── 2b. portão de profundidade (uma célula, decisão de 2026-09-04) ───
+
+        /// <summary>A hitbox do Damião, criada em runtime por <c>MaoFisicaBridge</c>.</summary>
+        private FavelaAmarela.Runtime.Combat.Hitbox HitboxDoJogador()
+        {
+            var h = _jogador.GetComponentInChildren<FavelaAmarela.Runtime.Combat.Hitbox>(true);
+
+            Assert.IsNotNull(h,
+                "O Damião está sem Hitbox. Ela é criada em Hitbox.GarantirPara pelo " +
+                "MaoFisicaBridge; sem ela o golpe não pode acertar nada.");
+
+            return h;
+        }
+
+        private static void DefinirProfundidade(
+            FavelaAmarela.Runtime.Combat.Hitbox hitbox, float valor)
+        {
+            var campo = typeof(FavelaAmarela.Runtime.Combat.Hitbox).GetField(
+                "profundidadeMaxima",
+                System.Reflection.BindingFlags.NonPublic |
+                System.Reflection.BindingFlags.Instance);
+
+            Assert.IsNotNull(campo,
+                "O campo 'profundidadeMaxima' sumiu da Hitbox. É ele que limita a " +
+                "profundidade de chão do golpe.");
+
+            campo.SetValue(hitbox, valor);
+        }
+
+        /// <summary>Golpeia numa direção com o alvo numa posição arbitrária.</summary>
+        private IEnumerator GolpearComAlvoEm(Vector2 direcao, Vector2 posicaoDoAlvo)
+        {
+            ZerarAcertos();
+
+            _inimigo.transform.position = posicaoDoAlvo;
+            Physics2D.SyncTransforms();
+
+            _mao.TryAtacar(direcao.normalized);
+
+            float ate = Time.time + _preparo + _janela + 0.05f;
+            while (Time.time < ate) yield return new WaitForFixedUpdate();
+        }
+
+        /// <summary>
+        /// Um alvo a menos de <b>uma célula</b> de profundidade continua sendo acertado.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator OGolpe_AcertaDentroDeUmaCelulaDeProfundidade()
+        {
+            yield return Montar();
+
+            const float profundidade = 0.4f;   // menos que a célula de 0,5
+            yield return GolpearComAlvoEm(Vector2.right, new Vector2(_alcance, profundidade));
+
+            Debug.Log($"[HitboxAudit] portão: alvo a {profundidade:0.##} de profundidade " +
+                      $"(célula = {FavelaAmarela.Runtime.Combat.Hitbox.ProfundidadeDeUmaCelula:0.##}); " +
+                      $"acertos = {_acertosNoInimigo}");
+
+            Assert.Greater(_acertosNoInimigo, 0,
+                $"O alvo está a {profundidade:0.##} unidades de profundidade — dentro da célula " +
+                $"de {FavelaAmarela.Runtime.Combat.Hitbox.ProfundidadeDeUmaCelula:0.##} — e o " +
+                "golpe não acertou. O portão está cortando perto demais e transformou um acerto " +
+                "legítimo em erro.");
+        }
+
+        /// <summary>
+        /// O teste que <b>prova</b> o portão: mesma posição, medida duas vezes. Com o portão
+        /// desligado o alvo é acertado; com uma célula, não.
+        ///
+        /// <para>Medir só o erro não provaria nada — o alvo poderia estar simplesmente longe
+        /// demais para o círculo. Provar o acerto primeiro, na MESMA posição, isola o portão
+        /// como a única causa da diferença.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AlemDeUmaCelula_OPortaoEhOQueRejeita_ENaoADistancia()
+        {
+            yield return Montar();
+
+            var posicao = new Vector2(_alcance, 1.0f);   // 2 células ao norte
+            var hitbox = HitboxDoJogador();
+
+            // ── 1. portão desligado: tem de acertar ──
+            DefinirProfundidade(hitbox, 0f);
+            yield return GolpearComAlvoEm(Vector2.right, posicao);
+            int semPortao = _acertosNoInimigo;
+
+            Debug.Log($"[HitboxAudit] portão: alvo em {posicao} — sem portão, acertos = {semPortao}");
+
+            Assert.Greater(semPortao, 0,
+                $"Com o portão DESLIGADO o alvo em {posicao} não foi acertado, então ele está " +
+                "fora do alcance do círculo e esta posição não serve para medir o portão. " +
+                "Aproxime o alvo, ou o teste vira um falso verde.");
+
+            // ── 2. portão de uma célula: tem de errar ──
+            yield return EsperarCooldown();
+            DefinirProfundidade(hitbox,
+                FavelaAmarela.Runtime.Combat.Hitbox.ProfundidadeDeUmaCelula);
+
+            yield return GolpearComAlvoEm(Vector2.right, posicao);
+            int comPortao = _acertosNoInimigo;
+
+            Debug.Log($"[HitboxAudit] portão: mesma posição, com uma célula, " +
+                      $"acertos = {comPortao}");
+
+            Assert.AreEqual(0, comPortao,
+                $"O alvo em {posicao} está a 1,0 unidade de profundidade — DUAS células — e o " +
+                $"golpe o acertou mesmo com o portão em " +
+                $"{FavelaAmarela.Runtime.Combat.Hitbox.ProfundidadeDeUmaCelula:0.##}. " +
+                $"Com o portão desligado ele levou {semPortao} acerto(s) na mesma posição, " +
+                "então a distância não é o que muda: o portão não está sendo aplicado.");
+        }
+
         // ── 3. controle negativo: a máscara ──────────────────────────────────
 
         [UnityTest]

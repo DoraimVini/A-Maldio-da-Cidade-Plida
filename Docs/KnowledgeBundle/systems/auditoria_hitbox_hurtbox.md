@@ -76,6 +76,41 @@ Medido por quadro (não pela folha inteira) em 2026-09-03.
 > eram artefato: medi a **folha inteira** em vez do quadro, e no caso da Pedra medi a aura
 > composta em vez do cristal. Medir por quadro é obrigatório aqui.
 
+> **Segunda armadilha de método, achada em 2026-09-04: esta tabela mede os PREFABS.** A
+> auditoria de colisores mediu as **instâncias de cena** e elas não batem — porque nenhum ator
+> instanciado neste projeto tem escala uniforme. Medido:
+>
+> | ator | escala da instância | esticamento em Y |
+> |---|---|---|
+> | Abdul (`Playtest_RuinasPalidas`) | 1,162 × 2,671 | **2,30×** |
+> | Cultista (10 no `Deserto_Hali`) | 0,630 × 0,804 | 1,28× |
+> | Cultista (2 na `Playtest`) | ~0,588 × ~0,755 | 1,27–1,30× |
+> | Cassilda (`Santuario_Yhtill`) | 1,478 × 1,925 | 1,30× |
+> | YugNeth (`Playtest`) | 0,901 × 1,133 | 1,26× |
+> | Byakhee (`Portoes`) | 1,021 × 0,938 | 0,92× (achatado) |
+>
+> Consequências que atingem esta tabela diretamente:
+>
+> 1. **A cobertura da coluna à direita não vale em jogo.** Ela foi calculada com quadro e
+>    hurtbox sob a mesma escala do prefab. Na cena os dois são esticados juntos, então a razão
+>    sobrevive — mas os **valores absolutos** de "hurtbox (mundo)" não são os que a física vê.
+> 2. **A hurtbox do Abdul na cena diverge do que `Hurtbox.GarantirPara` produziria**: 0,56 ×
+>    2,52 contra 1,89 × 6,60 esperados, com o centro a **2,61 unidades** do centro desenhado.
+>    E `GarantirPara` **não conserta em runtime** — ele faz `if (existente != null) return
+>    existente;`, ou seja, uma hurtbox já gravada na cena passa intacta.
+> 3. **As 10 hurtboxes de Cultista do Deserto saem 43% mais estreitas** do que a derivação
+>    daria. O Cultista é o inimigo mais encontrado do jogo.
+> 4. **O golpe é `OverlapCircle`** — um círculo verdadeiro em mundo. Contra corpos esticados
+>    1,28× em Y, o alcance relativo ao corpo desenhado deixa de ser igual na horizontal e na
+>    vertical. Isto é exatamente a causa nº 2 da lista de "feel off": *hurtbox misaligned with
+>    the sprite*.
+> 5. **É problema de arte também.** Pixel art a 32 PPU esticada por fator não inteiro (1,28;
+>    2,30) sai do grid de pixel — o que a skill `favela-pixelart-standards` existe para
+>    proteger, e um agravante conhecido em conjunto com `PixelPerfectCamera` +
+>    `PixelSnapping`.
+>
+> Nada disto foi decidido: é o estado medido. Ver `auditoria_colisores.md`.
+
 ---
 
 ## Tabela 3 — i-frames, knockback e hitstop
@@ -302,8 +337,42 @@ Guardas novas: `OPreparo_AdiaOAcerto_ENaoOImpede` (os dois lados num teste só �
 com a hitbox quebrada, o outro com o preparo ignorado) e `AHitbox_SaiDoCorpoENaoDoPe`, que
 falha se a sobreposição vertical cair abaixo de 50% do corpo.
 
+## Portão de profundidade (implementado em 2026-09-04)
+
+**Decisão do Vini: uma célula.** O golpe do Damião alcançava **três células de profundidade**.
+
+A conta: alcance 1,2 + raio 0,6, saindo da altura do torso (~1,0), cobre o chão de **0,8 a 3,2
+células ao norte** de quem bate. A causa é a projeção — uma unidade de mundo em Y vale **duas**
+células de chão (célula 1,0 × 0,5), então um círculo verdadeiro em mundo é uma elipse deitada
+no chão, funda o dobro do que é larga. Achatar a hitbox levaria de 3,0 para 2,4 só: o problema
+não é a forma do círculo, é o eixo em que ele é medido.
+
+`Hitbox.profundidadeMaxima` compara **profundidade de chão** (Y da raiz, o mesmo que o
+`DynamicYSort` usa) contra `AlturaDeChaoDoGolpe` = raiz de quem bate **+ deslocamento
+direcional**.
+
+> **Por que a referência é onde o golpe CAI, e não a raiz de quem bate.** Se fosse a raiz,
+> golpear para o norte passaria a errar: o alvo à frente estaria a 1,2 de profundidade e o
+> portão o rejeitaria — justo quem se quis acertar. Guardado por
+> `OGolpe_AcertaNasQuatroDirecoes`, que passa.
+
+**O portão nasce DESLIGADO no campo serializado e LIGADO em `Hitbox.GarantirPara`.** Só o
+`MaoFisicaBridge` chama esse método, então a mudança atinge o golpe do Damião — que é onde a
+profundidade foi medida e reclamada. As outras **dez** hitboxes do projeto são autoradas em
+prefab, e uma delas é a garra do Byakhee, um chefe que ataca **mergulhando**: um campo novo com
+padrão ligado teria mudado o comportamento de um chefe em silêncio, nos dez prefabs de uma vez.
+
+Prova em `AlemDeUmaCelula_OPortaoEhOQueRejeita_ENaoADistancia`: **mesma posição** (1,20, 1,00),
+medida duas vezes — sem portão, 1 acerto; com uma célula, 0. Medir só o erro não provaria nada,
+porque o alvo poderia estar longe demais para o círculo.
+
+---
+
 ## Próximo passo recomendado
 
 Migrar `EnemyCombat` (Cultista) e `EsqueletoInvocado` para `Hitbox` com janela e direção. É a
 mudança que mais altera o toque do combate, e o Esqueleto é o mais urgente porque a animação
 nova dele mente sobre a janela.
+
+Depois disso, decidir se o portão de profundidade vale para os inimigos também — hoje ele é só
+do jogador, de propósito.

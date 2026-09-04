@@ -51,6 +51,17 @@ namespace FavelaAmarela.Runtime.Combat
         [Tooltip("Deslocamento a partir deste objeto. Aponta para a frente do golpe.")]
         [SerializeField] private Vector2 deslocamento = Vector2.zero;
 
+        [Tooltip("Quanta PROFUNDIDADE de chão o golpe abrange, em unidades de mundo, para " +
+                 "cada lado do ponto onde ele cai. 0,5 = uma célula isométrica. Zero ou " +
+                 "negativo desliga o portão.")]
+        [SerializeField] private float profundidadeMaxima;
+
+        /// <summary>
+        /// Uma célula isométrica de profundidade para cada lado — o valor que o Vini escolheu
+        /// em 2026-09-04 para o golpe do Damião.
+        /// </summary>
+        public const float ProfundidadeDeUmaCelula = Core.Player.BaseIsometrica.AlturaDeCelulaPadrao;
+
         [Header("Alvo")]
         [Tooltip("Camadas de hurtbox que este golpe pode atingir " +
                  "(PlayerHurtbox para inimigos, EnemyHurtbox para o jogador).")]
@@ -74,6 +85,25 @@ namespace FavelaAmarela.Runtime.Combat
 
         /// <summary>Centro da área em coordenadas de mundo.</summary>
         public Vector2 Centro => (Vector2)transform.position + deslocamento;
+
+        /// <summary>
+        /// Profundidade de chão que o golpe abrange para cada lado, em unidades de mundo.
+        /// <c>&lt;= 0</c> significa portão desligado.
+        /// </summary>
+        public float ProfundidadeMaxima => profundidadeMaxima;
+
+        /// <summary>
+        /// Onde o golpe cai <b>no plano do chão</b> — a raiz de quem golpeia mais o
+        /// deslocamento direcional.
+        ///
+        /// <para><b>Não é o Y de <see cref="Centro"/>, e a diferença é o ponto todo.</b> O
+        /// círculo da consulta sai da altura do TORSO (ver <see cref="AlturaDoTorso"/>), porque
+        /// é lá que moram as hurtboxes — corpos são altos. Mas altura de corpo não é
+        /// profundidade de chão: neste isométrico quem diz profundidade é o Y da raiz, o mesmo
+        /// que o <c>DynamicYSort</c> usa para <c>sortingOrder</c>. Medir o portão pelo centro
+        /// do círculo puniria o golpe por o alvo ser alto.</para>
+        /// </summary>
+        public float AlturaDeChaoDoGolpe => transform.root.position.y + deslocamento.y;
 
         private void Awake() => ReconstruirFiltro();
 
@@ -155,9 +185,22 @@ namespace FavelaAmarela.Runtime.Combat
         /// <c>CarcosaDebuggerWindow.CriarCorpoDoChefe</c> —, para nenhum <c>Awake</c> rodar
         /// antes de a camada alvo existir.</para>
         /// </summary>
+        /// <param name="profundidade">
+        /// Profundidade de chão do portão, em unidades de mundo. O padrão é
+        /// <see cref="ProfundidadeDeUmaCelula"/>.
+        ///
+        /// <para><b>Por que o portão nasce LIGADO aqui e DESLIGADO no campo serializado.</b>
+        /// Este método só é chamado pelo <c>MaoFisicaBridge</c> — o golpe do Damião, que é
+        /// onde a profundidade de três células foi medida e reclamada. As outras dez hitboxes
+        /// do projeto são autoradas em prefab, e uma delas é a garra do Byakhee, um chefe que
+        /// ataca <b>mergulhando</b>: ligar o portão nela mudaria o comportamento de um chefe
+        /// sem que ninguém tivesse medido o efeito. Campo novo com padrão ligado teria feito
+        /// exatamente isso, em silêncio, nos dez prefabs de uma vez.</para>
+        /// </param>
         public static Hitbox GarantirPara(GameObject dono, string nome, LayerMask camadas,
                                           float raioDoGolpe, float distanciaAFrente,
-                                          bool pouparAliados = false)
+                                          bool pouparAliados = false,
+                                          float profundidade = ProfundidadeDeUmaCelula)
         {
             if (dono == null) return null;
 
@@ -167,6 +210,7 @@ namespace FavelaAmarela.Runtime.Combat
             {
                 if (existente.gameObject.name != nome) continue;
                 existente.pouparAliados = pouparAliados;
+                existente.profundidadeMaxima = profundidade;
                 existente.Configurar(raioDoGolpe, distanciaAFrente, camadas);
                 existente.transform.localPosition = new Vector3(0f, altura, 0f);
                 return existente;
@@ -179,6 +223,7 @@ namespace FavelaAmarela.Runtime.Combat
 
             var hitbox = go.AddComponent<Hitbox>();
             hitbox.pouparAliados = pouparAliados;
+            hitbox.profundidadeMaxima = profundidade;
             hitbox.Configurar(raioDoGolpe, distanciaAFrente, camadas);
 
             go.SetActive(true);
@@ -285,6 +330,30 @@ namespace FavelaAmarela.Runtime.Combat
 
                 // Não se fere a si mesmo: a hurtbox do próprio dono está na mesma hierarquia.
                 if (hurtbox.transform.IsChildOf(transform.root)) continue;
+
+                // ── PORTÃO DE PROFUNDIDADE (decisão do Vini, 2026-09-04: uma célula) ──
+                //
+                // Sem ele o golpe alcançava TRÊS CÉLULAS de profundidade. A conta: alcance 1,2
+                // mais raio 0,6, saindo da altura do torso (~1,0), cobre o chão de 0,8 a 3,2
+                // células ao norte de quem bate. A causa é a projeção: uma unidade de mundo em
+                // Y vale DUAS células de chão (célula 1,0 x 0,5), então um círculo verdadeiro
+                // em mundo é uma elipse deitada no chão -- funda o dobro do que é larga.
+                //
+                // Achatar a hitbox só levaria de 3,0 para 2,4 células, porque o problema não é
+                // a forma do círculo e sim o eixo em que ele é medido. O portão mede em
+                // PROFUNDIDADE DE CHÃO, comparando raízes, e por isso corta de verdade.
+                //
+                // O ponto de referência é AlturaDeChaoDoGolpe -- onde o golpe cai --, e não a
+                // raiz de quem bate. Fosse a raiz, golpear para o norte erraria: o alvo à
+                // frente estaria a 1,2 de profundidade e o portão o rejeitaria, quando ele é
+                // exatamente quem se quis acertar.
+                if (profundidadeMaxima > 0f)
+                {
+                    float profundidade =
+                        Mathf.Abs(hurtbox.transform.root.position.y - AlturaDeChaoDoGolpe);
+
+                    if (profundidade > profundidadeMaxima) continue;
+                }
 
                 // Aliados (Yug-Neth e companheiros futuros) nunca são atingidos pelo golpe do
                 // jogador -- nem por acidente no meio de uma luta. A taxonomia de layers do

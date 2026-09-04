@@ -4,6 +4,229 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Portão de profundidade: o golpe deixa de alcançar três células
+
+Decisão do Vini: **uma célula**.
+
+Suítes: PlayMode 45 → **47 (47 passando, 0 falhando)**; EditMode em 1050/1027.
+
+### O problema, medido
+
+Alcance 1,2 + raio 0,6, saindo da altura do torso (~1,0), cobria o chão de **0,8 a 3,2 células
+ao norte** de quem bate. A causa é a projeção: uma unidade de mundo em Y vale **duas** células
+de chão (célula 1,0 × 0,5), então o círculo da consulta é uma elipse deitada no chão — funda o
+dobro do que é larga. Achatar a hitbox levaria de 3,0 para 2,4 só; o eixo de medida é que
+estava errado, não a forma.
+
+### A implementação
+
+`Hitbox.profundidadeMaxima` compara o Y da **raiz** do alvo (a definição de profundidade do
+projeto, a mesma do `DynamicYSort`) contra `AlturaDeChaoDoGolpe` = raiz de quem bate **mais o
+deslocamento direcional**.
+
+A referência é *onde o golpe cai*, não a raiz de quem bate. Fosse a raiz, golpear para o norte
+passaria a errar — o alvo à frente estaria a 1,2 de profundidade e seria rejeitado, justo quem
+se quis acertar. `OGolpe_AcertaNasQuatroDirecoes` continua verde.
+
+### O padrão foi invertido de propósito
+
+O campo serializado nasce em **0 (desligado)**; quem liga é `Hitbox.GarantirPara`, com
+`ProfundidadeDeUmaCelula`. Só o `MaoFisicaBridge` chama esse método.
+
+**Motivo:** o GUID da `Hitbox` aparece em **dez prefabs**, e um deles é a garra do Byakhee — um
+chefe que ataca **mergulhando**. Um campo novo com padrão ligado mudaria o comportamento de um
+chefe sem ninguém ter medido, em dez prefabs de uma vez. A queixa era do golpe do Damião; a
+mudança é do golpe do Damião.
+
+### Os testes
+
+- `OGolpe_AcertaDentroDeUmaCelulaDeProfundidade` — alvo a 0,4 continua sendo acertado.
+- `AlemDeUmaCelula_OPortaoEhOQueRejeita_ENaoADistancia` — **mesma posição** (1,20, 1,00) medida
+  duas vezes: sem portão, 1 acerto; com uma célula, 0. Medir só o erro não provaria nada, já
+  que o alvo poderia estar simplesmente fora do círculo.
+
+### Arquivos
+
+- `Assets/Scripts/Combat/Hitbox.cs` — campo `profundidadeMaxima`, const
+  `ProfundidadeDeUmaCelula`, propriedade `AlturaDeChaoDoGolpe`, parâmetro novo em `GarantirPara`.
+- `Assets/Tests/PlayMode/HitboxAuditTests.cs` — 2 testes.
+- `Docs/KnowledgeBundle/systems/auditoria_hitbox_hurtbox.md` — seção do portão.
+
+
+## 2026-09-04 — `PhysicsQueryAuditTests`, e três correções ao enunciado
+
+Pedido: suíte PlayMode cobrindo cinco tipos de consulta de proximidade, cada teste logando o
+valor medido e falhando com mensagem clara.
+
+Suítes: PlayMode 35 → **45 (45 passando, 0 falhando)**; EditMode segue em 1050/1027.
+
+### O que foi medido antes de escrever
+
+| item do pedido | o que o jogo realmente faz |
+|---|---|
+| 1. golpe corpo a corpo | **já coberto** por `HitboxAuditTests` (limite, além do limite, 4 direções, costas) |
+| 2. i-frames da esquiva | **já coberto** por `HitboxAuditTests` (dentro e fora da janela) |
+| 3. "coleta via trigger" | **não é trigger.** `ColetavelDeItem` é `IInteragivel`; quem acha é `DetectorDeInteracao` com `Physics2D.OverlapCircle` de buffer **fixo em 8 slots** |
+| 4. "audição do Cultista" | **não é consulta de física.** `EnemyPerception` assina `OnSomEmitido` e compara `Vector2.Distance` contra `Mathf.Min(som.RaioEfetivo, raioAudicao)` |
+| 5. "AoE de chefe" | **não existe.** As únicas `OverlapCircleAll` do projeto são as duas habilidades de relíquia em `ArtefatosBridge` |
+
+**Itens 1 e 2 não foram reimplementados.** Viraram guardas de cobertura por reflexão: se
+alguém apagar ou renomear os testes do `HitboxAuditTests`, estes falham nomeando qual sumiu.
+Reescrever as asserções criaria duas fontes da verdade para a mesma regra — o que o doc de
+`ColisoresDoElencoTests` chama de modo de falha mais repetido do projeto.
+
+### Valores medidos (logados por cada teste)
+
+```
+coleta:  alcance do detector = 1,5; coletável a 0,75 -> alvo = ColetavelDeItem
+coleta:  coletável a 2,5, alcance 1,5 -> alvo = NENHUM (correto)
+coleta:  item entregue ao inventário; PodeInteragir depois de Interagir = False
+audição: raioAudicao = 10; som a 5  -> EstaOuvindo = True
+audição: som a 15, acuidade 10      -> EstaOuvindo = False
+audição: som fraco raio 2 a 3       -> EstaOuvindo = False   (agachar funciona)
+área:    raio 4; inimigo a 2 revelado = True; a 7 revelado = False
+área:    camadasDeEntidade = -1 (TODAS as camadas)
+```
+
+### Achados registrados, não corrigidos
+
+1. **`ArtefatosBridge.camadasDeEntidade` nasce em `~0`** — as duas habilidades de relíquia
+   consultam **todas as camadas** e descartam depois pelo `GetComponentInParent<EnemyBase>`.
+   Não é bug de correção; é varredura de parede, chão e gatilho a cada uso. O teste registra o
+   valor em vez de o afirmar, para a escolha ficar visível.
+2. **`DetectorDeInteracao` tem buffer fixo de 8 slots** e já avisa no console quando enche —
+   mas o alvo descartado não é reportado. Documentado no próprio componente.
+
+### Armadilha no ferramental
+
+`Tools/run_qa_tests.ps1` recebe **`-TestPlatform`**, não `-Modo`. O script não tem
+`[CmdletBinding()]`, então o PowerShell joga parâmetro desconhecido em `$args` **em silêncio** e
+cai no padrão `EditMode`. Rodar `-Modo PlayMode` executa EditMode e imprime `TESTS PASSED`.
+
+### Arquivos
+
+- `Assets/Tests/PlayMode/PhysicsQueryAuditTests.cs` — **novo**, 10 testes.
+
+
+## 2026-09-04 — Auditoria de colisores, e o elenco inteiro está esticado
+
+Pedido: estender o auditor para relatar **todo `Collider2D`** (tipo, tamanho, offset, trigger,
+composite, material) e comparar com `SpriteRenderer.bounds`, com limiar de 20% em qualquer
+dimensão ou 0,2 unidade de centro, funcionando **no Editor e em runtime**.
+
+Suítes: EditMode 1041 → **1050** (1027 passando, 23 aposentados).
+
+### 1. O limiar de 20% contra o sprite marcaria 100% do elenco
+
+Medido antes de escrever uma linha: os dois maiores desvios contra o sprite são **deliberados
+e documentados**.
+
+| o quê | contra o sprite |
+|---|---|
+| hurtbox (fatores 0,72 × 0,86 de `Hurtbox.GarantirPara`) | −28% de largura, −14% de altura |
+| pegada de movimento 0,60 × 0,30 num corpo de 1,00 × 2,53 | −40% de largura, −88% de altura |
+
+Um limiar cego acusaria os dois em todo ator, e o relatório não distinguiria mais nada.
+
+### 2. Comparar "por papel" também não bastou — e foi preciso rodar para descobrir
+
+A primeira versão chamou de **pegada todo colisor sólido**. Rodou, saiu com código 0, escreveu
+o relatório — e acusou **57 de 141 colisores**, entre eles as quatro paredes do Santuário, o
+Lago de Hali, os quatro limites do Deserto e os tilemaps de colisão. Trocar um limiar cego por
+outro não é medir. **A suíte não pegou isso; só a leitura do próprio relatório pegou.**
+
+Classificação final, com o que cada papel confere:
+
+| papel | o que é | o que se confere | quantos |
+|---|---|---|---|
+| `Hurtbox` | camada 13/14 ou componente `Hurtbox` | silhueta × 0,72/0,86 e o centro | 26 |
+| `Pegada` | sólido de **ator** (corpo não-estático **e** sprite) | proporção de chão 2:1 e linha do pé | 22 |
+| `Cenario` | sólido sem corpo ou sem sprite | nada | 35 |
+| `Gatilho` | trigger que não é hurtbox | nada | 58 |
+
+**O tamanho absoluto da pegada não é conferido de propósito:** `ColisoresDoElencoTests` já
+guarda os quatro humanos pelo caminho do prefab. Repetir a regra aqui, com identificação pior,
+criaria a segunda fonte da verdade que o doc daquele arquivo chama de modo de falha mais
+repetido do projeto.
+
+Resultado: **57 → 15** falsos positivos eliminados sem perder achado real.
+
+### 3. `usedByComposite` não existe na 6000.4
+
+O pedido pedia "Used By Composite", o **bool** das versões antigas. Não há sequer página para
+ele na Script Reference offline da versão exata; o sucessor é **`compositeOperation`**, um enum
+(None / Merge / Intersect / Difference / Flip) que diz *qual* booleana o composite aplica.
+Mesma classe de rename que pegou `velocity` → `linearVelocity`.
+
+### 4. O achado: nenhum ator instanciado em cena tem escala uniforme
+
+A ferramenta acusou, e a varredura do YAML confirmou:
+
+| ator | escala da instância | esticado em Y |
+|---|---|---|
+| **Abdul** (`Playtest_RuinasPalidas`) | 1,162 × 2,671 | **2,30×** |
+| Cultista (10 no `Deserto_Hali`) | 0,630 × 0,804 | 1,28× |
+| Cultista (2 na `Playtest`) | ~0,588 × ~0,755 | 1,27–1,30× |
+| Cassilda (`Santuario_Yhtill`) | 1,478 × 1,925 | 1,30× |
+| YugNeth (`Playtest`) | 0,901 × 1,133 | 1,26× |
+| Byakhee (`Portoes`) | 1,021 × 0,938 | 0,92× (achatado) |
+| `YugNeth.prefab` (na raiz do prefab) | 4,113 × 0,563 | — |
+
+**Isto falsificou uma afirmação que eu havia escrito em dois arquivos** —
+"todo o elenco deste projeto está em escala uniforme (medido em 2026-09-03)". A medição antiga
+olhou a **raiz dos prefabs**; é na **instância** que a escala é sobrescrita. Os dois
+comentários foram corrigidos no lugar, com o dado que os derrubou.
+
+Consequências medidas:
+
+1. **A hurtbox do Abdul na cena diverge da derivação**: 0,56 × 2,52 contra 1,89 × 6,60
+   esperados, com o centro a **2,61 unidades** do centro desenhado. E `GarantirPara` **não
+   conserta em runtime** — `if (existente != null) return existente;`, então a hurtbox gravada
+   na cena passa intacta.
+2. **As 10 hurtboxes de Cultista do Deserto saem 43% mais estreitas** que a derivação. É o
+   inimigo mais encontrado do jogo.
+3. **O golpe é `OverlapCircle`**, um círculo verdadeiro em mundo. Contra corpos esticados
+   1,28× em Y, o alcance relativo ao corpo desenhado deixa de ser igual nos dois eixos — a
+   causa nº 2 da lista de "feel off" do Vini.
+4. **É problema de arte também.** Pixel art a 32 PPU esticada por fator não inteiro sai do
+   grid de pixel, que é o que a skill `favela-pixelart-standards` protege.
+
+### 5. Achado colateral: o Deserto tem 10 Cultistas, não 4
+
+O relatório trouxe o mesmo caminho repetido, o que parecia bug da varredura. Não era: o
+`Deserto_Hali.unity` tem **10 instâncias** de Cultista, **quatro delas com o nome literalmente
+idêntico** (`Cultista_Setor_TumbaDeAlhazred_0`), mais duas de cada `(1)`, `(2)` e `(3)`.
+
+### Arquivos
+
+**Runtime (novo)**
+- `Assets/Scripts/Diagnostico/AuditoriaDeColisores.cs` — a medição. Vive no Runtime, e não no
+  Editor, porque o Editor pode referenciar o Runtime mas não o contrário, e o jogo rodando
+  precisa da **mesma** conta: em Play existem a hurtbox criada em `Awake`, o colisor desligado
+  por i-frame e o inimigo instanciado por spawner, que o disco não mostra.
+
+**Runtime (modificado)**
+- `Assets/Scripts/Diagnostico/VisualizadorDeGolpes.cs` — **Shift+F11** despeja a auditoria da
+  cena carregada no console (a metade runtime do pedido). Ressalva de escala corrigida.
+
+**Editor (modificado)**
+- `Assets/FavelaAmarela/Editor/Rigidbody2DAuditor.cs` — menu passa a
+  `Tools/FavelaAmarela/Auditar Física 2D` e sai em dois relatórios.
+
+**Testes (novo)**
+- `Assets/Tests/EditMode/AuditoriaDeColisoresTests.cs` — 9 testes, todos guardas de regressão
+  do falso positivo: parede é cenário, corpo Static é cenário, pegada deitada passa, pegada em
+  pé é acusada, tamanho é em mundo, não-medido não vira queixa, escala não uniforme é acusada
+  em ator mas não em cenário, e a composição é o enum da 6000.4.
+
+**Documentação**
+- `Docs/KnowledgeBundle/systems/auditoria_colisores.md` — **novo**, gerado por ferramenta.
+- `Docs/KnowledgeBundle/systems/auditoria_rigidbody2d.md` — indexado (não estava).
+- `Docs/KnowledgeBundle/systems/auditoria_hitbox_hurtbox.md` — a Tabela 2 ganhou a correção
+  **prefab ≠ instância**: ela mede os prefabs, e as instâncias não batem.
+- `Docs/KnowledgeBundle/systems/index.md` — as duas auditorias indexadas.
+
+
 
 
 ## 2026-09-03 — Altares, o Abdul inteiro, e a auditoria de onde o combate realmente acontece
