@@ -49,6 +49,20 @@ namespace FavelaAmarela.Runtime.GameLoop
         [Tooltip("Grava a partida em disco ao descansar aqui (GDD §8.3: save nos Postes de Luz).")]
         [SerializeField] private bool salvaAoDescansar = true;
 
+        [Header("Poste de Luz")]
+        [Tooltip("O corpo visível do Refúgio. Até 2026-09-04 os Refúgios eram círculos " +
+                 "INVISÍVEIS no chão: o jogo salvava, curava e gravava o ponto de renascimento " +
+                 "sem nada aparecer. [ASSET pixel art]")]
+        [SerializeField] private SpriteRenderer visualDoPoste;
+
+        [Tooltip("Primeiro quadro aceso. Aplicado no MESMO frame do descanso — sem ele o poste " +
+                 "só mudaria quando o animador virasse o quadro seguinte, e o jogador veria o " +
+                 "gesto acontecer atrasado. [ASSET pixel art]")]
+        [SerializeField] private Sprite posteAceso;
+
+        [Tooltip("Ciclo da chama. Nasce DESABILITADO no prefab/cena e é ligado ao descansar.")]
+        [SerializeField] private FavelaAmarela.Runtime.Enemies.AnimadorEmLaco chamaDoPoste;
+
         [Header("Feedback")]
         [Tooltip("Caixa de texto do Refúgio (reaproveita a UI de dica por ora).")]
         [SerializeField] private TutorialHintUI caixaDeTexto;
@@ -106,8 +120,28 @@ namespace FavelaAmarela.Runtime.GameLoop
 
             if (salvaAoDescansar) Salvar();
 
+            AcenderPoste();
+
             if (algoAconteceu && caixaDeTexto != null && !string.IsNullOrWhiteSpace(mensagemDeDescanso))
                 caixaDeTexto.Mostrar(mensagemDeDescanso);
+        }
+
+        /// <summary>
+        /// Acende o poste. <b>Acontece mesmo quando a cura não acontece</b> — e isso é
+        /// deliberado.
+        ///
+        /// <para>O intervalo de <see cref="intervaloDeAncoragem"/> existe contra farm de cura,
+        /// não contra informação. O poste aceso quer dizer <i>"é aqui que você volta"</i>, e
+        /// isso continua verdadeiro na segunda passagem: o save gravou
+        /// <c>Jogador.Refugio.Ponto</c> de novo. Apagar o poste porque a cura entrou em
+        /// carência ensinaria a coisa errada ao jogador.</para>
+        /// </summary>
+        private void AcenderPoste()
+        {
+            if (visualDoPoste != null && posteAceso != null)
+                visualDoPoste.sprite = posteAceso;
+
+            if (chamaDoPoste != null) chamaDoPoste.enabled = true;
         }
 
         /// <summary>
