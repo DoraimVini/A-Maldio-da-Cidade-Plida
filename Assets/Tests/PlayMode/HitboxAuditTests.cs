@@ -32,6 +32,15 @@ namespace FavelaAmarela.Tests.PlayMode
         // ── o rig ────────────────────────────────────────────────────────────
         private GameObject _chao;
         private GameObject _jogador;
+        private GameObject _contêinerDoJogador;
+        private GameObject _contêinerDosInimigos;
+
+        /// <summary>
+        /// Onde o rig monta o elenco. <b>Não é a origem</b> de propósito: na Tumba os atores
+        /// ficam por volta de y = -14, e código que confunde posição de ator com posição de
+        /// contêiner só erra fora do zero.
+        /// </summary>
+        private static readonly Vector3 OrigemDoRig = new Vector3(12f, -14f, 0f);
         private GameObject _inimigo;
 
         private FavelaAmarela.Player.MaoFisicaBridge _mao;
@@ -68,7 +77,8 @@ namespace FavelaAmarela.Tests.PlayMode
         [TearDown]
         public void TearDown()
         {
-            foreach (var go in new[] { _inimigo, _jogador, _chao })
+            foreach (var go in new[] { _inimigo, _jogador, _chao,
+                                       _contêinerDoJogador, _contêinerDosInimigos })
                 if (go != null) Object.DestroyImmediate(go);
 
             _danoNoJogador = 0f;
@@ -111,14 +121,30 @@ namespace FavelaAmarela.Tests.PlayMode
             // Não participa do dano. Está aqui como CONTROLE NEGATIVO: se um golpe algum dia
             // acertar o chão, a máscara está errada. Camada Default, sólido, como o cenário.
             _chao = new GameObject("Chao");
-            _chao.transform.position = new Vector3(0f, -0.5f, 0f);
+            _chao.transform.position = OrigemDoRig + new Vector3(0f, -0.5f, 0f);
             var piso = _chao.AddComponent<BoxCollider2D>();
             piso.size = new Vector2(40f, 1f);
 
             // ── o jogador ────────────────────────────────────────────────────
+            // O JOGADOR VIVE DENTRO DE UM CONTÊINER E LONGE DA ORIGEM, como na cena de
+            // verdade. As duas coisas são deliberadas, e a falta delas escondeu um bug real:
+            //
+            //  - Na Tumba, os atores são filhos de GameObjects de organização
+            //    (Inimigos_Playtest, TumbaDeAbdul_Conteudo) que ficam em y = 0, enquanto os
+            //    atores estão por volta de y = -14. Um rig com todo mundo solto na raiz faz
+            //    transform.root devolver o próprio ator -- e código que usa transform.root
+            //    passa no teste e quebra em jogo. Foi exatamente o que aconteceu com o portão
+            //    de profundidade em 2026-09-04: TODO golpe do Damião passou a ser rejeitado.
+            //
+            //  - Montar tudo em y = 0 esconde o mesmo defeito por outro caminho: com ator e
+            //    contêiner no mesmo Y, a diferença dá zero e a conta errada "acerta".
+            _contêinerDoJogador = new GameObject("Conteudo_DaCena");
+            _contêinerDosInimigos = new GameObject("Inimigos_DaCena");
+
             _jogador = new GameObject("Damiao", typeof(Rigidbody2D));
             _jogador.tag = "Player";
-            _jogador.transform.position = Vector3.zero;
+            _jogador.transform.SetParent(_contêinerDoJogador.transform, false);
+            _jogador.transform.position = OrigemDoRig;
 
             var srJogador = _jogador.AddComponent<SpriteRenderer>();
             srJogador.sprite = SpriteDeCorpo();
@@ -138,6 +164,7 @@ namespace FavelaAmarela.Tests.PlayMode
 
             // ── o inimigo ────────────────────────────────────────────────────
             _inimigo = new GameObject("Alvo", typeof(Rigidbody2D));
+            _inimigo.transform.SetParent(_contêinerDosInimigos.transform, false);
             var srInimigo = _inimigo.AddComponent<SpriteRenderer>();
             srInimigo.sprite = SpriteDeCorpo();
             _alvo = _inimigo.AddComponent<AlvoDeTeste>();
@@ -227,7 +254,8 @@ namespace FavelaAmarela.Tests.PlayMode
         {
             ZerarAcertos();
 
-            _inimigo.transform.position = (Vector3)(direcao.normalized * distancia);
+            _inimigo.transform.position = _jogador.transform.position
+                                          + (Vector3)(direcao.normalized * distancia);
 
             // Transform mexido por código não chega à física até o próximo passo — sem isto a
             // consulta enxerga o colisor na posição ANTERIOR e o teste mede o quadro errado.
@@ -322,7 +350,8 @@ namespace FavelaAmarela.Tests.PlayMode
             yield return Montar();
 
             ZerarAcertos();
-            _inimigo.transform.position = new Vector3(-_alcance, 0f, 0f);   // atrás
+            _inimigo.transform.position =
+                _jogador.transform.position + new Vector3(-_alcance, 0f, 0f);   // atrás
             Physics2D.SyncTransforms();
 
             _mao.TryAtacar(Vector2.right);                                   // golpe à frente
@@ -369,13 +398,54 @@ namespace FavelaAmarela.Tests.PlayMode
         {
             ZerarAcertos();
 
-            _inimigo.transform.position = posicaoDoAlvo;
+            _inimigo.transform.position = _jogador.transform.position + (Vector3)posicaoDoAlvo;
             Physics2D.SyncTransforms();
 
             _mao.TryAtacar(direcao.normalized);
 
             float ate = Time.time + _preparo + _janela + 0.05f;
             while (Time.time < ate) yield return new WaitForFixedUpdate();
+        }
+
+        /// <summary>
+        /// A guarda que faltava em 2026-09-04, e cuja falta quebrou o combate inteiro.
+        ///
+        /// <para>O portão media profundidade com <c>transform.root</c>. Numa cena real os
+        /// atores são filhos de contêineres de organização que ficam em <b>y = 0</b>, enquanto
+        /// os atores estão por volta de <b>y = -14</b> — então <c>transform.root</c> devolvia o
+        /// contêiner, a diferença dava 14, e <b>todo golpe do Damião era rejeitado</b>. O rig
+        /// antigo montava tudo solto na raiz e em y = 0, onde <c>transform.root</c> é o próprio
+        /// ator: o defeito não tinha como aparecer.</para>
+        ///
+        /// <para>Este teste afirma a propriedade diretamente, sem depender de acerto ou erro.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AProfundidadeDoGolpe_SegueOAtor_ENaoOConteinerDaCena()
+        {
+            yield return Montar();
+
+            var hitbox = HitboxDoJogador();
+
+            // Golpe para a direita: o deslocamento fica horizontal, então a profundidade do
+            // golpe tem de ser exatamente a do Damião.
+            yield return Golpear(Vector2.right, _alcance);
+
+            float doAtor = _jogador.transform.position.y;
+            float doConteiner = _contêinerDoJogador.transform.position.y;
+            float medida = hitbox.AlturaDeChaoDoGolpe;
+
+            Debug.Log($"[HitboxAudit] profundidade: ator y={doAtor:0.##}, " +
+                      $"contêiner y={doConteiner:0.##}, AlturaDeChaoDoGolpe={medida:0.##}");
+
+            Assert.AreNotEqual(doAtor, doConteiner,
+                "O rig pôs ator e contêiner no mesmo Y, então este teste não distingue os dois " +
+                "e passaria mesmo com o defeito. Ver OrigemDoRig.");
+
+            Assert.AreEqual(doAtor, medida, 0.05f,
+                $"A profundidade do golpe veio {medida:0.##}, e o Damião está em " +
+                $"{doAtor:0.##}. O contêiner da cena está em {doConteiner:0.##} — se a medida " +
+                "bate com ELE, o código está usando transform.root em vez do ator, e em jogo " +
+                "isso rejeita todos os golpes.");
         }
 
         /// <summary>
@@ -492,7 +562,8 @@ namespace FavelaAmarela.Tests.PlayMode
         {
             _danoNoJogador = 0f;
 
-            _inimigo.transform.position = new Vector3(distancia, 0f, 0f);
+            _inimigo.transform.position =
+                _jogador.transform.position + new Vector3(distancia, 0f, 0f);
             Physics2D.SyncTransforms();
 
             var hitbox = ArmarHitboxDoInimigo(raio, alcance);
@@ -618,7 +689,8 @@ namespace FavelaAmarela.Tests.PlayMode
                 "O preparo veio zero — a fase não existe e este teste não mede nada.");
 
             ZerarAcertos();
-            _inimigo.transform.position = new Vector3(_alcance, 0f, 0f);
+            _inimigo.transform.position =
+                _jogador.transform.position + new Vector3(_alcance, 0f, 0f);
             Physics2D.SyncTransforms();
 
             _mao.TryAtacar(Vector2.right);

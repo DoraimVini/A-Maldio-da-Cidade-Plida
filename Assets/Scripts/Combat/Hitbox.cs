@@ -103,9 +103,36 @@ namespace FavelaAmarela.Runtime.Combat
         /// que o <c>DynamicYSort</c> usa para <c>sortingOrder</c>. Medir o portão pelo centro
         /// do círculo puniria o golpe por o alvo ser alto.</para>
         /// </summary>
-        public float AlturaDeChaoDoGolpe => transform.root.position.y + deslocamento.y;
+        public float AlturaDeChaoDoGolpe => AlturaDeChaoDe(_corpoDoDono, transform.parent)
+                                            + deslocamento.y;
 
-        private void Awake() => ReconstruirFiltro();
+        /// <summary>
+        /// O Y de chão de um ator. <b>Não use <c>transform.root</c> para isto.</b>
+        ///
+        /// <para>Foi exatamente o que quebrou o combate em 2026-09-04: numa cena real os atores
+        /// são filhos de contêineres de organização (<c>Inimigos_Playtest</c>,
+        /// <c>TumbaDeAbdul_Conteudo</c>), e <c>transform.root</c> devolve o CONTÊINER, que está
+        /// em y = 0. Com o Damião por volta de y = -14, a diferença dava 14 e o portão rejeitava
+        /// TODO golpe. O teste não pegou porque montava jogador e inimigo soltos na raiz, onde
+        /// <c>transform.root</c> é o próprio ator.</para>
+        ///
+        /// <para>Quem marca o ator é o <see cref="Rigidbody2D"/>: ele mora no objeto do ator,
+        /// nunca no contêiner de organização, que é um <c>GameObject</c> vazio.</para>
+        /// </summary>
+        private static float AlturaDeChaoDe(Rigidbody2D corpo, Transform reserva)
+        {
+            if (corpo != null) return corpo.position.y;
+            return reserva != null ? reserva.position.y : 0f;
+        }
+
+        /// <summary>Corpo do dono, resolvido uma vez. Ver <see cref="AlturaDeChaoDe"/>.</summary>
+        private Rigidbody2D _corpoDoDono;
+
+        private void Awake()
+        {
+            ReconstruirFiltro();
+            _corpoDoDono = GetComponentInParent<Rigidbody2D>();
+        }
 
         private void ReconstruirFiltro()
         {
@@ -328,8 +355,23 @@ namespace FavelaAmarela.Runtime.Combat
                     continue;
                 }
 
-                // Não se fere a si mesmo: a hurtbox do próprio dono está na mesma hierarquia.
-                if (hurtbox.transform.IsChildOf(transform.root)) continue;
+                // Não se fere a si mesmo.
+                //
+                // A versão anterior comparava com transform.root, e carregava a MESMA armadilha
+                // que quebrou o portão de profundidade em 2026-09-04: num contêiner de cena
+                // compartilhado (Inimigos_Playtest, TumbaDeAbdul_Conteudo), transform.root é o
+                // contêiner, e "todo inimigo é filho do contêiner" leria como "todo inimigo sou
+                // eu" -- o golpe pularia o elenco inteiro. Hoje não acontece porque o Damião é
+                // raiz de cena, mas isso é sorte de arrumação, não invariante.
+                //
+                // Comparar o CORPO é exato: cada ator tem o seu, e contêiner de organização é
+                // GameObject vazio, sem Rigidbody2D.
+                var corpoDoAlvo = _buffer[i].attachedRigidbody;
+                bool souEu = _corpoDoDono != null && corpoDoAlvo != null
+                    ? corpoDoAlvo == _corpoDoDono
+                    : hurtbox.transform.IsChildOf(transform.parent != null
+                                                  ? transform.parent : transform);
+                if (souEu) continue;
 
                 // ── PORTÃO DE PROFUNDIDADE (decisão do Vini, 2026-09-04: uma célula) ──
                 //
@@ -349,8 +391,9 @@ namespace FavelaAmarela.Runtime.Combat
                 // exatamente quem se quis acertar.
                 if (profundidadeMaxima > 0f)
                 {
-                    float profundidade =
-                        Mathf.Abs(hurtbox.transform.root.position.y - AlturaDeChaoDoGolpe);
+                    float profundidade = Mathf.Abs(
+                        AlturaDeChaoDe(_buffer[i].attachedRigidbody, hurtbox.transform)
+                        - AlturaDeChaoDoGolpe);
 
                     if (profundidade > profundidadeMaxima) continue;
                 }
