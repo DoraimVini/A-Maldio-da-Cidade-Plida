@@ -24,14 +24,22 @@ namespace FavelaAmarela.Runtime.Diagnostico
     /// posição <b>exatos</b> que a física usou.</para>
     ///
     /// <para><b>Ligar e desligar:</b> <see cref="Mostrar"/> é estático e público; a tecla
-    /// <b>F11</b> alterna em jogo. (F1–F4 são as Relíquias e F12 é o
-    /// <see cref="ConsoleDeCarcosa"/>.)</para>
+    /// <b>F11</b> alterna em jogo, e <b>Shift+F11</b> despeja no console a auditoria de
+    /// colisores da cena (<see cref="AuditarColisoresDaCena"/>). (F1–F4 são as Relíquias e F12
+    /// é o <see cref="ConsoleDeCarcosa"/>.)</para>
     ///
     /// <para><b>Custo em build de release: zero.</b> Os métodos de registro carregam
     /// <see cref="ConditionalAttribute"/>, então o <b>compilador apaga as chamadas</b> fora do
     /// Editor e de build de desenvolvimento — o código de combate não paga nem o teste do
     /// <c>if</c>.</para>
+    ///
+    /// <para><b>Roda em Edit mode também</b> (<see cref="ExecuteAlways"/>): em Play ele se
+    /// auto-instancia e não precisa estar em cena nenhuma; em Edit mode basta pôr o componente
+    /// num GameObject e o Scene view passa a desenhar as hurtboxes e os gatilhos sem entrar no
+    /// jogo. As marcas de golpe, essas, só existem em Play — quem as registra é o código de
+    /// combate.</para>
     /// </summary>
+    [ExecuteAlways]
     [AddComponentMenu("Favela Amarela/Diagnóstico/Visualizador de Golpes")]
     public sealed class VisualizadorDeGolpes : MonoBehaviour
     {
@@ -60,8 +68,18 @@ namespace FavelaAmarela.Runtime.Diagnostico
         [SerializeField] private bool pegadasDeMovimento;
 
         [Header("Comportamento")]
-        [Tooltip("Começa ligado ao entrar em Play.")]
+        [Tooltip("Liga o desenho. Em Play define o estado inicial (F11 alterna depois); em " +
+                 "Edit mode é o próprio interruptor, porque não há tecla para ler.")]
         [SerializeField] private bool ligadoAoIniciar;
+
+        /// <summary>
+        /// Em Edit mode a caixa do Inspector É o interruptor: sem Play não há
+        /// <c>Keyboard.current</c> nem árbitro de foco, e marcar a caixa tem de acender na hora.
+        /// </summary>
+        private void OnValidate()
+        {
+            if (!Application.isPlaying) Mostrar = ligadoAoIniciar;
+        }
 
         [Tooltip("Segundos que um golpe registrado fica na tela, no MÍNIMO. Ver o doc de " +
                  "RegistrarCirculo: com 0 os golpes instantâneos piscam por um quadro e não " +
@@ -85,6 +103,30 @@ namespace FavelaAmarela.Runtime.Diagnostico
         private static float _permanencia = 0.25f;
 
         private static VisualizadorDeGolpes _instancia;
+
+        /// <summary>
+        /// O relógio da expiração, <b>por modo</b>.
+        ///
+        /// <para><c>Time.time</c> é escalado por <c>Time.timeScale</c> e conta a partir do
+        /// início da aplicação — em Edit mode ele não avança de forma útil, e uma marca
+        /// registrada fora do Play ou nunca expiraria ou expiraria no mesmo quadro.
+        /// <c>EditorApplication.timeSinceStartup</c> é o relógio do Editor e, segundo a doc da
+        /// 6000.4, <b>não é zerado ao entrar em Play</b>.</para>
+        ///
+        /// <para>Registro e poda passam os dois por aqui, então dentro de um mesmo modo as
+        /// contas fecham. Na troca de modo a lista é esvaziada (ver <c>Awake</c>), porque as
+        /// duas origens de tempo não são comparáveis entre si.</para>
+        /// </summary>
+        private static float Agora
+        {
+            get
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying) return (float)UnityEditor.EditorApplication.timeSinceStartup;
+#endif
+                return Time.time;
+            }
+        }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         // Cache da varredura de colisores: OnDrawGizmos roda todo quadro, e um
@@ -122,7 +164,15 @@ namespace FavelaAmarela.Runtime.Diagnostico
             }
 
             _instancia = this;
-            DontDestroyOnLoad(gameObject);
+
+            // DontDestroyOnLoad só existe em Play: chamá-lo em Edit mode reclama no console e
+            // não faz nada. Em Edit mode o componente vive no GameObject onde foi posto.
+            if (Application.isPlaying) DontDestroyOnLoad(gameObject);
+
+            // As marcas de um modo não valem no outro: os dois relógios (Time.time e
+            // EditorApplication.timeSinceStartup) têm origens diferentes, então um Expira
+            // gravado em Edit mode leria como passado remoto ou futuro distante em Play.
+            _marcas.Clear();
 
             Mostrar = ligadoAoIniciar;
             _permanencia = permanenciaMinima;
@@ -143,6 +193,10 @@ namespace FavelaAmarela.Runtime.Diagnostico
             // calada, que é exatamente o que este comentário existe para impedir.
             PodarExpiradas();
 
+            // Daqui para baixo é só Play. Em Edit mode não há teclado de jogo nem árbitro de
+            // foco para consultar, e o toggle é a caixa no Inspector.
+            if (!Application.isPlaying) return;
+
             // O ÁRBITRO VEM ANTES DA TECLA. Leitura crua de teclado ignora mapa de ação,
             // painel aberto e Time.timeScale — foi assim que digitar "3" no console consumia o
             // item do slot 3. O ConsoleDeCarcosa TOMA o foco porque congela o jogo; este aqui
@@ -153,7 +207,54 @@ namespace FavelaAmarela.Runtime.Diagnostico
             // Input System novo: o projeto está em activeInputHandler 1, então Input.GetKeyDown
             // e KeyCode nem existem em runtime aqui.
             var teclado = Keyboard.current;
-            if (teclado != null && teclado.f11Key.wasPressedThisFrame) Alternar();
+            if (teclado == null || !teclado.f11Key.wasPressedThisFrame) return;
+
+            // Shift+F11 audita em vez de alternar: a mesma tecla, porque quem quer conferir
+            // geometria de colisor e quem quer ver a hitbox desenhada é a mesma pessoa no
+            // mesmo momento.
+            bool shift = teclado.leftShiftKey.isPressed || teclado.rightShiftKey.isPressed;
+            if (shift) AuditarColisoresDaCena();
+            else Alternar();
+        }
+
+        /// <summary>
+        /// Mede todo colisor da cena carregada e joga o resultado no console — a metade
+        /// <b>runtime</b> da auditoria de colisores, sendo a outra o
+        /// <c>Rigidbody2DAuditor</c> do Editor.
+        ///
+        /// <para><b>Por que as duas existem.</b> A do Editor vê prefabs e cenas fechadas, mas vê
+        /// o objeto <b>como está no disco</b>. Esta aqui vê o que o jogo montou: hurtbox criada
+        /// em <c>Awake</c> por <c>Hurtbox.GarantirPara</c>, colisor desligado por i-frame,
+        /// inimigo instanciado por spawner. A conta é a mesma classe
+        /// (<see cref="AuditoriaDeColisores"/>) nas duas — de propósito, para não haver duas
+        /// versões da mesma medida divergindo em silêncio.</para>
+        /// </summary>
+        [Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        public static void AuditarColisoresDaCena()
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var colisores = FindObjectsByType<Collider2D>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            var texto = new System.Text.StringBuilder();
+            texto.AppendLine($"[AuditoriaDeColisores] {colisores.Length} colisor(es) na cena.");
+
+            int queixosos = 0;
+            for (int i = 0; i < colisores.Length; i++)
+            {
+                var m = AuditoriaDeColisores.Medir(colisores[i]);
+                if (string.IsNullOrEmpty(m.Queixa)) continue;
+
+                queixosos++;
+                texto.AppendLine($"  {m.Caminho} [{m.Tipo}, {m.Funcao}] — {m.Queixa}");
+            }
+
+            texto.Append(queixosos == 0
+                ? "  nada fora do esperado para o papel de cada colisor."
+                : $"  {queixosos} fora do esperado.");
+
+            Debug.Log(texto.ToString());
+#endif
         }
 
         /// <summary>Liga/desliga o desenho. Exposto para o Console e para atalhos futuros.</summary>
@@ -199,7 +300,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 Centro = centro,
                 Raio = Mathf.Max(0.01f, raio),
                 Cor = cor,
-                Expira = Time.time + Mathf.Max(duracao, _permanencia),
+                Expira = Agora + Mathf.Max(duracao, _permanencia),
             });
         }
 
@@ -223,7 +324,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 Raio = 0f,
                 Tamanho = tamanho,
                 Cor = cor,
-                Expira = Time.time + Mathf.Max(duracao, _permanencia),
+                Expira = Agora + Mathf.Max(duracao, _permanencia),
             });
         }
 
@@ -232,7 +333,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
 
         private static void PodarExpiradas()
         {
-            float agora = Time.time;
+            float agora = Agora;
             for (int i = _marcas.Count - 1; i >= 0; i--)
                 if (_marcas[i].Expira <= agora) _marcas.RemoveAt(i);
         }
@@ -247,9 +348,9 @@ namespace FavelaAmarela.Runtime.Diagnostico
         {
             if (!Mostrar) return;
 
-            if (Application.isPlaying && Time.time >= _proximaVarredura)
+            if (Application.isPlaying && Agora >= _proximaVarredura)
             {
-                _proximaVarredura = Time.time + IntervaloDeVarredura;
+                _proximaVarredura = Agora + IntervaloDeVarredura;
                 _colisores = FindObjectsByType<Collider2D>(
                     FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             }
@@ -258,6 +359,12 @@ namespace FavelaAmarela.Runtime.Diagnostico
                 _colisores = FindObjectsByType<Collider2D>(
                     FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             }
+
+            // Poda TAMBÉM aqui. Em Edit mode o Update de um [ExecuteAlways] só roda quando o
+            // Editor resolve repintar — pode ficar minutos parado com o mouse fora da janela.
+            // Sem esta segunda poda, uma marca registrada fora do Play ficaria na tela até
+            // alguém mexer em alguma coisa.
+            PodarExpiradas();
 
             DesenharColisores();
             DesenharMarcas();
@@ -308,10 +415,15 @@ namespace FavelaAmarela.Runtime.Diagnostico
         /// está desligado</b> — e é exatamente durante os i-frames da Esquiva que a hurtbox do
         /// Damião fica desligada. Pela matriz, ela continua desenhável.</para>
         ///
-        /// <para><b>Ressalva honesta:</b> sob escala não uniforme, um círculo desenhado pela
-        /// matriz vira elipse, enquanto a física continua tratando como círculo. Todo o elenco
-        /// deste projeto está em escala uniforme (medido em 2026-09-03), então a diferença não
-        /// aparece — mas se algum dia alguém escalar um ator só em X, o desenho mente.</para>
+        /// <para><b>Ressalva, e ela MORDE aqui.</b> Sob escala não uniforme um círculo
+        /// desenhado pela matriz vira elipse, enquanto a física continua tratando como círculo
+        /// do maior eixo. Este doc dizia que "todo o elenco deste projeto está em escala
+        /// uniforme (medido em 2026-09-03)" — <b>é falso</b>. A auditoria de colisores de
+        /// 2026-09-04 mediu o contrário: <b>nenhum</b> ator instanciado em cena tem escala
+        /// uniforme (Abdul em 1,162 × 2,671; os Cultistas em 0,630 × 0,804; Cassilda em
+        /// 1,478 × 1,925). A medição anterior olhou a raiz dos prefabs, não as instâncias — e
+        /// é na instância que a escala é sobrescrita. Ou seja: para os colisores circulares
+        /// destes atores, <b>o desenho mente hoje</b>, e mente para menos no eixo curto.</para>
         /// </summary>
         private static void DesenharForma(Collider2D col)
         {
