@@ -55,16 +55,16 @@ Comparar **por papel** também não bastou enquanto o papel era grosseiro: a pri
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
+| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Capsule | Pegada | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y); proporção 0,73:1 — chão isométrico é 2:1 (±0,5); a +2,4 do pé — pegada é área de chão |
+| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Circle | Gatilho | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y) |
+| Portoes_Das_Ruinas | `Portoes_Root/Byakhee/Hurtbox` | Box | Hurtbox | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y) |
+| Santuario_Yhtill | `Cassilda` | Circle | Gatilho | escala não uniforme 1,478 × 1,925 (esticado 1,3× em Y) |
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | escala não uniforme 0,592 × 0,751 (esticado 1,27× em Y) |
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | escala não uniforme 0,583 × 0,758 (esticado 1,3× em Y) |
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | escala não uniforme 0,592 × 0,751 (esticado 1,27× em Y) |
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | escala não uniforme 0,583 × 0,758 (esticado 1,3× em Y) |
 | Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred/Hurtbox` | Box | Hurtbox | escala não uniforme 1,162 × 2,671 (esticado 2,3× em Y); largura -70% do esperado (0,56 contra 1,89); altura -62% do esperado (2,52 contra 6,6); centro a 2,61 do centro desenhado (limiar 0,2) |
 | Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Box | Pegada | escala não uniforme 0,901 × 1,133 (esticado 1,26× em Y); proporção 0,41:1 — chão isométrico é 2:1 (±0,5); a +0,78 do pé — pegada é área de chão |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Capsule | Pegada | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y); proporção 0,73:1 — chão isométrico é 2:1 (±0,5); a +2,4 do pé — pegada é área de chão |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Circle | Gatilho | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y) |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee/Hurtbox` | Box | Hurtbox | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y) |
-| Santuario_Yhtill | `Cassilda` | Circle | Gatilho | escala não uniforme 1,478 × 1,925 (esticado 1,3× em Y) |
 
 ## Todos os colisores
 
@@ -169,23 +169,6 @@ Tamanho e centro em **unidades de mundo** (já multiplicados pela escala); offse
 | PedraDePoder | `PedraDePoder/Hurtbox` | Box | Hurtbox | 0,65×1,16 | — | 0, 0,75 | 0, 0,68 | sim | None | — | — |
 | Player_Damiao | `Player_Damiao` | Box | Cenario | 0,6×0,3 | — | 0, 0 | 0, 0 | não | None | — | — |
 | Player_Damiao | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | 0,7×1,9 | — | 0, 1,25 | 0, 1,05 | sim | None | — | — |
-| Tumba_De_Alhazred | `DesertFloorGrid/Colisao` | TilemapCollider2D | Cenario | 0×0 | — | 0, 0 | 0,54, 0,68 | não | Merge | — | — |
-| Tumba_De_Alhazred | `DesertFloorGrid/Colisao` | Composite | Cenario | 53,5×27,25 | — | 0, 0 | 0,54, 0,68 | não | None | — | — |
-| Tumba_De_Alhazred | `Fragmento_1` | Circle | Gatilho | 1,6×1,6 | 0,8 | 0, 0 | 12, 4 | sim | None | — | 0,2×0,2 |
-| Tumba_De_Alhazred | `Fragmento_2` | Circle | Gatilho | 1,6×1,6 | 0,8 | 0, 0 | 30, -12 | sim | None | — | 0,2×0,2 |
-| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | 0,41×0,26 | — | 0, 0 | 7,32, 2,42 | não | None | — | 1,44×2,02 |
-| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | 0,41×0,26 | — | 0, 0 | 11,4, 1,57 | não | None | — | 1,42×2,04 |
-| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | 1,04×1,73 | — | 0, 1,28 | 7,32, 3,39 | sim | None | — | 1,44×2,02 |
-| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | 1,02×1,75 | — | 0, 1,28 | 11,4, 2,55 | sim | None | — | 1,42×2,04 |
-| Tumba_De_Alhazred | `Patua_Pickup` | Box | Gatilho | 1,4×1,4 | — | 0, 0,5 | 0,3, -36,63 | sim | None | — | 0,5×0,5 |
-| Tumba_De_Alhazred | `Player_Damiao` | Box | Pegada | 0,57×0,29 | — | 0, 0 | 1,59, 1,27 | não | None | — | 0,95×2,2 |
-| Tumba_De_Alhazred | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | 0,67×1,81 | — | 0, 1,25 | 1,59, 2,27 | sim | None | — | 0,95×2,2 |
-| Tumba_De_Alhazred | `Saida_TumbaAlhazred` | Box | Gatilho | 1,6×1,6 | — | 0, 0 | -3,39, -1,17 | sim | None | — | — |
-| Tumba_De_Alhazred | `Saida_TumbaAlhazred (1)` | Box | Gatilho | 1,6×1,6 | — | 0, 0 | 41,43, -17,6 | sim | None | — | — |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred` | Box | Cenario | 0,3×2,54 | — | 0,01, 0,47 | 37,05, -14,85 | não | None | — | 2,62×7,68 |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred/Hurtbox` | Box | Hurtbox | 0,56×2,52 | — | -0,02, 0,46 | 37,02, -14,88 | sim | None | — | 2,62×7,68 |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Bau_DaTumba` | Box | Gatilho | 6,24×2,01 | — | 0, 0 | 4,9, 2,75 | sim | None | — | 0,62×0,2 |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Box | Pegada | 0,61×1,52 | — | 0,19, 0,69 | 44,23, -15,47 | não | None | — | 1,13×1,77 |
 | Portoes_Das_Ruinas | `Player_Damiao` | Box | Pegada | 0,6×0,3 | — | 0, 0 | 0, -10 | não | None | — | 0,99×2,3 |
 | Portoes_Das_Ruinas | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | 0,7×1,9 | — | 0, 1,25 | 0, -8,95 | sim | None | — | 0,99×2,3 |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Capsule | Pegada | 2,04×2,82 | — | 0, 2,56 | 0, 4,66 | não | None | — | 5,23×4,81 |
@@ -212,6 +195,23 @@ Tamanho e centro em **unidades de mundo** (já multiplicados pela escala); offse
 | Santuario_Yhtill | `Santuario_Root/Parede_Sul` | Box | Cenario | 16×0,5 | — | 0, 0 | 0, -5,5 | não | None | — | — |
 | Santuario_Yhtill | `SantuarioFloorGrid/Colisao` | TilemapCollider2D | Cenario | 0×0 | — | 0, 0 | 0, 0 | não | Merge | — | — |
 | Santuario_Yhtill | `SantuarioFloorGrid/Colisao` | Composite | Cenario | 30×15 | — | 0, 0 | 0, 0 | não | None | — | — |
+| Tumba_De_Alhazred | `DesertFloorGrid/Colisao` | TilemapCollider2D | Cenario | 0×0 | — | 0, 0 | 0,54, 0,68 | não | Merge | — | — |
+| Tumba_De_Alhazred | `DesertFloorGrid/Colisao` | Composite | Cenario | 53,5×27,25 | — | 0, 0 | 0,54, 0,68 | não | None | — | — |
+| Tumba_De_Alhazred | `Fragmento_1` | Circle | Gatilho | 1,6×1,6 | 0,8 | 0, 0 | 12, 4 | sim | None | — | 0,2×0,2 |
+| Tumba_De_Alhazred | `Fragmento_2` | Circle | Gatilho | 1,6×1,6 | 0,8 | 0, 0 | 30, -12 | sim | None | — | 0,2×0,2 |
+| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | 0,41×0,26 | — | 0, 0 | 7,32, 2,42 | não | None | — | 1,44×2,02 |
+| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | 0,41×0,26 | — | 0, 0 | 11,4, 1,57 | não | None | — | 1,42×2,04 |
+| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | 1,04×1,73 | — | 0, 1,28 | 7,32, 3,39 | sim | None | — | 1,44×2,02 |
+| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | 1,02×1,75 | — | 0, 1,28 | 11,4, 2,55 | sim | None | — | 1,42×2,04 |
+| Tumba_De_Alhazred | `Patua_Pickup` | Box | Gatilho | 1,4×1,4 | — | 0, 0,5 | 0,3, -36,63 | sim | None | — | 0,5×0,5 |
+| Tumba_De_Alhazred | `Player_Damiao` | Box | Pegada | 0,57×0,29 | — | 0, 0 | 1,59, 1,27 | não | None | — | 0,95×2,2 |
+| Tumba_De_Alhazred | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | 0,67×1,81 | — | 0, 1,25 | 1,59, 2,27 | sim | None | — | 0,95×2,2 |
+| Tumba_De_Alhazred | `Saida_TumbaAlhazred` | Box | Gatilho | 1,6×1,6 | — | 0, 0 | -3,39, -1,17 | sim | None | — | — |
+| Tumba_De_Alhazred | `Saida_TumbaAlhazred (1)` | Box | Gatilho | 1,6×1,6 | — | 0, 0 | 41,43, -17,6 | sim | None | — | — |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred` | Box | Cenario | 0,3×2,54 | — | 0,01, 0,47 | 37,05, -14,85 | não | None | — | 2,62×7,68 |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred/Hurtbox` | Box | Hurtbox | 0,56×2,52 | — | -0,02, 0,46 | 37,02, -14,88 | sim | None | — | 2,62×7,68 |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Bau_DaTumba` | Box | Gatilho | 6,24×2,01 | — | 0, 0 | 4,9, 2,75 | sim | None | — | 0,62×0,2 |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Box | Pegada | 0,61×1,52 | — | 0,19, 0,69 | 44,23, -15,47 | não | None | — | 1,13×1,77 |
 | YugNeth | `YugNeth` | Box | Cenario | 0,6×0,6 | — | 0, 0 | 0, 0 | não | None | — | — |
 
 > **Polygon, Edge e Composite** aparecem com tamanho medido por `bounds`, que a doc da 6000.4 diz ficar **vazio com o colisor desligado ou o objeto inativo** — nesses casos a linha traz `0×0`, que aqui significa *não medido*, não *vazio*.

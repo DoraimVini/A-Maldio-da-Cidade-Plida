@@ -37,16 +37,16 @@ date: 2026-09-04
 | EspectroHali | `EspectroHali` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 1 |
 | EsqueletoInvocado | `EsqueletoInvocado` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
 | Player_Damiao | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
-| Tumba_De_Alhazred | `DesertFloorGrid/Colisao` | Static | 0 | 1 | 0 | 0,05 | — | Discrete | None | StartAwake | 2 |
-| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
-| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
-| Tumba_De_Alhazred | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 1 |
 | Portoes_Das_Ruinas | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 4 |
 | Portoes_Das_Ruinas | `PortoesFloorGrid/Colisao` | Static | 0 | 1 | 0 | 0,05 | — | Discrete | None | StartAwake | 2 |
 | Santuario_Yhtill | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
 | Santuario_Yhtill | `SantuarioFloorGrid/Colisao` | Static | 0 | 1 | 0 | 0,05 | — | Discrete | None | StartAwake | 2 |
+| Tumba_De_Alhazred | `DesertFloorGrid/Colisao` | Static | 0 | 1 | 0 | 0,05 | — | Discrete | None | StartAwake | 2 |
+| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
+| Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
+| Tumba_De_Alhazred | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 1 |
 | YugNeth | `YugNeth` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 1 |
 
 ## Pareamentos suspeitos
@@ -67,12 +67,12 @@ date: 2026-09-04
 | Deserto_Hali | `Deserto_Root/Limite_Oeste` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | Deserto_Hali | `Deserto_Root/Limite_Sul` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | PedraDePoder | `PedraDePoder` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | Portoes_Das_Ruinas | `Portoes_Root/Os_Portoes` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | ReiEmAmarelo | `ReiEmAmarelo` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | Santuario_Yhtill | `Santuario_Root/Parede_Leste` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | Santuario_Yhtill | `Santuario_Root/Parede_Norte` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | Santuario_Yhtill | `Santuario_Root/Parede_Oeste` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 | Santuario_Yhtill | `Santuario_Root/Parede_Sul` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred` | Collider2D **sólido** sem Rigidbody2D — é colisor estático. Correto se nunca se move; se mover, a Unity reconstrói a árvore estática a cada passo e o atravessamento fica provável. |
 
 > **Nota da 6000.4:** as colunas de amortecimento são `linearDamping` e `angularDamping`. `drag` e `angularDrag` **não existem mais** nesta versão da Unity.

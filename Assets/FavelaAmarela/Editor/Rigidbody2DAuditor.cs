@@ -53,6 +53,16 @@ namespace FavelaAmarela.EditorTools
         private const string SaidaColisores =
             "Docs/KnowledgeBundle/systems/auditoria_colisores.md";
 
+        private const string SaidaGatilhos =
+            "Docs/KnowledgeBundle/systems/auditoria_gatilhos.md";
+
+        /// <summary>Uma linha de gatilho, mais de onde ela veio.</summary>
+        private struct GatilhoMedido
+        {
+            public string Origem;
+            public AuditoriaDeGatilhos.Linha L;
+        }
+
         /// <summary>Uma medida de colisor, mais de onde ela veio.</summary>
         private struct ColisorMedido
         {
@@ -96,21 +106,25 @@ namespace FavelaAmarela.EditorTools
             var corpos = new List<Corpo>();
             var soltos = new List<Desparelhado>();
             var colisores = new List<ColisorMedido>();
+            var gatilhos = new List<GatilhoMedido>();
 
-            VarrerPrefabs(corpos, soltos, colisores);
-            int cenas = VarrerCenasDoBuild(corpos, soltos, colisores);
+            VarrerPrefabs(corpos, soltos, colisores, gatilhos);
+            int cenas = VarrerCenasDoBuild(corpos, soltos, colisores, gatilhos);
 
             Escrever(corpos, soltos, cenas);
             EscreverColisores(colisores, cenas);
+            EscreverGatilhos(gatilhos, cenas);
 
             Resumir(corpos, soltos, cenas);
             ResumirColisores(colisores);
+            ResumirGatilhos(gatilhos);
         }
 
         // ── varreduras ───────────────────────────────────────────────────────
 
         private static void VarrerPrefabs(List<Corpo> corpos, List<Desparelhado> soltos,
-                                          List<ColisorMedido> colisores)
+                                          List<ColisorMedido> colisores,
+                                          List<GatilhoMedido> gatilhos)
         {
             foreach (var guid in AssetDatabase.FindAssets("t:Prefab"))
             {
@@ -119,12 +133,13 @@ namespace FavelaAmarela.EditorTools
                 if (raiz == null) continue;
 
                 Colher(raiz, Path.GetFileNameWithoutExtension(caminho), corpos, soltos,
-                       colisores);
+                       colisores, gatilhos);
             }
         }
 
         private static int VarrerCenasDoBuild(List<Corpo> corpos, List<Desparelhado> soltos,
-                                              List<ColisorMedido> colisores)
+                                              List<ColisorMedido> colisores,
+                                              List<GatilhoMedido> gatilhos)
         {
             int lidas = 0;
 
@@ -137,7 +152,7 @@ namespace FavelaAmarela.EditorTools
 
                 foreach (var raiz in cena.GetRootGameObjects())
                     Colher(raiz, Path.GetFileNameWithoutExtension(entrada.path), corpos,
-                           soltos, colisores);
+                           soltos, colisores, gatilhos);
 
                 EditorSceneManager.CloseScene(cena, removeScene: true);
             }
@@ -148,7 +163,8 @@ namespace FavelaAmarela.EditorTools
         /// <summary>Percorre a hierarquia inteira, inclusive objetos desativados.</summary>
         private static void Colher(GameObject raiz, string origem,
                                    List<Corpo> corpos, List<Desparelhado> soltos,
-                                   List<ColisorMedido> colisores)
+                                   List<ColisorMedido> colisores,
+                                   List<GatilhoMedido> gatilhos)
         {
             // A GEOMETRIA É MEDIDA PELA CLASSE DE RUNTIME, não por uma cópia daqui. É a mesma
             // AuditoriaDeColisores que o jogo chama com Shift+F11 -- duas contas separadas
@@ -157,6 +173,11 @@ namespace FavelaAmarela.EditorTools
             AuditoriaDeColisores.Medir(raiz, medidas);
             foreach (var m in medidas)
                 colisores.Add(new ColisorMedido { Origem = origem, M = m });
+
+            var linhas = new List<AuditoriaDeGatilhos.Linha>();
+            AuditoriaDeGatilhos.Medir(raiz, linhas);
+            foreach (var l in linhas)
+                gatilhos.Add(new GatilhoMedido { Origem = origem, L = l });
 
             foreach (var t in raiz.GetComponentsInChildren<Transform>(includeInactive: true))
             {
@@ -439,6 +460,170 @@ namespace FavelaAmarela.EditorTools
                 resumo.AppendLine($"     {c.Origem} / {c.M.Caminho} [{c.M.Funcao}] — {c.M.Queixa}");
 
             resumo.AppendLine($"  relatório em {SaidaColisores}");
+            Debug.Log(resumo.ToString());
+        }
+
+        /// <summary>
+        /// Escreve o relatório de gatilhos: para que serve cada um, e se o callback casa com o
+        /// colisor.
+        ///
+        /// <para><b>A contagem de <c>OnCollision*2D</c> sai do <c>TypeCache</c></b>, e não da
+        /// varredura de cenas: um script pode existir no projeto sem estar em cena nenhuma, e
+        /// afirmar "não existe nenhum" com base no que está montado seria afirmar sobre a
+        /// amostra em vez de sobre o projeto.</para>
+        /// </summary>
+        private static void EscreverGatilhos(List<GatilhoMedido> gatilhos, int cenas)
+        {
+            var comCollision = TiposComCallbackDeColisao();
+
+            var md = new StringBuilder();
+            md.AppendLine("---");
+            md.AppendLine("type: Game System");
+            md.AppendLine("title: Auditoria de Gatilhos e Callbacks");
+            md.AppendLine("description: Todo Collider2D marcado como trigger, para que serve, e " +
+                          "se o callback do script casa com o colisor. Gerado por " +
+                          "Tools/FavelaAmarela/Auditar Física 2D.");
+            md.AppendLine($"date: {System.DateTime.Now:yyyy-MM-dd}");
+            md.AppendLine("---");
+            md.AppendLine();
+            md.AppendLine("# Auditoria de Gatilhos e Callbacks");
+            md.AppendLine();
+            md.AppendLine("> **Gerado por ferramenta.** Rode " +
+                          "`Tools/FavelaAmarela/Auditar Física 2D` para atualizar.");
+            md.AppendLine();
+
+            md.AppendLine("## As regras, citadas da 6000.4");
+            md.AppendLine();
+            md.AppendLine("Da Script Reference offline de `MonoBehaviour.OnTriggerEnter2D`:");
+            md.AppendLine();
+            md.AppendLine("> *\"This message is sent to the trigger Collider2D and the " +
+                          "Rigidbody2D (if any) that the trigger Collider2D belongs to, and to " +
+                          "the Rigidbody2D (or the Collider2D if there is no Rigidbody2D) that " +
+                          "touches the trigger.\"*");
+            md.AppendLine(">");
+            md.AppendLine("> *\"Note: Trigger events are only sent if one of the Colliders also " +
+                          "has a Rigidbody2D attached.\"*");
+            md.AppendLine();
+            md.AppendLine("Três consequências que mudam o que conta como defeito:");
+            md.AppendLine();
+            md.AppendLine("1. **Script em objeto SÓLIDO com `OnTriggerEnter2D` é legítimo** — " +
+                          "ele recebe ao *entrar* no gatilho de outro. Acusar isso seria " +
+                          "acusar o padrão certo.");
+            md.AppendLine("2. **Zona sem `Rigidbody2D` funciona**, desde que quem entre tenha " +
+                          "um. Aqui quem entra é o Damião, que tem. Acusar zona sem corpo " +
+                          "seria falso positivo.");
+            md.AppendLine("3. **A mensagem vai para o GameObject do colisor.** Script no pai " +
+                          "com o trigger num filho **nunca recebe** — este é defeito de " +
+                          "verdade, e silencioso.");
+            md.AppendLine();
+
+            md.AppendLine("## `OnCollision*2D` no projeto");
+            md.AppendLine();
+            if (comCollision.Count == 0)
+            {
+                md.AppendLine("**Nenhum script declara `OnCollisionEnter2D`, `Stay` ou `Exit`.** " +
+                              "Medido pelo `TypeCache`, sobre todos os tipos do projeto.");
+                md.AppendLine();
+                md.AppendLine("Isso responde metade da pergunta \"scripts em objetos sólidos " +
+                              "usam callback de colisão?\": **não há nenhum**. Nada neste jogo " +
+                              "depende de evento de colisão sólida — o colisor sólido só barra " +
+                              "movimento, e a física resolve sozinha. Não é lacuna: é o modelo " +
+                              "do projeto, em que dano sai de consulta " +
+                              "(`Physics2D.OverlapCircle`) e não de sobreposição de colisor.");
+            }
+            else
+            {
+                md.AppendLine("| tipo | callbacks |");
+                md.AppendLine("|---|---|");
+                foreach (var t in comCollision.OrderBy(x => x.Key))
+                    md.AppendLine($"| `{t.Key}` | {t.Value} |");
+            }
+            md.AppendLine();
+
+            var problemas = gatilhos.Where(g => g.L.Diagnostico !=
+                                           AuditoriaDeGatilhos.Veredito.Ok).ToList();
+
+            md.AppendLine("## Fora do esperado");
+            md.AppendLine();
+            if (problemas.Count == 0)
+            {
+                md.AppendLine("Nenhum. Todo gatilho tem dono, e todo callback casa com o colisor.");
+            }
+            else
+            {
+                md.AppendLine("| origem | objeto | diagnóstico | o quê |");
+                md.AppendLine("|---|---|---|---|");
+                foreach (var g in problemas.OrderBy(x => x.Origem).ThenBy(x => x.L.Caminho))
+                    md.AppendLine($"| {g.Origem} | `{g.L.Caminho}` | **{g.L.Diagnostico}** | " +
+                                  $"{g.L.Explicacao} |");
+            }
+            md.AppendLine();
+
+            var triggers = gatilhos.Where(g => g.L.EhTrigger).ToList();
+
+            md.AppendLine($"## Os {triggers.Count} gatilhos");
+            md.AppendLine();
+            md.AppendLine("| origem | objeto | forma | propósito | corpo? | callbacks |");
+            md.AppendLine("|---|---|---|---|---|---|");
+            foreach (var g in triggers.OrderBy(x => x.L.Funcao.ToString())
+                                      .ThenBy(x => x.Origem).ThenBy(x => x.L.Caminho))
+            {
+                md.AppendLine($"| {g.Origem} | `{g.L.Caminho}` | {g.L.Tipo} | {g.L.Funcao} | " +
+                              $"{(g.L.TemCorpoNaHierarquia ? "sim" : "não")} | {g.L.Callbacks} |");
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(SaidaGatilhos));
+            File.WriteAllText(SaidaGatilhos, md.ToString());
+            AssetDatabase.Refresh();
+        }
+
+        /// <summary>Tipos do projeto que declaram algum <c>OnCollision*2D</c>.</summary>
+        private static Dictionary<string, string> TiposComCallbackDeColisao()
+        {
+            var nomes = new[] { "OnCollisionEnter2D", "OnCollisionStay2D", "OnCollisionExit2D" };
+            var achados = new Dictionary<string, string>();
+
+            foreach (var t in TypeCache.GetTypesDerivedFrom<MonoBehaviour>())
+            {
+                if (t.Assembly.FullName.StartsWith("Unity")) continue;
+
+                var deste = nomes.Where(n => t.GetMethod(n,
+                        System.Reflection.BindingFlags.Instance |
+                        System.Reflection.BindingFlags.Public |
+                        System.Reflection.BindingFlags.NonPublic |
+                        System.Reflection.BindingFlags.DeclaredOnly) != null).ToList();
+
+                if (deste.Count > 0) achados[t.Name] = string.Join(", ", deste);
+            }
+
+            return achados;
+        }
+
+        private static void ResumirGatilhos(List<GatilhoMedido> gatilhos)
+        {
+            var resumo = new StringBuilder();
+            var triggers = gatilhos.Where(g => g.L.EhTrigger).ToList();
+
+            resumo.AppendLine($"[AuditoriaDeGatilhos] {triggers.Count} gatilho(s).");
+
+            foreach (var g in triggers.GroupBy(x => x.L.Funcao)
+                                      .OrderByDescending(g => g.Count()))
+                resumo.AppendLine($"  propósito {g.Key}: {g.Count()}");
+
+            int comCollision = TiposComCallbackDeColisao().Count;
+            resumo.AppendLine($"  tipos com OnCollision*2D no projeto: {comCollision}");
+
+            var problemas = gatilhos.Where(g => g.L.Diagnostico !=
+                                           AuditoriaDeGatilhos.Veredito.Ok).ToList();
+
+            resumo.AppendLine(problemas.Count == 0
+                ? "  fora do esperado: nenhum"
+                : $"  fora do esperado: {problemas.Count}");
+
+            foreach (var g in problemas.OrderBy(x => x.Origem).ThenBy(x => x.L.Caminho))
+                resumo.AppendLine($"     [{g.L.Diagnostico}] {g.Origem} / {g.L.Caminho}");
+
+            resumo.AppendLine($"  relatório em {SaidaGatilhos}");
             Debug.Log(resumo.ToString());
         }
 

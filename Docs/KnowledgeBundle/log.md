@@ -4,6 +4,94 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Auditoria de gatilhos: 84 triggers, e zero `OnCollisionEnter2D`
+
+Pedido: listar todo `Collider2D` com `isTrigger`, identificar o propósito de cada um, apontar
+trigger que deveria ser sólido (ou o inverso), e conferir se os callbacks casam com os colisores.
+
+Suítes: EditMode **1049 (1026 passando, 0 falhando)**.
+
+### As regras vieram da doc, e mudaram o que conta como defeito
+
+De `MonoBehaviour.OnTriggerEnter2D` na Script Reference offline da 6000.4:
+
+> *"This message is sent to the trigger Collider2D … **and to the Rigidbody2D (or the Collider2D
+> if there is no Rigidbody2D) that touches the trigger**."*
+> *"**Trigger events are only sent if one of the Colliders also has a Rigidbody2D attached.**"*
+
+Três consequências:
+
+1. Script em objeto **sólido** com `OnTriggerEnter2D` é **legítimo** — ele recebe ao entrar no
+   gatilho de outro. Acusar isso seria acusar o padrão certo.
+2. Zona **sem** `Rigidbody2D` funciona, desde que quem entre tenha um. Aqui quem entra é o
+   Damião. Acusar zona sem corpo seria falso positivo.
+3. A mensagem vai para o **GameObject do colisor** — script no pai com trigger no filho nunca
+   recebe. **Esse** é defeito de verdade.
+
+### Os 84 gatilhos
+
+| propósito | quantos |
+|---|---|
+| Hurtbox | 26 |
+| Zona de ambiente (refúgio, véu, arena, portal de fase) | 21 |
+| Coletável | 14 |
+| Interação | 10 |
+| Portal de cena | 8 |
+| Volume de contato (projétil, contato de inimigo) | 3 |
+| **Desconhecido** | **2** |
+
+**"Hitbox de ataque" não aparece porque tem ZERO colisores** — e isso está certo. Neste projeto
+a hitbox é `Physics2D.OverlapCircle`, não colisor. O `Hitbox_Garras` do Byakhee existe como
+componente e **não tem `Collider2D`**.
+
+### `OnCollision*2D`: nenhum no projeto inteiro
+
+Medido por `TypeCache`, sobre todos os tipos — não sobre os instanciados nas cenas. **Zero.**
+Isso responde metade da pergunta: não há script em objeto sólido usando callback de colisão
+porque **não há callback de colisão nenhum**. Não é lacuna, é o modelo: dano sai de consulta, e
+colisor sólido só barra movimento.
+
+### O único achado: dois gatilhos órfãos no Byakhee
+
+`Portoes_Das_Ruinas / Portoes_Root/Byakhee` tem um **Circle** e um **Box** marcados como
+trigger, **sem callback e sem componente que os explique**. O prefab do Byakhee tem só dois
+colisores (cápsula sólida de pegada + caixa da hurtbox) — os dois extras foram postos **na
+instância**.
+
+**Não é cosmético.** O Byakhee está na camada **6 (`Enemy`)**, e `Enemy` está em
+`DetectorDeInteracao.CamadasPadraoDeInteragiveis`. O buffer daquele `OverlapCircle` tem **8
+slots fixos**, e o próprio componente documenta o sintoma: *"perto de um baú com dois inimigos
+por perto, o baú é o que sobra de fora — e o 'E' simplesmente não faz nada, sem uma linha no
+console"*. Cada órfão come um slot perto do chefe.
+
+Não removi: são da cena de um chefe, e quero confirmação.
+
+### Dois falsos positivos meus, achados conferindo o próprio relatório
+
+1. **Três Pontos Focais de relíquia do Castelo** saíram como `CallbackNoPaiColisorNoFilho`. O
+   pai (`Z5_TronoDeAldebaran`) **tem `BoxCollider2D` próprio**, então o callback dele dispara no
+   colisor dele e o trigger do filho é outra coisa. A regra passou a exigir que o pai **não**
+   tenha colisor.
+2. **Treze gatilhos como "Desconhecido"** — entre eles `RefugioDeLuz`, `VeuDaTempestade`,
+   `ArenaDosPortoes`, que são os mais claros do jogo. O classificador parava no nome da classe.
+   A regra nova é derivável em vez de uma lista de nomes: quem tem callback **tem** propósito, e
+   o que separa os grupos é o corpo — **com** `Rigidbody2D` se move e encosta (projétil,
+   contato); **sem**, fica parado e o jogador entra (refúgio, véu, arena). 13 → 2.
+
+### A suíte pegou uma API morta minha
+
+`LigacaoDoJogoTests.NenhumPontoDeEntradaNovoFicaSemChamador` acusou
+`AuditoriaDeGatilhos.ContarCallbacksDeColisao`: escrevi o método e depois usei `TypeCache` no
+Editor, deixando-o órfão. **Apagado**, não isentado — a versão runtime só veria os scripts
+instanciados nas cenas e afirmaria sobre a amostra achando que afirma sobre o projeto.
+
+### Arquivos
+
+- `Assets/Scripts/Diagnostico/AuditoriaDeGatilhos.cs` — **novo**.
+- `Assets/FavelaAmarela/Editor/Rigidbody2DAuditor.cs` — terceiro relatório.
+- `Docs/KnowledgeBundle/systems/auditoria_gatilhos.md` — **novo**, gerado por ferramenta.
+
+
 ## 2026-09-04 — `Tumba_De_Alhazred`, e a `cena_1` sai do projeto
 
 Pedido do Vini: renomear a cena de playtest, apagar a `cena_1`, deixar o projeto o mais limpo
