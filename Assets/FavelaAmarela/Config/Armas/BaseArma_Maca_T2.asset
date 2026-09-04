@@ -15,7 +15,9 @@ MonoBehaviour:
   NomeDaFamilia: Maça
   Alcance: 1.2
   Raio: 0.6
+  Preparo: 0.1
   JanelaAtiva: 0.1
+  Recuperacao: 0.2
   Entrega: 0
   Empunhadura: 0
   DanoMinBase: 48

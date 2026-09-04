@@ -41,11 +41,32 @@ namespace FavelaAmarela.Inventario
         [Min(0.05f)]
         public float Raio = 0.6f;
 
-        [Header("Como o golpe ocupa tempo")]
-        [Tooltip("Quanto tempo a área fica ativa. Janela curta exige mira; janela longa " +
-                 "perdoa. Zero faria o golpe existir por um quadro só e parecer que falhou.")]
+        [Header("Como o golpe ocupa tempo — as três fases")]
+        [Tooltip("PREPARO: do comando até a área ficar ativa. É o telegrafo — o tempo em que " +
+                 "o golpe já foi decidido e ainda não acerta. Zero faz o golpe sair do nada e " +
+                 "tira do oponente qualquer chance de ler.")]
+        [Min(0f)]
+        public float Preparo = 0.1f;
+
+        [Tooltip("ATIVO: quanto tempo a área fica consultando. Janela curta exige mira; janela " +
+                 "longa perdoa. Zero faria o golpe existir por um quadro só e parecer que falhou.")]
         [Min(0.02f)]
-        public float JanelaAtiva = 0.1f;
+        public float JanelaAtiva = 0.15f;
+
+        [Tooltip("RECUPERAÇÃO: depois de a área fechar, quanto tempo o ator ainda fica preso. " +
+                 "É o custo de errar — sem ele, atacar não tem risco nenhum.")]
+        [Min(0f)]
+        public float Recuperacao = 0.2f;
+
+        /// <summary>
+        /// Quanto tempo o golpe ocupa o ator, do comando até poder agir de novo.
+        ///
+        /// <para>É esta soma que tranca a <c>PlayerStateMachine</c> — não a
+        /// <c>DurationSeconds</c> da arma. As três fases só significam alguma coisa se o
+        /// bloqueio for exatamente elas: preso menos que isso, a recuperação não existe;
+        /// preso mais, sobra um tempo morto que nenhuma fase explica.</para>
+        /// </summary>
+        public float DuracaoTotalDoGolpe => Preparo + JanelaAtiva + Recuperacao;
 
         [Header("Como o golpe alcança")]
         [Tooltip("Corpo-a-corpo é o único implementado. Projétil e Fogo existem para o jogo " +
@@ -139,6 +160,12 @@ namespace FavelaAmarela.Inventario
         public const float RaioPadrao = 0.6f;
 
         /// <inheritdoc cref="AlcancePadrao"/>
-        public const float JanelaPadrao = 0.1f;
+        public const float JanelaPadrao = 0.15f;
+
+        /// <inheritdoc cref="AlcancePadrao"/>
+        public const float PreparoPadrao = 0.1f;
+
+        /// <inheritdoc cref="AlcancePadrao"/>
+        public const float RecuperacaoPadrao = 0.2f;
     }
 }

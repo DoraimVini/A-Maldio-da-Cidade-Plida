@@ -231,6 +231,77 @@ quando as duas bordas se encostam. O teste mede a meia-largura do colisor que o 
 vez de assumir, e lê alcance/raio/janela do componente **por reflexão**: uma cópia dos números
 passaria a medir a cópia depois de alguém mexer na arma.
 
+## 2026-09-03, mais tarde: três fases, e a hitbox que saía do pé
+
+Duas mudanças no golpe básico do jogador. A segunda mudou a primeira, então foram juntas.
+
+### A hitbox saía do PÉ
+
+`Hitbox.GarantirPara` fazia `SetParent(dono.transform, false)` e mais nada. O pivô de todo o
+elenco é BottomCenter (o jogo ordena profundidade por `-worldCenter.y`), então a hitbox nascia
+no chão:
+
+| | cobertura vertical |
+|---|---|
+| círculo do golpe, origem no pé (raio 0,6) | y −0,60 a **+0,60** — metade **abaixo do chão** |
+| hurtbox do alvo | y 0,14 a 1,86 |
+| **sobreposição** | **0,46 de 1,72 = 27% do corpo** — a canela |
+| com a origem no meio do corpo | 1,20 = **70%** |
+
+Os números já estavam impressos no registro do `HitboxAuditTests` do dia (`hurtbox do alvo:
+0,72 × 1,72 em (0,00, 1,00)`) e ninguém tinha lido o que implicavam. Também explicava a margem
+apertada que o teste de alcance vinha raspando.
+
+A altura é **derivada da arte** (`sprite.bounds.center.y`, a mesma fonte que
+`Hurtbox.GarantirPara` usa), e não um `+0.5f` fixo: assim a garra de um Byakhee de 4,6 unidades
+sai do corpo dele, e não da altura do peito do Damião.
+
+### As três fases
+
+`BaseDeArma` ganhou `Preparo` e `Recuperacao` ao lado da `JanelaAtiva` que já existia, e os 9
+assets receberam os valores explicitamente (campo ausente no YAML depende de sutileza de
+desserialização):
+
+| arma | preparo | ativo | recuperação | total |
+|---|---|---|---|---|
+| Lâmina Fina | 0,1 | 0,07 | 0,2 | **0,37 s** |
+| Maça | 0,1 | 0,10 | 0,2 | **0,40 s** |
+| Alfanje | 0,1 | 0,15 | 0,2 | **0,45 s** |
+
+A distinção entre as famílias sobrevive: a janela ativa continua sendo a de cada uma.
+
+**O que mudou de verdade é o PREPARO.** Até aqui a hitbox era armada no mesmo quadro do
+comando — o golpe saía do nada, sem telegrafo, e não havia instante em que ele já estava
+decidido e ainda não tinha acertado.
+
+A **recuperação não precisa de código**: é o resto do bloqueio da FSM depois de a janela
+fechar. Escrever uma espera para ela seria um segundo relógio para o mesmo tempo.
+
+> **Consequência de jogo, e ela é grande.** A FSM passa a trancar pela soma das fases, e não
+> mais por `resultado.DurationSeconds`. A mão vazia vai de **0,20 s para 0,45 s** de
+> compromisso. É o que "recuperação" significa — errar passa a custar — mas só o playteste
+> diz se o toque ficou bom.
+
+Desenhar durante os quadros ativos já funcionava: o `VisualizadorDeGolpes` registra de dentro
+de `Hitbox.Consultar`. Com o preparo, agora há um intervalo visível em que nada é desenhado e
+o golpe já foi comandado — que é exatamente o telegrafo.
+
+### Medição depois das duas mudanças
+
+```
+[HitboxAudit] célula isométrica 1 x 0,5
+  golpe do jogador : alcance 1,2  raio 0,6
+  fases            : preparo 0,1 s  ativo 0,15 s (7,5 ticks) total 0,45 s
+  cobre de 0,6 a 1,8 à frente = 1,8 larguras de célula
+  hurtbox do alvo  : 0,72 x 1,72 em (0,00, 1,00)
+  acerto máximo de centro a centro: 2,16
+  origem do golpe  : y 1  (0 seria o pé)
+```
+
+Guardas novas: `OPreparo_AdiaOAcerto_ENaoOImpede` (os dois lados num teste só — um passaria
+com a hitbox quebrada, o outro com o preparo ignorado) e `AHitbox_SaiDoCorpoENaoDoPe`, que
+falha se a sobreposição vertical cair abaixo de 50% do corpo.
+
 ## Próximo passo recomendado
 
 Migrar `EnemyCombat` (Cultista) e `EsqueletoInvocado` para `Hitbox` com janela e direção. É a

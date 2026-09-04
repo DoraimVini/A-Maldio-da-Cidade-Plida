@@ -10,7 +10,7 @@ description: Histórico cronológico de mudanças na base de conhecimento
 
 Duas tarefas pedidas antes de o Vini dormir: **começar pelos altares** e **trocar o Abdul**.
 
-Suítes: EditMode 1030 → **1038** (1015 passando, 23 aposentados); PlayMode 23 → **33/33**.
+Suítes: EditMode 1030 → **1038** (1015 passando, 23 aposentados); PlayMode 23 → **35/35**.
 
 ### 1. Os altares estavam mudos, não quebrados
 
@@ -429,6 +429,64 @@ parecido com um inimigo real.
 
 > **E o `exit code 0` mentiu de novo.** Rodei as duas suítes num comando só; o PlayMode passou,
 > o EditMode falhou, e o código de saída veio do último. Só reler a saída pegou.
+
+
+### 11. O golpe ganha três fases — e a hitbox sai do pé
+
+Dois pedidos do Vini, e o segundo mudou o primeiro, então foram juntos.
+
+#### A hitbox saía do PÉ, e cruzava 27% do alvo
+
+O Vini apontou: *"se o pivô é bottom-center mas o OverlapCircle usa transform.position, a
+hitbox fica nos pés, não no torso"*. Medido, e é pior do que soa:
+
+| | cobertura vertical |
+|---|---|
+| círculo do golpe, origem no pé (raio 0,6) | y −0,60 a **+0,60** — metade **abaixo do chão** |
+| hurtbox do alvo | y 0,14 a 1,86 |
+| **sobreposição** | **0,46 de 1,72 = 27% do corpo** — a canela |
+| com origem no meio do corpo | 1,20 = **70%** |
+
+`Hitbox.GarantirPara` fazia `SetParent(dono.transform, false)` e mais nada.
+
+**Os números já estavam impressos no registro do `HitboxAuditTests` do mesmo dia** — `hurtbox do
+alvo: 0,72 × 1,72 em (0,00, 1,00)` — e eu não tinha lido o que implicavam. Também explicava a
+margem que o teste de alcance vinha raspando (0,5675 contra 0,6).
+
+A altura é **derivada da arte** (`sprite.bounds.center.y`, a mesma fonte que
+`Hurtbox.GarantirPara` usa) e não um `+0.5f` fixo: assim a garra de um Byakhee de 4,6 unidades
+sai do corpo dele, e não da altura do peito do Damião.
+
+#### As três fases
+
+`BaseDeArma` ganhou `Preparo` e `Recuperacao` ao lado da `JanelaAtiva`, e os 9 assets receberam
+os valores explicitamente — campo ausente no YAML depende de sutileza de desserialização.
+
+| arma | preparo | ativo | recuperação | total |
+|---|---|---|---|---|
+| Lâmina Fina | 0,1 | 0,07 | 0,2 | **0,37 s** |
+| Maça | 0,1 | 0,10 | 0,2 | **0,40 s** |
+| Alfanje | 0,1 | 0,15 | 0,2 | **0,45 s** |
+
+Pôr as fases na **arma** e não no ator preserva a distinção que o projeto construiu em 27/08: a
+janela ativa continua sendo a de cada família. Fases fixas no ator apagariam isso.
+
+**O que muda de verdade é o PREPARO.** Até aqui a hitbox era armada no mesmo quadro do comando —
+o golpe saía do nada, sem telegrafo. A **recuperação não precisa de código**: é o resto do
+bloqueio da FSM depois de a janela fechar; escrever uma espera para ela seria um segundo relógio
+para o mesmo tempo.
+
+> **Consequência de jogo, e é grande.** A FSM passa a trancar pela soma das fases, não mais por
+> `resultado.DurationSeconds`. A mão vazia vai de **0,20 s para 0,45 s** de compromisso. É o que
+> "recuperação" significa — errar passa a custar — mas só o playteste diz se ficou bom.
+
+Desenhar durante os quadros ativos já funcionava (o `VisualizadorDeGolpes` registra de dentro de
+`Hitbox.Consultar`). Com o preparo, agora existe um intervalo visível em que nada é desenhado e o
+golpe já foi comandado — que é o telegrafo.
+
+Guardas novas: `OPreparo_AdiaOAcerto_ENaoOImpede` (os dois lados num teste só: um passaria com a
+hitbox quebrada, o outro com o preparo ignorado) e `AHitbox_SaiDoCorpoENaoDoPe`, que falha se a
+sobreposição cair abaixo de 50% do corpo. PlayMode 33 → **35**.
 
 
 ### Testes

@@ -86,6 +86,40 @@ namespace FavelaAmarela.Runtime.Combat
         }
 
         /// <summary>
+        /// Altura do <b>meio do corpo</b> do dono, em unidades locais.
+        ///
+        /// <para><b>O defeito que isto conserta (2026-09-03).</b> A hitbox nascia com
+        /// <c>SetParent(dono.transform, false)</c> e mais nada — ou seja, no <b>pé</b>, porque
+        /// o pivô de todo o elenco é BottomCenter (o jogo ordena profundidade por
+        /// <c>-worldCenter.y</c>). Com raio 0,6, o círculo do golpe cobria de y −0,60 a +0,60:
+        /// <b>metade dele debaixo do chão</b>.</para>
+        ///
+        /// <para>E as hurtboxes ficam no <b>corpo</b>, não no pé: a do alvo padrão vai de
+        /// y 0,14 a 1,86. Medido, a sobreposição vertical era de <b>0,46 de 1,72 — 27% do
+        /// corpo</b>, só a canela. Daqui sai a queixa de "meu golpe passa por baixo" e a
+        /// sensação de acerto que não vem. Com a origem no meio do corpo a sobreposição vai
+        /// para 70%.</para>
+        ///
+        /// <para><b>Derivada da arte, e não um 0,5 fixo</b>, pela mesma fonte que
+        /// <c>Hurtbox.GarantirPara</c> usa (<c>sprite.bounds.center</c>): assim a garra de um
+        /// Byakhee de 4,6 unidades sai do corpo dele, e não da altura do peito do Damião.</para>
+        /// </summary>
+        private static float AlturaDoTorso(GameObject dono)
+        {
+            var sr = dono.GetComponentInChildren<SpriteRenderer>(true);
+
+            if (sr == null || sr.sprite == null)
+            {
+                Debug.LogWarning($"[Hitbox] '{dono.name}' não tem sprite — o golpe sai do PÉ, " +
+                                 "e a hurtbox de quem ele tenta acertar está no corpo. Metade " +
+                                 "do círculo fica debaixo do chão.", dono);
+                return 0f;
+            }
+
+            return sr.sprite.bounds.center.y;
+        }
+
+        /// <summary>
         /// Define a geometria do golpe a partir de dado — o alcance, o raio e a camada que
         /// esta hitbox pode acertar.
         ///
@@ -127,17 +161,21 @@ namespace FavelaAmarela.Runtime.Combat
         {
             if (dono == null) return null;
 
+            float altura = AlturaDoTorso(dono);
+
             foreach (var existente in dono.GetComponentsInChildren<Hitbox>(true))
             {
                 if (existente.gameObject.name != nome) continue;
                 existente.pouparAliados = pouparAliados;
                 existente.Configurar(raioDoGolpe, distanciaAFrente, camadas);
+                existente.transform.localPosition = new Vector3(0f, altura, 0f);
                 return existente;
             }
 
             var go = new GameObject(nome);
             go.SetActive(false);
             go.transform.SetParent(dono.transform, false);
+            go.transform.localPosition = new Vector3(0f, altura, 0f);
 
             var hitbox = go.AddComponent<Hitbox>();
             hitbox.pouparAliados = pouparAliados;

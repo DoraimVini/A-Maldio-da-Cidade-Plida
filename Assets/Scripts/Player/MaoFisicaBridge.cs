@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
@@ -214,9 +215,27 @@ namespace FavelaAmarela.Player
         private float RaioAtual =>
             _baseDaArma != null ? _baseDaArma.Raio : BaseDeArma.RaioPadrao;
 
-        /// <summary>Quanto tempo a área fica ativa.</summary>
+        /// <summary>Quanto tempo a área fica ativa (fase ATIVA).</summary>
         private float JanelaAtual =>
             _baseDaArma != null ? _baseDaArma.JanelaAtiva : BaseDeArma.JanelaPadrao;
+
+        /// <summary>Do comando até a área abrir (fase de PREPARO) — o telegrafo do golpe.</summary>
+        private float PreparoAtual =>
+            _baseDaArma != null ? _baseDaArma.Preparo : BaseDeArma.PreparoPadrao;
+
+        /// <summary>Depois de a área fechar, quanto tempo o ator ainda fica preso.</summary>
+        private float RecuperacaoAtual =>
+            _baseDaArma != null ? _baseDaArma.Recuperacao : BaseDeArma.RecuperacaoPadrao;
+
+        /// <summary>Preparo + ativo + recuperação. É o que tranca a FSM.</summary>
+        private float DuracaoTotalDoGolpe => PreparoAtual + JanelaAtual + RecuperacaoAtual;
+
+        /// <summary>
+        /// O golpe em andamento. Guardado para poder ser cortado: sem isto, dois comandos
+        /// muito próximos deixariam duas corrotinas vivas, e a segunda armaria a hitbox depois
+        /// de o ator já ter saído do golpe.
+        /// </summary>
+        private Coroutine _golpeEmCurso;
 
         /// <summary>
         /// Cria (ou reconfigura) a hitbox com a geometria da arma atual. Chamada de novo a cada
@@ -401,11 +420,25 @@ namespace FavelaAmarela.Player
                 // senão desarmado passaria a matar.
                 : _maoVazia.Execute();
 
-            if (!_fsm.TryEntrarAcao(PlayerState.Atacando, resultado.DurationSeconds)) return;
+            // A FSM TRANCA PELA SOMA DAS FASES, e não mais por resultado.DurationSeconds.
+            //
+            // As três fases só significam alguma coisa se o bloqueio for exatamente elas:
+            // preso menos que isso, a recuperação não existe e errar não custa nada; preso
+            // mais, sobra um tempo morto que nenhuma fase explica.
+            //
+            // CONSEQUÊNCIA DE JOGO, e ela é grande: a mão vazia ia de 0,20 s de compromisso
+            // para 0,45 s. O golpe passa a ser uma decisão, não um reflexo -- que é o ponto de
+            // ter recuperação. A cadência da arma (IArma.CanActivate) continua valendo por
+            // cima, e segue sendo o que impede o segundo golpe cedo demais.
+            float total = DuracaoTotalDoGolpe;
+            if (!_fsm.TryEntrarAcao(PlayerState.Atacando, total)) return;
 
             _lastUseTime = Time.time;
-            ResolverGolpe(direcao, resultado);
-            OnAtaqueExecutado?.Invoke(direcao, resultado.DurationSeconds);
+
+            if (_golpeEmCurso != null) StopCoroutine(_golpeEmCurso);
+            _golpeEmCurso = StartCoroutine(GolpearEmTresFases(direcao, resultado));
+
+            OnAtaqueExecutado?.Invoke(direcao, total);
         }
 
         /// <summary>Habilidade da arma equipada (botão separado, cooldown próprio), na direção dada.</summary>
@@ -484,6 +517,43 @@ namespace FavelaAmarela.Player
         /// aos aliados, a repulsão e o hit-stop passaram todos a viver na <c>Hitbox</c> — um
         /// lugar só, em vez de dois que divergem.</para>
         /// </summary>
+        /// <summary>
+        /// Preparo → ativo → recuperação.
+        ///
+        /// <para><b>O que muda de verdade</b> é o <b>preparo</b>: até aqui a hitbox era armada
+        /// no mesmo quadro do comando, então o golpe não tinha telegrafo nenhum — saía do nada.
+        /// Agora existe um intervalo em que o golpe já foi decidido e ainda não acerta, que é
+        /// o que dá ao oponente o que ler e ao jogador o que se comprometer.</para>
+        ///
+        /// <para>A fase ATIVA é a janela da <see cref="Combat.Hitbox"/>, que já consultava a
+        /// cada <c>FixedUpdate</c> enquanto aberta — essa parte não mudou, e é ela que faz o
+        /// golpe pegar quem atravessa a área durante o golpe.</para>
+        ///
+        /// <para>A RECUPERAÇÃO não precisa de código: é o resto do bloqueio da FSM depois de a
+        /// janela fechar. Escrever uma espera para ela seria inventar um segundo relógio para
+        /// o mesmo tempo.</para>
+        ///
+        /// <para><b>O teste do meio não é zelo.</b> Entre o comando e a abertura da janela o
+        /// ator pode ter morrido, sido congelado ou empurrado para outro estado. Sem conferir,
+        /// a hitbox abriria de um golpe que o jogo já cancelou.</para>
+        /// </summary>
+        private IEnumerator GolpearEmTresFases(Vector2 direcao, ArmaResult resultado)
+        {
+            float preparo = PreparoAtual;
+            if (preparo > 0f) yield return new WaitForSeconds(preparo);
+
+            // O golpe ainda é meu? Se a FSM saiu de Atacando no meio do preparo, foi
+            // interrompida — e um golpe interrompido não acerta.
+            if (_fsm == null || _fsm.CurrentState != PlayerState.Atacando)
+            {
+                _golpeEmCurso = null;
+                yield break;
+            }
+
+            ResolverGolpe(direcao, resultado);
+            _golpeEmCurso = null;
+        }
+
         private void ResolverGolpe(Vector2 direcao, ArmaResult resultado)
         {
             if (_hitbox == null) GarantirHitbox();
@@ -504,7 +574,9 @@ namespace FavelaAmarela.Player
                 Debug.Log($"[Golpe] arma={arma} familia={familia} dano={resultado.Dano:0.##} " +
                           $"trauma={resultado.TraumaAnomalia:0.##} " +
                           $"alcance={AlcanceAtual:0.##} raio={RaioAtual:0.##} " +
-                          $"janela={JanelaAtual:0.###}s", this);
+                          $"preparo={PreparoAtual:0.###}s ativo={JanelaAtual:0.###}s " +
+                          $"recuperacao={RecuperacaoAtual:0.###}s " +
+                          $"total={DuracaoTotalDoGolpe:0.###}s", this);
             }
         }
 

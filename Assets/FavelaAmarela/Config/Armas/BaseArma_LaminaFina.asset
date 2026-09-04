@@ -15,7 +15,9 @@ MonoBehaviour:
   NomeDaFamilia: "L\xE2mina fina"
   Alcance: 0.95
   Raio: 0.42
+  Preparo: 0.1
   JanelaAtiva: 0.07
+  Recuperacao: 0.2
   Empunhadura: 0
   DanoMinBase: 24
   DanoMaxBase: 35

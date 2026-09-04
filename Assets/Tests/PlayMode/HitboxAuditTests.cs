@@ -57,7 +57,7 @@ namespace FavelaAmarela.Tests.PlayMode
         private float _danoNoJogador;
 
         /// <summary>Geometria do golpe de mão vazia, lida do próprio código (não copiada).</summary>
-        private float _alcance, _raio, _janela;
+        private float _alcance, _raio, _janela, _preparo;
 
         /// <summary>Meia-largura da hurtbox do inimigo, medida do colisor que o jogo criou.</summary>
         private float _meiaLarguraDoInimigo;
@@ -180,6 +180,7 @@ namespace FavelaAmarela.Tests.PlayMode
             _alcance = LerPropriedadePrivada("AlcanceAtual");
             _raio = LerPropriedadePrivada("RaioAtual");
             _janela = LerPropriedadePrivada("JanelaAtual");
+            _preparo = LerPropriedadePrivada("PreparoAtual");
 
             Assert.Greater(_alcance, 0f, "AlcanceAtual veio zero — o golpe não sairia do corpo.");
             Assert.Greater(_raio, 0f, "RaioAtual veio zero.");
@@ -234,9 +235,9 @@ namespace FavelaAmarela.Tests.PlayMode
 
             _mao.TryAtacar(direcao.normalized);
 
-            // A hitbox consulta em FixedUpdate enquanto a janela está aberta. Espero a janela
-            // inteira mais uma folga, para não medir metade dela.
-            float ate = Time.time + _janela + 0.05f;
+            // Preparo + janela + folga. Esperar só a janela mediria o golpe ANTES de ele
+            // existir: desde 2026-09-03 a hitbox só abre depois da fase de preparo.
+            float ate = Time.time + _preparo + _janela + 0.05f;
             while (Time.time < ate) yield return new WaitForFixedUpdate();
         }
 
@@ -326,7 +327,7 @@ namespace FavelaAmarela.Tests.PlayMode
 
             _mao.TryAtacar(Vector2.right);                                   // golpe à frente
 
-            float ate = Time.time + _janela + 0.05f;
+            float ate = Time.time + _preparo + _janela + 0.05f;
             while (Time.time < ate) yield return new WaitForFixedUpdate();
 
             Assert.AreEqual(0, _acertosNoInimigo,
@@ -483,7 +484,96 @@ namespace FavelaAmarela.Tests.PlayMode
                 "EsquivaBridge existe para impedir (invulnerabilidade permanente).");
         }
 
-        // ── 6. o registro para revisão manual ────────────────────────────────
+        // ── 6. as três fases ─────────────────────────────────────────────────
+
+        /// <summary>
+        /// Durante o PREPARO o golpe ainda não acerta — e depois dele, acerta.
+        ///
+        /// <para>É a fase que passou a existir em 2026-09-03. Até aqui a hitbox era armada no
+        /// mesmo quadro do comando: o golpe saía do nada, sem telegrafo, e não havia instante
+        /// em que ele já estava decidido e ainda não tinha acertado.</para>
+        ///
+        /// <para>Os dois lados são um teste só de propósito. Só o primeiro passaria com a
+        /// hitbox <b>quebrada</b> (nunca arma); só o segundo passaria com o preparo
+        /// <b>ignorado</b>. Juntos, prendem a fase entre duas paredes.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator OPreparo_AdiaOAcerto_ENaoOImpede()
+        {
+            yield return Montar();
+
+            Assert.Greater(_preparo, 0f,
+                "O preparo veio zero — a fase não existe e este teste não mede nada.");
+
+            ZerarAcertos();
+            _inimigo.transform.position = new Vector3(_alcance, 0f, 0f);
+            Physics2D.SyncTransforms();
+
+            _mao.TryAtacar(Vector2.right);
+
+            // Metade do preparo: o golpe foi comandado e a área ainda não abriu.
+            float meio = Time.time + _preparo * 0.5f;
+            while (Time.time < meio) yield return new WaitForFixedUpdate();
+
+            Assert.AreEqual(0, _acertosNoInimigo,
+                $"O golpe acertou {_preparo * 0.5f:0.###} s depois do comando, dentro do " +
+                $"preparo de {_preparo:0.###} s. A hitbox está abrindo cedo demais — sem " +
+                "preparo o golpe não tem telegrafo nenhum.");
+
+            // Agora atravessa a janela inteira.
+            float fim = Time.time + _preparo + _janela + 0.05f;
+            while (Time.time < fim) yield return new WaitForFixedUpdate();
+
+            Assert.Greater(_acertosNoInimigo, 0,
+                "Passado o preparo e a janela inteira, o golpe nunca acertou. O preparo deixou " +
+                "de adiar e passou a IMPEDIR — provavelmente a corrotina foi cortada, ou a FSM " +
+                "saiu de Atacando antes de a janela abrir.");
+        }
+
+        /// <summary>
+        /// A hitbox sai do <b>corpo</b>, não do pé.
+        ///
+        /// <para>O pivô de todo o elenco é BottomCenter, então uma hitbox em
+        /// <c>localPosition</c> zero fica no chão. Medido em 2026-09-03: com raio 0,6 o círculo
+        /// ia de y −0,60 a +0,60, <b>metade debaixo do chão</b>, e cruzava só 27% da hurtbox do
+        /// alvo (0,46 de 1,72) — a canela. É de onde vem "meu golpe passa por baixo".</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AHitbox_SaiDoCorpoENaoDoPe()
+        {
+            yield return Montar();
+
+            var hitbox = _jogador.GetComponentInChildren<FavelaAmarela.Runtime.Combat.Hitbox>(true);
+            Assert.IsNotNull(hitbox,
+                "O Damião do rig está sem Hitbox — MaoFisicaBridge.GarantirHitbox não rodou.");
+
+            float altura = hitbox.transform.localPosition.y;
+
+            Assert.Greater(altura, 0f,
+                $"A hitbox está em y {altura:0.###} — no PÉ. Com o pivô em BottomCenter isso " +
+                "põe metade do círculo debaixo do chão, e as hurtboxes ficam no corpo.");
+
+            // E ela tem de cruzar a maior parte do corpo do alvo, não a canela.
+            var hurtbox = _inimigo
+                .GetComponentInChildren<FavelaAmarela.Runtime.Combat.Hurtbox>(true)
+                .GetComponent<Collider2D>();
+
+            float alvoBaixo = hurtbox.bounds.center.y - hurtbox.bounds.extents.y;
+            float alvoAlto = hurtbox.bounds.center.y + hurtbox.bounds.extents.y;
+            float golpeBaixo = altura - _raio;
+            float golpeAlto = altura + _raio;
+
+            float sobreposicao = Mathf.Max(0f, Mathf.Min(golpeAlto, alvoAlto)
+                                             - Mathf.Max(golpeBaixo, alvoBaixo));
+            float fracao = sobreposicao / (alvoAlto - alvoBaixo);
+
+            Assert.Greater(fracao, 0.5f,
+                $"O golpe cruza só {fracao * 100:0}% do corpo do alvo (de y " +
+                $"{golpeBaixo:0.##} a {golpeAlto:0.##}, contra {alvoBaixo:0.##} a " +
+                $"{alvoAlto:0.##}). Antes do conserto de 2026-09-03 eram 27% — a canela.");
+        }
+
+        // ── 7. o registro para revisão manual ────────────────────────────────
 
         /// <summary>
         /// Não afirma nada sobre balanceamento — <b>relata</b>. A geometria de arma é decisão de
@@ -510,8 +600,11 @@ namespace FavelaAmarela.Tests.PlayMode
             Debug.Log(
                 "[HitboxAudit] medido em jogo, célula isométrica 1 × " + celula.ToString("0.##") +
                 System.Environment.NewLine +
-                $"  golpe do jogador : alcance {_alcance:0.###}  raio {_raio:0.###}  " +
-                $"janela {_janela:0.###} s ({_janela / Time.fixedDeltaTime:0.#} ticks de física)" +
+                $"  golpe do jogador : alcance {_alcance:0.###}  raio {_raio:0.###}" +
+                System.Environment.NewLine +
+                $"  fases            : preparo {_preparo:0.###} s  ativo {_janela:0.###} s " +
+                $"({_janela / Time.fixedDeltaTime:0.#} ticks) " +
+                $"total {_preparo + _janela + LerPropriedadePrivada("RecuperacaoAtual"):0.###} s" +
                 System.Environment.NewLine +
                 $"  cobre de {_alcance - _raio:0.###} a {_alcance + _raio:0.###} à frente " +
                 $"= {(_alcance + _raio) / 1f:0.##} larguras de célula" +
@@ -522,7 +615,10 @@ namespace FavelaAmarela.Tests.PlayMode
                 $"  hurtbox do Damião: {hurtboxJogador.bounds.size.x:0.###} × " +
                 $"{hurtboxJogador.bounds.size.y:0.###} em {hurtboxJogador.bounds.center}" +
                 System.Environment.NewLine +
-                $"  acerto máximo de centro a centro: {limite:0.###}");
+                $"  acerto máximo de centro a centro: {limite:0.###}" +
+                System.Environment.NewLine +
+                $"  origem do golpe  : y {_jogador.GetComponentInChildren<FavelaAmarela.Runtime.Combat.Hitbox>(true).transform.localPosition.y:0.###} " +
+                "(0 seria o pé, com metade do círculo debaixo do chão)");
 
             Assert.Greater(_janela, Time.fixedDeltaTime * 2f,
                 $"A janela do golpe é {_janela:0.###} s e o Fixed Timestep é " +

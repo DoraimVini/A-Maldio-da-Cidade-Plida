@@ -15,7 +15,9 @@ MonoBehaviour:
   NomeDaFamilia: Alfanje
   Alcance: 1.6
   Raio: 0.85
+  Preparo: 0.1
   JanelaAtiva: 0.15
+  Recuperacao: 0.2
   Entrega: 0
   Empunhadura: 0
   DanoMinBase: 84
