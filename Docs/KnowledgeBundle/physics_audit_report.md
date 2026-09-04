@@ -146,27 +146,44 @@ A do Abdul era a mais grave e não estava na lista original: o chefe da Tumba ti
 existe** (`if (existente != null) return existente;`), então todo valor errado gravado numa cena
 sobrevive para sempre — foi por isso que o conserto teve de ser por ferramenta.
 
-### Encontrado e NÃO corrigido: a escala
+### Corrigido: a escala, pela altura
 
-Sobram **29 achados, e todos são a mesma coisa**: nenhum ator instanciado em cena tem escala
-uniforme.
+Decisão do Vini: **a altura vence**. É o eixo que ele ajustou à mão (o Abdul foi de 0,97 para
+2,06 unidades em 2026-09-03), e altura é o que lê como "o tamanho deste personagem". Igualar
+pela largura desfaria esse ajuste.
 
-| ator | escala da instância | esticado em Y |
-|---|---|---|
-| Abdul (`Tumba_De_Alhazred`) | 1,162 × 2,671 | **2,30×** |
-| Cultista (10 no `Deserto_Hali`) | 0,630 × 0,804 | 1,28× |
-| Cassilda (`Santuario_Yhtill`) | 1,478 × 1,925 | 1,30× |
-| YugNeth | 0,901 × 1,133 | 1,26× |
-| Byakhee (`Portoes`) | 1,021 × 0,938 | 0,92× (achatado) |
+`UniformizarEscalaDosAtores` uniformizou **14 atores**; só a largura mudou.
 
-**Por que este é o único que não corrigi sozinho:** uniformizar exige escolher qual eixo vence,
-e a escolha muda o tamanho visual de cada personagem. Igualar pela altura alarga o Abdul em
-2,3×; igualar pela largura o deixa com menos da metade da altura. É decisão de olho, não de
-regra — e o Vini ajustou a altura do Abdul à mão em 2026-09-03.
+| ator | de | para | largura |
+|---|---|---|---|
+| Cultista × 10 (`Deserto_Hali`) | 0,630 × 0,804 | 0,804 × 0,804 | +28% |
+| Cultista × 2 (`Tumba_De_Alhazred`) | ~0,588 × ~0,755 | ~0,755 × ~0,755 | +27% a +30% |
+| YugNeth | 0,901 × 1,133 | 1,133 × 1,133 | +26% |
+| Byakhee | 1,021 × 0,938 | 0,938 × 0,938 | −8% |
 
-Isso derrubou uma afirmação escrita em dois arquivos do projeto ("todo o elenco está em escala
-uniforme"): a medição antiga olhou a **raiz dos prefabs**, e é na **instância** que a escala é
-sobrescrita.
+**Achados: 29 → 4.**
+
+### E o achado que só apareceu jogando
+
+O Vini viu o resultado e relatou: *"a Byakhee está muito menor do que estava, ela tem que ser
+maior que o Damião"*. Medido, ele estava certo — e o problema era **mais antigo** que o ajuste
+de escala:
+
+| | corpo desenhado | escala | no mundo |
+|---|---|---|---|
+| Damião | 2,53 un | 0,8375 | **2,12 un** |
+| Byakhee (antes) | 2,50 un | 0,938 | **2,35 un** |
+
+A Aparição da Fase 1 era **11% maior** que o protagonista. Isso lê como "do mesmo tamanho", não
+como chefe; o estreitamento de 8% só tornou visível uma coisa que já estava errada.
+
+`EscalaRelativaAoDamiao` passou a ajustar por **altura-alvo relativa** em vez de escala
+absoluta — escala absoluta não diz nada, o que o jogador enxerga é a razão entre os dois corpos.
+A Byakhee foi para **1,8× o Damião** (escala 0,938 → 1,526; corpo 2,35 → 3,82 unidades).
+
+> **A conta usa o corpo DESENHADO, não a célula do sprite.** Os quadros do Byakhee têm 164 px
+> (5,12 unidades a PPU 32) e o bicho ocupa 2,50 delas — o resto é margem transparente. Escalar
+> pela célula daria um chefe com menos da metade do tamanho pedido.
 
 ### 3.3 Materiais físicos: não existe nenhum
 
@@ -306,7 +323,8 @@ A lista encolheu de dez para quatro. O que saiu está nas §3 e §5.
 
 | # | achado | por que não foi corrigido |
 |---|---|---|
-| 1 | **Nenhum ator instanciado em cena tem escala uniforme** (Abdul esticado 2,30× em Y) | **Precisa de decisão de olho.** Uniformizar exige escolher qual eixo vence: pela altura, o Abdul alarga 2,3×; pela largura, perde mais da metade da altura. É a única pendência que depende de um número que só o Vini pode dar |
+| 1 | **Abdul e Cassilda continuam com escala não uniforme** (2,30× e 1,30× em Y) | São `PrefabInstance` **sem `Rigidbody2D` no próprio transform**, e a ferramenta classifica ator por "corpo não-estático + sprite". Os outros 14 foram uniformizados. Estes dois pedem ou um filtro mais largo — que arriscaria esmagar cenário desenhado de propósito — ou o ajuste à mão no Inspector |
+| 1b | **Pegada do Byakhee 0,67:1 e a 2,4 do pé** | Ela é `CapsuleCollider2D`, e o recalibrador só achata `BoxCollider2D`. E o Byakhee **voa**: a linha do pé não se aplica a quem paira |
 | 2 | **`EsqueletoInvocado` ainda acerta instantâneo** | Ele não usa `EnemyCombat` — tem golpe próprio. A migração é a mesma receita já aplicada ao Cultista e ao Cortesão, mas mexe num inimigo que só aparece na luta do Abdul, e vale medir a luta antes |
 | 3 | **`CortesaoPalido` é `MonoBehaviour` sem FSM separada** | Saiu de `Core/` para `Runtime/Enemies/` porque `Core` tem `references: []` e não enxerga `Hitbox`/`EnemyBase` — sem isso o ator **não tinha como** ganhar combate. Isso põe o arquivo onde ele deve morar, mas **não paga** a dívida POCO: separar `CortesaoPalidoFSM` continua devendo |
 | 4 | **O `Deserto_Hali` tem 10 Cultistas**, quatro com o nome literalmente idêntico | Conteúdo de cena, não física. Registrado porque o relatório parecia ter linhas duplicadas e não tinha — e porque dez inimigos onde a nomenclatura sugere quatro é fato de balanceamento |
