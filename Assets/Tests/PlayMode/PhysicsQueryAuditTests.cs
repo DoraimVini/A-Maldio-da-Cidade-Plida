@@ -512,6 +512,19 @@ namespace FavelaAmarela.Tests.PlayMode
                           typeof(CircleCollider2D));
             go.transform.position = posicao;
 
+            // NA CAMADA DE INIMIGO, como no jogo. Resolvida por nome porque a ordem do
+            // TagManager não é contrato.
+            //
+            // Até 2026-09-04 o rig deixava o inimigo na camada 0 e o teste passava assim mesmo
+            // -- porque a máscara das relíquias era `~0`, TODAS as camadas. Ao apertar a
+            // máscara para Enemy, este teste caiu, e caiu com razão: ele estava verde por
+            // acidente, medindo uma consulta que não filtrava nada.
+            int camadaDeInimigo = LayerMask.NameToLayer("Enemy");
+            Assert.GreaterOrEqual(camadaDeInimigo, 0,
+                "A camada 'Enemy' não existe no TagManager. As habilidades de relíquia " +
+                "consultam por ela; sem ela, elas não acham inimigo nenhum em jogo.");
+            go.layer = camadaDeInimigo;
+
             var rb = go.GetComponent<Rigidbody2D>();
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.gravityScale = 0f;

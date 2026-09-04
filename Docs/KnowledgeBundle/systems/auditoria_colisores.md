@@ -33,28 +33,26 @@ Comparar **por papel** também não bastou enquanto o papel era grosseiro: a pri
 
 | origem | objeto | tipo | papel | queixa |
 |---|---|---|---|---|
-| Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Cortesao_Palido_0` | Box | Pegada | proporção 1:1 — chão isométrico é 2:1 (±0,5) |
-| Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Cortesao_Palido_1` | Box | Pegada | proporção 1:1 — chão isométrico é 2:1 (±0,5) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)` | Box | Pegada | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y) |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Capsule | Pegada | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y); proporção 0,73:1 — chão isométrico é 2:1 (±0,5); a +2,4 do pé — pegada é área de chão |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee/Hurtbox` | Box | Hurtbox | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y) |
 | Santuario_Yhtill | `Cassilda` | Circle | Gatilho | escala não uniforme 1,478 × 1,925 (esticado 1,3× em Y) |
@@ -62,8 +60,8 @@ Comparar **por papel** também não bastou enquanto o papel era grosseiro: a pri
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | escala não uniforme 0,583 × 0,758 (esticado 1,3× em Y) |
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | escala não uniforme 0,592 × 0,751 (esticado 1,27× em Y) |
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista/Hurtbox` | Box | Hurtbox | escala não uniforme 0,583 × 0,758 (esticado 1,3× em Y) |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred/Hurtbox` | Box | Hurtbox | escala não uniforme 1,162 × 2,671 (esticado 2,3× em Y); largura -70% do esperado (0,56 contra 1,89); altura -62% do esperado (2,52 contra 6,6); centro a 2,61 do centro desenhado (limiar 0,2) |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Box | Pegada | escala não uniforme 0,901 × 1,133 (esticado 1,26× em Y); proporção 0,41:1 — chão isométrico é 2:1 (±0,5); a +0,78 do pé — pegada é área de chão |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred/Hurtbox` | Box | Hurtbox | escala não uniforme 1,162 × 2,671 (esticado 2,3× em Y) |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Box | Pegada | escala não uniforme 0,901 × 1,133 (esticado 1,26× em Y); a +0,78 do pé — pegada é área de chão |
 
 ## Todos os colisores
 
@@ -81,8 +79,8 @@ Tamanho e centro em **unidades de mundo** (já multiplicados pela escala); offse
 | Castelo_Carcosa | `Castelo_Root/Z1_PortoesInternos` | Box | Gatilho | 20×10 | — | 0, 0 | 0, -30 | sim | None | — | 0,4 | 0 | — |
 | Castelo_Carcosa | `Castelo_Root/Z1_PortoesInternos/Refugio_DosPortoes` | Circle | Gatilho | 4×4 | 2 | 0, 0 | -5, -30 | sim | None | — | 0,4 | 0 | 0,16×0,16 |
 | Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete` | Box | Gatilho | 30×15 | — | 0, 0 | 0, 0 | sim | None | — | 0,4 | 0 | — |
-| Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Cortesao_Palido_0` | Box | Pegada | 0,6×0,6 | — | 0, 0 | -9, 0 | não | None | — | 0,4 | 0 | 0,91×1,72 |
-| Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Cortesao_Palido_1` | Box | Pegada | 0,6×0,6 | — | 0, 0 | 0, 6 | não | None | — | 0,4 | 0 | 0,91×1,72 |
+| Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Cortesao_Palido_0` | Box | Pegada | 0,6×0,3 | — | 0, 0 | -9, 0 | não | None | — | 0,4 | 0 | 0,91×1,72 |
+| Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Cortesao_Palido_1` | Box | Pegada | 0,6×0,3 | — | 0, 0 | 0, 6 | não | None | — | 0,4 | 0 | 0,91×1,72 |
 | Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Nobre_Fossilizado_0` | Box | Cenario | 1,2×1 | — | 0, -0,5 | -10, 1,5 | não | None | — | 0,4 | 0 | 0,16×0,16 |
 | Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Nobre_Fossilizado_1` | Box | Cenario | 1,2×1 | — | 0, -0,5 | -3, 4,5 | não | None | — | 0,4 | 0 | 0,16×0,16 |
 | Castelo_Carcosa | `Castelo_Root/Z2_SalaoDoBanquete/Nobre_Fossilizado_2` | Box | Cenario | 1,2×1 | — | 0, -0,5 | 3, 4,5 | não | None | — | 0,4 | 0 | 0,16×0,16 |
@@ -133,22 +131,22 @@ Tamanho e centro em **unidades de mundo** (já multiplicados pela escala); offse
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0` | Box | Pegada | 0,44×0,28 | — | 0, 0 | -34,93, 7,3 | não | None | — | 0,4 | 0 | 1,54×2,16 |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)` | Box | Pegada | 0,44×0,28 | — | 0, 0 | 19, 4,38 | não | None | — | 0,4 | 0 | 1,54×2,16 |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)` | Box | Pegada | 0,44×0,28 | — | 0, 0 | -31,9, -2,84 | não | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | 19,08, 5,41 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | -31,82, -1,81 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | 19, 5,41 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (1)/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | -31,9, -1,81 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)` | Box | Pegada | 0,44×0,28 | — | 0, 0 | 36,14, 0,86 | não | None | — | 0,4 | 0 | 1,54×2,16 |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)` | Box | Pegada | 0,44×0,28 | — | 0, 0 | 23,46, -1,22 | não | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | 36,22, 1,89 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | 23,54, -0,19 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | 36,14, 1,89 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (2)/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | 23,46, -0,19 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)` | Box | Pegada | 0,44×0,28 | — | 0, 0 | 30,12, -16,78 | não | None | — | 0,4 | 0 | 1,54×2,16 |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)` | Box | Pegada | 0,44×0,28 | — | 0, 0 | -26,36, 26,22 | não | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | 30,2, -15,75 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | -26,28, 27,25 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | -7,7, -2,53 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | 12,86, 25,71 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | 3,92, -7,53 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 0,63×1,86 | — | 0,12, 1,28 | -34,85, 8,33 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
-| Deserto_Hali | `Player_Damiao` | Box | Pegada | 0,57×0,29 | — | 0, 0 | -12, -13,12 | não | None | — | 0,4 | 0 | 0,95×2,2 |
-| Deserto_Hali | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | 0,67×1,81 | — | 0, 1,25 | -12, -12,12 | sim | None | — | 0,4 | 0 | 0,95×2,2 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | 30,12, -15,75 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0 (3)/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | -26,36, 27,25 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | -7,78, -2,53 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | 12,78, 25,71 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | 3,84, -7,53 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | 1,11×1,86 | — | 0, 1,28 | -34,93, 8,33 | sim | None | — | 0,4 | 0 | 1,54×2,16 |
+| Deserto_Hali | `Player_Damiao` | Box | Pegada | 0,57×0,29 | — | 0, 0 | -24, -28 | não | None | — | 0,4 | 0 | 0,95×2,2 |
+| Deserto_Hali | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | 0,67×1,81 | — | 0, 1,25 | -24, -27 | sim | None | — | 0,4 | 0 | 0,95×2,2 |
 | Deserto_Hali | `Refugios/Refugio_Entrada` | Circle | Gatilho | 3,6×3,6 | 1,8 | 0, 0 | -24, -22 | sim | None | — | 0,4 | 0 | — |
 | Deserto_Hali | `Refugios/Refugio_PortoesDasRuinas` | Circle | Gatilho | 3,6×3,6 | 1,8 | 0, 0 | -4, 26 | sim | None | — | 0,4 | 0 | — |
 | Deserto_Hali | `Refugios/Refugio_SantuarioDeYhtill` | Circle | Gatilho | 3,6×3,6 | 1,8 | 0, 0 | -26, 18 | sim | None | — | 0,4 | 0 | — |
@@ -206,9 +204,9 @@ Tamanho e centro em **unidades de mundo** (já multiplicados pela escala); offse
 | Tumba_De_Alhazred | `Saida_TumbaAlhazred` | Box | Gatilho | 1,6×1,6 | — | 0, 0 | -3,39, -1,17 | sim | None | — | 0,4 | 0 | — |
 | Tumba_De_Alhazred | `Saida_TumbaAlhazred (1)` | Box | Gatilho | 1,6×1,6 | — | 0, 0 | 41,43, -17,6 | sim | None | — | 0,4 | 0 | — |
 | Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred` | Box | Cenario | 0,3×2,54 | — | 0,01, 0,47 | 37,05, -14,85 | não | None | — | 0,4 | 0 | 2,62×7,68 |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred/Hurtbox` | Box | Hurtbox | 0,56×2,52 | — | -0,02, 0,46 | 37,02, -14,88 | sim | None | — | 0,4 | 0 | 2,62×7,68 |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Abdul_Alhazred/Hurtbox` | Box | Hurtbox | 1,89×6,6 | — | 0, 1,44 | 37,04, -12,27 | sim | None | — | 0,4 | 0 | 2,62×7,68 |
 | Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/Bau_DaTumba` | Box | Gatilho | 6,24×2,01 | — | 0, 0 | 4,9, 2,75 | sim | None | — | 0,4 | 0 | 0,62×0,2 |
-| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Box | Pegada | 0,61×1,52 | — | 0,19, 0,69 | 44,23, -15,47 | não | None | — | 0,4 | 0 | 1,13×1,77 |
+| Tumba_De_Alhazred | `TumbaDeAbdul_Conteudo/YugNeth` | Box | Pegada | 0,61×0,39 | — | 0,19, 0,69 | 44,23, -15,47 | não | None | — | 0,4 | 0 | 1,13×1,77 |
 | YugNeth | `YugNeth` | Box | Cenario | 0,6×0,6 | — | 0, 0 | 0, 0 | não | None | — | 0,4 | 0 | — |
 
 > **Polygon, Edge e Composite** aparecem com tamanho medido por `bounds`, que a doc da 6000.4 diz ficar **vazio com o colisor desligado ou o objeto inativo** — nesses casos a linha traz `0×0`, que aqui significa *não medido*, não *vazio*.

@@ -37,7 +37,16 @@ namespace FavelaAmarela.Player
 
         [Header("Aplacamento (Sibilo de Yig)")]
         [Tooltip("Camadas consideradas na varredura de entidades. Vazio = todas.")]
-        [SerializeField] private LayerMask camadasDeEntidade = ~0;
+        /// <summary>
+        /// Camadas que as habilidades de relíquia consultam.
+        ///
+        /// <para><b>Era <c>~0</c> — todas as camadas — até 2026-09-04.</b> As duas habilidades
+        /// varriam parede, chão, gatilho e UI para descartar tudo depois no
+        /// <c>GetComponentInParent&lt;EnemyBase&gt;</c>. Não quebrava nada; só fazia a consulta
+        /// percorrer o mundo inteiro a cada uso. O alvo real das duas é <b>inimigo</b>, e é isso
+        /// que a máscara passa a dizer.</para>
+        /// </summary>
+        [SerializeField] private LayerMask camadasDeEntidade = 1 << 6;   // Enemy
 
         private readonly InventarioDeArtefatos _inventario = new InventarioDeArtefatos();
         private readonly Dictionary<string, ArtefatoDef> _porId = new Dictionary<string, ArtefatoDef>();

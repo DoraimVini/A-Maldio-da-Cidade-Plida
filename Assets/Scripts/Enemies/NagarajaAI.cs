@@ -67,6 +67,12 @@ namespace FavelaAmarela.Runtime.Enemies
         
         private EnemyBase _enemyBase;
         private Rigidbody2D _rb;
+
+        /// <summary>
+        /// O que a rotina de luta DECIDIU no <c>Update</c>; quem escreve no corpo é o
+        /// <c>FixedUpdate</c>. Ver o doc dele.
+        /// </summary>
+        private Vector2 _velocidadeDesejada;
         private Transform _jogador;
         private float _attackCooldown;
         private float _velocidadeCaca;
@@ -169,7 +175,7 @@ namespace FavelaAmarela.Runtime.Enemies
             
             if (distancia <= _alcanceDeGolpe)
             {
-                _rb.linearVelocity = Vector2.zero;
+                _velocidadeDesejada = Vector2.zero;
                 if (_attackCooldown <= 0)
                 {
                     Atacar();
@@ -180,11 +186,22 @@ namespace FavelaAmarela.Runtime.Enemies
                 Vector2 direcao = _seguidorDeCaminho != null
                     ? _seguidorDeCaminho.DirecaoPara(_jogador.position)
                     : (Vector2)(_jogador.position - transform.position).normalized;
-                _rb.linearVelocity = direcao * _velocidadeCaca;
+                _velocidadeDesejada = direcao * _velocidadeCaca;
                 GetComponent<SpriteRenderer>().flipX = direcao.x < 0;
             }
         }
         
+        /// <summary>
+        /// A única escrita no corpo. <c>ExecutarRotinaDeLuta</c> roda no <c>Update</c> e apenas
+        /// decide; escrever <c>linearVelocity</c> de lá punha uma decisão de ritmo variável num
+        /// consumo de ritmo fixo (50 Hz), o que faz a mesma velocidade valer por dois passos de
+        /// física num quadro rápido e duas decisões se atropelarem num quadro lento.
+        /// </summary>
+        private void FixedUpdate()
+        {
+            if (_rb != null) _rb.linearVelocity = _velocidadeDesejada;
+        }
+
         private void Atacar()
         {
             _attackCooldown = cadenciaDeAtaque;

@@ -23,6 +23,7 @@ Este bundle OKF contém a base de conhecimento completa do projeto, organizada p
 - [Unity 6.4 Gotchas](unity64_gotchas/index.md) — APIs renomeadas, armadilhas de performance e padrões técnicos
 - [Testes e QA](tests/index.md) — Padrões de testes e pipeline de qualidade
 - [Lore e Vocabulário](lore/index.md) — Terminologia diegética e regras do universo narrativo
+- [Auditoria de Física 2D — relatório consolidado](physics_audit_report.md) — **[2026-09-04]** Estado medido de Physics2D, Rigidbody2D, Collider2D, consultas, movimento e testes, com o que foi corrigido e as quatro pendências que restaram.
 
 ## Como Usar Este Bundle
 

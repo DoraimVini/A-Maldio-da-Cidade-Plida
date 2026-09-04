@@ -567,6 +567,9 @@ namespace FavelaAmarela.Runtime.Enemies
                 _spriteRenderer.color = ativo ? corProtegido : corVulneravel;
         }
 
+        /// <summary>Raio do anel de invocação, em unidades de mundo (eixo largo).</summary>
+        private const float RaioDeInvocacao = 1.5f;
+
         private void HandleInvocarEsqueletos()
         {
             TocarAnimacao(Anim.Attack);
@@ -607,9 +610,17 @@ namespace FavelaAmarela.Runtime.Enemies
                 if (ponto != null) return ponto.position;
             }
 
-            // Fallback: distribui ao redor do Abdul.
+            // Fallback: distribui ao redor do Abdul, numa ELIPSE e não num círculo.
+            //
+            // Um círculo de raio 1,5 em espaço de mundo é, no chão isométrico, uma elipse de
+            // TRÊS células de profundidade e uma e meia de largura — os esqueletos nasciam
+            // esparramados para o norte e para o sul em vez de em volta. A célula é 1,0 × 0,5,
+            // então o eixo Y vale metade. O ByakheeAI já faz assim ao circundar.
             float angulo = indice * Mathf.PI * 2f / Mathf.Max(1, esqueletosPorInvocacao);
-            return transform.position + new Vector3(Mathf.Cos(angulo), Mathf.Sin(angulo), 0f) * 1.5f;
+            return transform.position + new Vector3(
+                Mathf.Cos(angulo) * RaioDeInvocacao,
+                Mathf.Sin(angulo) * RaioDeInvocacao * Core.Player.BaseIsometrica.AlturaDeCelulaPadrao,
+                0f);
         }
 
         /// <summary>

@@ -195,11 +195,18 @@ namespace FavelaAmarela.Runtime.Cinematics
         {
             if (playerTransform != null)
             {
-                // Movemos o transform fisicamente, já que o input está bloqueado.
-                // Como não estamos injetando no Input System, caso queira que o Animator 
+                // Como não estamos injetando no Input System, caso queira que o Animator
                 // toque a animação de andar, será necessário ter um bridge de animação.
-                Vector3 move = new Vector3(dir.x, dir.y, 0f) * (velocidadeMovimentoCinematica * Time.deltaTime);
-                playerTransform.position += move;
+                Vector2 move = new Vector2(dir.x, dir.y) * (velocidadeMovimentoCinematica * Time.deltaTime);
+
+                // Rigidbody2D.position, e NÃO transform.position. O projeto está com
+                // Auto Sync Transforms DESLIGADO (Physics2DSettings): escrever no transform de
+                // um objeto com corpo não move o colisor na hora, e as consultas continuam
+                // vendo a posição anterior até o próximo passo de física. Durante a cinemática
+                // isso punha o Damião atravessando geometria com o colisor atrasado.
+                var corpo = playerTransform.GetComponent<Rigidbody2D>();
+                if (corpo != null) corpo.position += move;
+                else playerTransform.position += (Vector3)move;
             }
         }
 

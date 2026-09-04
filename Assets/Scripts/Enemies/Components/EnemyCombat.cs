@@ -81,6 +81,28 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_attackCooldown > 0f) _attackCooldown -= Time.deltaTime;
         }
 
+        [Header("Janela do golpe")]
+        [Tooltip("Segundos que a área de acerto fica aberta. NÃO é a cadência: é quanto tempo " +
+                 "o golpe existe, e portanto quanto tempo há para esquivar dele.")]
+        [Min(0.05f)]
+        [SerializeField] private float janelaDoGolpe = 0.15f;
+
+        [Tooltip("Raio da área atingida, em unidades de mundo.")]
+        [Min(0.1f)]
+        [SerializeField] private float raioDoGolpe = 0.6f;
+
+        private FavelaAmarela.Runtime.Combat.Hitbox _hitbox;
+
+        private void GarantirHitbox()
+        {
+            if (_hitbox != null) return;
+
+            _hitbox = FavelaAmarela.Runtime.Combat.Hitbox.GarantirPara(
+                gameObject, "Hitbox_Inimigo", LayerMask.GetMask("PlayerHurtbox"),
+                raioDoGolpe, alcanceDeGolpe, pouparAliados: false,
+                profundidade: FavelaAmarela.Runtime.Combat.Hitbox.ProfundidadeDeUmaCelula);
+        }
+
         public bool AlvoEstaAoAlcance()
         {
             if (_alvoCache != null)
@@ -89,9 +111,14 @@ namespace FavelaAmarela.Runtime.Enemies
                 else if (_alvoCache is IDanificavel && !((MonoBehaviour)_alvoCache).enabled) _alvoCache = null;
             }
 
-            // Golpe INSTANTANEO e RADIAL: sem janela e sem direcao, entao estar atras do
-            // Cultista nao protege. A marca aparece por um piso de tempo justamente para
-            // esse quadro unico ser visivel. Ver systems/auditoria_hitbox_hurtbox.md.
+            // Esta consulta e DETECCAO, nao dano: ela responde "tem alguem ao alcance?" para a
+            // FSM decidir entre Chase e Attack. Radial esta certo aqui -- proximidade nao tem
+            // direcao.
+            //
+            // Ate 2026-09-04 ela era tambem o GOLPE: TentarAtacar aplicava dano direto no alvo
+            // que esta consulta cacheava, sem janela e sem direcao. Consequencia: nao dava para
+            // esquivar no tempo (o golpe existia por um quadro so) e estar ATRAS do Cultista
+            // nao protegia. O dano passou para uma Hitbox com janela; ver TentarAtacar.
             FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.RegistrarCirculo(
                 transform.position, alcanceDeGolpe,
                 FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.CorDeGolpe);
@@ -110,13 +137,47 @@ namespace FavelaAmarela.Runtime.Enemies
             return _alvoCache != null;
         }
 
+        /// <summary>
+        /// Desfere o golpe. <b>Abre uma janela</b> em vez de aplicar dano no mesmo quadro.
+        ///
+        /// <para>É a diferença entre um golpe que se pode esquivar e um teste de posição: com
+        /// janela, atravessar a área <i>durante</i> o golpe acerta, e sair antes de ela abrir
+        /// não acerta. E com direção, estar atrás do inimigo protege — o que o golpe radial
+        /// anterior não permitia.</para>
+        /// </summary>
         public bool TentarAtacar()
         {
             if (!EstaPronto || !AlvoEstaAoAlcance()) return false;
+
             _attackCooldown = cadenciaDeAtaque;
-            _alvoCache?.ReceberGolpe(new ArmaResult(true, 0f, 0f, false, 0f, DanoEfetivo));
+            GarantirHitbox();
+
+            var golpe = new ArmaResult(true, 0f, 0f, false, 0f, DanoEfetivo);
+
+            if (_hitbox != null)
+            {
+                Vector2 direcao = DirecaoAteOAlvo();
+                _hitbox.Armar(golpe, janelaDoGolpe, direcao);
+                OnAtaqueDesferido?.Invoke();
+                return true;
+            }
+
+            // Reserva: sem hitbox o inimigo ficaria inofensivo, o que e pior que o golpe
+            // antigo. Falha alto para nao virar "o Cultista parou de bater" em playtest.
+            Debug.LogError($"[EnemyCombat] '{name}' esta sem Hitbox -- o golpe caiu para o " +
+                           "acerto instantaneo, que nao e esquivavel no tempo.", this);
+            _alvoCache?.ReceberGolpe(golpe);
             OnAtaqueDesferido?.Invoke();
             return true;
+        }
+
+        /// <summary>Direção até o alvo cacheado; zero se ele sumiu (a Hitbox trata como radial).</summary>
+        private Vector2 DirecaoAteOAlvo()
+        {
+            if (_alvoCache is MonoBehaviour mb && mb != null)
+                return ((Vector2)mb.transform.position - (Vector2)transform.position).normalized;
+
+            return Vector2.zero;
         }
     }
 }

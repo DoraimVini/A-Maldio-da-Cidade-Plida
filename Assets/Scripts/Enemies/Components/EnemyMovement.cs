@@ -18,6 +18,12 @@ namespace FavelaAmarela.Runtime.Enemies
         private Vector2 _velocidadeAlvo;
         private float _multiplicadorAlvo;
 
+        /// <summary>
+        /// Se a IA quer estar se movendo agora. Separado de <see cref="_velocidadeAlvo"/>
+        /// porque "quero parar" e "ainda não decidi" são coisas diferentes.
+        /// </summary>
+        private bool _querendoMover;
+
         public float VelocidadeErrante => velocidadeErrante;
         public float VelocidadeCaca => velocidadeCaca;
 
@@ -36,11 +42,35 @@ namespace FavelaAmarela.Runtime.Enemies
             _seguidor = GetComponent<SeguidorDeCaminho>();
         }
 
+        /// <summary>
+        /// <b>O único lugar do componente que escreve no corpo.</b>
+        ///
+        /// <para><b>Por que isto mudou em 2026-09-04.</b> O caminho sem aceleração escrevia
+        /// <c>linearVelocity</c> dentro de <see cref="MoverPara"/> — que é chamado do
+        /// <c>Update</c> pela <c>EnemyStateMachine</c>, pelo <c>AvatarDeSetAI</c> e pelo
+        /// <c>SsethFarejadorAI</c>. Escrever velocidade em ritmo VARIÁVEL para ser consumida em
+        /// ritmo FIXO (50 Hz) faz a mesma decisão valer por dois passos de física num quadro
+        /// rápido, e duas decisões se atropelarem num quadro lento — a segunda escrita descarta
+        /// a primeira antes de ela ter existido. Como este é o componente de movimento
+        /// COMPARTILHADO, o defeito valia para boa parte do elenco de uma vez.</para>
+        ///
+        /// <para>A decisão continua no <c>Update</c>, que é onde a IA pensa; só a escrita
+        /// desceu para cá. <c>MoverPara</c> passou a apenas <b>guardar</b> o que quer.</para>
+        /// </summary>
         private void FixedUpdate()
         {
-            if (!usarAceleracao || _velocidadeAlvo == Vector2.zero) return;
-            _rb.linearVelocity = Vector2.MoveTowards(_rb.linearVelocity,
-                _velocidadeAlvo * _multiplicadorAlvo, aceleracao * Time.fixedDeltaTime);
+            if (!_querendoMover)
+            {
+                _rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
+            Vector2 desejada = _velocidadeAlvo * _multiplicadorAlvo;
+
+            _rb.linearVelocity = usarAceleracao
+                ? Vector2.MoveTowards(_rb.linearVelocity, desejada,
+                                      aceleracao * Time.fixedDeltaTime)
+                : desejada;
         }
 
         /// <summary>
@@ -61,21 +91,25 @@ namespace FavelaAmarela.Runtime.Enemies
             if (direcao.sqrMagnitude < 0.0001f) { Parar(); return; }
             direcao.Normalize();
 
-            float vel = velocidade > 0f ? velocidade : velocidadeErrante;
-            if (usarAceleracao)
-            {
-                _velocidadeAlvo = direcao;
-                _multiplicadorAlvo = vel;
-            }
-            else _rb.linearVelocity = direcao * vel;
+            // GUARDA, nao escreve. Quem escreve e o FixedUpdate -- ver o doc dele.
+            _velocidadeAlvo = direcao;
+            _multiplicadorAlvo = velocidade > 0f ? velocidade : velocidadeErrante;
+            _querendoMover = true;
 
+            // O flip e do RENDERER, nao do corpo: pode continuar aqui, no ritmo do quadro.
             if (direcao.x != 0f) _sr.flipX = direcao.x < 0f;
         }
 
         public void Parar()
         {
-            _rb.linearVelocity = Vector2.zero;
+            _querendoMover = false;
             _velocidadeAlvo = Vector2.zero;
+
+            // Zera TAMBEM aqui, e nao so no FixedUpdate: EnemyStateMachine.EnterState chama
+            // Parar() ao entrar em Patrol justamente porque sair de Chase com a velocidade
+            // cravada fazia o inimigo deslizar em linha reta para fora da cena. Esperar ate
+            // 20 ms para zerar reintroduziria uma versao curta disso.
+            _rb.linearVelocity = Vector2.zero;
 
             // Esquece o caminho junto: parar e depois retomar com um caminho velho faria a
             // unidade andar para onde o alvo ESTAVA.
