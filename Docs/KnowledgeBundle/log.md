@@ -4,6 +4,72 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Quebrei as paredes do Deserto, e a suíte não viu
+
+### O incidente
+
+Uniformizar a escala do elenco pulava a Cassilda e o Abdul, que são `PrefabInstance` **sem
+`Rigidbody2D` no próprio transform**. Alarguei o filtro da ferramenta para "qualquer coisa com
+`SpriteRenderer`", com o argumento de que **só restava um objeto não uniforme no projeto** e
+portanto nada mais poderia ser tocado.
+
+**O argumento estava errado.** A varredura que o sustentava tinha olhado apenas os *overrides
+de `PrefabInstance`* no YAML — e não os GameObjects comuns de cena, que é o que as paredes são.
+
+Numa execução:
+
+```
+Limite_Norte / Limite_Sul     88 × 1  ->  1 × 1     (as paredes do Deserto)
+Limite_Leste / Limite_Oeste    1 × 64 -> 64 × 64
+Fundo / Preenchimento (barra de vida)      −87% de largura
+VisualDoEscudo do Abdul                   +152%
+Bau_DaTumba                                −68%
+```
+
+**E as duas suítes passaram VERDE por cima disso** — 1052 + 50 testes, zero falhas. As paredes
+que impedem o jogador de sair do mapa viraram quadrados de uma unidade e nada reclamou. Só a
+leitura do log da ferramenta pegou.
+
+Revertido com `git checkout -- Assets/Scenes/`, e o filtro voltou a exigir corpo não-estático,
+com o estrago registrado no próprio código para não ser alargado de novo.
+
+### A guarda que faltava
+
+`ParedesDoMapaTests.ParedesDeLimite_ContinuamCompridas`. Ela mede o **tamanho efetivo em
+mundo** — caixa × escala — e não a escala, e isso importa porque as paredes deste projeto
+ganham comprimento por **dois caminhos diferentes**: o Deserto estica o transform (88 × 1 sobre
+uma caixa de 1 × 1) e o Santuário deixa a escala em 1 × 1 e dimensiona a caixa (16 × 0,5).
+
+Ela errou duas vezes antes de acertar, e as duas vezes por medir a coisa errada:
+
+1. **Media só a escala** → reprovou o Santuário inteiro, cujas paredes têm escala 1 × 1.
+2. **Limiar de 20** → reprovou o Santuário de novo, cujas paredes medem 16. O limiar tinha sido
+   escolhido olhando só o Deserto (88 e 64).
+
+O limiar final é **8**, calibrado contra a menor parede real do projeto (11, leste/oeste do
+Santuário) e oito vezes acima do colapso.
+
+### Escalas, agora pela tabela por nome
+
+Quem não tem corpo passa por `EscalaRelativaAoDamiao`, onde a mudança é deliberada e não pega
+ninguém de carona:
+
+| ator | de | para |
+|---|---|---|
+| **Abdul** | 2,59× (esticado 1,16 × 2,67) | **1,2×** uniforme |
+| **Rei em Amarelo** | 1,03× | **3,0×** |
+| **Byakhee** | 1,8× | **2,7×** |
+| Cassilda | 1,44× esticado | 1,44× uniforme |
+
+**O Abdul nunca foi pedido.** A escala dele saltou de `0,8507 × 0,9034` para
+`1,1621 × 2,6705` no commit `6b8d9e07` (2026-08-26), que era *"fix(art): sprite do Damião
+cortado"* — entrou de carona num commit sobre outro personagem.
+
+A escada final: Cultista 0,98× · Abdul 1,2× · Byakhee 2,7× · Rei em Amarelo 3,0×.
+
+EditMode 1052 → **1053** (1030 passando) + PlayMode 50 (50/50).
+
+
 ## 2026-09-04 — O Cortesão vira inimigo de verdade, e o QA passa a rodar as duas suítes
 
 ### O QA rodava a metade errada

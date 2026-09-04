@@ -51,7 +51,24 @@ namespace FavelaAmarela.EditorTools
                 // Ele nao leva dano por design ("um rito que se sobrevive"), mas presenca de
                 // tela e outra coisa: a ultima luta precisa dominar a sala como a penultima ja
                 // domina.
-                ["ReiEmAmarelo"] = (2.2f, 2.19f),
+                // 3,0x: o chefe FINAL tem de ser o maior. A 2,2x ele ficava menor que o
+                // Abdul (2,59x) e que a Byakhee (2,7x) -- a mesma inversao que o Vini apontou.
+                // Ele nao leva dano por design ("um rito que se sobrevive"), e por isso a
+                // presenca de tela e o unico canal que ele tem para pesar.
+                ["ReiEmAmarelo"] = (3.0f, 2.19f),
+
+                // 1,2x: "um pouco mais alto que o Damiao, so, nao precisa virar uma torre".
+                // O Abdul e HUMANO -- um feiticeiro, nao uma aparicao. Ele estava em 2,59x por
+                // acidente: a escala dele passou de 0,85 x 0,90 para 1,16 x 2,67 de carona no
+                // commit 6b8d9e07 (2026-08-26), que era sobre o sprite do DAMIAO. Ninguem pediu
+                // aquilo, e o esticamento em Y foi o que sobreviveu a uniformizacao.
+                ["Abdul_Alhazred"] = (1.2f, 2.06f),
+
+                // A Cassilda entra aqui, e nao na uniformizacao automatica, porque ela e
+                // PrefabInstance SEM Rigidbody2D -- e alargar aquele filtro para alcanca-la foi
+                // o que esmagou as paredes do Deserto. 1,44x preserva a altura que ela ja
+                // tinha; o efeito e so tirar o esticamento (largura +30%).
+                ["Cassilda"] = (1.44f, 1.59f),
             };
 
         [MenuItem("Tools/FavelaAmarela/Cena: escala dos chefes relativa ao Damião")]

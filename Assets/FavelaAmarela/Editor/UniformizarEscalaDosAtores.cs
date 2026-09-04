@@ -101,6 +101,27 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static bool EhAtor(Transform t)
         {
+            // EXIGE Rigidbody2D não-estático, e isto NÃO é excesso de zelo.
+            //
+            // Em 2026-09-04 este filtro foi alargado para "qualquer coisa com SpriteRenderer",
+            // com o argumento de que só restava um objeto não uniforme no projeto e portanto
+            // nada mais poderia ser tocado. O argumento estava ERRADO: a varredura que o
+            // sustentava tinha olhado apenas os overrides de <c>PrefabInstance</c> no YAML, e
+            // não os GameObjects comuns de cena.
+            //
+            // O resultado, numa única execução:
+            //   Limite_Norte e Limite_Sul     88 × 1  ->  1 × 1    (as paredes do Deserto)
+            //   Limite_Leste e Limite_Oeste    1 × 64 -> 64 × 64
+            //   Fundo e Preenchimento (barra de vida)      −87% de largura
+            //   VisualDoEscudo do Abdul                   +152%
+            //
+            // E as duas suítes passaram VERDE por cima disso — 1052 + 50 testes, zero falhas.
+            // Nada neste projeto guarda o tamanho das paredes do mapa.
+            //
+            // O corpo não-estático é o que separa ATOR de cenário, e cenário esticado é
+            // legítimo: uma parede É uma caixa alongada. Quem não tem corpo e precisa de ajuste
+            // vai na tabela por nome de <c>EscalaRelativaAoDamiao</c>, onde a mudança é
+            // deliberada, revisável e não pega ninguém de carona.
             var corpo = t.GetComponent<Rigidbody2D>();
             return corpo != null
                    && corpo.bodyType != RigidbodyType2D.Static
