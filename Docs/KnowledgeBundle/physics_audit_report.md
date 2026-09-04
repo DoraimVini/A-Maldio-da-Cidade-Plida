@@ -195,10 +195,10 @@ Medido para o elenco inteiro, pelo **corpo desenhado** e pela escala **efetiva e
 
 | ator | no mundo | × Damião |
 |---|---|---|
-| Abdul (Tumba) | 5,50 un | 2,59× |
+| **Rei em Amarelo** (Castelo) | **6,36 un** | **3,00×** ← ajustado |
 | **Byakhee** (Portões) | **5,72 un** | **2,70×** ← ajustado |
-| **Rei em Amarelo** (Castelo) | **4,66 un** | **2,20×** ← ajustado |
-| Cassilda (NPC) | 3,06 un | 1,44× |
+| **Abdul** (Tumba) | **2,54 un** | **1,20×** ← ajustado |
+| Cassilda (NPC) | 3,05 un | 1,44× |
 | Pedra de Poder | 2,94 un | 1,39× |
 | Esqueleto Invocado | 2,09 un | 0,99× |
 | Cultista (Deserto) | 2,08 un | 0,98× |
@@ -208,21 +208,68 @@ Medido para o elenco inteiro, pelo **corpo desenhado** e pela escala **efetiva e
 
 **A hierarquia estava invertida.** O Rei em Amarelo — chefe final do Vertical Slice — media
 **1,03×**, o tamanho do Damião e **menor que a Cassilda**, que é NPC de diálogo. Quanto mais
-tarde o chefe, menor ele ficava.
+tarde o chefe, menor ele ficava. Ele não leva dano por design (*"um rito que se sobrevive"*),
+o que faz da presença de tela o único canal que ele tem para pesar.
 
-Ele não leva dano por design (*"um rito que se sobrevive"*), mas presença de tela é outra
-coisa: a última luta precisa dominar a sala como a penúltima já domina. Foi para **2,2×**.
+A primeira correção o levou a **2,2×** — e continuou errada, porque deixou o chefe final ainda
+menor que o Abdul (2,59×) e que a Byakhee (2,7×). O Vini apontou: *"você fez o Rei menor que
+ele, isso não faz sentido"*. Foi para **3,0×**.
 
-A Byakhee foi para **2,7×** a pedido do Vini, partindo do 1,8× anterior.
+**O Abdul nunca foi pedido.** A escala dele saltou de `0,8507 × 0,9034` para
+`1,1621 × 2,6705` no commit `6b8d9e07` (2026-08-26), que era *"fix(art): sprite do Damião
+cortado"* — entrou de carona num commit sobre outro personagem, e o esticamento em Y foi o que
+sobreviveu à uniformização. Ele é **humano** — um feiticeiro, não uma aparição —, então foi para
+**1,2×**: um pouco mais alto que o Damião, e nada de torre.
 
-> **Por que o Abdul está em 2,59× e o Rei estava em 1,03×.** O Abdul foi escalado numa sessão
-> anterior, a pedido, e a escala foi aplicada **só em Y** (1,162 × 2,671) — daí ele ser ao
-> mesmo tempo o maior do elenco e o único que resistiu à uniformização. O Rei nunca foi
-> escalado: estava na escala 1,0 do prefab desde que foi montado.
+A escada final, por altura de corpo desenhado:
 
-> **As quatro Pedras de Poder continuam cabendo.** O anel de fallback do Abdul já é isométrico
-> (`dx = 4,5`, `dy = 2,25`, nas diagonais), e o Abdul tem ~2,6 unidades de largura — as Pedras
-> caem bem fora dele. O risco que o Vini levantou foi medido e não se confirma.
+    Cultista 0,98×  <  Abdul 1,2×  <  Byakhee 2,7×  <  Rei em Amarelo 3,0×
+
+> **As quatro Pedras de Poder continuam cabendo** — e agora com folga maior do que quando o Vini
+> levantou o risco. O anel de fallback do Abdul é isométrico (`dx = 4,5`, `dy = 2,25`, nas
+> diagonais) e o Abdul **encolheu** para ~1,2 unidades de largura.
+
+#### O incidente: as paredes do Deserto, e a suíte que não viu
+
+A Cassilda e o Abdul escapavam da uniformização por serem `PrefabInstance` **sem `Rigidbody2D`
+no próprio transform**. Alarguei o filtro de `UniformizarEscalaDosAtores` para "qualquer coisa
+com `SpriteRenderer`", com o argumento de que **só restava um objeto não uniforme no projeto** e
+portanto nada mais poderia ser tocado.
+
+**O argumento estava errado.** A varredura que o sustentava tinha olhado apenas os *overrides de
+`PrefabInstance`* no YAML — e não os GameObjects comuns de cena, que é o que as paredes são.
+Numa execução:
+
+| objeto | antes | depois |
+|---|---|---|
+| `Limite_Norte` / `Limite_Sul` (Deserto) | 88 × 1 | **1 × 1** |
+| `Limite_Leste` / `Limite_Oeste` (Deserto) | 1 × 64 | **64 × 64** |
+| `Fundo` / `Preenchimento` (barra de vida) | — | **−87% de largura** |
+| `VisualDoEscudo` (Abdul) | — | **+152%** |
+| `Bau_DaTumba` | — | **−68%** |
+
+**As duas suítes passaram VERDE por cima disso** — 1052 de EditMode e 50 de PlayMode, zero
+falhas. As paredes que impedem o jogador de sair do mapa viraram quadrados de uma unidade e nada
+no projeto reclamou. Só a leitura do log da ferramenta pegou.
+
+Revertido com `git checkout -- Assets/Scenes/`, e o filtro voltou a exigir corpo não-estático,
+com o estrago registrado no próprio `EhAtor` para não ser alargado de novo. **Quem não tem corpo
+vai na tabela por nome de `EscalaRelativaAoDamiao`**, onde a mudança é deliberada, revisável e
+não pega ninguém de carona — foi por esse caminho que a Cassilda finalmente entrou.
+
+A guarda que faltava é `ParedesDoMapaTests.ParedesDeLimite_ContinuamCompridas`. Ela mede o
+**tamanho efetivo em mundo** — caixa × escala — e não a escala, e isso importa porque as paredes
+deste projeto ganham comprimento por **dois caminhos diferentes**: o Deserto estica o transform
+(88 × 1 sobre uma caixa de 1 × 1) e o Santuário deixa a escala em 1 × 1 e dimensiona a caixa
+(16 × 0,5). Ela errou duas vezes antes de acertar, e as duas por medir a coisa errada:
+
+1. **Media só a escala** → reprovou o Santuário inteiro, cujas paredes têm escala 1 × 1.
+2. **Limiar de 20** → reprovou o Santuário de novo, cujas paredes medem 16. O limiar tinha sido
+   escolhido olhando só o Deserto (88 e 64).
+
+O limiar final é **8**, calibrado contra a menor parede real do projeto (11, leste/oeste do
+Santuário) e oito vezes acima do colapso.
+
 
 ---
 
@@ -364,8 +411,7 @@ A lista encolheu de dez para quatro. O que saiu está nas §3 e §5.
 
 | # | achado | por que não foi corrigido |
 |---|---|---|
-| 1 | **Abdul e Cassilda continuam com escala não uniforme** (2,30× e 1,30× em Y) | São `PrefabInstance` **sem `Rigidbody2D` no próprio transform**, e a ferramenta classifica ator por "corpo não-estático + sprite". Os outros 14 foram uniformizados. Estes dois pedem ou um filtro mais largo — que arriscaria esmagar cenário desenhado de propósito — ou o ajuste à mão no Inspector |
-| 1b | **Pegada do Byakhee 0,67:1 e a 2,4 do pé** | Ela é `CapsuleCollider2D`, e o recalibrador só achata `BoxCollider2D`. E o Byakhee **voa**: a linha do pé não se aplica a quem paira |
+| 1 | **Pegada do Byakhee 0,67:1 e a 2,4 do pé** | Ela é `CapsuleCollider2D`, e o recalibrador só achata `BoxCollider2D`. E o Byakhee **voa**: a linha do pé não se aplica a quem paira |
 | 2 | **`EsqueletoInvocado` ainda acerta instantâneo** | Ele não usa `EnemyCombat` — tem golpe próprio. A migração é a mesma receita já aplicada ao Cultista e ao Cortesão, mas mexe num inimigo que só aparece na luta do Abdul, e vale medir a luta antes |
 | 3 | **`CortesaoPalido` é `MonoBehaviour` sem FSM separada** | Saiu de `Core/` para `Runtime/Enemies/` porque `Core` tem `references: []` e não enxerga `Hitbox`/`EnemyBase` — sem isso o ator **não tinha como** ganhar combate. Isso põe o arquivo onde ele deve morar, mas **não paga** a dívida POCO: separar `CortesaoPalidoFSM` continua devendo |
 | 4 | **O `Deserto_Hali` tem 10 Cultistas**, quatro com o nome literalmente idêntico | Conteúdo de cena, não física. Registrado porque o relatório parecia ter linhas duplicadas e não tinha — e porque dez inimigos onde a nomenclatura sugere quatro é fato de balanceamento |
@@ -376,6 +422,10 @@ A lista encolheu de dez para quatro. O que saiu está nas §3 e §5.
 - **10 hurtboxes de Cultista** alargadas em 76%
 - **3 pegadas** deitadas na razão 2:1 (YugNeth e os dois Cortesãos)
 - **`EnemyMovement`, `NagarajaAI` e a cinemática de abertura** deixam de contornar a física
+- **Escala do elenco** ajustada por altura-alvo relativa ao Damião — Abdul 2,59× → 1,2×, Rei em
+  Amarelo 1,03× → 3,0×, Byakhee 1,8× → 2,7×, Cassilda uniformizada preservando a altura
+- **`ParedesDoMapaTests`** acrescentado depois de uma ferramenta minha esmagar as paredes de
+  limite do Deserto com as duas suítes verdes (ver §3.4)
 - **Máscara das relíquias** apertada de `~0` para `Enemy` — e isso **derrubou um teste que
   estava verde por acidente**: o rig criava o inimigo na camada 0 e só passava porque a máscara
   aceitava tudo. O rig foi corrigido, não a máscara
