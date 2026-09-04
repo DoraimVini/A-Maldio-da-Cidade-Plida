@@ -45,7 +45,16 @@ namespace FavelaAmarela.Runtime.Interaction
 
         // Buffers pré-alocados: o detector roda a cada frame e não pode gerar lixo
         // (Regra de Ouro 1). 8 slots cobrem folgadamente os alvos ao alcance.
-        private const int MaxCandidatos = 8;
+        // 8 -> 16 em 2026-09-04. O Vini viu o aviso de buffer cheio em jogo, na Tumba:
+        // "8 colisores ao alcance: o buffer encheu e alvos podem estar sendo descartados em
+        // silencio". A mascara nao da para apertar -- AbdulAlhazredAI e NagarajaAI SAO
+        // IInteragivel e vivem na camada Enemy, entao Enemy tem de continuar nela. Perto de
+        // uma parede (Obstacle) com dois inimigos e alguns props, 8 enche.
+        //
+        // O custo de dobrar sao 8 referencias a mais em dois arrays, alocados uma vez no
+        // Awake. O custo de nao dobrar e o "E" nao funcionar sem uma linha no console -- e
+        // agora com uma linha, que e pior: o aviso aparece e o jogador nao sabe o que fazer.
+        private const int MaxCandidatos = 16;
         private readonly Collider2D[] _hits = new Collider2D[MaxCandidatos];
         private readonly IInteragivel[] _componentes = new IInteragivel[MaxCandidatos];
         private CandidatoDeInteracao[] _candidatos;

@@ -4,6 +4,65 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — O portão de profundidade rejeitava quem estava perto
+
+Relato de playteste: *"tá muito difícil de encaixar um golpe neles… até as pedras de poder
+foram difíceis de acertar"*, mais um Cultista que não levou dano e os esqueletos do Abdul
+imunes. **Uma causa só, e minha.**
+
+Suítes: PlayMode 49 → **50 (50/50)**; EditMode **1052 (1029 passando, 0 falhando)**.
+
+### A conta
+
+O portão comparava a profundidade do alvo com o **centro** do golpe. Atacando para o norte, o
+centro fica a 1,2 de profundidade (o alcance), então a faixa aceita virava **[0,70; 1,70]**:
+
+```
+alvo a 0,00 (0 células, encostado): ERRA
+alvo a 0,25 (0,5 célula):           ERRA
+alvo a 0,50 (1 célula):             ERRA
+alvo a 1,20 (2,4 células):          acerta
+```
+
+Um inimigo **colado** no Damião era rejeitado. Atacando para leste o defeito some — ali o
+deslocamento em Y é zero e a faixa cai em cima do próprio jogador. **Todos os testes golpeiam
+para a direita**, e por isso nenhum pegou.
+
+### A correção
+
+A faixa passa a ser o **intervalo entre quem bate e onde o golpe cai**, alargado pela tolerância
+nas duas pontas — não uma faixa em torno do centro:
+
+```csharp
+float piso = Mathf.Min(doAtacante, doGolpe) - profundidadeMaxima;
+float teto = Mathf.Max(doAtacante, doGolpe) + profundidadeMaxima;
+```
+
+Resultado: para leste, ±1 célula (contra ±2,4 do círculo cru — que é o corte que o portão
+existe para fazer); para o norte, nada é cortado aquém do alcance.
+
+Guarda: `GolpeandoParaONorte_AcertaQuemEstaPerto`, que golpeia para **cima** com o alvo a 35%
+do alcance.
+
+### Buffer de interação: 8 → 16
+
+O Vini viu em jogo: *"8 colisores ao alcance: o buffer encheu e alvos podem estar sendo
+descartados em silêncio"*. A máscara **não dá para apertar** — `AbdulAlhazredAI` e `NagarajaAI`
+são `IInteragivel` e vivem na camada `Enemy`. Perto de uma parede com dois inimigos e alguns
+props, 8 enche. Dobrar custa 8 referências em dois arrays alocados uma vez.
+
+### Achados registrados, não corrigidos
+
+- **Os esqueletos do Abdul nascem num círculo de raio 1,5 em espaço de MUNDO** — que num
+  isométrico é **3 células de profundidade**, não um anel redondo. O `ByakheeAI` já faz certo
+  (`* 0.6f, // elipse: o isométrico achata o eixo Y`). Não mexi: muda posicionamento de chefe.
+- **A hurtbox dos Cultistas sai 43% mais estreita** do que `Hurtbox.GarantirPara` produziria
+  (0,63 contra 1,11) — valor gravado na cena, e `GarantirPara` não corrige o que já existe.
+  Candidato direto a "difícil de encaixar golpe".
+- **O prefab do esqueleto está correto**: tem `Hurtbox` filha na camada 14, com trigger e
+  sprite. A imunidade deles era o portão, não falta de área atingível.
+
+
 ## 2026-09-04 — Levar um golpe passa a contar
 
 Relato de playteste do Vini, na Tumba: *"o primeiro cultista não me notou, nem quando eu

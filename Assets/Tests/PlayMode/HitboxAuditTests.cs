@@ -449,6 +449,36 @@ namespace FavelaAmarela.Tests.PlayMode
         }
 
         /// <summary>
+        /// O defeito que o Vini pegou jogando: <i>"tá muito difícil de encaixar um golpe
+        /// neles"</i>.
+        ///
+        /// <para>O portão comparava a profundidade do alvo com o <b>centro</b> do golpe.
+        /// Atacando para o NORTE o centro fica a 1,2 de profundidade, então a faixa aceita
+        /// virava [0,70; 1,70] — e um inimigo <b>encostado</b> no Damião era rejeitado. Os
+        /// testes não pegaram porque todos golpeiam para a <b>direita</b>, onde o deslocamento
+        /// em Y é zero e a faixa cai em cima do próprio jogador.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator GolpeandoParaONorte_AcertaQuemEstaPerto()
+        {
+            yield return Montar();
+
+            // Bem mais perto que o alcance: é aqui que a faixa errada rejeitava.
+            var posicao = new Vector2(0f, _alcance * 0.35f);
+            yield return GolpearComAlvoEm(Vector2.up, posicao);
+
+            Debug.Log($"[HitboxAudit] portão ao norte: alvo a {posicao.y:0.##} de profundidade " +
+                      $"(alcance {_alcance:0.##}); acertos = {_acertosNoInimigo}");
+
+            Assert.Greater(_acertosNoInimigo, 0,
+                $"Golpe para o NORTE com o alvo a {posicao.y:0.##} de profundidade não acertou. " +
+                "Ele está mais PERTO que o alcance, na direção do golpe — se este caso erra, o " +
+                "portão está medindo uma faixa em torno do centro do golpe em vez do intervalo " +
+                "entre quem bate e onde o golpe cai, e o sintoma em jogo é não conseguir " +
+                "encaixar golpe em inimigo colado.");
+        }
+
+        /// <summary>
         /// Um alvo a menos de <b>uma célula</b> de profundidade continua sendo acertado.
         /// </summary>
         [UnityTest]

@@ -391,11 +391,25 @@ namespace FavelaAmarela.Runtime.Combat
                 // exatamente quem se quis acertar.
                 if (profundidadeMaxima > 0f)
                 {
-                    float profundidade = Mathf.Abs(
-                        AlturaDeChaoDe(_buffer[i].attachedRigidbody, hurtbox.transform)
-                        - AlturaDeChaoDoGolpe);
+                    // O golpe cobre a faixa de chao ENTRE quem bate e onde ele cai, alargada
+                    // pela tolerancia nas duas pontas. Nao e uma faixa em torno so do centro.
+                    //
+                    // CORRECAO DE 2026-09-04, achada em playteste: a primeira versao comparava
+                    // com o centro do golpe. Atacando para o NORTE, o centro fica a 1,2 de
+                    // profundidade, entao a faixa aceita virava [0,70; 1,70] -- e um inimigo
+                    // ENCOSTADO no Damiao (profundidade 0 a 0,5) era rejeitado. O Vini relatou
+                    // "ta muito dificil de encaixar um golpe neles", e a conta dava razao a
+                    // ele. Atacando para leste o defeito some, porque ali o deslocamento em Y
+                    // e zero e a faixa cai em cima do proprio jogador -- por isso passou
+                    // despercebido nos testes, que golpeiam para a direita.
+                    float doAtacante = AlturaDeChaoDe(_corpoDoDono, transform.parent);
+                    float doGolpe = AlturaDeChaoDoGolpe;
 
-                    if (profundidade > profundidadeMaxima) continue;
+                    float piso = Mathf.Min(doAtacante, doGolpe) - profundidadeMaxima;
+                    float teto = Mathf.Max(doAtacante, doGolpe) + profundidadeMaxima;
+
+                    float alvoY = AlturaDeChaoDe(_buffer[i].attachedRigidbody, hurtbox.transform);
+                    if (alvoY < piso || alvoY > teto) continue;
                 }
 
                 // Aliados (Yug-Neth e companheiros futuros) nunca são atingidos pelo golpe do
