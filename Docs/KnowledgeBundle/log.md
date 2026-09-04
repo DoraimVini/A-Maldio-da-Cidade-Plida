@@ -4,6 +4,29 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Os dois gatilhos órfãos do Byakhee saíram
+
+A instância do Byakhee na `Portoes_Das_Ruinas` carregava um `CircleCollider2D` e um
+`BoxCollider2D`, ambos `isTrigger`, **sem callback e sem componente que os explicasse**. O
+prefab tem só a cápsula sólida de pegada e a caixa da hurtbox — os dois extras foram postos na
+instância.
+
+**Não eram inofensivos.** O Byakhee está na camada `Enemy`, que está em
+`DetectorDeInteracao.CamadasPadraoDeInteragiveis`. Aquele `OverlapCircle` tem **8 slots fixos**
+e descarta o excedente em ordem arbitrária — cada órfão comia um slot perto do chefe.
+
+**Feito por ferramenta, não por YAML.** A instância é um `PrefabInstance`, e componente
+adicionado a instância vive em dois lugares: o bloco do componente e a contabilidade do
+`PrefabInstance`. Editar o texto deixaria uma das duas para trás — e este projeto já pagou por
+regex em YAML de cena.
+
+Verificado pela auditoria, não pelo log da ferramenta: **84 → 82 gatilhos, "fora do esperado:
+nenhum"**, e a categoria `Desconhecido` desapareceu. Mantidos intactos a cápsula de pegada e a
+hurtbox do filho.
+
+- `Assets/FavelaAmarela/Editor/RemoverGatilhosOrfaosDoByakhee.cs` — **novo**.
+
+
 ## 2026-09-04 — Materiais de física: não existe nenhum, e o padrão vale por acidente
 
 Pedido: listar os `PhysicsMaterial2D` do projeto com atrito e elasticidade, e apontar colisor

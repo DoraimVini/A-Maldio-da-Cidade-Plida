@@ -31,12 +31,9 @@ Isso responde metade da pergunta "scripts em objetos sólidos usam callback de c
 
 ## Fora do esperado
 
-| origem | objeto | diagnóstico | o quê |
-|---|---|---|---|
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | **GatilhoSemDono** | Trigger sem callback e sem componente que explique o que ele é. Ou sobrou de algo removido, ou alguém depende dele por consulta de física (OverlapCircle), que não aparece aqui. |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | **GatilhoSemDono** | Trigger sem callback e sem componente que explique o que ele é. Ou sobrou de algo removido, ou alguém depende dele por consulta de física (OverlapCircle), que não aparece aqui. |
+Nenhum. Todo gatilho tem dono, e todo callback casa com o colisor.
 
-## Os 84 gatilhos
+## Os 82 gatilhos
 
 | origem | objeto | forma | propósito | corpo? | callbacks |
 |---|---|---|---|---|---|
@@ -54,8 +51,6 @@ Isso responde metade da pergunta "scripts em objetos sólidos usam callback de c
 | Patua_DasLuasGemeas | `Patua_DasLuasGemeas` | Circle | Coletavel | não | — |
 | Patua_Pickup | `Patua_Pickup` | Box | Coletavel | não | — |
 | Tumba_De_Alhazred | `Patua_Pickup` | Box | Coletavel | não | — |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Circle | Desconhecido | sim | — |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Box | Desconhecido | sim | — |
 | Abdul_Alhazred | `Abdul_Alhazred/Hurtbox` | Box | Hurtbox | não | — |
 | Byakhee | `Byakhee/Hurtbox` | Box | Hurtbox | sim | — |
 | Castelo_Carcosa | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | sim | — |

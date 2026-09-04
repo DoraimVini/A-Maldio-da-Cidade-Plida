@@ -38,7 +38,7 @@ date: 2026-09-04
 | EsqueletoInvocado | `EsqueletoInvocado` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
 | Player_Damiao | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
 | Portoes_Das_Ruinas | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 4 |
+| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
 | Portoes_Das_Ruinas | `PortoesFloorGrid/Colisao` | Static | 0 | 1 | 0 | 0,05 | — | Discrete | None | StartAwake | 2 |
 | Santuario_Yhtill | `Player_Damiao` | Dynamic | 0 | 1 | 0 | 0,05 | Rot | Continuous | Interpolate | StartAwake | 2 |
 | Santuario_Yhtill | `SantuarioFloorGrid/Colisao` | Static | 0 | 1 | 0 | 0,05 | — | Discrete | None | StartAwake | 2 |

@@ -9,7 +9,7 @@ date: 2026-09-04
 
 > **Gerado por ferramenta.** Rode `Tools/FavelaAmarela/Auditar Física 2D` para atualizar — edições à mão neste arquivo são perdidas.
 
-141 colisor(es) em 6 cena(s) do Build Settings e nos prefabs do projeto.
+139 colisor(es) em 6 cena(s) do Build Settings e nos prefabs do projeto.
 
 ## Como ler a coluna "queixa"
 
@@ -56,7 +56,6 @@ Comparar **por papel** também não bastou enquanto o papel era grosseiro: a pri
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
 | Deserto_Hali | `Inimigos_Deserto/Cultista_Setor_TumbaDeAlhazred_0/Hurtbox` | Box | Hurtbox | escala não uniforme 0,63 × 0,804 (esticado 1,28× em Y); largura -43% do esperado (0,63 contra 1,11) |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Capsule | Pegada | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y); proporção 0,73:1 — chão isométrico é 2:1 (±0,5); a +2,4 do pé — pegada é área de chão |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Circle | Gatilho | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y) |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee/Hurtbox` | Box | Hurtbox | escala não uniforme 1,021 × 0,938 (esticado 0,92× em Y) |
 | Santuario_Yhtill | `Cassilda` | Circle | Gatilho | escala não uniforme 1,478 × 1,925 (esticado 1,3× em Y) |
 | Tumba_De_Alhazred | `Inimigos_Playtest/Cultista` | Box | Pegada | escala não uniforme 0,592 × 0,751 (esticado 1,27× em Y) |
@@ -172,8 +171,6 @@ Tamanho e centro em **unidades de mundo** (já multiplicados pela escala); offse
 | Portoes_Das_Ruinas | `Player_Damiao` | Box | Pegada | 0,6×0,3 | — | 0, 0 | 0, -10 | não | None | — | 0,4 | 0 | 0,99×2,3 |
 | Portoes_Das_Ruinas | `Player_Damiao/Hurtbox` | Capsule | Hurtbox | 0,7×1,9 | — | 0, 1,25 | 0, -8,95 | sim | None | — | 0,4 | 0 | 0,99×2,3 |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Capsule | Pegada | 2,04×2,82 | — | 0, 2,56 | 0, 4,66 | não | None | — | 0,4 | 0 | 5,23×4,81 |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Circle | Gatilho | 1,52×1,52 | 0,76 | -0,04, 0,97 | -0,05, 3,17 | sim | None | — | 0,4 | 0 | 5,23×4,81 |
-| Portoes_Das_Ruinas | `Portoes_Root/Byakhee` | Box | Gatilho | 2,83×3,21 | — | -0,26, 1,92 | -0,27, 4,06 | sim | None | — | 0,4 | 0 | 5,23×4,81 |
 | Portoes_Das_Ruinas | `Portoes_Root/Byakhee/Hurtbox` | Box | Hurtbox | 3,77×4,14 | — | 0, 2,56 | 0, 4,66 | sim | None | — | 0,4 | 0 | 5,23×4,81 |
 | Portoes_Das_Ruinas | `Portoes_Root/Gatilho_DaArena` | Box | Gatilho | 38×1,5 | — | 0, 0 | 0, -7 | sim | None | — | 0,4 | 0 | — |
 | Portoes_Das_Ruinas | `Portoes_Root/Os_Portoes` | Box | Cenario | 18×1 | — | 0, 0,5 | 0, 11,5 | não | None | — | 0,4 | 0 | — |
