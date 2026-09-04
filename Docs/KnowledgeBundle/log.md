@@ -4,6 +4,46 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Robe amarelo, e o Damião nasce onde deve
+
+### O robe
+
+As nove folhas de `Damiao/Animado` repintadas: **outline preto, resto amarelo, sombreação
+preservada**. O método não é troca de cor por cor — mapeia a **luminância perceptual** de cada
+pixel numa rampa amarela (matiz 48°, saturação 0,80, piso de valor 0,46). Trocar cor a cor por
+tabela chapada mataria o volume do pano, e é a rampa de sombra que dá leitura de robe.
+
+**O arco do golpe ficou como estava.** O Vini corrigiu no meio do trabalho: *"tudo era só a
+roupa, não é pra aplicar nos golpes"*. O que separa os dois é a **temperatura**, e não uma
+lista de cores: medido no quadro do golpe, arco e lâmina são frios (`#C0CCDC`, `#FFFFFF`,
+`#525B92` — azul ≥ vermelho) e o robe é quente nas 18 cores da folha. Uma lista envelheceria no
+dia em que a arte mudasse; a regra não.
+
+Piso de valor foi de 0,20 para 0,46 depois da primeira tentativa sair **oliva** em vez de
+amarela — preservar o valor original mantinha escuro o que era marrom escuro.
+
+### O nascimento no Deserto
+
+De `(-12, -13,12)` para **`(-24, -28)`**: 6 unidades do `Refugio_Entrada`, 2,5 da face interna
+do `Limite_Sul`. Dos três refúgios da cena, o da Entrada é o único perto de uma parede — 9
+unidades do limite sul, contra 19 do oeste; os outros dois ficam no miolo do mapa.
+
+Feito por ferramenta (`MoverNascimentoDoDamiao`): posição de `PrefabInstance` vive em
+`m_Modifications` com `propertyPath` por eixo, e não num `m_LocalPosition` de `Transform` — um
+`grep` na cena nem acha o objeto.
+
+A folga de 2,5 é deliberada: o `Limite_Sul` é caixa de altura 1 centrada em y = -31, então a
+face interna está em -30,5, e nascer colado geraria sobreposição no primeiro `FixedUpdate`.
+
+### Buffer de interação 8 → 16 e a cena de abertura
+
+Ver a entrada anterior. A `Library/LastSceneManagerSetup.txt` é reapontada para `Cena_Menu` ao
+fim de cada sessão de trabalho — **toda execução em batch a reescreve**, e isso é do ferramental,
+não da Unity.
+
+EditMode **1052 (1029 passando, 0 falhando)**.
+
+
 ## 2026-09-04 — O portão de profundidade rejeitava quem estava perto
 
 Relato de playteste: *"tá muito difícil de encaixar um golpe neles… até as pedras de poder
