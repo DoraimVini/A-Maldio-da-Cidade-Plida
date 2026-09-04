@@ -666,8 +666,8 @@ namespace FavelaAmarela.EditorTools
             if (col == null) col = go.AddComponent<BoxCollider2D>();
             col.size = new Vector2(0.6f, 0.6f);
 
-            var ia = go.GetComponent<FavelaAmarela.Core.Combat.CortesaoPalido>();
-            if (ia == null) ia = go.AddComponent<FavelaAmarela.Core.Combat.CortesaoPalido>();
+            var ia = go.GetComponent<FavelaAmarela.Runtime.Enemies.CortesaoPalido>();
+            if (ia == null) ia = go.AddComponent<FavelaAmarela.Runtime.Enemies.CortesaoPalido>();
 
             // Pontos de patrulha como filhos: o array é de Transform, então precisam existir
             // como objetos de cena.

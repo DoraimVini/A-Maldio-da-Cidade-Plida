@@ -4,6 +4,75 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — O Cortesão vira inimigo de verdade, e o QA passa a rodar as duas suítes
+
+### O QA rodava a metade errada
+
+`Tools/run_qa_tests.ps1` tinha padrão **EditMode** — e **todos** os testes de física do projeto
+vivem no PlayMode (hitbox, i-frames, consultas de proximidade, percepção, portão de
+profundidade). Quem rodava o script sem argumento validava **146 arquivos de configuração e
+zero de combate**, sem nada avisar.
+
+Somava-se a isso o parâmetro engolido: sem `[CmdletBinding()]`, o PowerShell joga nome
+desconhecido em `$args` em silêncio, então `-Modo PlayMode` executava EditMode e imprimia
+`TESTS PASSED`.
+
+Os dois consertados: `[CmdletBinding()]` + `[ValidateSet]`, e o **padrão passa a ser `Ambos`**,
+que roda as duas e soma. `-Modo` agora falha alto.
+
+**Sobre "integrar os testes": não havia o que integrar.** O Unity Test Framework descobre por
+*assembly*, não por lista — `Assets/Tests/PlayMode/` tem asmdef próprio, e todo arquivo novo ali
+entra na suíte sozinho. O `PhysicsQueryAuditTests` já rodava desde que foi escrito.
+
+Resultado: **EditMode 1052 (1029 passando) + PlayMode 50 (50 passando) = 1102 testes, 0 falhando.**
+
+### O Cortesão Pálido
+
+Relato de playteste: *"tem colisor, mas não leva dano, nem causa, e ele invade a luta contra o
+Rei"*. Três sintomas, três causas.
+
+1. **Não levava dano** — não implementava `IDanificavel`, e o comentário do próprio arquivo já
+   dizia: *"não existe caminho no jogo que tire vida dele"*. Medido: no `Castelo_Carcosa`
+   inteiro, a única hurtbox era a do `Player_Damiao`.
+2. **Não causava dano** — zero referências a ataque no arquivo. Nunca foi escrito.
+3. **Invadia a luta do Rei** — `jogadorDetectado` **nunca voltava a false**: o `return` de
+   `Update` saía cedo para sempre. Sem coleira, ele seguia o Damião do Salão do Banquete até o
+   Trono, três zonas adiante. O `Castelo_Carcosa` também é a única cena de chefe **sem trava de
+   arena** (a Tumba tem `TrancaDeArena_Abdul`, os Portões têm `Gatilho_DaArena`).
+
+**Consertos:** coleira de 20 unidades medida da origem da caça (mesmo conceito e valor de
+`EnemyStateMachine.maxChaseDistance`); `EnemyBase` + `Ficha_CortesaoPalido` (160/26/10/15,
+nível 3) nas duas instâncias; e golpe com **janela** via `Hitbox` — não o acerto radial
+instantâneo —, com dano vindo da ficha e portão de profundidade de uma célula, igual ao do
+Damião.
+
+### A mudança que foi forçada
+
+`CortesaoPalido` saiu de `Core/` para `Runtime/Enemies/`. A nota antiga dizia que mover daria
+*"ganho nenhum em jogo"* — **deixou de ser verdade**: `FavelaAmarela.Core` tem
+`references: []` e não enxerga `Hitbox` nem `EnemyBase`. De dentro de `Core/`, este ator **não
+tinha como** ganhar combate.
+
+Isso **não paga** a dívida POCO: põe um `MonoBehaviour` onde ele deve morar, e só. Separar
+`CortesaoPalidoFSM` (Core) de um adaptador continua em aberto.
+
+**Não virou a pilha padrão do elenco** de propósito: ele é o **único ator do jogo com detecção
+visual** — cone mais raycast de oclusão. O resto percebe 100% por som, e o `CLAUDE.md` registra
+que visão *"é sistema, não ajuste"*. Trocá-lo apagaria a única visão que existe.
+
+### Duas armadilhas de ferramenta, para não repetir
+
+**`SerializedObject` não gravou a referência de asset.** O `int` persistiu, a referência não —
+com os tipos medidos como **idênticos** e `IsInstanceOfType == True`. Gastei três execuções numa
+teoria de incompatibilidade que o próprio diagnóstico derrubou. O que funciona é
+`FieldInfo.SetValue` + `EditorUtility.SetDirty`, e a verificação é o **disco**.
+
+**Deadlock do `bee_backend`.** Uma execução ficou 30 minutos parada em *"More than one copy of
+bee_backend running -- PID 16412 waiting"*, esperando um lock cujo processo não existia mais.
+Sintoma: log congelado e `Unity.exe` vivo consumindo nada. Conserto: matar o processo em
+batch mode (confirmar pela linha de comando que é o de batch, e não o Editor do Vini).
+
+
 ## 2026-09-04 — Robe amarelo, e o Damião nasce onde deve
 
 ### O robe

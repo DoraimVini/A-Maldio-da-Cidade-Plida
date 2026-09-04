@@ -132,7 +132,7 @@ namespace FavelaAmarela.EditorTools
 
             var cena = EditorSceneManager.OpenScene(CenaDoCastelo, OpenSceneMode.Single);
 
-            int cortesaos = MarcarPorTipo<FavelaAmarela.Core.Combat.CortesaoPalido>(
+            int cortesaos = MarcarPorTipo<FavelaAmarela.Runtime.Enemies.CortesaoPalido>(
                 0.45f, resumo, "Cortesão Pálido", "já foi gente: cambaleia, não voa");
 
             int ecos = MarcarPorTipo<FavelaAmarela.Runtime.Enemies.EcoDeCarcosa>(

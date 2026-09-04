@@ -19,7 +19,10 @@
     um arquivo de log, e só o que importa é impresso.
 
 .PARAMETER TestPlatform
-    EditMode (padrão) ou PlayMode.
+    EditMode, PlayMode ou Ambos. O PADRÃO é Ambos desde 2026-09-04: todos os testes de
+    física do projeto (hitbox, i-frames, consultas de proximidade, percepção, portão de
+    profundidade) vivem no PlayMode, e o padrão antigo era EditMode — quem rodava sem
+    argumento validava a configuração e não validava o combate.
 
 .PARAMETER ComGraficos
     Tira o -nographics. Necessário quando os testes de layout acusarem que não conseguiram
@@ -30,11 +33,44 @@
     encaixa em nenhum dos quatro estados.
 #>
 
+# [CmdletBinding()] NAO e enfeite. Sem ele, o PowerShell joga parametro desconhecido em
+# $args EM SILENCIO e segue com o padrao: rodar "-Modo PlayMode" executava EditMode e
+# imprimia TESTS PASSED, o que ja aconteceu em 2026-09-04. Com ele, o nome errado FALHA.
+[CmdletBinding()]
 param(
-    [string]$TestPlatform = "EditMode",
+    [ValidateSet("EditMode", "PlayMode", "Ambos")]
+    [string]$TestPlatform = "Ambos",
     [switch]$Detalhado,
     [switch]$ComGraficos
 )
+
+# ── Modo Ambos ─────────────────────────────────────────────────────────────────────────
+# E o PADRAO desde 2026-09-04, e a troca foi por um motivo medido: o padrao antigo era
+# EditMode, e TODOS os testes de fisica do projeto vivem no PlayMode -- hitbox, i-frames,
+# consultas de proximidade, percepcao, portao de profundidade. Quem rodava o script sem
+# argumento validava 146 arquivos de configuracao e ZERO de combate, e nada avisava.
+if ($TestPlatform -eq "Ambos") {
+    $codigo = 0
+    foreach ($plataforma in @("EditMode", "PlayMode")) {
+        $argumentos = @{ TestPlatform = $plataforma }
+        if ($Detalhado)   { $argumentos.Detalhado = $true }
+        if ($ComGraficos) { $argumentos.ComGraficos = $true }
+
+        & $PSCommandPath @argumentos
+        if ($LASTEXITCODE -ne 0) { $codigo = $LASTEXITCODE }
+    }
+
+    Write-Host ""
+    if ($codigo -eq 0) {
+        Write-Host "  AS DUAS SUITES PASSARAM" -ForegroundColor Green
+        Write-Host "TESTS PASSED"
+    }
+    else {
+        Write-Host "  UMA DAS SUITES FALHOU — role para cima para ver qual." -ForegroundColor Red
+        Write-Host "TESTS FAILED"
+    }
+    exit $codigo
+}
 
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8

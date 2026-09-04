@@ -70036,6 +70036,7 @@ GameObject:
   - component: {fileID: 1616806561}
   - component: {fileID: 1616806560}
   - component: {fileID: 1616806564}
+  - component: {fileID: 1616806565}
   m_Layer: 0
   m_Name: Cortesao_Palido_0
   m_TagString: Untagged
@@ -70081,6 +70082,11 @@ MonoBehaviour:
   pontosDePatrulha:
   - {fileID: 1846048089}
   - {fileID: 1585571499}
+  alcanceDoGolpe: 1.1
+  raioDoGolpe: 0.6
+  janelaDoGolpe: 0.15
+  recargaDoGolpe: 1.4
+  distanciaMaximaDeCaca: 20
 --- !u!61 &1616806561
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -70226,6 +70232,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 0.45
+--- !u!114 &1616806565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1616806558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c78e21417e14e24a80040c0d42ef897, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyBase
+  ficha: {fileID: 11400000, guid: cc70b156b7eb467498a3c442a98f6e03, type: 2}
+  nivelDaUnidade: 3
+  ehAparicaoPrimordial: 0
+  mostrarNumerosDeDano: 1
+  corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}
+  corDoTraumaAnomalo: {r: 0.9, g: 0.85, b: 0.4, a: 1}
+  exposicaoAoAbater: 1
 --- !u!1 &1705262443
 GameObject:
   m_ObjectHideFlags: 0
@@ -70663,6 +70688,7 @@ GameObject:
   - component: {fileID: 1952111492}
   - component: {fileID: 1952111491}
   - component: {fileID: 1952111495}
+  - component: {fileID: 1952111496}
   m_Layer: 0
   m_Name: Cortesao_Palido_1
   m_TagString: Untagged
@@ -70708,6 +70734,11 @@ MonoBehaviour:
   pontosDePatrulha:
   - {fileID: 1720523446}
   - {fileID: 1039247636}
+  alcanceDoGolpe: 1.1
+  raioDoGolpe: 0.6
+  janelaDoGolpe: 0.15
+  recargaDoGolpe: 1.4
+  distanciaMaximaDeCaca: 20
 --- !u!61 &1952111492
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -70853,6 +70884,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 0.45
+--- !u!114 &1952111496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952111489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c78e21417e14e24a80040c0d42ef897, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyBase
+  ficha: {fileID: 11400000, guid: cc70b156b7eb467498a3c442a98f6e03, type: 2}
+  nivelDaUnidade: 3
+  ehAparicaoPrimordial: 0
+  mostrarNumerosDeDano: 1
+  corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}
+  corDoTraumaAnomalo: {r: 0.9, g: 0.85, b: 0.4, a: 1}
+  exposicaoAoAbater: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -1,16 +1,27 @@
 using UnityEngine;
 
-namespace FavelaAmarela.Core.Combat
+namespace FavelaAmarela.Runtime.Enemies
 {
     /// <summary>
     /// O Cortesão Pálido do Castelo: patrulha entre pontos e persegue Damião quando o vê.
     ///
-    /// <para><b>Dívida conhecida e deliberada.</b> Esta classe é um <c>MonoBehaviour</c> morando
-    /// em <c>Core/</c>, o que contraria a regra POCO do <c>CLAUDE.md</c> §2. Consertar isso de
-    /// verdade é separar uma <c>CortesaoPalidoFSM</c> (Core) de um adaptador (Runtime), como
-    /// <c>CultistaFSM</c> + <c>CultistaAI</c> — trabalho de IA de inimigo, não de física. Mover
-    /// só o arquivo de pasta trocaria uma violação por outra e mexeria em três referências para
-    /// ganho nenhum em jogo. Fica registrado aqui, com nome e endereço.</para>
+    /// <para><b>SAIU de <c>Core/</c> em 2026-09-04, e a mudança foi forçada.</b> A nota antiga
+    /// dizia que mover o arquivo daria "ganho nenhum em jogo" — deixou de ser verdade no dia em
+    /// que o Vini pediu que o Cortesão levasse e causasse dano. <c>FavelaAmarela.Core</c> tem
+    /// <c>references: []</c> e não pode enxergar <c>Hitbox</c> nem <c>EnemyBase</c>, que vivem
+    /// no Runtime: de dentro de <c>Core/</c> este ator <b>não tinha como</b> ganhar combate.</para>
+    ///
+    /// <para><b>O que a mudança NÃO paga.</b> Ela põe um <c>MonoBehaviour</c> onde
+    /// <c>MonoBehaviour</c> deve morar, e só. A dívida de verdade continua em aberto: separar
+    /// uma <c>CortesaoPalidoFSM</c> (Core) de um adaptador (Runtime), como
+    /// <c>CultistaFSM</c> + <c>CultistaAI</c>. Fica registrado aqui, com nome e endereço.</para>
+    ///
+    /// <para><b>Por que ele não virou a pilha padrão do elenco</b> (<c>EnemyMovement</c> +
+    /// <c>EnemyPerception</c> + <c>EnemyStateMachine</c>): ele é o <b>único ator do jogo com
+    /// detecção VISUAL</b> — cone de visão mais raycast de oclusão. O resto do elenco percebe
+    /// 100% por som, e o <c>CLAUDE.md</c> registra que visão "é sistema, não ajuste, e não
+    /// estava no prazo do edital". Trocá-lo pela pilha padrão apagaria a única visão que
+    /// existe.</para>
     ///
     /// <para><b>O que MUDOU em 2026-08-27</b>, e não é dívida — é defeito:</para>
     ///
@@ -55,8 +66,45 @@ namespace FavelaAmarela.Core.Combat
         /// <summary>Distância que conta como "chegou" ao ponto de patrulha.</summary>
         private const float RaioDeChegada = 0.2f;
 
+        [Header("Golpe")]
+        [Tooltip("Distância em que ele para de avançar e bate.")]
+        [Min(0.1f)]
+        [SerializeField] private float alcanceDoGolpe = 1.1f;
+
+        [Tooltip("Raio da área atingida, em unidades de mundo.")]
+        [Min(0.1f)]
+        [SerializeField] private float raioDoGolpe = 0.6f;
+
+        [Tooltip("Segundos que a janela de acerto fica aberta. Não é o intervalo entre golpes: " +
+                 "é quanto tempo o golpe EXISTE, e portanto quanto tempo há para esquivar.")]
+        [Min(0.05f)]
+        [SerializeField] private float janelaDoGolpe = 0.15f;
+
+        [Tooltip("Segundos entre um golpe e o seguinte.")]
+        [Min(0.1f)]
+        [SerializeField] private float recargaDoGolpe = 1.4f;
+
+        [Header("Coleira")]
+        [Tooltip("Distância máxima do ponto onde a caça começou. Passando disso ele desiste e " +
+                 "volta a patrulhar. 20 é o mesmo valor que EnemyStateMachine.maxChaseDistance " +
+                 "usa para o resto do elenco.")]
+        [Min(1f)]
+        [SerializeField] private float distanciaMaximaDeCaca = 20f;
+
         private Transform alvo;
         private bool jogadorDetectado = false;
+
+        /// <summary>
+        /// Onde a caça começou. É a referência da coleira — e é o ponto de partida, não a
+        /// posição atual, pelo mesmo motivo que a <c>EnemyStateMachine</c> usa
+        /// <c>_chaseOrigin</c>: medir contra a posição atual nunca dispara, porque ela é sempre
+        /// zero.
+        /// </summary>
+        private Vector2 origemDaCaca;
+
+        private Combat.Hitbox _hitbox;
+        private EnemyBase _corpoDeCombate;
+        private float _proximoGolpe;
 
         private Rigidbody2D _corpo;
         private int _mascaraDoJogador;
@@ -84,9 +132,78 @@ namespace FavelaAmarela.Core.Combat
         /// </summary>
         private void Update()
         {
-            if (jogadorDetectado && alvo != null) return;
+            if (jogadorDetectado && alvo != null)
+            {
+                // A COLEIRA. Sem ela, `jogadorDetectado` NUNCA voltava a false: este `return`
+                // saía cedo para sempre, e o Cortesão perseguia o Damião pelo mapa inteiro. O
+                // Vini relatou o sintoma jogando o Castelo -- "ele invade a luta contra o Rei",
+                // que é a última luta do Vertical Slice, três zonas adiante do Salão do
+                // Banquete onde ele patrulha.
+                //
+                // Mede contra ONDE A CAÇA COMEÇOU, e não contra a posição atual: distância até
+                // si mesmo é sempre zero e nunca dispararia. Mesma semântica de
+                // EnemyStateMachine._chaseOrigin, e o mesmo valor padrão (20).
+                if (Vector2.Distance(transform.position, origemDaCaca) <= distanciaMaximaDeCaca)
+                    return;
+
+                DesistirDaCaca();
+                return;
+            }
 
             ProcurarJogador();
+        }
+
+        /// <summary>
+        /// Larga a perseguição e volta à patrulha. Público não: quem decide é a coleira.
+        /// </summary>
+        private void DesistirDaCaca()
+        {
+            jogadorDetectado = false;
+            alvo = null;
+        }
+
+        /// <summary>
+        /// Arma o golpe se o Damião estiver ao alcance e a recarga tiver passado.
+        /// </summary>
+        /// <returns>true se golpeou — quem chama para de avançar.</returns>
+        private bool TentarGolpear()
+        {
+            if (alvo == null || Time.time < _proximoGolpe) return false;
+
+            if (Vector2.Distance(transform.position, alvo.position) > alcanceDoGolpe)
+                return false;
+
+            GarantirHitbox();
+            if (_hitbox == null) return false;
+
+            _proximoGolpe = Time.time + recargaDoGolpe;
+
+            // O dano sai da FICHA, e não de um número solto aqui: é o EnemyBase que carrega a
+            // ficha do Cortesão, e é dela que o resto do elenco tira ataque. Um float no
+            // Inspector deste script seria uma segunda fonte da verdade para o mesmo número.
+            float dano = _corpoDeCombate != null ? _corpoDeCombate.Atributos.Ataque : 0f;
+
+            var golpe = new Core.Abilities.ArmaResult(
+                success: true, durationSeconds: 0f, cooldownSeconds: 0f, dano: dano);
+
+            Vector2 direcao = ((Vector2)alvo.position - (Vector2)transform.position).normalized;
+            _hitbox.Armar(golpe, janelaDoGolpe, direcao);
+            return true;
+        }
+
+        private void GarantirHitbox()
+        {
+            if (_hitbox != null) return;
+
+            int camadaDoJogador = LayerMask.GetMask("PlayerHurtbox");
+
+            // Profundidade de uma célula, igual à do golpe do Damião. Simetria de propósito: um
+            // inimigo que alcança três células de profundidade enquanto o jogador alcança uma
+            // lê como injustiça, porque contradiz o que se vê.
+            _hitbox = Combat.Hitbox.GarantirPara(
+                gameObject, "Hitbox_Cortesao", camadaDoJogador,
+                raioDoGolpe, alcanceDoGolpe, pouparAliados: false,
+                profundidade: Combat.Hitbox.ProfundidadeDeUmaCelula);
         }
 
         private void FixedUpdate()
@@ -96,6 +213,10 @@ namespace FavelaAmarela.Core.Combat
 
             if (jogadorDetectado && alvo != null)
             {
+                // Golpear vem ANTES de mover: quem já está ao alcance para e bate, em vez de
+                // continuar empurrando o Damião enquanto o acerta.
+                if (TentarGolpear()) { Parar(); return; }
+
                 destino = alvo.position;
                 velocidade = velocidadePatrulha * FatorDePerseguicao;
             }
@@ -166,6 +287,10 @@ namespace FavelaAmarela.Core.Combat
 
             if (hit.collider != null) return;
 
+            // A origem da caça é gravada AQUI, no instante em que ele passa a caçar -- não no
+            // Awake. Gravar no Awake mediria a coleira contra o ponto de nascimento, e um
+            // Cortesão que patrulhasse para longe começaria a caça já esticado.
+            origemDaCaca = transform.position;
             jogadorDetectado = true;
             alvo = col.transform;
         }
