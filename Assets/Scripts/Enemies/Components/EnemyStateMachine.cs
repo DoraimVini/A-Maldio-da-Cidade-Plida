@@ -47,6 +47,14 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_enemyBase != null)
             {
                 _enemyBase.OnAbatido += () => TryTransition(EnemyState.Dead);
+
+                // LEVAR UM GOLPE PASSA A CONTAR. Até 2026-09-04 OnGolpeRecebido não tinha
+                // ouvinte nenhum na IA: o inimigo reagia a passo e ignorava facada. Quem
+                // decide o que fazer é a percepção, não a FSM -- ela sobe a suspeita e dispara
+                // OnEntrouCaca, que já está ligado acima. Assim há UM caminho para Chase, e
+                // não dois que podem divergir.
+                if (_perception != null)
+                    _enemyBase.OnGolpeRecebido += _ => _perception.NotarAgressao();
             }
         }
 
@@ -137,6 +145,15 @@ namespace FavelaAmarela.Runtime.Enemies
                     {
                         _movement.MoverPara(_perception.UltimaOrigemConhecida.Value, _movement.VelocidadeCaca);
                         if (_combat.AlvoEstaAoAlcance()) TryTransition(EnemyState.Attack);
+                    }
+                    else
+                    {
+                        // Chase SEM destino era um no-op silencioso: o inimigo ficava parado,
+                        // em estado de caça, para sempre -- nem perseguia nem voltava a
+                        // patrulhar, porque a distância até _chaseOrigin nunca crescia. Voltar
+                        // a Patrol é o comportamento honesto: sem alvo não há caça.
+                        TryTransition(EnemyState.Patrol);
+                        break;
                     }
                     if (Vector2.Distance(transform.position, _chaseOrigin) > maxChaseDistance)
                     {

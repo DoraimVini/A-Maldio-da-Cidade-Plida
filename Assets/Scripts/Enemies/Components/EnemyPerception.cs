@@ -140,6 +140,36 @@ namespace FavelaAmarela.Runtime.Enemies
             _ultimaOrigemConhecida = som.Origem;
         }
 
+        /// <summary>
+        /// O inimigo <b>foi golpeado</b>. Sobe a suspeita ao máximo e passa a caçar.
+        ///
+        /// <para><b>Por que isto faltava, e o que custava.</b> Até 2026-09-04 nada ligava dano
+        /// à percepção: <c>EnemyBase</c> disparava <c>OnGolpeRecebido</c> e <b>ninguém
+        /// escutava</b>. O Vini relatou, jogando a Tumba: <i>"o primeiro cultista não me notou,
+        /// nem quando eu batia"</i>. Estava certo — o estímulo mais inequívoco do jogo era o
+        /// único que a IA ignorava. Ela reagia a passo e não reagia a facada.</para>
+        ///
+        /// <para><b>Por que a origem é a POSIÇÃO DELE, e não a do atacante.</b> Passar a origem
+        /// de verdade exigiria mudar <c>IDanificavel.ReceberGolpe</c>, que é interface do Core
+        /// com uma dúzia de implementadores. E não faz falta: quem acabou de acertar um golpe
+        /// corpo a corpo está <b>encostado</b>. O <c>Chase</c> consulta
+        /// <c>AlvoEstaAoAlcance()</c> contra o jogador de verdade, então a imprecisão de uma
+        /// unidade não muda o desfecho — ele entra em <c>Attack</c> no mesmo quadro.</para>
+        /// </summary>
+        public void NotarAgressao()
+        {
+            _ultimaOrigemConhecida = transform.position;
+            _tempoDesdeUltimoSom = 0f;
+            _suspeita = 1f;
+            OnSuspeitaChanged?.Invoke(_suspeita);
+
+            if (_jaEntrouCaca) return;
+
+            _jaEntrouAlerta = true;
+            _jaEntrouCaca = true;
+            OnEntrouCaca?.Invoke();
+        }
+
         public void PerderAlvo()
         {
             _suspeita = 0f;

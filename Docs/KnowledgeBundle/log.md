@@ -4,6 +4,70 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Levar um golpe passa a contar
+
+Relato de playteste do Vini, na Tumba: *"o primeiro cultista não me notou, nem quando eu
+batia, ele entrava e saía do estado de alerta; o segundo começou a perseguir depois que eu
+andei mais para a frente dele. Nada disso pareceu fazer muito sentido."*
+
+Ele estava certo nas duas metades, e cada uma tinha causa própria.
+
+Suítes: PlayMode 48 → **49 (49/49)**; EditMode **1052 (1029 passando, 0 falhando)**.
+
+### Defeito 1 — dano não chegava à IA
+
+`EnemyBase` dispara `OnGolpeRecebido` e `OnDanoSofrido`. Quem assina: `AudioDeCombate`,
+`EnemyStatusEffects`, `AnimadorDoByakhee` e `SsethFarejadorAI`. **A `EnemyStateMachine` não
+assinava nenhum dos dois.** As únicas transições ligadas eram `OnEntrouAlerta → Alert`,
+`OnEntrouCaca → Chase`, `OnPerdeuAlvo → Patrol` e `OnAbatido → Dead`.
+
+Consequência: o estado `Hurt` era **inalcançável por dano** — só por `Atordoar()`, que é a
+relíquia. A IA reagia a **passo** e ignorava **facada**.
+
+### Defeito 2 — `Chase` sem destino era um no-op silencioso
+
+```csharp
+case EnemyState.Chase:
+    if (_perception.UltimaOrigemConhecida.HasValue) { ... }   // sem else
+```
+
+Sem origem, o inimigo ficava **parado em estado de caça, para sempre**: não perseguia, e não
+voltava a patrulhar porque a distância até `_chaseOrigin` nunca crescia. E só o som preenchia
+`UltimaOrigemConhecida` — então, mesmo que o golpe levasse a Hurt, a caça seguinte não faria
+nada.
+
+### O "entrando e saindo do alerta"
+
+A suspeita sobe e desce na **mesma taxa** (`taxaSuspeita 0,4/s`), com alerta em 0,3 e caça em
+0,7. Andar emite som a cada 0,15 s; **atacar parado não emite nada**. Então o ciclo era: anda →
+sobe → Alerta (0,75 s); para para bater → decai → cai abaixo de 0,3 → `OnPerdeuAlvo` → Patrulha;
+anda de novo → Alerta. Nunca os **1,75 s contínuos** que a Caça exige. O segundo cultista
+perseguiu porque o Vini andou à frente dele tempo bastante.
+
+### A correção
+
+`EnemyPerception.NotarAgressao()` — sobe a suspeita a 1, grava a origem e dispara `OnEntrouCaca`.
+A `EnemyStateMachine` passa a assinar `OnGolpeRecebido`. **Quem decide é a percepção, não a
+FSM**, para haver *um* caminho até `Chase` e não dois que possam divergir.
+
+**A origem é a posição do próprio inimigo, e não a do atacante.** Passar a origem de verdade
+exigiria mudar `IDanificavel.ReceberGolpe`, interface do Core com uma dúzia de implementadores.
+E não faz falta: quem acabou de acertar um golpe corpo a corpo está encostado, e o `Chase`
+consulta `AlvoEstaAoAlcance()` contra o jogador de verdade — a imprecisão de uma unidade não
+muda o desfecho, ele entra em `Attack` no mesmo quadro.
+
+`Chase` sem destino passa a voltar para `Patrol`.
+
+Guarda: `Item4_LevarUmGolpe_PoeOInimigoEmCaca`. Medido: `suspeita = 1; origem = (7,00, -11,00);
+caça = True`.
+
+### O que NÃO foi mexido
+
+A **taxa de suspeita** continua simétrica em 0,4/s. Ela é balanceamento, não defeito — e agora
+que a facada conta, o ciclo de oscilação deixa de aparecer em combate. Se ainda incomodar em
+aproximação furtiva, o ajuste é decaimento mais lento que a subida.
+
+
 ## 2026-09-04 — Limpeza, e dois quase-erros meus
 
 Removidos: `Assets/Sprites` (continha **um** arquivo, um `.meta` órfão de uma pasta que não

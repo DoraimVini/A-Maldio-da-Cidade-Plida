@@ -420,6 +420,51 @@ namespace FavelaAmarela.Tests.PlayMode
                 "descartado e só raioAudicao valeu — e então agachar não muda nada.");
         }
 
+        /// <summary>
+        /// <b>Levar um golpe tem de contar.</b> Guarda o defeito que o Vini pegou jogando a
+        /// Tumba em 2026-09-04: <i>"o primeiro cultista não me notou, nem quando eu batia"</i>.
+        ///
+        /// <para>Causa: <c>EnemyBase</c> disparava <c>OnGolpeRecebido</c> e <b>ninguém
+        /// escutava</b>. A IA reagia a passo e ignorava facada — o estímulo mais inequívoco do
+        /// jogo era o único que não chegava à percepção. E o <c>Chase</c> só se move quando há
+        /// <c>UltimaOrigemConhecida</c>, que só o som preenchia: mesmo que o golpe levasse a
+        /// Hurt, a caça seguinte seria um no-op silencioso.</para>
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Item4_LevarUmGolpe_PoeOInimigoEmCaca()
+        {
+            var ouvinte = MontarOuvinte(out _);
+            ouvinte.transform.position = new Vector3(7f, -11f, 0f);
+
+            yield return null;
+
+            Assert.IsFalse(ouvinte.UltimaOrigemConhecida.HasValue,
+                "O rig começou com origem conhecida — o teste não distinguiria o efeito do golpe.");
+
+            bool entrouEmCaca = false;
+            ouvinte.OnEntrouCaca += () => entrouEmCaca = true;
+
+            ouvinte.NotarAgressao();
+            yield return null;
+
+            Debug.Log($"[PhysicsQueryAudit] agressão: suspeita = {ouvinte.Suspeita:0.##}; " +
+                      $"origem = {ouvinte.UltimaOrigemConhecida}; caça = {entrouEmCaca}");
+
+            Assert.IsTrue(entrouEmCaca,
+                "Levar um golpe não disparou OnEntrouCaca. É esse evento que a " +
+                "EnemyStateMachine escuta para entrar em Chase — sem ele, o inimigo apanha e " +
+                "continua patrulhando, que foi exatamente o relato de playteste.");
+
+            Assert.IsTrue(ouvinte.UltimaOrigemConhecida.HasValue,
+                "Entrou em caça sem origem conhecida. O Chase só se move quando " +
+                "UltimaOrigemConhecida tem valor — sem ela, a caça é um no-op silencioso e o " +
+                "inimigo fica parado em estado de perseguição.");
+
+            Assert.AreEqual(1f, ouvinte.Suspeita, 0.001f,
+                $"A suspeita ficou em {ouvinte.Suspeita:0.##} depois de um golpe. Ser atingido " +
+                "não é uma pista: é certeza, e tem de saturar o medidor.");
+        }
+
         // ═══════════════════════════════════════════════════════════════════
         // 5 — efeito em área (Physics2D.OverlapCircleAll das relíquias)
         // ═══════════════════════════════════════════════════════════════════
