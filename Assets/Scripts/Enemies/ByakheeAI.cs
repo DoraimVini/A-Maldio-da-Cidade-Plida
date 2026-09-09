@@ -29,6 +29,15 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Raio que ele percorre ao circundar, em unidades.")]
         [SerializeField] private float raioDeVoo = 3f;
 
+        [Tooltip("Até onde ele pode se afastar do centro da arena, em unidades. Fora disso " +
+                 "ele é forçado a voltar.")]
+        [Min(4f)]
+        [SerializeField] private float raioDaArena = 12f;
+
+        [Tooltip("Velocidade com que ele se arrasta na direção do jogador enquanto está " +
+                 "POUSADO e longe demais para ser alcançado.")]
+        [SerializeField] private float velocidadeNoChao = 2.6f;
+
         [Header("Movimento")]
         [SerializeField] private float velocidadeRasante = 6f;
         [SerializeField] private float velocidadeMergulho = 9f;
@@ -186,12 +195,124 @@ namespace FavelaAmarela.Runtime.Enemies
                     Circundar();
                     break;
 
+                case ByakheeState.Pousado:
+                case ByakheeState.Frenesi:
+                    ArrastarAteOJogador();
+                    break;
+
                 default:
-                    // Pousado, grito e frenesi acontecem parado: é o que dá ao jogador um
-                    // alvo estável justamente quando ele pode acertar.
+                    // Grito e telegrafo acontecem parado: é o que dá ao jogador um alvo
+                    // estável justamente quando ele pode reagir.
                     _rb.linearVelocity = Vector2.zero;
                     break;
             }
+
+            ManterNaArena();
+        }
+
+        /// <summary>
+        /// Enquanto está no chão e <b>vulnerável</b>, ele se arrasta na direção do jogador até
+        /// ficar ao alcance — e só então para.
+        ///
+        /// <para><b>O defeito que isto conserta (2026-09-09).</b> O rasante corre por
+        /// <c>duracaoRasante</c> (2 s) a <c>velocidadeRasante</c> (6 un/s): <b>12 unidades em
+        /// linha reta</b>, atravessando o jogador e seguindo adiante. E <c>DepoisDoVoo</c>
+        /// alterna mergulho e pouso — ou seja, <b>um pouso em cada dois acontece a 12 unidades
+        /// do jogador</b>, que então tem 2 segundos de janela para percorrer 12 unidades
+        /// correndo a 7,5 un/s. Não dá: ele chega com a janela fechando, e a fase 2 encurta a
+        /// janela para 1,5 s.</para>
+        ///
+        /// <para>Somado ao dreno passivo de Resiliência (2/s, que corre o tempo todo), metade
+        /// das janelas de dano ser inalcançável é o que faz a luta não fechar. O Vini relatou
+        /// as três coisas juntas — "não dá para ganhar", "sai do mapa" e "difícil de atingir" —
+        /// e as três saem daqui.</para>
+        ///
+        /// <para><b>Por que arrastar em vez de encurtar o rasante.</b> O rasante atravessar o
+        /// jogador é o que o torna esquivável andando de lado, que é a defesa que o design
+        /// pede; encurtá-lo tiraria isso. Arrastar preserva o telegrafo <i>e</i> devolve a
+        /// leitura: quando ele está no chão vindo na sua direção, é a hora de bater.</para>
+        /// </summary>
+        private void ArrastarAteOJogador()
+        {
+            if (_jogador == null)
+            {
+                _rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
+            Vector2 paraOJogador = (Vector2)_jogador.position - _rb.position;
+
+            // Ele não anda até "perto": anda até um ponto AO LADO do jogador, NIVELADO com ele
+            // em profundidade de chão.
+            //
+            // Isto é o terceiro pedaço do relato do Vini, o "a hurtbox dela é muito difícil de
+            // atingir" -- e ele NÃO é da hurtbox, que mede 8,45 × 10,09 unidades contra um corpo
+            // desenhado de 5,72. É do PORTÃO DE PROFUNDIDADE da Hitbox, que aceita meia célula
+            // (0,5) de diferença em Y entre quem bate e quem apanha. A órbita de Circundando usa
+            // `Sin(ângulo) × raioDeVoo × 0,6` = até 1,8 unidade em Y: ele parava ao NORTE ou ao
+            // SUL do Damião, três vezes e meia fora da faixa, e todo golpe para o lado era
+            // rejeitado sem nada na tela dizendo por quê.
+            //
+            // Parar ao lado resolve na geometria em vez de afrouxar o portão -- que existe
+            // porque uma unidade de mundo em Y vale DUAS células de chão neste isométrico, e
+            // alargá-lo devolveria o golpe que alcança três células de profundidade.
+            float lado = paraOJogador.x >= 0f ? -1f : 1f;
+            Vector2 destino = (Vector2)_jogador.position + new Vector2(lado * DistanciaDeParada, 0f);
+
+            Vector2 paraODestino = destino - _rb.position;
+
+            // Chegou: para. O alvo estável que o design pede continua existindo — só deixa de
+            // acontecer do outro lado da arena, e fora do alcance do golpe.
+            if (paraODestino.sqrMagnitude <= TolerenciaDeChegada * TolerenciaDeChegada)
+            {
+                _rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
+            _rb.linearVelocity = paraODestino.normalized * velocidadeNoChao;
+        }
+
+        /// <summary>
+        /// Distância em que ele para de se arrastar. Folgada de propósito: o alcance do Alfanje
+        /// é 1,6 mais 0,85 de raio, e o corpo dele é largo.
+        /// </summary>
+        private const float DistanciaDeParada = 2.2f;
+
+        /// <summary>
+        /// Quão perto do ponto de parada conta como chegado. Meia célula isométrica: menos que
+        /// isso e ele fica tremendo em torno do destino, porque a velocidade de um
+        /// <c>FixedUpdate</c> a 2,6 un/s já anda 0,05.
+        /// </summary>
+        private const float TolerenciaDeChegada =
+            Core.Player.BaseIsometrica.AlturaDeCelulaPadrao * 0.5f;
+
+        /// <summary>
+        /// <b>Coleira da arena.</b> Se ele passou do <see cref="raioDaArena"/>, a velocidade que
+        /// aponta para fora é trocada por uma que aponta para dentro.
+        ///
+        /// <para><b>O defeito que isto conserta.</b> Nada limitava a posição dele. O rasante são
+        /// 12 unidades em linha reta na direção em que o jogador estava, e a órbita de
+        /// <c>Circundando</c> segue o <b>jogador</b>, não o centro. Encadeando rasantes, ele
+        /// caminha para fora da arena e não volta — o "ela continua saindo do mapa" do
+        /// playtest. Esta cena não tem <c>Limite_*</c>: não há parede para segurá-lo.</para>
+        ///
+        /// <para>Corrige por <b>velocidade</b>, e não escrevendo <c>transform.position</c>: com
+        /// <c>Auto Sync Transforms</c> desligado, mover o transform de um corpo deixa o colisor
+        /// para trás até o próximo passo de física — e a hurtbox dele iria junto.</para>
+        /// </summary>
+        private void ManterNaArena()
+        {
+            Vector2 doCentro = _rb.position - (Vector2)_centro;
+            if (doCentro.sqrMagnitude <= raioDaArena * raioDaArena) return;
+
+            Vector2 paraDentro = -doCentro.normalized;
+
+            // Só corrige o que aponta para fora: um movimento que já volta é preservado, senão
+            // ele ficaria colado na borda em vez de retomar o padrão.
+            if (Vector2.Dot(_rb.linearVelocity, paraDentro) > 0f) return;
+
+            _rb.linearVelocity = paraDentro * Mathf.Max(_rb.linearVelocity.magnitude,
+                                                        velocidadeCircundando);
         }
 
         /// <summary>
