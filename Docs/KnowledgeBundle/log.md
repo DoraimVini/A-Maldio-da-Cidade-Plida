@@ -4,6 +4,109 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — A fila, e um teste do projeto me corrigindo
+
+### 1. Quem não tem `EnemyBase` morria em silêncio
+
+Sobra da rodada anterior. O som de **acerto** tinha ido para `Hurtbox.Receber`, mas o de
+**abate** ficou para trás pelo motivo certo: a Hurtbox vê o golpe chegar e não sabe se ele
+derrubou alguém. Então ele continuou no `AudioDeCombate` — que exige `EnemyBase`, e `EnemyBase`
+existe em **dois prefabs do projeto inteiro**.
+
+Resolvido expondo `EstaAbatido` em `IDanificavel`: a Hurtbox compara antes e depois de entregar
+o golpe e reconhece a transição. Os cinco implementadores já tinham o estado — a `Vitalidade` de
+cada um —, só não o expunham por um contrato comum.
+
+> **O compilador achou um sexto que eu não tinha achado.** Minha varredura olhou
+> `Assets/Scripts` e esqueceu que a pasta de testes também implementa a interface:
+> `AlvoDeTeste`. Erro de compilação limpo, na primeira tentativa de rodar a ferramenta. É o
+> tipo de coisa que uma mudança de interface deve fazer — e que uma lista à mão não faria.
+
+Com os dois sons fora dele, o `AudioDeCombate` ficou **sem comportamento nenhum**. Foi removido
+dos dois prefabs por ferramenta (a Unity resolve os `fileID`; este repositório já tem um
+incidente catalogado de regex que atravessou o separador do YAML) e o arquivo foi apagado.
+Junto saíram as duas ferramentas de Editor que ainda o acrescentavam — `LigarAudioDoCombate` e
+`LigarSistemasNovos` —, senão a próxima execução delas reintroduziria a duplicação.
+
+**Limite conhecido, escrito no código:** isto reconhece morte **por golpe**. Quem cai por
+sangramento, por expirar o tempo de vida ou por Colapso mental não passa pela Hurtbox.
+
+### 2. O guarda de import — e onde eu estava errado
+
+`favela-pixelart-standards` existe desde o começo do projeto e mesmo assim **12 dos 176 PNGs a
+violavam**, com 1056 testes verdes por cima. Escrevi `ImportacaoDaPixelArtTests`, que varre a
+arte **em uso** (GUID referenciado por cena, prefab ou asset) e cobra Point, sem compressão e
+PPU 32.
+
+**A regra não é uma só, e é por isso que a skill sozinha nunca funcionou.** `filterMode` e
+compressão valem para toda arte; **PPU só governa sprite de mundo** — um `UnityEngine.UI.Image`
+é esticado pelo `RectTransform` e não liga para PPU nenhum. Uma regra chapada reprovaria a HUD
+inteira sem que nada estivesse errado.
+
+> **E eu "consertei" três ícones que estavam certos.** Alfanje, Coroa de Ossos e Maça estavam em
+> **Bilinear**, e eu virei os três para Point. `IconesDosItensTests.Icones_TemFiltroCoerenteComAOrigem`
+> reprovou — e estava certo: **são pintura reduzida de ~485 px**, não pixel art, e Point num
+> ícone pintado serrilha as bordas suaves e fica *pior* que a fonte. Revertido. O guarda novo
+> passou a **pular a pasta de ícones**, que tem dono, em vez de duplicar uma lista de 50 nomes
+> e brigar por ela.
+
+Cinco exceções ficaram registradas **com a razão escrita**, e aparecem no log do teste a cada
+rodada: o Véu da Tempestade (é `Image` de canvas, o Bilinear é o que faz a bruma), as três
+barras da HUD (canvas, PPU não se aplica) e a **Coisa do Cemitério**.
+
+> **A Coisa do Cemitério corrige um erro do meu próprio relatório.** Ela está a **PPU 16** num
+> sprite de mundo, o que significa que mede **2,31 unidades — 1,09× o Damião**, e não os
+> 1,16 / 0,55× que a §3.4 do `physics_audit_report.md` afirma. Minha ferramenta de medida
+> assumia PPU 32 para todo mundo. Corrigir para 32 **reduziria a criatura à metade**, então é
+> decisão de design, não de import: fica na lista de exceções até o Vini decidir. Efeito
+> colateral real: os pixels dela têm o dobro do tamanho dos do resto do elenco.
+
+### 3. Os nove quadrados brancos do Castelo
+
+6 Nobres Fossilizados (Z2) e 3 Espelhos de Aldebaran (Z3) desenhavam o sprite embutido da Unity
+e não tinham componente que trocasse isso em runtime. Ganharam arte própria em
+`Art/Environment/CasteloCarcosa/`, desenhada por script como o Poste e o Eco.
+
+Medidas tiradas da cena, não chutadas: o Nobre tem `BoxCollider2D` **1,20 × 1,00** — é
+**cobertura** —, então o sprite é 40 × 56 px = 1,25 × 1,75 un, um pouco abaixo do Damião (2,12),
+para ler como "dá para se agachar atrás". O Espelho não tem colisor: não é obstáculo, é
+presença — 32 × 64 = 1 × 2 un.
+
+**A primeira versão dos Nobres saiu como peão de xadrez.** O erro foi construir o corpo como uma
+interpolação única de largura do pescoço ao chão: sem ombro, sem cintura, e com os braços
+*dentro* da silhueta, onde não aparecem. Refeita com plano de corpo e os braços quebrando o
+contorno.
+
+> **Eram 15 quadrados brancos, e não 9.** A varredura que fiz para escrever o guarda achou
+> mais seis fora do Castelo: os **3 Fragmentos de Yhtill** (itens de quest que o jogador tem de
+> achar), a **Passagem para o Castelo**, o **Piso do Santuário** e o **Visual do Escudo do
+> Abdul**. `ArteNasCenasTests` congela essa lista com o custo de cada um escrito — ela existe
+> para encolher, e reprova tanto um objeto novo nessa condição quanto um que já ganhou arte e
+> continua listado.
+
+> **E o guarda não pode olhar só o YAML.** Os 3 Pontos Focais, o Refúgio e os 9 consumíveis do
+> Deserto também gravam o sprite embutido no arquivo — e estão certos, porque
+> `PontoFocalDeReliquia`, `RefugioDeLuz` e `ColetavelDeItem` escrevem `SpriteRenderer.sprite`
+> no `Awake`. A primeira versão da minha medição tinha o detector quebrado (cortava `.cs.meta`
+> inteiro e tentava abrir um caminho sem extensão), então **todo mundo** aparecia como nu,
+> inclusive os cobertos. Se eu tivesse reportado aquilo, teria acusado seis sistemas que
+> funcionam.
+
+**Y-sorting escrito uma vez, sem componente.** Ganhar arte cria o problema que o quadrado branco
+escondia: um vulto de 1,75 unidade que o jogador contorna precisa ser desenhado atrás dele
+quando está atrás. O `DynamicYSort` resolveria, mas roda em `LateUpdate` e estes nove **não se
+movem** — a ferramenta grava o `sortingOrder` uma vez, com o mesmo fator `-y × 10` do
+`LevelBlockoutGenerator`.
+
+### Suíte
+
+EditMode 1056 → **1057** · PlayMode 52 → **52**.
+
+> A contagem ficou em 1056 numa das rodadas **sem que nada tivesse deixado de rodar**: entrou o
+> teste de import e saiu o `OByakhee_CarregaOAudioDeCombate`, +1 −1. É exatamente o caso em que
+> contagem estável mente. Conferido por nome no `EditModeResults.xml`.
+
+
 ## 2026-09-04 — Três coisas que o jogador sentia e nenhum teste via
 
 Rodada de implementação por ordem de prioridade, com o critério sendo **o que atrapalha quem

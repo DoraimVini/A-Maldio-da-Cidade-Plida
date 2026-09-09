@@ -203,7 +203,7 @@ Medido para o elenco inteiro, pelo **corpo desenhado** e pela escala **efetiva e
 | Esqueleto Invocado | 2,09 un | 0,99× |
 | Cultista (Deserto) | 2,08 un | 0,98× |
 | Cultista (Tumba) | 1,96 un | 0,93× |
-| Coisa do Cemitério | 1,16 un | 0,55× |
+| Coisa do Cemitério | **2,31 un** | **1,09×** ⚠️ |
 | Cone de Gelo (projétil) | 0,15 un | 0,07× |
 
 **A hierarquia estava invertida.** O Rei em Amarelo — chefe final do Vertical Slice — media
@@ -224,6 +224,17 @@ sobreviveu à uniformização. Ele é **humano** — um feiticeiro, não uma apa
 A escada final, por altura de corpo desenhado:
 
     Cultista 0,98×  <  Abdul 1,2×  <  Byakhee 2,7×  <  Rei em Amarelo 3,0×
+
+> ⚠️ **Correção de 2026-09-09: a Coisa do Cemitério estava medida errada nesta tabela.** Ela
+> constava com 1,16 un / 0,55× — knee-high, menor que um Cultista. O erro é da minha ferramenta
+> de medida, que assumia **PPU 32 para todo o elenco**: o sprite dela está a **PPU 16**, então
+> cada pixel vale o dobro e o corpo desenhado chega ao mundo com **2,31 unidades — 1,09× o
+> Damião**. Para um caçador que mata por contato, o tamanho real faz muito mais sentido que o
+> que eu tinha reportado.
+>
+> Corrigir o PPU para 32 **reduziria a criatura à metade**, então é decisão de design e não de
+> import; fica registrada como exceção justificada em `ImportacaoDaPixelArtTests`. Efeito
+> colateral que continua valendo: os pixels dela têm o dobro do tamanho dos do resto do elenco.
 
 > **As quatro Pedras de Poder continuam cabendo** — e agora com folga maior do que quando o Vini
 > levantou o risco. O anel de fallback do Abdul é isométrico (`dx = 4,5`, `dy = 2,25`, nas
