@@ -20,7 +20,6 @@ GameObject:
   - component: {fileID: 1318061846628413486}
   - component: {fileID: 9220689360430143524}
   - component: {fileID: 6360046265921058457}
-  - component: {fileID: 4695545914089126774}
   - component: {fileID: 4727924443773620933}
   - component: {fileID: 1537815508846015432}
   - component: {fileID: 574957450421472710}
@@ -264,6 +263,8 @@ MonoBehaviour:
   camadasAlvo:
     serializedVersion: 2
     m_Bits: 0
+  janelaDoGolpe: 0.15
+  raioDoGolpe: 0.6
 --- !u!114 &1318061846628413486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,18 +312,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyStatusEffects
   mostrarNumerosDeSangramento: 1
   corDoSangramento: {r: 0.85, g: 0.15, b: 0.2, a: 1}
---- !u!114 &4695545914089126774
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1290442817582334512}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03db3837762a1e440b4c8896e33f276e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Audio.AudioDeCombate
 --- !u!114 &4727924443773620933
 MonoBehaviour:
   m_ObjectHideFlags: 0

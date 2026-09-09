@@ -96,7 +96,23 @@ namespace FavelaAmarela.Runtime.Combat
                 Audio.MixerDeAudio.Instancia?.Tocar(
                     Audio.SomDoJogo.EntidadeFerida, transform.position);
 
+            // O estado ANTES do golpe. Sem isto não dá para distinguir "morreu agora" de
+            // "já estava morto e levou mais uma pancada" -- e a segunda tocaria o som de
+            // abate a cada golpe num corpo caído.
+            bool estavaDePe = _dono != null && !_dono.EstaAbatido;
+
             _dono?.ReceberGolpe(resultado);
+
+            // O som do ABATE, e por que ele mora aqui e não no prefab de cada inimigo: ele
+            // vinha do AudioDeCombate, que exige EnemyBase, e EnemyBase existe em DOIS
+            // prefabs do projeto inteiro. Abdul, Esqueletos, Pedras de Poder e o próprio
+            // Damião caíam em silêncio.
+            //
+            // Limite conhecido: isto reconhece morte POR GOLPE. Quem cai por sangramento,
+            // por expirar o tempo de vida ou por Colapso mental não passa por aqui.
+            if (estavaDePe && _dono.EstaAbatido)
+                Audio.MixerDeAudio.Instancia?.Tocar(
+                    Audio.SomDoJogo.EntidadeAbatida, transform.position);
         }
 
         // ── Construção automática ─────────────────────────────────────────────

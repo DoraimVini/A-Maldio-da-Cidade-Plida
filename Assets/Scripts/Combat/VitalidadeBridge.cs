@@ -248,6 +248,9 @@ namespace FavelaAmarela.Runtime.Combat
         }
 
         /// <inheritdoc />
+        /// <inheritdoc />
+        public bool EstaAbatido => Vitalidade.EstaAbatido;
+
         public void ReceberGolpe(ArmaResult resultado)
         {
             // Golpe de arma contra esta unidade: só o canal de dano físico por ora.

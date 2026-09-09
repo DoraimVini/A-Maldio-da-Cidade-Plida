@@ -25,7 +25,14 @@ namespace FavelaAmarela.Tests.EditMode
     /// ainda assim <b>quase todo o elenco apanhava em silêncio</b>, porque o único disparador
     /// exigia <c>EnemyBase</c> — que só dois prefabs têm. "Alguém dispara este som" e "este som
     /// toca quando devia" são perguntas diferentes; ver
-    /// <see cref="OSomDeImpacto_SaiDaHurtbox_QueTodoGolpeAtravessa"/>.</para>
+    /// <see cref="OsSonsDeCombate_SaemDaHurtbox_QueTodoGolpeAtravessa"/>.</para>
+    ///
+    /// <para><b>Terceira rodada (2026-09-09).</b> O som de <b>abate</b> tinha ficado para trás
+    /// na segunda: a <c>Hurtbox</c> vê o golpe chegar e não sabia se ele derrubou alguém, então
+    /// ele continuou no <c>AudioDeCombate</c> — e portanto continuou valendo só para Cultista e
+    /// Byakhee. Resolvido expondo <c>EstaAbatido</c> em <c>IDanificavel</c>, o que deixa a
+    /// Hurtbox comparar antes e depois. Com os dois sons fora dele, o <c>AudioDeCombate</c>
+    /// ficou vazio e foi <b>apagado</b>.</para>
     ///
     /// <para><b>Este teste mede disparo, não existência.</b> Um guarda que só verificasse "o
     /// enum tem nove valores" teria passado durante todo o período em que o combate era mudo.
@@ -93,16 +100,6 @@ namespace FavelaAmarela.Tests.EditMode
                 "os golpes de Damião saem mudos");
 
         /// <summary>
-        /// O Byakhee estava sem <c>AudioDeCombate</c> — acertar o chefe não produzia som.
-        /// </summary>
-        [Test]
-        public void OByakhee_CarregaOAudioDeCombate()
-            => AssertPrefabTemComponente(
-                "Assets/FavelaAmarela/Art/Enemies/Byakhee.prefab",
-                "AudioDeCombate",
-                "acertar e abater o chefe não produz som");
-
-        /// <summary>
         /// O som de <b>impacto</b> tem de sair da <c>Hurtbox</c>, e não de um componente posto
         /// prefab a prefab.
         ///
@@ -124,36 +121,68 @@ namespace FavelaAmarela.Tests.EditMode
         /// <c>Hitbox</c>) terminam os dois nela.</para>
         /// </summary>
         [Test]
-        public void OSomDeImpacto_SaiDaHurtbox_QueTodoGolpeAtravessa()
+        public void OsSonsDeCombate_SaemDaHurtbox_QueTodoGolpeAtravessa()
         {
             const string hurtbox = "Assets/Scripts/Combat/Hurtbox.cs";
 
             Assert.IsTrue(File.Exists(hurtbox), $"Arquivo ausente: {hurtbox}");
 
-            StringAssert.Contains("SomDoJogo.EntidadeFerida", File.ReadAllText(hurtbox),
-                "O som de impacto saiu da Hurtbox. Onde quer que ele tenha ido, alcança MENOS " +
+            string codigo = File.ReadAllText(hurtbox);
+
+            StringAssert.Contains("SomDoJogo.EntidadeFerida", codigo,
+                "O som de IMPACTO saiu da Hurtbox. Onde quer que ele tenha ido, alcança MENOS " +
                 "gente: a Hurtbox é o único ponto por onde todo golpe que acerta passa, nos " +
                 "dois sentidos. Um componente por prefab deixa mudo quem não o carrega — foi " +
-                "o que aconteceu com o AudioDeCombate, que exige EnemyBase e por isso só " +
+                "o que aconteceu com o AudioDeCombate, que exigia EnemyBase e por isso só " +
                 "alcançava 2 dos prefabs do elenco.");
+
+            StringAssert.Contains("SomDoJogo.EntidadeAbatida", codigo,
+                "O som de ABATE saiu da Hurtbox. Ele exige que IDanificavel exponha " +
+                "EstaAbatido, para a Hurtbox comparar antes e depois de entregar o golpe — " +
+                "sem isso, só quem tem EnemyBase morre fazendo barulho, e isso é o Cultista e " +
+                "o Byakhee.");
         }
 
         /// <summary>
-        /// O contrário do teste acima: o <c>AudioDeCombate</c> <b>não pode voltar</b> a tocar o
-        /// som de dano, senão Cultista e Byakhee tocam duas vezes no mesmo acerto.
+        /// O <c>AudioDeCombate</c> foi <b>aposentado</b>, e não pode voltar.
+        ///
+        /// <para>Ele sonorizava dano e abate, e trazia
+        /// <c>[RequireComponent(typeof(EnemyBase))]</c> — o que limitava os dois sons a dois
+        /// prefabs. Com ambos na <c>Hurtbox</c>, o componente ficou sem comportamento nenhum.
+        /// Se ele reaparecer tocando qualquer um dos dois, Cultista e Byakhee passam a tocar
+        /// <b>duas vezes</b> por golpe, e só eles: o defeito soa como problema de mixagem
+        /// naqueles dois inimigos, não como duplicação.</para>
         /// </summary>
         [Test]
-        public void OAudioDeCombate_NaoDuplicaOSomDeImpacto()
+        public void OAudioDeCombate_ContinuaAposentado()
         {
             const string componente = "Assets/Scripts/Audio/AudioDeCombate.cs";
 
-            Assert.IsTrue(File.Exists(componente), $"Arquivo ausente: {componente}");
+            Assert.IsFalse(File.Exists(componente),
+                "O AudioDeCombate voltou a existir. Os dois sons que ele tocava vivem hoje na " +
+                "Hurtbox, que alcança o elenco inteiro; um componente por prefab só pode " +
+                "alcançar menos. Se a intenção for um som específico de algum inimigo, ele " +
+                "precisa de outro nome e de outro gatilho — não deste.");
 
-            StringAssert.DoesNotContain("SomDoJogo.EntidadeFerida", File.ReadAllText(componente),
-                "O AudioDeCombate voltou a tocar o som de impacto, que agora também sai da " +
-                "Hurtbox. Cultista e Byakhee — os dois únicos prefabs com EnemyBase — passam a " +
-                "tocar DUAS VEZES por acerto, e só eles: o defeito soa como problema de " +
-                "mixagem naqueles dois inimigos, não como duplicação.");
+            // Procura pelo GUID, e nao pelo NOME: prefab e YAML de GUIDs, e a string
+            // "AudioDeCombate" nunca apareceria la -- a versao anterior deste trecho passaria
+            // sempre, medindo nada. Este e o GUID que o AudioDeCombate.cs.meta carregava; com o
+            // script apagado ele virou lapide, e encontra-lo num prefab significa exatamente
+            // "Missing (Mono Script)" no Inspector.
+            const string guidAposentado = "03db3837762a1e440b4c8896e33f276e";
+
+            var prefabsComOComponente = Directory
+                .EnumerateFiles("Assets", "*.prefab", SearchOption.AllDirectories)
+                .Where(f => File.ReadAllText(f).Contains(guidAposentado))
+                .Select(Path.GetFileName)
+                .ToList();
+
+            Assert.IsEmpty(prefabsComOComponente,
+                "Prefab ainda referencia o AudioDeCombate: " +
+                string.Join(", ", prefabsComOComponente) +
+                ". Com o script apagado, isso vira 'Missing (Mono Script)' no Inspector — " +
+                "que é pior que o componente vazio que a aposentadoria veio remover. " +
+                "Conserto: abra o prefab e remova o componente pelo Inspector.");
         }
 
         private static void AssertPrefabTemComponente(string prefab, string componente,

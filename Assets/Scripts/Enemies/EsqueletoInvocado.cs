@@ -82,6 +82,9 @@ namespace FavelaAmarela.Runtime.Enemies
         /// <summary>Esqueleto comum, não é boss — leva crítico furtivo normalmente.</summary>
         public bool EhAparicaoPrimordial => false;
 
+        /// <inheritdoc />
+        public bool EstaAbatido => _vitalidade != null && _vitalidade.EstaAbatido;
+
         /// <summary>
         /// Animador, se este Esqueleto tiver um.
         ///

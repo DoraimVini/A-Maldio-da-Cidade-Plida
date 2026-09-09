@@ -27,19 +27,22 @@ namespace FavelaAmarela.EditorTools
         private const string PrefabDamiao =
             "Assets/FavelaAmarela/Art/Characters/Damiao/Player_Damiao.prefab";
 
-        private const string PrefabByakhee = "Assets/FavelaAmarela/Art/Enemies/Byakhee.prefab";
-
         [MenuItem("Tools/FavelaAmarela/Áudio: ligar o som do combate")]
         public static void Executar()
         {
             bool ok = true;
 
             ok &= Garantir<AudioDoJogador>(PrefabDamiao, "golpe e habilidade de Damião");
-            ok &= Garantir<AudioDeCombate>(PrefabByakhee, "dano e abate do Byakhee");
+
+            // A linha do Byakhee saiu em 2026-09-09, com a aposentadoria do AudioDeCombate.
+            // Ela punha o componente NUM prefab, que era o defeito de origem: os dois sons
+            // que ele tocava -- acerto e abate -- passaram para a Hurtbox, que é o único
+            // ponto por onde todo golpe atravessa e portanto alcança o elenco inteiro.
+            // Reintroduzi-la faria Byakhee e Cultista tocarem duas vezes por golpe.
 
             if (ok)
-                Debug.Log("[LigarAudioDoCombate] Concluído. O golpe de Damião e os acertos no " +
-                          "Byakhee passam a soar.");
+                Debug.Log("[LigarAudioDoCombate] Concluído. O golpe de Damião passa a soar. " +
+                          "Acerto e abate saem da Hurtbox e não pedem componente nenhum.");
         }
 
         /// <summary>

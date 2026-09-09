@@ -232,6 +232,9 @@ namespace FavelaAmarela.Runtime.Enemies
         /// <remarks>Sempre true: Aparições Primordiais são imunes a crítico furtivo.</remarks>
         public bool EhAparicaoPrimordial => true;
 
+        /// <inheritdoc />
+        public bool EstaAbatido => _vitalidade != null && _vitalidade.EstaAbatido;
+
         private void Awake()
         {
             // A caixa de diálogo vive no prefab persistente do HUD desde 2026-08-22.

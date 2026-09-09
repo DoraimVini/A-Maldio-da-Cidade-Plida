@@ -85,11 +85,10 @@ namespace FavelaAmarela.EditorTools
                 return;
             }
 
-            if (raiz.GetComponent<AudioDeCombate>() == null)
-            {
-                raiz.AddComponent<AudioDeCombate>();
-                mudou = true;
-            }
+            // O AudioDeCombate era acrescentado aqui e foi aposentado em 2026-09-09: os
+            // dois sons dele -- acerto e abate -- vivem na Hurtbox, que alcança quem não tem
+            // EnemyBase (Abdul, Esqueletos, Pedras de Poder, o próprio Damião). Voltar a
+            // acrescentá-lo faria este inimigo tocar duas vezes por golpe.
 
             if (tabela != null)
             {

@@ -42,6 +42,20 @@ namespace FavelaAmarela.Tests.PlayMode
         public bool EhAparicaoPrimordial => false;
 
         /// <summary>
+        /// Se o dublê já foi abatido. <b>Escrevível de propósito</b>: ele não tem
+        /// <c>Vitalidade</c> — anota golpes, não os resolve —, então não há de onde derivar o
+        /// estado. Deixando o teste ditá-lo, dá para exercitar os dois lados da transição que a
+        /// <c>Hurtbox</c> usa para decidir se toca o som de abate.
+        ///
+        /// <para>Este membro entrou no contrato em 2026-09-09, quando o som de abate saiu do
+        /// <c>AudioDeCombate</c> — que exigia <c>EnemyBase</c> e por isso só alcançava dois
+        /// prefabs — e foi para a <c>Hurtbox</c>. O compilador achou este dublê antes de mim: a
+        /// varredura que eu tinha feito olhou só <c>Assets/Scripts</c> e esqueceu que a pasta de
+        /// testes também implementa a interface.</para>
+        /// </summary>
+        public bool EstaAbatido { get; set; }
+
+        /// <summary>
         /// Garante a própria hurtbox, exatamente como <c>EsqueletoInvocado</c>,
         /// <c>PedraDePoder</c> e <c>AbdulAlhazredAI</c> fazem.
         ///

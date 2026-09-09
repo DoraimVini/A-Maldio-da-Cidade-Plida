@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.Hitbox
   raio: 1.5
   deslocamento: {x: 0, y: 0}
+  profundidadeMaxima: 0
   camadasAlvo:
     serializedVersion: 2
     m_Bits: 8192
@@ -159,7 +160,6 @@ GameObject:
   - component: {fileID: 3096421289379231945}
   - component: {fileID: 4383678035820145529}
   - component: {fileID: 8963580533039878870}
-  - component: {fileID: 7018458313242706803}
   - component: {fileID: 3420742979077037208}
   m_Layer: 6
   m_Name: Byakhee
@@ -429,18 +429,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 2.5625}
   m_Size: {x: 2, y: 3}
   m_Direction: 0
---- !u!114 &7018458313242706803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5445350593436559665}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03db3837762a1e440b4c8896e33f276e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Audio.AudioDeCombate
 --- !u!114 &3420742979077037208
 MonoBehaviour:
   m_ObjectHideFlags: 0
