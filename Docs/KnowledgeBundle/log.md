@@ -4,6 +4,99 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — A luta contra a Byakhee: três sintomas, uma geometria
+
+O Vini jogou e relatou três coisas: *"não dá para ganhar da Byakhee"*, *"ela continua saindo do
+mapa"* e *"a hurtbox dela é muito difícil de atingir"*. Medido, **as três saem da geometria da
+arena, e nenhuma da hurtbox** — que é generosa: `3,69 × 4,4075` local × escala `2,2896` =
+**8,45 × 10,09 unidades de mundo**, contra um corpo desenhado de 5,72.
+
+> **É a segunda vez que ele relata "não dá para ganhar da Byakhee".** A primeira foi em
+> 2026-08-28, e a causa era outra — o nível travado em 1 fazia o Baú entregar arma de tier 1
+> para sempre. Aquilo foi corrigido concedendo Exposição no mundo. O que sobrou é isto aqui, e
+> não tem nada a ver com balanceamento: minha conta dá ~37 de dano por golpe contra 500 de
+> Vitalidade, ou seja **14 acertos no nível 1 e 9 no nível 3** — exatamente os números que o
+> `CLAUDE.md` já registrava. Os números sempre estiveram certos.
+
+### O que estava errado
+
+**1. Metade das janelas de dano era inalcançável.** Ela só pode ser ferida no chão — imunidade
+em voo, por design, e é isso que faz a luta ser leitura de padrão. Mas o rasante corre
+`velocidadeRasante 6 × duracaoRasante 2` = **12 unidades em linha reta**, atravessando o jogador
+e seguindo adiante; e `DepoisDoVoo` alterna mergulho e pouso, então **um pouso em cada dois
+acontece a 12 unidades do jogador** — e ela ficava *parada* lá, porque o design dizia "pousado
+acontece parado, é o alvo estável". A janela da fase 2 dura **1,5 s**, e correndo a 7,5 un/s o
+Damião cobre **11,25**. Não dava.
+
+Somado ao dreno passivo de Resiliência (**2/s** contra os **100** do jogador — um relógio de
+**50 segundos**), a luta não fechava antes do Colapso.
+
+**2. O portão de profundidade rejeitava golpe de lado.** A órbita de `Circundando` usa
+`Sin(ângulo) × raioDeVoo × 0,6` = até **±1,8 unidade em Y**. O portão da `Hitbox` aceita
+**±0,5** — uma célula isométrica. Ela parava ao norte ou ao sul do Damião, 3,5× fora da faixa, e
+todo golpe lateral era descartado **sem nada na tela dizendo por quê**. É a mesma família do
+defeito de 2026-09-04, agora agravada por um chefe cujo corpo desenhado tem 5,72 unidades: o
+jogador mira no corpo, e o jogo julga pela raiz.
+
+**3. Nada limitava a posição dela.** `_centro` só era lido no fallback de "o jogador sumiu" —
+não existia coleira nenhuma. Esta cena não tem `Limite_*`: não havia parede para segurá-la, e o
+rasante encadeado a levava para fora do mapa.
+
+> **Aqui eu errei o diagnóstico, e vale registrar como.** Anunciei que `centroDaArena` estava
+> **vazio** porque li `centroDaArena: {fileID: 0}` no **prefab**. Um prefab *não consegue*
+> referenciar objeto de cena — aquele zero é o normal. A referência vive no override da
+> **instância** e estava correta desde o commit anterior. Cheguei a escrever uma ferramenta para
+> "consertar", ela gravou o mesmo valor e não mudou um byte; foi o `git status` limpo que me
+> pegou. A ferramenta foi apagada. **Prefab não é a instância** — a mesma armadilha que já custou
+> caro na medição de escala do elenco.
+
+### O que mudou
+
+- **Coleira de arena** (`raioDaArena`, 12 un): a velocidade que aponta para fora é trocada por
+  uma que aponta para dentro. Por **velocidade**, e não escrevendo `transform.position` — com
+  `Auto Sync Transforms` desligado, mover o transform de um corpo deixa o colisor para trás até
+  o próximo passo de física, e a hurtbox iria junto.
+- **Pouso alcançável**: enquanto vulnerável, ela se arrasta a 2,6 un/s até um ponto **ao lado**
+  do jogador e **nivelado em profundidade de chão**. Resolve o portão na geometria em vez de
+  afrouxá-lo — alargar o portão devolveria o golpe que alcança três células de profundidade.
+  O alvo estável que o design pede continua existindo; só deixa de acontecer do outro lado da
+  arena.
+- **Guarda**: `LutaContraByakheeAlcancavelTests` — a conta acima, escrita, mais a exigência de
+  que a coleira tenha centro. Ele reprovaria antes do conserto.
+
+> **O guarda me pegou na primeira execução**, e por uma razão que vale registrar: ele lia
+> `velocidadeNoChao` do prefab e o campo **não estava lá**. Acrescentar um `[SerializeField]`
+> não reescreve os prefabs existentes — até alguém salvá-los, o campo não está no YAML e a
+> desserialização cai no inicializador do C#. O teste passou a modelar isso: prefab primeiro,
+> inicializador depois, e falha alta se não achar em nenhum dos dois.
+
+### E o som que mentia — regressão minha, consertada junto
+
+O som de impacto que passou para a `Hurtbox` na rodada anterior tocava **antes** de o alvo
+decidir se aceita o golpe. Contra a Byakhee em voo o jogador **ouvia o acerto conectar e ela não
+perdia nada** — e o mesmo valia para o **Abdul de escudo levantado**, que é a regra central da
+Fase 1 dele. Numa luta cuja regra inteira é "espere a janela", isso não é falta de polimento: é
+o jogo dizendo que a regra não existe.
+
+`IDanificavel` ganhou **`PodeSerFerido`** — "um golpe entregue agora seria aplicado?" — e a
+`Hurtbox` pergunta **antes** de entregar, porque depois o alvo já mudou de estado. Recusar em
+silêncio é a informação certa: nenhum som de carne quer dizer que nada entrou.
+
+Não é `EstaAbatido` invertido, e cada implementador recusa pelo **seu** motivo — foi por isso que
+cada um foi lido antes de escrever a propriedade, em vez de copiar a mesma expressão seis vezes:
+
+| quem | recusa quando |
+|---|---|
+| `EnemyBase` | `IgnorarDano` — é o que o `ByakheeAI` liga e desliga pela FSM (imunidade em voo) |
+| `AbdulAlhazredAI` | `_poupado` (o golpe que trai a trégua desperta a luta e não fere) **e** `!_fsm.PodeReceberDano` (Escudo Mágico de pé) |
+| `VitalidadeBridge` | `IgnorarDano` — invulnerabilidade de cutscene |
+| `PedraDePoder` | `Quebrada` |
+| `EsqueletoInvocado` | só abatido: não tem escudo nem janela |
+| `AlvoDeTeste` | escrevível, começa aceitando |
+
+Guarda: `AudioDoCombateTests` passou a exigir que a `Hurtbox` cite `PodeSerFerido`.
+
+
 ## 2026-09-09 — A fila, e um teste do projeto me corrigindo
 
 ### 1. Quem não tem `EnemyBase` morria em silêncio
