@@ -4,6 +4,63 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — Os botões em branco: 1,3 px de margem entre funcionar e não
+
+O Vini mandou a captura da tela de Colapso: a frase aparecia e os **dois botões saíam vazios**,
+só a moldura. E: *"quando você entra no menu de opções também não tem como sair"*.
+
+### A causa, e ela era a mesma nos dois
+
+Os rótulos existiam, com o texto certo (`"Despertar no último refúgio"`, `"Menu principal"`),
+fonte atribuída, cor visível e componente ligado. Medido com o prefab instanciado e o Canvas
+forçado:
+
+```
+Tela_Colapso/.../Botao_Retomar/Rotulo:  caixa 39,3 px,  MinSize 38
+Tela_Pause/Botao_Opcoes/Rotulo:         caixa 39,3 px,  MinSize 38
+```
+
+**Margem de 1,3 px.** O `Best Fit` da Unity se recusa a desenhar abaixo do mínimo — e não avisa,
+não loga, não lança nada. Bastava a tela ser um pouco menor: na resolução de referência
+(1080 de altura) a mesma caixa dá **34 px**, e o texto some.
+
+**Os três botões do menu de pause estavam na mesma situação** — `Continuar`, `Sair`, `Opções`. O
+menu inteiro era retângulo vazio, e é isso que deixou o Vini sem saída: não era falta de botão de
+fechar (ele existe, com rótulo "Fechar", e está ligado no `onClick`), era não dar para ler qual
+botão era qual.
+
+> **Minha primeira conta estava errada, e a medição corrigiu.** Pela YAML eu calculei 4,5 px de
+> altura, supondo canvas de 1080. Instanciado, o canvas mede 1663 × 1247 e o rótulo dá 39,3. O
+> defeito era o mesmo; o número, não. Ler hierarquia de âncoras em regex é a receita para
+> consertar o valor errado — por isso a ferramenta instancia e pergunta à Unity.
+
+### O conserto, e por que 70% e não "cabe"
+
+Empatar não é caber. O critério passou a ser **`MinSize` ≤ 70% da caixa**: a caixa muda com a
+resolução, então o mínimo tem de valer na menor tela plausível, não na que o teste calhou de
+medir. 18 rótulos ajustados — 5 botões de fluxo e 13 dicas de tecla.
+
+E o **consertador usa 60%, mais rigoroso que a guarda**. A primeira tentativa consertou para 21
+numa caixa de 30 px e o teste reprovou os mesmos rótulos por centésimos: quem conserta precisa de
+mais margem que quem confere, senão os dois empatam na fronteira.
+
+### As guardas
+
+`RotuloCabeNaCaixaTests`, em PlayMode porque só lá o layout é real — e **ligando as telas de
+fluxo antes de medir**, que nascem ocultas. Objeto desligado mede zero e passa batido: foi
+exatamente assim que o defeito chegou ao jogador com a suíte verde.
+
+O segundo teste é mais bruto e vale igual: **botão de tela de fluxo precisa ter texto escrito**.
+Botão em branco é indistinguível de botão quebrado.
+
+> Um detalhe de teste que vale registrar: instanciar o `HUD_Gameplay` numa suíte que já tem HUD
+> vivo faz a cópia se **autodestruir** pela guarda de singleton — e o `Destroy` da Unity é
+> adiado ao fim do quadro, então conferir antes do `yield` não pega nada. O teste mede a
+> sobrevivente, que é a que o jogador vê.
+
+EditMode 1104 · PlayMode 62 → **64**.
+
+
 ## 2026-09-09 — O playtest da abertura: dois defeitos, e um deles não tinha resposta possível
 
 O Vini jogou e relatou duas coisas: *"não tem dano e armadura para se manter vivo contra os dois
