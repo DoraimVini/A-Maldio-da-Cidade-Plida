@@ -260,7 +260,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyCombat
   alcanceDeGolpe: 1.2
   cadenciaDeAtaque: 1.2
-  danoDoGolpe: 20
+  danoDoGolpe: 16
   camadasAlvo:
     serializedVersion: 2
     m_Bits: 0

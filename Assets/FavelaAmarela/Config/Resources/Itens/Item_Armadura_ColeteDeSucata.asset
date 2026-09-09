@@ -24,4 +24,6 @@ MonoBehaviour:
   Empunhadura: 0
   Modificadores:
   - Stat: 7
+    Valor: 2
+  - Stat: 8
     Valor: 1

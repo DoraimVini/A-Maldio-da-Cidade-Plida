@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   vitalidadeMax: 300
   ataque: 8
-  conjuracao: 25
+  conjuracao: 18
   defesa: 5
   resistenciaAnomala: 20

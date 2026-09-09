@@ -4,6 +4,69 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — O playtest da abertura: dois defeitos, e um deles não tinha resposta possível
+
+O Vini jogou e relatou duas coisas: *"não tem dano e armadura para se manter vivo contra os dois
+cultistas do início"* e, depois, *"mesmo com a arma do baú, não fica com vida suficiente nem para
+lutar contra Abdul"*. Medidos, os dois eram verdade — e por motivos completamente diferentes.
+
+### Contra o cultista: o golpe
+
+`Ataque 20` contra a `Defesa 6` do Damião passa **14**. Cem de Vitalidade morrem em **7 golpes**,
+e com dois cultistas a 1,2 s de cadência isso é pouco mais de **quatro segundos** de exposição.
+
+Foi para **16**. Não para os 14 sugeridos, e a matriz explica por quê: a 14 a curva de armadura
+**colapsa** — com Defesa 13 (conjunto Sepulto) o golpe já bate no piso de 15%, e Yhtill e Set
+deixam de valer qualquer coisa. A 16 a progressão continua significando algo:
+
+| defesa | por golpe | golpes até a morte |
+|---|---|---|
+| 6 (nada) | 10,0 | 10 |
+| 10 (conjunto inicial) | 6,0 | 17 |
+| 13 (Sepulto) | 3,0 | 33 |
+
+### Contra o Abdul: um canal inteiro sem resposta
+
+Aqui o defeito era maior. O ataque **físico** do Abdul é 8 contra Defesa 6 — **2 de dano**,
+irrelevante. Quem mata é a **Conjuração 25**, que bate na Resiliência Mental mitigada por
+`ResistenciaAnomala` — e a de Damião é **zero**.
+
+Varridas as **14 peças de equipamento defensivo do projeto: nenhuma dava `DefesaAnomalia`.**
+Todas davam só `DefesaFisica`. Não existia no jogo inteiro um item, uma build ou uma escolha que
+reduzisse o dano do canal que mata. A troca era **6,6 golpes contra 4 conjurações**: perder era
+aritmética, não erro de execução.
+
+E havia uma inversão de progressão junto: o conjunto **Sepulto**, que ajudaria a enfrentá-lo,
+**dropa do próprio Abdul**.
+
+As doze peças passaram a dar defesa anômala, em curva — inicial 3, Sepulto 4, Yhtill 10, Set 14
+— e a Conjuração do Abdul foi de 25 para **18**. Agora, com o conjunto inicial vestido, são
+**6,7 conjurações** contra os **6,6 golpes** que Damião precisa. A luta virou uma troca, e a
+armadura é o que a decide.
+
+### As guardas fizeram o trabalho delas
+
+Três testes já existentes falharam na hora, e um deles pedia literalmente *"se foi decisão de
+balanceamento, ajuste este teste junto e diga por quê"*. Foi o que foi feito.
+
+Um deles obrigou a uma revisão maior: `OCultista_DerrubaODamiaoEmQuatroAOitoGolpes` defendia a
+faixa 4–8 com o motivo *"empurrar ao stealth, que é o núcleo tonal do jogo"*. **Esse motivo
+caducou em 2026-09-01**, quando a furtividade deixou de ser pilar e o gênero passou a ser
+"combate + exploração". A faixa estava calibrada para um jogo que não existe mais; foi para
+4–12, com a decisão citada.
+
+### O que fica registrado e NÃO foi feito
+
+- **A paridade Sseth = Cultista quebrou.** O documento dizia que o Sseth bate 20 *"igual ao
+  Cultista de propósito"*. O Cultista caiu para 16 e o Sseth não foi junto — ele é conteúdo do
+  Templo, não da abertura. Se a paridade era o ponto, ele precisa cair também.
+- **A curva de poder inteira é opcional.** Toda a Exposição e toda a armadura inicial vêm dos
+  cultistas do Deserto, e dá para chegar na Tumba sem lutar. Quem for direto chega no Abdul no
+  nível 1, sem armadura — e aí a troca volta a ser 5,6 contra 6,6.
+
+EditMode 1099 → **1104** · PlayMode 62.
+
+
 ## 2026-09-09 — HUD: o pedido já estava atendido, e as minhas duas conclusões caíram
 
 O Vini pediu "conserta o HUD e vamos aproveitar e inserir UIs para a vida e da RM". Medido antes

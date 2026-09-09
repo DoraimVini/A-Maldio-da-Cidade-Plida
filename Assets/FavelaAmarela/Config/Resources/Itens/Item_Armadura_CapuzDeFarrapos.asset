@@ -25,3 +25,5 @@ MonoBehaviour:
   Modificadores:
   - Stat: 7
     Valor: 1
+  - Stat: 8
+    Valor: 1

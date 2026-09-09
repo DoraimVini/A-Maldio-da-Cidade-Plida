@@ -84,8 +84,8 @@ dela — é uma escala de tropa, com chefes fora dela de propósito.
 | Ficha | Vitalidade | Ataque | Defesa | Conjuração | Resist. Anômala |
 |---|---|---|---|---|---|
 | `Ficha_Damiao` | 100 | 0 *(desarmado)* | 6 | 0 | 0 |
-| `Ficha_Cultista` | 100 | 20 | 5 | 0 | 0 |
-| `Ficha_Abdul` | 300 | 8 | 5 | 25 | 20 |
+| `Ficha_Cultista` | 100 | **16** | 5 | 0 | 0 |
+| `Ficha_Abdul` | 300 | 8 | 5 | **18** | 20 |
 | `Ficha_Byakhee` | 500 | 26 | 8 | 20 | 12 |
 | `Ficha_YugNeth` | 40 | 0 | 0 | 0 | 0 |
 | `Ficha_Sseth` | 120 | 20 | 6 | 0 | 0 |
@@ -107,8 +107,10 @@ decisão de design, e vivem no asset para serem mexidas sem tocar em código.
 
 **A identidade de cada um**, para os números não parecerem arbitrários:
 
-- **Sseth Farejador** — tropa. Bate igual ao Cultista (20) de propósito: ele não é mais forte,
-  ele **caça por faro**. O que muda é o jogo de furtividade, não a conta de dano.
+- **Sseth Farejador** — tropa. Bate **20**, e até 2026-09-09 isso era "igual ao Cultista de
+  propósito: ele não é mais forte, ele **caça por faro**". O Cultista caiu para 16 e o Sseth
+  **não foi junto** — ele é conteúdo do Templo, não da abertura, e o ajuste veio de um playtest
+  da abertura. A paridade quebrou; se ela era o ponto, o Sseth precisa cair também.
 - **Nagaraja** — elite nomeado, fala Aklo, é `IInteragivel` (tem conversa antes da luta, como
   o Abdul). É o único do Templo com **mente** (Resiliência 60): dá para derrotá-lo pelo canal
   anômalo, o que é coerente com uma criatura que argumenta. Larga a Coroa de Ossos.
@@ -117,6 +119,19 @@ decisão de design, e vivem no asset para serem mexidas sem tocar em código.
   Byakhee de propósito, porque o Templo é conteúdo opcional e punir quem explora seria punir a
   curiosidade. Sem mente: é um avatar de deus, não há o que argumentar.
 
+> **Ajuste de 2026-09-09, por playtest.** O Cultista foi de **20 para 16** e a Conjuração do
+> Abdul de **25 para 18**. O relato do Vini: *"não tem dano e armadura para se manter vivo
+> contra os dois cultistas do início"* e *"mesmo com a arma do baú, não fica com vida
+> suficiente nem para lutar contra Abdul"*. Medido, os dois eram verdade e por motivos
+> diferentes: 20 bruto contra Defesa 6 passava **14**, matando em 7 golpes; e a Conjuração 25
+> do Abdul entrava **inteira** na Resiliência Mental, porque a `ResistenciaAnomala` do Damião é
+> 0 e **nenhuma das 14 peças defensivas do projeto dava `DefesaAnomalia`** — a luta era um
+> cronômetro de 4 conjurações contra os 6,6 golpes que ele precisava. As armaduras passaram a
+> dar defesa anômala na mesma rodada. Guarda: `BalanceamentoDaAberturaTests`.
+>
+> **Por que 16 e não os 14 sugeridos:** a 14 a curva de armadura colapsa — o conjunto Sepulto
+> já bate no piso de 15% e Yhtill e Set deixam de valer qualquer coisa contra cultista.
+>
 > ⚠️ **O `Ataque` do Cultista era 14 no asset e 20 em jogo.** Cada inimigo carregava
 > **dois** números de dano — o da ficha e um campo serializado no `MonoBehaviour` — e só o
 > segundo rodava. Em 2026-08-28 os dois foram unificados na ficha, e a ficha foi corrigida

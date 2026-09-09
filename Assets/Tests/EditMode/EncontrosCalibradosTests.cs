@@ -71,15 +71,27 @@ namespace FavelaAmarela.Tests.EditMode
 
         /// <summary>
         /// <b>O encontro que ensina o jogo.</b> O Cultista tem de ser punitivo o bastante para
-        /// empurrar ao stealth e lento o bastante para haver janela de fuga.
+        /// o combate ter peso e lento o bastante para haver janela de reação.
         ///
-        /// <para>Alvo autorado: entre <b>4 e 8</b> golpes no nível 1. Com Ataque 20 contra a
-        /// Defesa 6 do Damião são 14 por golpe, e 100 de Vitalidade dão <b>8</b>. A faixa é
-        /// larga de propósito — o número exato é decisão de playtest do Vini, o que este teste
-        /// impede é que ele mude por acidente ao mexer em outra coisa.</para>
+        /// <para><b>Faixa antiga: 4 a 8 golpes</b>, e o motivo escrito era "empurrar ao
+        /// stealth, que é o núcleo tonal do jogo". Com Ataque 20 contra a Defesa 6 do Damião
+        /// eram 14 por golpe, e 100 de Vitalidade davam exatamente 8 — o teto da faixa.</para>
+        ///
+        /// <para><b>Faixa nova: 4 a 12, e o motivo antigo caducou (2026-09-09).</b> A
+        /// furtividade <b>deixou de ser pilar</b> em 2026-09-01 — o gênero passou a ser "combate
+        /// + exploração", e o <c>CLAUDE.md</c> registra que a única ferramenta de stealth que
+        /// existe é a tempestade abafando som. A faixa estava calibrada para empurrar a um pilar
+        /// que foi aposentado.</para>
+        ///
+        /// <para><b>E o playtest confirmou pelo outro lado.</b> O Vini: <i>"não tem dano e
+        /// armadura para se manter vivo contra os dois cultistas do início"</i>. Com Ataque 16
+        /// são 10 por golpe e 10 golpes — e a curva de armadura passa a significar algo (10 sem
+        /// nada, 6 com o conjunto inicial, 3 com o Sepulto). A 14, que foi a primeira sugestão,
+        /// o conjunto Sepulto já bateria no piso de 15% e Yhtill e Set deixariam de valer
+        /// qualquer coisa contra cultista.</para>
         /// </summary>
         [Test]
-        public void OCultista_DerrubaODamiaoEmQuatroAOitoGolpes()
+        public void OCultista_DerrubaODamiaoEmQuatroADozeGolpes()
         {
             var damiao = Ficha("Damiao").CriarFicha(1);
             int golpes = Golpes(damiao, Ficha("Cultista").Ataque);
@@ -88,9 +100,10 @@ namespace FavelaAmarela.Tests.EditMode
                 $"O Cultista derruba o Damião em {golpes} golpes no nível 1 — não sobra janela " +
                 "de fuga, e o Deserto tem onze deles.");
 
-            Assert.LessOrEqual(golpes, 8,
-                $"O Cultista precisa de {golpes} golpes — deixou de empurrar ao stealth, que é " +
-                "o núcleo tonal do jogo.");
+            Assert.LessOrEqual(golpes, 12,
+                $"O Cultista precisa de {golpes} golpes — o combate de abertura perdeu o peso. " +
+                "A faixa foi de 4-8 para 4-12 em 2026-09-09, quando a furtividade deixou de ser " +
+                "pilar; ela não é para crescer de novo sem uma decisão igual.");
         }
 
         /// <summary>
@@ -98,11 +111,22 @@ namespace FavelaAmarela.Tests.EditMode
         /// <c>Ataque 14</c> enquanto o <c>EnemyCombat</c> batia com <c>20</c> — e só o 20 rodava.
         /// Unificar os dois na ficha, sem corrigir a ficha, teria enfraquecido o inimigo em 30%
         /// numa mudança que se anunciava como refatoração.
+        ///
+        /// <para><b>20 → 16 em 2026-09-09, e desta vez por decisão.</b> O guarda funcionou: ele
+        /// pediu "se foi decisão de balanceamento, ajuste este teste junto e diga por quê", e é
+        /// o que esta nota faz. O motivo é playtest do Vini — <i>"não tem dano e armadura para
+        /// se manter vivo contra os dois cultistas do início"</i> — e a medição confirmou: 20
+        /// bruto contra Defesa 6 passava 14, e 100 de Vitalidade morriam em 7 golpes, pouco mais
+        /// de quatro segundos com dois cultistas.</para>
+        ///
+        /// <para><b>O prefab foi junto.</b> O <c>danoDoGolpe</c> do <c>EnemyCombat</c> é
+        /// fallback e só vale quando a ficha traz Ataque 0 — mas deixá-lo em 20 recriaria
+        /// exatamente a divergência que esta classe existe para impedir.</para>
         /// </summary>
         [Test]
         public void ODanoDoCultista_ContinuaSendoOQueOJogoJogava()
         {
-            Assert.AreEqual(20f, Ficha("Cultista").Ataque, 0.01f,
+            Assert.AreEqual(16f, Ficha("Cultista").Ataque, 0.01f,
                 "O Ataque do Cultista mudou. Se foi decisão de balanceamento, ajuste este teste " +
                 "junto e diga por quê; se foi efeito colateral, o Deserto inteiro mudou de " +
                 "dificuldade sem ninguém pedir.");
