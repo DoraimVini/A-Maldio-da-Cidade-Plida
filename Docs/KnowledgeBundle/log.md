@@ -4,6 +4,219 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — Auditoria do tilemap, e duas premissas minhas que caíram
+
+Branch nova: `develop_progression`.
+
+### O que a auditoria mediu
+
+| pergunta | resposta medida |
+|---|---|
+| O Grid está isométrico? | **Sim.** `m_CellLayout: 2` (Isometric), célula `1 × 0,5`, swizzle XYZ, nas 6 cenas |
+| `Isometric Z as Y`? | **Não, e não deve.** O projeto ordena profundidade por `-y × 10`; ZAsY brigaria com isso |
+| As sprites batem com a célula? | **Todas.** 32 × 16 px a PPU 32 = exatamente `1,00 × 0,50`, pivô central |
+| Existe transição de terreno? | **Nenhuma.** Cada piso usa 3–5 *variações do mesmo chão* |
+| Rule Tiles em uso? | **Sim, dois** — `RuleTile_Areia` e `RuleTile_Muro`, ambos `UnityEngine.IsometricRuleTile` |
+
+Ou seja: **não há causa geométrica de costura neste projeto**, e a premissa de que Rule Tiles
+não estavam em uso era falsa.
+
+### Onde eu errei, duas vezes
+
+**1. "O pacote 2D Tilemap Extras não está instalado."** Eu grepei `manifest.json`, que lista
+**só dependências diretas**. O `packages-lock.json` tem `com.unity.2d.tilemap.extras 7.0.1` em
+`depth: 1`, puxado pelo feature set 2D, resolvido em `Library/PackageCache/`. Escrevi um
+`IsoRuleTile` do zero — com tabela de vizinhança, sorteio determinístico e cinco testes — para
+substituir uma classe que já estava no projeto, já pintava 19 512 células e tem editor visual
+que o meu não teria. Apagado.
+
+**2. E o meu próprio teste me pegou num terceiro erro**, antes de o código ir a lugar nenhum: eu
+esperava que o vizinho de célula `(1, 0)` caísse a **45°** na tela. Cai a **27°**, porque a
+célula é 2:1 — projeção **diamétrica**, não isométrica verdadeira, coisa que o
+`BaseIsometrica` documenta na primeira linha da classe. Os offsets estavam certos; a expectativa
+que eu escrevi é que era ingênua.
+
+> A lição repetida: **`manifest.json` não é a lista de pacotes do projeto.** É a lista do que foi
+> pedido à mão. Quem responde "este pacote existe aqui?" é o `packages-lock.json` — ou a
+> `Library/PackageCache/`.
+
+### O achado que sobrou, e é real
+
+O chão do Deserto é pintado por **dois mecanismos ao mesmo tempo**:
+
+| | células | |
+|---|---|---|
+| `RuleTile_Areia` | 19 512 | 77,3% |
+| `sand_01/02/03`, `pebbles`, `crack` **crus** | 5 740 | 22,7% |
+
+E a regra da areia sorteia **exatamente essas cinco sprites**. Hoje isso é invisível, porque a
+regra tem **uma regra só, sem nenhuma condição de vizinhança, com saída aleatória**. No dia em
+que alguém acrescentar uma borda — que é o motivo de existir um Rule Tile — cada célula crua
+vira **um buraco no terreno aos olhos da regra**: as vizinhas passam a desenhar borda contornando
+pedaços de chão que visualmente são chão. A costura seria fabricada pela mistura.
+
+A Tumba pinta 1 111 células **só** com areia crua, sem Rule Tile nenhum; Castelo, Portões e
+Santuário não usam Rule Tile. E o `RuleTile_Muro` existe, é referenciado pela cena da Tumba e
+**não pinta uma célula sequer**.
+
+Guarda: `TilemapSemMisturaTests`, que congela a lista em vez de proibir.
+
+**Consolidado no mesmo dia**, com autorização do Vini: `ConsolidarOChaoDeAreia` passou **6 851
+células** para a regra — 5 740 no Deserto, 1 111 na Tumba — e os dois pisos foram conferidos
+**no disco** em 100% `RuleTile_Areia`. A lista congelada do guarda nasceu com uma entrada e já
+está vazia.
+
+A ferramenta escreve com `SetTiles` **em lote** e conta as células antes e depois, recusando-se a
+salvar se o total cair. Não é zelo: em 2026-09-01, nesta mesma Unity, o `SetTile` singular gravou
+NULL num tilemap com conteúdo e apagou 9 104 células em três cenas **relatando sucesso**. Os
+totais desta execução: 25 252 → 25 252 e 1 381 → 1 381.
+
+> **E a primeira versão do log da ferramenta mentia.** Para Castelo, Portões e Santuário — que
+> não têm areia nenhuma, usam outro piso — ela dizia *"nada a consolidar (já é tudo
+> RuleTile_Areia)"*, que é uma frase falsa sobre três cenas. Corrigida para dizer o que de fato
+> aconteceu: nenhuma célula de areia crua, N células de outro piso intocadas.
+
+### Import dos tiles: 5 de 6 já estavam certos
+
+Conferidos os 14 sprites de `Art/Tiles` contra a lista de ajustes: PPU 32 ✅, pivô consistente ✅,
+Point ✅, sem compressão ✅, `spriteExtrude` uniforme em 1 ✅ (o padrão da Unity; a doc o define
+como *"o número de pixels em branco entre a borda do gráfico e a malha"*, e o que evita costura é
+ele ser **igual em todos**, não ser zero).
+
+O que **estava** errado era o sexto: **3 dos 14 em `Tight`**. A doc define `Tight` como *"malha
+ajustada aos valores de alfa"* — e um tile de chão isométrico é um losango dentro de um retângulo
+32 × 16, com os quatro cantos transparentes. Com `Tight` a malha deixa de ser a célula e passa a
+ser o losango, e duas células vizinhas encostam malha com malha. Corrigidos para `FullRect`:
+`arena_piso_placeholder` (que pinta as 4 096 células da Arena de Testes) e
+`santuario_piso_placeholder`.
+
+O terceiro, `wall_stone`, fica em `Tight` de propósito: pivô `BottomCenter`, é **parede**, não
+ladrilha no plano do piso. Guarda novo: `ImportacaoDaPixelArtTests.TileDeChao_UsaMalhaFullRect`,
+que discrimina pelo **pivô** — central é chão, `BottomCenter` fica em pé — em vez de por nome de
+arquivo, para não envelhecer quando entrar tile novo.
+
+> O padding ≥ 2 px do atlas, último item da lista, **já era guardado** desde antes por
+> `SpriteAtlasDaPixelArtTests`.
+
+### Grid, anchor e renderer: os três já estavam certos
+
+| ponto | medido |
+|---|---|
+| Cell Size 1 × 0,5, Z consistente | ✅ — **32 057 células, todas em `z = 0`**, nas 6 cenas |
+| Tile Anchor casando com o pivô | ✅ — anchor `(0.5, 0.5, 0)` nos 12 tilemaps; pivô das sprites é **Center** |
+| Modo do `TilemapRenderer` | Todos `Chunk`, e é a escolha certa |
+
+**A ressalva do anchor importa:** o conselho pede `(0.5, 0)` *se o pivô for bottom-center*. Os
+tiles de chão daqui são **centro**. Mudar o anchor deslocaria o piso das seis cenas **meia
+célula para baixo**.
+
+**E `Chunk` está certo** porque os pisos ficam em `sortingOrder: -1000`, abaixo de tudo: chão
+nunca precisa se intercalar com ator, então `Individual` custaria ordenação por tile em troca de
+nada. Achado menor: 2 dos 4 tilemaps `Colisao` carregam um `TilemapRenderer` e 2 não — mas os
+tiles de colisão têm `m_Sprite: {fileID: 0}`, não desenham nada, então é overhead sem efeito.
+
+### Tiles duplicados: não existem
+
+Varridos todos os `.asset` de tile: **13 assets sobre 13 sprites distintas, um para um**. Nenhum
+par de Tile assets compartilha sprite, então não há divergência de colisor ou cor escondida.
+
+### A distribuição do sorteio, medida — e uma advertência minha exagerada
+
+Escrevi `AuditoriaDoTilemap`, que varre os Tilemaps das cenas do Build Settings e escreve
+`auditoria_tilemap.md`: tiles em uso por célula, import de cada sprite, duplicatas, Rule Tiles
+sem condição de vizinhança, e **o que cada tile de fato desenha**.
+
+A última é medida com `Tilemap.GetSprite`, que pergunta ao próprio tile — o `Mathf.PerlinNoise`
+da Unity não é reproduzível fora da engine, e qualquer conta minha em Python seria palpite com
+cara de número.
+
+**Eu tinha avisado que a consolidação levaria os detalhes de 2,7% para "muito mais". Exagerado.**
+Aqueles 2,7% eram só a fatia pintada à mão; a regra já governava 77,3% do Deserto com a mesma
+distribuição. O efeito real:
+
+| sprite | antes | agora | delta |
+|---|---|---|---|
+| `sand_03` | 43,8% | 48,4% | +4,6 |
+| `sand_02` | 21,8% | 19,3% | −2,5 |
+| `sand_crack` | 13,6% | 16,1% | +2,5 |
+| `sand_01` | 13,0% | 8,1% | −4,9 |
+| `sand_pebbles` | 7,6% | 7,9% | +0,3 |
+
+**O achado real é maior e anterior a tudo isso.** O sorteio é fortemente desigual, e já era para
+77% do mapa antes de eu tocar em nada: `sand_03` cobre **48,4%** do Deserto e `sand_crack` — um
+tile de **detalhe** — cobre **16,1%**, uma célula em cada seis.
+
+A causa é `FloorToInt(perlin × 5)`. Ruído Perlin **agrupa em torno de 0,5**, não é uniforme:
+quem estiver no índice do meio de `m_Sprites` leva quase metade, quem estiver nas pontas leva
+pouco. A ordem hoje é `sand_01, sand_02, sand_03, sand_crack, sand_pebbles` — `sand_03` calhou
+no meio gordo e a rachadura logo ao lado. **A ordem da lista define a frequência, e ninguém a
+escolheu pensando nisso.**
+
+**Consertado sem uma linha de código**, reordenando `m_Sprites` de
+`sand_01, sand_02, sand_03, sand_crack, sand_pebbles` para
+`sand_crack, sand_01, sand_03, sand_02, sand_pebbles` — detalhes nas pontas finas, areias lisas
+no meio gordo. Re-rodada a auditoria:
+
+| sprite | antes | agora |
+|---|---|---|
+| `sand_03` | 48,4% | 48,4% |
+| `sand_01` | 8,1% | **19,3%** |
+| `sand_02` | 19,3% | **16,1%** |
+| `sand_crack` | **16,1%** | **8,1%** |
+| `sand_pebbles` | 7,9% | 7,9% |
+
+Rachadura caiu pela metade — de uma célula em cada 6 para uma em cada 12. Detalhes somados
+**24,0% → 16,0%**; areias lisas **76% → 84%**.
+
+> **A prova de que a ordem é o único botão:** as contagens de células saíram **idênticas** —
+> 12232, 4884, 4074, 2056, 2006 —, só os nomes trocaram de posição. As frequências do Perlin são
+> puramente posicionais; nada no ruído depende de qual sprite está em cada índice.
+
+> **E a primeira versão do relatório mentia.** A seção de import saiu com a **tabela vazia** e o
+> texto "Nenhuma divergência de import" — eu guardava só os *nomes* das sprites e tentava
+> reencontrá-las com `AssetDatabase.FindAssets("nome t:Sprite")`, que não acha sub-asset de
+> textura. Um relatório que diz "conferi e está tudo bem" sem ter conferido nada é pior que
+> relatório ausente. Corrigido para guardar as `Sprite` que a varredura já tinha em mãos; agora
+> confere 11 e o "nenhuma divergência" significa alguma coisa.
+
+### Ferramentas de tilemap
+
+**`Tools/gerar_transicoes_iso.py`** — gera o conjunto de 47 transições entre dois terrenos.
+O 47 foi **derivado, não aceito**: um canto só muda o desenho quando as duas arestas dele
+existem, e a soma dá 1+4+10+16+16. A derivação é **topológica** — depende só de haver 4 arestas
+e 4 cantos alternando num ciclo —, então vale para o losango igual ao retângulo. O que muda é
+**qual vizinho é qual**, e o cabeçalho do script carrega o mapa.
+
+> **O padrão de banda que eu tinha posto produzia saída invisível.** Com 4 px a transição some:
+> o losango tem meia-altura 8 e as pontas leste/oeste têm **1 px**, então a borda vira franja no
+> contorno. Não era falta de contraste — `sand_01` tem brilho 154 e `arena_piso_01` tem 92.
+> Trocado para **85% da meia-altura** (6,8 px a 32×16), proporcional ao tile. Um padrão que
+> produz nada é um padrão ruim.
+
+Os 47 PNGs **não** foram para o repositório: não há uma célula onde dois terrenos se encontrem,
+e seriam 47 arquivos órfãos. O script fica versionado; a saída se gera quando houver limite.
+
+**`TileMapTools`** — janela de Editor com quatro operações. Uma delas foi **mudada em relação ao
+pedido**: era *"Fix All Pivots — sets pivot to bottom-center for all tiles in a folder"*, e
+aplicar isso deslocaria o piso das seis cenas **meia célula para baixo**. Os 13 tiles de chão têm
+pivô **Center**, casando com o `m_TileAnchor (0.5, 0.5, 0)` dos 12 tilemaps; `BottomCenter` é de
+coisa em pé, e o `wall_stone` é o único, corretamente. O botão passou a **perguntar o alvo**,
+começar em `Center`, e separar conferência de correção com diálogo do que vai mudar.
+
+As caixas de ajuda da janela carregam o achado do Perlin — a ordem da seleção define a
+frequência, índice do meio leva 48,4% — porque sem isso a ferramenta é uma armadilha.
+
+### O "campo de seed": a Unity não expõe um
+
+O `RuleTile.GetTileData` no modo `Random` faz
+`Mathf.PerlinNoise((x + 100000) * m_PerlinScale, (y + 100000) * m_PerlinScale)` e escala pelo
+número de sprites. Ou seja: **já é determinístico por posição**, que é o que o conselho pede. Mas
+o deslocamento `100000f` é **constante literal no código do pacote** — não há seed exposto. O que
+é ajustável é `m_PerlinScale` (0,5 na `RuleTile_Areia`), que muda a *frequência* do ruído, isto é,
+o tamanho das manchas de uma mesma sprite — não a semente. Expor semente exigiria subclasse de
+`IsometricRuleTile` sobrescrevendo `GetTileData`, e não há razão medida para isso hoje.
+
+
 ## 2026-09-09 — A luta contra a Byakhee: três sintomas, uma geometria
 
 O Vini jogou e relatou três coisas: *"não dá para ganhar da Byakhee"*, *"ela continua saindo do
