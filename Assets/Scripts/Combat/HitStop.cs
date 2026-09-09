@@ -53,10 +53,31 @@ namespace FavelaAmarela.Runtime.Combat
         /// Congela o mundo proporcionalmente ao peso do golpe.
         /// </summary>
         /// <param name="dano">Dano do golpe. Serve só de escala: 0 não congela nada.</param>
+        /// <summary>
+        /// Disparado a cada golpe que aterrissa, com o dano dele.
+        ///
+        /// <para><b>Por que um evento, e não o HitStop chamar a câmera.</b> Combate não deve
+        /// conhecer câmera: são camadas diferentes, e um <c>GetComponent</c> de câmera dentro do
+        /// resolvedor de golpe seria o começo de um acoplamento que só cresce. Quem quiser
+        /// reagir ao impacto assina — hoje é o <c>IsometricCameraController</c>, para o tremor
+        /// de tela.</para>
+        ///
+        /// <para><b>Estático porque o <c>Bater</c> é estático</b>, e ele é estático porque a
+        /// <c>Hitbox</c> o chama de dentro da consulta, sem referência a nada. Quem assina
+        /// precisa se desinscrever no <c>OnDestroy</c>: evento estático segura o assinante vivo
+        /// entre trocas de cena.</para>
+        /// </summary>
+        public static event System.Action<float> OnImpacto;
+
         public static void Bater(float dano)
         {
-            if (_instancia == null) return;
             if (dano <= 0f) return;
+
+            // O aviso sai mesmo sem instância na cena: quem treme a tela não depende de haver
+            // um HitStop montado, e uma cena sem ele não deveria perder o tremor junto.
+            OnImpacto?.Invoke(dano);
+
+            if (_instancia == null) return;
 
             // 40 de dano (o Maca) é a referência de "golpe cheio".
             float duracao = Mathf.Clamp(dano / 40f * 0.06f, 0.02f, DuracaoMaxima);

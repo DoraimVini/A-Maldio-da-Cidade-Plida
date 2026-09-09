@@ -4,6 +4,85 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — Auditoria da câmera: cinco pontos que não se aplicavam, três defeitos que existiam
+
+Auditoria pedida sobre um texto que se declarava inferido — "likely", "assumption", "unknown".
+Medido, cinco dos nove pontos **não se aplicam a este projeto**, e três defeitos reais estavam
+fora da lista.
+
+### O que a medição derrubou
+
+| alegado | medido |
+|---|---|
+| "provavelmente `transform.position = alvo + offset` com `Lerp`" | É `Vector3.SmoothDamp`, `smoothTime 0,15` — melhor do que o suposto |
+| "jitter se suaviza em `Update` e move em `FixedUpdate`" | O Damião está em `m_Interpolate: 1`. A transform é interpolada por quadro, então `LateUpdate` está certo |
+| "`Camera.main` repetido é ineficiente" | **Zero** ocorrências no projeto inteiro |
+| "aspect pode cortar ou esticar" | `CropFrame` 0/0, `StretchFill` off, `UpscaleRT` off — em outra proporção mostra **mais mundo** |
+| "pixel-perfect provável" | Certeza, e afinado: `PixelPerfectCamera` nas 5 câmeras de gameplay, `orthographicSize` derivado (4,21875 em 4 cenas, 5,625 em 2) |
+| "screen shake usado em acertos" | Existe e **não é usado em acerto nenhum** — um único chamador, a cutscene da queda Z4→Z5 |
+
+### Os três defeitos reais
+
+**1. Nada limitava a câmera.** Com `orthographicSize` 4,21875 a 16:9 ela enxerga **7,50 unidades**
+para cada lado, e no Deserto o jogador **alcança** as paredes de limite: a câmera seguia e
+revelava o vazio além da borda. Corrigido por `EnquadramentoDaCamera.Prender`, que deriva a área
+dos `Limite_*` da cena — como o `VeuDaTempestade` faz com os cantos, e pelo mesmo motivo: **o mapa
+já dobrou de tamanho uma vez**, e número escrito à mão teria ficado no meio do mapa novo.
+
+Sala menor que a vista **centraliza** em vez de travar; travar com mínimo > máximo daria um
+`Clamp` invertido e a câmera piscaria entre as duas bordas.
+
+**2. O tremor ficava DENTRO do amortecedor.** Ele fazia `transform.position +=` depois do
+`SmoothDamp`, e no quadro seguinte o `SmoothDamp` partia da posição **já sacudida**, com o
+`velocity` guardado — o tranco entrava no estado do amortecedor. Agora a posição seguida é
+guardada à parte e o tremor só é somado na hora de escrever.
+
+**3. Nenhum golpe sacudia a tela.** `HitStop.OnImpacto` é evento estático que a câmera assina —
+combate não conhece câmera. O modelo passou de "duração + magnitude constante" para **trauma**
+que acumula e decai, com o trauma **ao quadrado**: golpe fraco (trauma 0,2) desloca 4% do máximo
+em vez de 20%, então a tela não chia numa luta. E escala com o zoom, porque as cenas rodam em dois
+tamanhos com 33% de diferença.
+
+> **Uma armadilha que a lista não previu.** O `HitStop` põe o `timeScale` em **0,05** no impacto —
+> que é exatamente quando o tremor acontece. Medido em `Time.deltaTime`, um tremor de 0,3 s
+> duraria **seis segundos** de relógio. Passou a usar tempo real, mas continua **cortado pela
+> pausa**: tremer atrás de um menu não é dramático, é defeito.
+
+### A recomendação que me corrigiu
+
+A lista pedia `perlinNoise × trauma² × maxShake`, e eu tinha escrito
+`Random.insideUnitCircle` **por quadro**. Sorteio independente por quadro não é tremor, é chiado:
+a câmera salta para um ponto sem relação com o anterior. Trocado por Perlin contínuo — e com
+deslocamento grande entre as amostras de X e Y, senão as duas leem quase o mesmo valor e o tremor
+sai **sempre na diagonal**. Guarda: `ORuido_NaoSaiSempreNaDiagonal`.
+
+### O resto do seguimento
+
+Zona morta de 0,75 un (passo curto não arrasta a câmera), antecipação de 1,8 un pela velocidade
+do corpo — saturando na corrida de 7,5 — suavizada à parte, e **teto de velocidade** de 24 un/s.
+
+> A recomendação sugeria `Vector3.MoveTowards` "para evitar lag". Seria pior: velocidade
+> constante lê como mecânico. O `Vector3.SmoothDamp` tem sobrecarga com `maxSpeed`, que dá
+> amortecimento **e** teto.
+
+### O que foi recusado, com motivo
+
+- **Fit de aspect** e **zoom dinâmico**: os dois escreveriam `orthographicSize`, e o
+  `PixelPerfectCamera` reescreve esse valor a cada quadro. O projeto já tem um `SetZoom` que
+  documenta isso e **avisa** em vez de fingir. O caminho real é a resolução de referência.
+- **Multi-target com o companheiro**: seria ativamente errado. Yug-Neth fica a 1,8 un e não sai
+  de quadro — mas ele pode ser **incapacitado e ficar caído** enquanto o jogador segue, que é
+  mecânica. A câmera seria puxada de volta para um companheiro no chão.
+
+### Achado que fica registrado
+
+O arquivo é `CameraController.cs` e a classe é `IsometricCameraController`. Funciona — a cena
+referencia por GUID e a suíte está verde —, mas nomes divergentes são frágeis. Renomear o arquivo
+preserva o `.meta` e portanto o GUID; fica como limpeza barata pendente.
+
+EditMode 1061 → **1079** (1056 passando) · PlayMode **52/52**.
+
+
 ## 2026-09-09 — Auditoria do tilemap, e duas premissas minhas que caíram
 
 Branch nova: `develop_progression`.
