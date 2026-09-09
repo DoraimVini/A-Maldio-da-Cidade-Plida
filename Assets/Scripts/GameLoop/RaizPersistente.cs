@@ -2,6 +2,7 @@ using UnityEngine;
 using FavelaAmarela.Inventario;
 using FavelaAmarela.Runtime.Persistencia;
 using FavelaAmarela.Runtime.Progression;
+using FavelaAmarela.Runtime.UI;
 
 namespace FavelaAmarela.Runtime.GameLoop
 {
@@ -56,10 +57,28 @@ namespace FavelaAmarela.Runtime.GameLoop
             GerenciadorDeSave.GarantirInstancia();
             ProgressionBridge.GarantirInstancia();
 
+            // O HUD é o QUINTO, e faltava (2026-09-09). Ele já tinha o
+            // [RuntimeInitializeOnLoadMethod] próprio e um GarantirInstancia correto -- medido,
+            // chamado à mão ele nasce sem problema. Mas o atributo sozinho não bastou: num
+            // arranque medido, o InventoryManager existia e o HUD não, no MESMO instante.
+            //
+            // É exatamente o que o doc do InventoryManager já previa -- "manter os dois
+            // caminhos faz o inventário existir de qualquer jeito". Ele tinha dois; o HUD tinha
+            // um. Sem esta linha, o GameLoopBootstrap não acha o HUD, ninguém chama Bind() nas
+            // barras, e a Vitalidade e a Resiliência Mental ficam CONGELADAS na tela parecendo
+            // bug de lógica de dano.
+            HUDController.GarantirInstancia();
+
             Adotar(ItemDatabase.Instance);
             Adotar(InventoryManager.Instance);
             Adotar(GerenciadorDeSave.Instancia);
             Adotar(ProgressionBridge.Instancia);
+
+            // O HUD NÃO é adotado, e é a única exceção da lista. Ele é um Canvas: reparentá-lo
+            // sob um GameObject comum não traz ganho nenhum e arrisca o layout se a raiz algum
+            // dia deixar de ser identidade. Ele já sobrevive por DontDestroyOnLoad próprio, e a
+            // guarda de singleton dele já responde "existe um só". Estar nesta lista é o que
+            // importa: é aqui que se pergunta o que atravessa as cenas.
         }
 
         /// <summary>

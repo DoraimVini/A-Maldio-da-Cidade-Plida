@@ -4,6 +4,63 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — HUD: o pedido já estava atendido, e as minhas duas conclusões caíram
+
+O Vini pediu "conserta o HUD e vamos aproveitar e inserir UIs para a vida e da RM". Medido antes
+de construir: **as UIs já existiam.**
+
+| campo do `HUDController` | estado no `HUD_Gameplay.prefab` |
+|---|---|
+| `vitalidadeBar` (a vida) | **ligado** |
+| `resilienciaBar` (a RM) | **ligado** |
+| `vigorBar`, `barraDeAcoes`, `barraDeItens`, `barraDeArtefatos`, `companheiroBar` | ligados |
+| `telaPause`, `sequenciaColapso` | ligados |
+
+**Nove de nove.** Construir barras novas teria duplicado o que já estava pronto e wired.
+
+### Duas conclusões minhas caíram, uma depois da outra
+
+**1. "Nenhuma cena tem HUDController, logo o HUD está morto."** Errado. Procurei o GUID do script
+e o do prefab nas seis cenas e não achei — mas **ausência das cenas é o desenho**: o HUD nasce de
+`Resources/HUD_Gameplay` por `[RuntimeInitializeOnLoadMethod]`, sobrevive por
+`DontDestroyOnLoad`, e o `Ocultar()` desliga o **Canvas** e não o **GameObject**, exatamente para
+continuar encontrável por `FindAnyObjectByType`. Eu medi o lugar errado.
+
+**2. "Então é defeito real do jogo."** Também não estabelecido. Instrumentei o caminho e o log
+mostrou o oposto do que eu supunha:
+
+```
+[SONDA] GarantirInstancia chamado. Instancia=False
+[SONDA] prefab=True
+[SONDA] Awake do HUDController rodou.
+[SONDA] instanciado. ativo=True temComponente=True Instancia=True   <- NASCE CERTO
+...
+[SONDA] GarantirInstancia chamado. Instancia=False                  <- MORREU
+```
+
+O HUD **nasce perfeitamente** e depois é destruído, repetidamente. O runner de PlayMode limpa
+objetos entre testes, inclusive `DontDestroyOnLoad` — então o que o teste mede ali é o runner,
+não o jogo.
+
+> **O que fica: um teste em batch não decide se o HUD aparece em jogo.** Trinta segundos de
+> Editor decidem. Registrar isso vale mais que um teste que finge medir o resultado quando mede
+> o ambiente.
+
+### O que foi de fato entregue
+
+- **HUD registrado na `RaizPersistente`**, como quinto serviço persistente. Não mudou o resultado
+  dos testes — é alinhamento com o padrão que o próprio projeto documenta: o `InventoryManager`
+  diz *"manter os dois caminhos faz o inventário existir de qualquer jeito"*, e tinha dois; o HUD
+  tinha um. **Não é adotado sob a raiz**, e é a única exceção da lista: ele é um `Canvas`, e
+  reparentá-lo sob um GameObject comum não traz ganho e arrisca layout.
+- **Três guardas** sobre o mecanismo, que é o que dá para guardar: o prefab continua em
+  `Resources`; `GarantirInstancia()` cria o HUD **ativo** e com o componente (pega alguém salvar
+  o prefab com a raiz inativa, que faria o `Awake` nunca rodar); e as barras de vida e de RM
+  continuam dentro do prefab.
+
+EditMode **1099** · PlayMode 59 → **62**.
+
+
 ## 2026-09-09 — Camadas de ordenação e sombra de chão
 
 O Vini pediu profundidade e fundo para as cenas. Medido antes de sugerir, o quadro era
