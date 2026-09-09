@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.U2D;
 using FavelaAmarela.Core.Camera;
 using FavelaAmarela.Runtime.Combat;
@@ -150,13 +151,37 @@ namespace FavelaAmarela.CameraSystem
                 _trauma,
                 EnquadramentoDaCamera.TraumaDeUmGolpe(dano, danoDeReferencia, traumaPorGolpe));
 
+        /// <summary>Prefixos que nomeiam parede de borda neste projeto.</summary>
+        /// <remarks>
+        /// São três porque as cenas <b>divergem</b>, e a divergência custou caro: o Deserto usa
+        /// <c>Limite_*</c>, o Santuário usa <c>Parede_*</c>. Ver <c>ResolverLimites</c>.
+        /// </remarks>
+        private static readonly string[] PrefixosDeParede = { "Limite_", "Parede_", "Muro_" };
+
         /// <summary>
-        /// A área que a câmera pode enquadrar: a autorada, ou a união dos <c>Limite_*</c> da
-        /// cena.
+        /// A área que a câmera pode enquadrar, por ordem de confiança: a autorada, as paredes
+        /// de borda nomeadas, ou — só então — a extensão dos Tilemaps.
         ///
         /// <para>Derivar é o padrão deste projeto, e pelo mesmo motivo que o
         /// <c>VeuDaTempestade</c> registra: <b>o mapa dobrou de tamanho em 2026-09-01</b>, e
         /// quatro números escritos à mão teriam ficado no meio do mapa novo, em silêncio.</para>
+        ///
+        /// <para><b>O defeito que isto fecha (2026-09-09), e ele era meu.</b> A primeira versão
+        /// procurava só <c>Limite_*</c>, porque foi escrita olhando o Deserto de Hali. Medido
+        /// depois nas seis cenas: <b>só o Deserto usa esse nome</b>. O Santuário tem as quatro
+        /// paredes equivalentes chamadas <c>Parede_*</c>; Castelo, Tumba e Portões não têm
+        /// parede nomeada nenhuma. O travamento funcionava em <b>uma cena de seis</b>, e as
+        /// outras cinco só recebiam um aviso no console.</para>
+        ///
+        /// <para><b>Por que o Tilemap é o ÚLTIMO recurso e não o primeiro.</b> É tentador
+        /// derivar do chão pintado — mas medido, o chão do Deserto é <c>228 × 114</c> contra
+        /// <c>88 × 64</c> de área jogável: <b>2,6× mais largo</b>, porque a areia é pintada bem
+        /// além das paredes para nunca aparecer borda. Travar por ele deixaria a câmera passar
+        /// 70 unidades da parede. Onde há parede nomeada, ela é a verdade; o Tilemap só entra
+        /// onde não há nenhuma, e aí é melhor que não travar coisa alguma.</para>
+        ///
+        /// <para>Sem margem extra de propósito: o <c>Prender</c> já recua a meia-vista inteira,
+        /// e qualquer folga somada aqui seria vazio a mais na tela, não a menos.</para>
         /// </summary>
         private void ResolverLimites()
         {
@@ -164,34 +189,72 @@ namespace FavelaAmarela.CameraSystem
 
             if (limitesDoMapa != null)
             {
-                var b = limitesDoMapa.bounds;
-                _limiteMin = b.min;
-                _limiteMax = b.max;
-                _temLimites = true;
+                Guardar(limitesDoMapa.bounds);
                 return;
             }
 
             var paredes = FindObjectsByType<Collider2D>(FindObjectsInactive.Include,
                                                         FindObjectsSortMode.None)
-                .Where(c => c.name.StartsWith("Limite_"))
+                .Where(c => PrefixosDeParede.Any(
+                    p => c.name.StartsWith(p, System.StringComparison.Ordinal)))
                 .ToArray();
 
-            if (paredes.Length == 0)
+            if (paredes.Length > 0)
             {
-                // Sem erro alto: a Arena de Testes e o Menu não têm limites de propósito. O
-                // aviso existe para a cena que DEVERIA ter e não tem.
-                Debug.LogWarning("[IsometricCameraController] Nenhum 'Limite_*' na cena — a " +
-                                 "câmera vai seguir o alvo sem travar, e pode mostrar o vazio " +
-                                 "além da borda do mapa.", this);
+                Bounds uniao = paredes[0].bounds;
+                for (int i = 1; i < paredes.Length; i++) uniao.Encapsulate(paredes[i].bounds);
+
+                Guardar(uniao);
                 return;
             }
 
-            Bounds uniao = paredes[0].bounds;
-            for (int i = 1; i < paredes.Length; i++) uniao.Encapsulate(paredes[i].bounds);
+            var mapas = FindObjectsByType<Tilemap>(FindObjectsInactive.Include,
+                                                   FindObjectsSortMode.None);
 
-            _limiteMin = uniao.min;
-            _limiteMax = uniao.max;
+            if (mapas.Length > 0)
+            {
+                Bounds uniao = ParaMundo(mapas[0]);
+                for (int i = 1; i < mapas.Length; i++) uniao.Encapsulate(ParaMundo(mapas[i]));
+
+                Guardar(uniao);
+
+                Debug.Log("[IsometricCameraController] Sem parede de borda nomeada nesta cena — " +
+                          $"limites derivados de {mapas.Length} Tilemap(s): {uniao.size.x:0.0} × " +
+                          $"{uniao.size.y:0.0} un. É melhor que não travar, mas menos preciso " +
+                          "que paredes nomeadas.", this);
+                return;
+            }
+
+            // Sem erro alto: a Cena_Menu não tem limites de propósito. O aviso existe para a
+            // cena que DEVERIA ter e não tem.
+            Debug.LogWarning("[IsometricCameraController] Nenhuma parede de borda e nenhum " +
+                             "Tilemap na cena — a câmera vai seguir o alvo sem travar, e pode " +
+                             "mostrar o vazio além da borda do mapa.", this);
+        }
+
+        private void Guardar(Bounds b)
+        {
+            _limiteMin = b.min;
+            _limiteMax = b.max;
             _temLimites = true;
+        }
+
+        /// <summary>
+        /// A caixa do tilemap no mundo, pelos dois cantos.
+        ///
+        /// <para>Dois cantos bastam porque a skill isométrica proíbe rotação — a profundidade
+        /// aqui é <c>sortingOrder</c>, não transform girada.</para>
+        /// </summary>
+        private static Bounds ParaMundo(Tilemap mapa)
+        {
+            Bounds local = mapa.localBounds;
+
+            Vector3 a = mapa.transform.TransformPoint(local.min);
+            Vector3 b = mapa.transform.TransformPoint(local.max);
+
+            var caixa = new Bounds(a, Vector3.zero);
+            caixa.Encapsulate(b);
+            return caixa;
         }
 
         private void LateUpdate()

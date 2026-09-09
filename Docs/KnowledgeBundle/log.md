@@ -4,6 +4,79 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — O travamento da câmera funcionava em uma cena de seis
+
+Uma spec pedia uma ferramenta de Editor que definisse os limites da câmera pelo maior Tilemap da
+cena. Medi antes de escrever, e a medição derrubou a premissa **e** encontrou um defeito meu,
+maior que a spec.
+
+### O defeito
+
+O `ResolverLimites` procurava colisores com nome começando em `Limite_`. Escrevi isso olhando o
+Deserto de Hali. Varridas as seis cenas:
+
+| cena | objetos de borda | achava? |
+|---|---|---|
+| Deserto_Hali | `Limite_Norte/Sul/Leste/Oeste` | sim |
+| Santuario_Yhtill | **`Parede_`**`Norte/Sul/Leste/Oeste` | **não** |
+| Castelo_Carcosa | tilemap `Colisao` | **não** |
+| Tumba_De_Alhazred | tilemap `Colisao` | **não** |
+| Portoes_Das_Ruinas | tilemap `Colisao` | **não** |
+
+**Uma de seis.** Com a suíte verde e 22 testes EditMode confirmando a aritmética — porque a
+aritmética estava certa. Faltava o elo. É o Corolário 2 em forma pura: li uma cena e
+generalizei para seis.
+
+### Por que o Tilemap é o ÚLTIMO recurso, e não o primeiro
+
+A spec queria derivar do maior Tilemap. Medido:
+
+| cena | paredes | tilemap |
+|---|---|---|
+| Deserto_Hali | 88 × 64 | **228 × 114** |
+| Santuario_Yhtill | 16 × 11 | 30 × 15 |
+
+O chão do Deserto é **2,6× mais largo que a área jogável** — a areia é pintada muito além das
+paredes para nunca aparecer borda. Travar por ela deixaria a câmera passar **70 unidades** da
+parede. Onde há parede nomeada, ela é a verdade.
+
+Mas nas três cenas sem parede nomeada o Tilemap é a **única** fonte, e travar por ele é melhor
+que não travar. Virou escada de prioridade: colisor autorado → paredes nomeadas (`Limite_`,
+`Parede_`, `Muro_`) → união dos Tilemaps → aviso.
+
+Sem margem extra, ao contrário do que a spec pedia: o `Prender` já recua a meia-vista inteira, e
+folga somada ali seria vazio **a mais** na tela.
+
+### O que fecha a porta
+
+Sete testes PlayMode montando o componente de verdade — incluindo `ParedeChamadaParede_TambemConta`,
+que falha se só `Limite_*` voltar a contar. E três guardas EditMode que varrem as cenas: nenhuma
+sem fonte de limites, as que têm parede nomeada continuam tendo, e a lista das que dependem do
+Tilemap está congelada como dívida registrada.
+
+> **Um teste meu falhou primeiro, e a expectativa é que estava errada.** Cravei que a câmera
+> repousaria a 4,67 depois de 120 quadros; mediu 1,07. Não sei se foi a proporção da tela em
+> batch mode ou convergência lenta — as duas explicam. Reescrevi para medir a proporção da
+> câmera viva e asserir a **invariante** (a câmera nunca passa da borda da zona morta), que vale
+> em todo quadro convergido ou não, e a mensagem de falha agora imprime a proporção.
+
+### O `Shake` legado
+
+Ele fazia `amplitudeDoTremor = Max(amplitudeDoTremor, magnitude)` — mutação permanente de campo
+serializado a partir do argumento de uma chamada. Hoje era no-op por sorte (0,15 contra 0,35).
+Parou de escrever, e agora avisa. Guarda: `OShakeLegado_NaoAlteraAAmplitudeSerializada`.
+
+`AcrescentarTrauma(float)` entra como porta pública para o que não é golpe.
+
+### Ferramenta
+
+`Tools/Camera/Auditar limites da câmera` → `Docs/KnowledgeBundle/auditoria_limites_camera.md`.
+**Não escreve nas cenas** — a pergunta que decide o conserto é qual fonte diz a verdade, e isso
+é medição, não ação.
+
+EditMode 1079 → **1086** · PlayMode 52 → **59**.
+
+
 ## 2026-09-09 — Zona morta retangular, e a mutação silenciosa dentro do Shake
 
 Uma spec de `CameraFollow` genérica chegou com oito itens. **Seis já estavam prontos** desde a
