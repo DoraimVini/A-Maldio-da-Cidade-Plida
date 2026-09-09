@@ -141,9 +141,28 @@ namespace FavelaAmarela.CameraSystem
         private void ResolverCorpoDoAlvo()
             => _corpoDoAlvo = target != null ? target.GetComponentInParent<Rigidbody2D>() : null;
 
-        private void OnEnable() => HitStop.OnImpacto += AoImpacto;
+        private void OnEnable()
+        {
+            HitStop.OnImpacto += AoImpacto;
+            EnquadramentoDaCamera_TremorDoMundo(true);
+        }
 
-        private void OnDisable() => HitStop.OnImpacto -= AoImpacto;
+        private void OnDisable()
+        {
+            HitStop.OnImpacto -= AoImpacto;
+            EnquadramentoDaCamera_TremorDoMundo(false);
+        }
+
+        /// <summary>
+        /// Assina (ou larga) o canal de tremores do <b>mundo</b> — o que não é golpe. Golpe
+        /// entra por <c>HitStop.OnImpacto</c>; pouso de chefe, portão batendo e chão
+        /// desmoronando entram por aqui.
+        /// </summary>
+        private void EnquadramentoDaCamera_TremorDoMundo(bool assinar)
+        {
+            if (assinar) TremorDoMundo.OnTremor += AcrescentarTrauma;
+            else TremorDoMundo.OnTremor -= AcrescentarTrauma;
+        }
 
         /// <summary>Todo golpe que aterrissa sacode a tela, na medida do dano.</summary>
         private void AoImpacto(float dano)

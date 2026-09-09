@@ -184,7 +184,7 @@ namespace FavelaAmarela.Tests.EditMode
         /// </summary>
         private static IEnumerable<CameraDeCena> Cameras()
         {
-            string guidDoControlador = GuidDo("Assets/Scripts/Camera/CameraController.cs");
+            string guidDoControlador = GuidDo("Assets/Scripts/Camera/IsometricCameraController.cs");
 
             foreach (var caminho in Directory.GetFiles(PastaDeCenas, "*.unity",
                                                        SearchOption.AllDirectories).OrderBy(c => c))

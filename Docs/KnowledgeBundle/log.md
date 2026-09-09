@@ -4,6 +4,55 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — Três acabamentos: fundo das cenas, nome do arquivo, e o trauma que não tinha porta
+
+Itens sinalizados ao longo do dia e nunca fechados.
+
+### As câmeras limpavam de três jeitos diferentes
+
+Três das cinco cenas de gameplay estavam em `ClearFlags: Skybox` **sem material de skybox
+atribuído**, num jogo 2D ortográfico. Cada uma tem uma `m_BackGroundColor` escolhida a dedo — o
+quase-preto 0,04/0,03/0,05 do Castelo, o 0,1/0,09/0,07 do Santuário — e essa cor **só governa com
+certeza em `SolidColor`**. Ter duas cenas num modo e três no outro não foi decisão de ninguém.
+
+As cinco em `SolidColor`. Guarda: `AsCamerasDeGameplay_LimpamComCorSolida`.
+
+### O arquivo com o nome errado
+
+`CameraController.cs` continha a classe `IsometricCameraController`. Funcionava — a cena
+referencia o `.meta`, não o nome —, e o `.meta` foi renomeado junto, então o GUID é o mesmo e as
+**seis cenas seguem ligadas**.
+
+> **O rename revelou uma coisa.** A linha de base do `LigacaoDoJogoTests` chaveava
+> `CameraController.SetTarget` — pelo nome do **arquivo**, não da classe. O teste deriva a classe
+> do arquivo, então o rename corrigiu chaves que estavam erradas desde sempre.
+
+### `AcrescentarTrauma` ganhou uma porta
+
+Ele era público e **não tinha um chamador sequer**. Golpe já sacode a tela por
+`HitStop.OnImpacto`; faltava o canal do que **não é golpe**.
+
+As duas saídas óbvias falham aqui: campo serializado no inimigo não funciona porque **prefab não
+referencia objeto de cena** (o Byakhee é prefab, a câmera é cena), e `FindObjectOfType` é
+proibido em produção. Então `Core.Camera.TremorDoMundo` — um evento estático em **Core**, o único
+lugar que Inimigos e Câmera já referenciam. Pôr o evento na camada da câmera criaria uma aresta
+Inimigos → Câmera que não existe.
+
+Primeiro chamador: **o pouso do Byakhee**, com trauma 0,5 — acima dos 0,45 de um golpe cheio do
+jogador, porque a criatura chegando no chão deve pesar mais que uma espadada.
+
+### Um teste meu que já falhou duas vezes, agora sem número cravado
+
+`ForaDaZonaMorta_ACameraSegueSuavemente` falhou primeiro por 120 quadros serem poucos, depois por
+0,3 un de tolerância. Passou a medir **fração do caminho andado** (≥ 90%), que é a propriedade
+real — a velocidade de convergência em batch mede o ambiente, não a câmera.
+
+> E a mensagem de falha resolveu uma dúvida que eu tinha registrado como não resolvida: a
+> proporção medida é **1,778**. Não era a tela de batch mode; era convergência mesmo.
+
+EditMode 1104 → **1110** · PlayMode 64.
+
+
 ## 2026-09-09 — O chão do Deserto: costura 0,00 usando os pixels do próprio pack
 
 O Vini: *"eu quero que o mapa seja inteiriço, sem o espaço entre as tiles"*. E depois, quando

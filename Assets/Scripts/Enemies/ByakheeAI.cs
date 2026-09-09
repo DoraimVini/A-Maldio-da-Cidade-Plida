@@ -36,6 +36,12 @@ namespace FavelaAmarela.Runtime.Enemies
 
         [Tooltip("Velocidade com que ele se arrasta na direção do jogador enquanto está " +
                  "POUSADO e longe demais para ser alcançado.")]
+        /// <summary>
+        /// Trauma que o pouso do Byakhee gera. 0,5 sacode com peso sem saturar: um golpe cheio
+        /// do jogador gera 0,45, e a criatura chegando no chão deve ler como mais que isso.
+        /// </summary>
+        private const float TraumaDoPouso = 0.5f;
+
         [SerializeField] private float velocidadeNoChao = 2.6f;
 
         [Header("Movimento")]
@@ -374,6 +380,10 @@ namespace FavelaAmarela.Runtime.Enemies
                     break;
 
                 case ByakheeState.Pousado:
+                    // O pouso sacode o chão ANTES do golpe: é o aviso de que a criatura chegou.
+                    // Pelo canal do mundo, não por referência -- este é um prefab e a câmera é
+                    // objeto de cena, e prefab não referencia cena.
+                    Core.Camera.TremorDoMundo.Sacudir(TraumaDoPouso);
                     GolpearComGarras();
                     break;
             }

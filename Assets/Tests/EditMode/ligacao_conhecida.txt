@@ -18,7 +18,7 @@
 
 ok metodo ArtefatosBridge.EquiparNoPrimeiroSlotLivre | O doc do próprio método diz: é o que o Carcosa Debugger usa para conceder relíquias de teste.
 ok metodo ByakheeAI.TentarCortarAsa | O doc diz: exposto para quando a Lâmina do Sinal existir. Hoje o pouso da fase 3 vem do intervalo espontâneo da FSM.
-ok metodo CameraController.SetTarget | Quem liga a câmera ao alvo são as ferramentas de montagem de cena; em jogo o alvo vem serializado.
+ok metodo IsometricCameraController.SetTarget | Quem liga a câmera ao alvo são as ferramentas de montagem de cena; em jogo o alvo vem serializado.
 ok metodo GerenciadorDeSave.AplicarTudo | A persistência deste projeto é PULL: cada IPersistente se registra E aplica o próprio estado no Start (ver EstadoPersistenteDoJogador:50). Este é o caminho de push, alternativo e não usado. Conferido em 2026-09-02.
 ok metodo HUDController.DefinirTelasDeFluxo | Usado pela ferramenta que monta o HUD, não pelo jogo.
 ok metodo ItemDatabase.ClearInstanceForTesting | O nome diz. Existe para o rig de teste.
@@ -27,7 +27,7 @@ ok metodo PortalDeCena.DefinirCenaDestino | As ferramentas de Editor montam os p
 ok metodo PortalDeCena.DefinirChegada | Idem.
 
 divida metodo AbdulAlhazredAI.MirarEm | A mira das conjurações do Abdul existe e nada a aciona — ele conjura sem apontar.
-divida metodo CameraController.SetZoom | Nenhum momento do jogo aproxima ou afasta a câmera. Candidato natural: o desvelar do Rei e a morte.
+divida metodo IsometricCameraController.SetZoom | Nenhum momento do jogo aproxima ou afasta a câmera. Candidato natural: o desvelar do Rei e a morte.
 divida metodo GerenciadorDeVigor.PodeExecutarAcao | Ninguém pergunta se há Vigor antes de agir — as ações se pagam por caminhos próprios.
 divida metodo GerenciadorDeVigor.RestaurarCompletamente | O Refúgio de Luz devolve Vitalidade e Resiliência e NÃO devolve Vigor. Provável esquecimento.
 divida metodo NavegacaoDoMundo.Reavaliar | A malha de navegação nunca é reavaliada. Quando os Portões abrem ou uma tranca de arena cai, o mundo muda e os inimigos continuam com o mapa velho.
