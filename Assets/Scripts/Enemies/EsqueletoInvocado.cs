@@ -52,6 +52,16 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Segundos entre golpes.")]
         [SerializeField] private float cadenciaDeAtaque = 1.5f;
 
+        [Header("Janela do golpe")]
+        [Tooltip("Segundos que a área de acerto fica aberta. NÃO é a cadência: é quanto tempo " +
+                 "o golpe existe, e portanto quanto tempo há para esquivar dele.")]
+        [Min(0.05f)]
+        [SerializeField] private float janelaDoGolpe = 0.15f;
+
+        [Tooltip("Raio da área atingida, em unidades de mundo.")]
+        [Min(0.1f)]
+        [SerializeField] private float raioDoGolpe = 0.5f;
+
         [Header("Tempo de vida")]
         [Tooltip("Segundos até virar pó sozinho. Impede que a arena encha de esqueletos numa luta longa.")]
         [SerializeField] private float tempoDeVida = 20f;
@@ -67,6 +77,7 @@ namespace FavelaAmarela.Runtime.Enemies
         private VitalidadeBridge _vitalidadeDoAlvo;
         private float _tempoDesdeUltimoGolpe;
         private float _tempoRestante;
+        private FavelaAmarela.Runtime.Combat.Hitbox _hitbox;
 
         /// <summary>Esqueleto comum, não é boss — leva crítico furtivo normalmente.</summary>
         public bool EhAparicaoPrimordial => false;
@@ -143,26 +154,69 @@ namespace FavelaAmarela.Runtime.Enemies
             _rb.linearVelocity = _perseguidor.CalcularVelocidade(transform.position, passo);
         }
 
+        /// <summary>
+        /// Acha (ou cria) a área de acerto deste Esqueleto. Preguiçoso, como no
+        /// <c>EnemyCombat</c>: <c>Hitbox.GarantirPara</c> lê o sprite para achar a altura do
+        /// torso, e um Esqueleto invocado em runtime pode ainda não ter quadro nenhum no
+        /// <c>Awake</c>.
+        /// </summary>
+        private void GarantirHitbox()
+        {
+            if (_hitbox != null) return;
+
+            _hitbox = FavelaAmarela.Runtime.Combat.Hitbox.GarantirPara(
+                gameObject, "Hitbox_Esqueleto", LayerMask.GetMask("PlayerHurtbox"),
+                raioDoGolpe, alcanceDeGolpe, pouparAliados: false,
+                profundidade: FavelaAmarela.Runtime.Combat.Hitbox.ProfundidadeDeUmaCelula);
+        }
+
+        /// <summary>
+        /// Desfere o golpe. <b>Abre uma janela</b> em vez de aplicar dano no mesmo quadro.
+        ///
+        /// <para><b>O defeito que isto fecha.</b> Até aqui o Esqueleto não tinha geometria de
+        /// golpe nenhuma: o dano saía no instante em que a cadência estourava, e a única
+        /// condição era o <c>Vector2.Distance &lt;= alcanceDeGolpe</c> do <c>FixedUpdate</c>.
+        /// É o mesmo defeito já corrigido no Byakhee, no Cultista e no Cortesão Pálido, e
+        /// quebra o combate pelos mesmos dois motivos: <b>sem janela</b> não existe esquivar
+        /// no tempo certo, só estar longe naquele quadro exato — apesar de o golpe ter cinco
+        /// quadros de animação com arco de lâmina; e <b>sem direção</b>, estar atrás do
+        /// Esqueleto levava lâmina igual.</para>
+        ///
+        /// <para>Pesa mais aqui do que num Cultista solto: o Esqueleto existe para <b>pressão
+        /// enquanto o jogador procura Pedras de Poder</b> na luta do Abdul, e vários deles
+        /// aparecem ao mesmo tempo. Dano sem janela, multiplicado por invocação, lê como a
+        /// luta cobrando o que não mostrou.</para>
+        /// </summary>
         private void TentarGolpear(float dt)
         {
             _tempoDesdeUltimoGolpe += dt;
             if (_tempoDesdeUltimoGolpe < cadenciaDeAtaque) return;
 
             _tempoDesdeUltimoGolpe = 0f;
-            // NAO HA GEOMETRIA no golpe: o dano sai na cadencia, e a unica condicao e o
-            // Distance <= alcanceDeGolpe la em cima, no FixedUpdate. Desenho o alcance para
-            // a tela mostrar o que o codigo realmente usa -- um raio, sem direcao nem janela,
-            // apesar de o golpe ter 5 quadros de animacao com arco de lamina.
-            FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.RegistrarCirculo(
-                transform.position, alcanceDeGolpe,
-                FavelaAmarela.Runtime.Diagnostico.VisualizadorDeGolpes.CorDeGolpe);
-
-            // A mitigação pela Defesa do alvo acontece dentro do VitalidadeBridge.
-            _vitalidadeDoAlvo?.ReceberDanoFisico(ataque);
+            GarantirHitbox();
 
             // O golpe acontece num instante e não muda a velocidade do corpo — é a única das
             // três situações do Esqueleto que o animador não consegue ler sozinho.
             _animador?.Golpear();
+
+            var golpe = new ArmaResult(true, 0f, 0f, dano: ataque);
+
+            if (_hitbox != null)
+            {
+                Vector2 direcao = _alvo != null
+                    ? ((Vector2)_alvo.position - (Vector2)transform.position).normalized
+                    : Vector2.zero;
+
+                _hitbox.Armar(golpe, janelaDoGolpe, direcao);
+                return;
+            }
+
+            // Reserva: sem hitbox o Esqueleto ficaria inofensivo, o que é pior que o golpe
+            // antigo. Falha alto para não virar "os esqueletos pararam de bater" em playtest.
+            // A mitigação pela Defesa do alvo acontece dentro do VitalidadeBridge.
+            Debug.LogError($"[EsqueletoInvocado] '{name}' está sem Hitbox — o golpe caiu para " +
+                           "o acerto instantâneo, que não é esquivável no tempo.", this);
+            _vitalidadeDoAlvo?.ReceberDanoFisico(ataque);
         }
 
         /// <inheritdoc />

@@ -569,10 +569,13 @@ namespace FavelaAmarela.Tests.PlayMode
         // ── 4. golpe do inimigo no jogador ───────────────────────────────────
 
         /// <summary>
-        /// Monta a hitbox do lado do inimigo pelo mesmo caminho que o Byakhee usa
-        /// (<c>Hitbox.GarantirPara</c> + <c>Armar</c>) — que é o único caminho de inimigo com
-        /// janela ativa neste projeto. Cultista, Esqueleto e Sseth ainda batem por proximidade
-        /// instantânea; ver <c>systems/auditoria_hitbox_hurtbox.md</c>.
+        /// Monta a hitbox do lado do inimigo pelo mesmo caminho que todo inimigo com janela
+        /// usa (<c>Hitbox.GarantirPara</c> + <c>Armar</c>).
+        ///
+        /// <para>A versão anterior deste comentário dizia que o Byakhee era o <b>único</b> e que
+        /// "Cultista, Esqueleto e Sseth ainda batem por proximidade instantânea". Venceu: o
+        /// Cultista e o Cortesão migraram com o <c>EnemyCombat</c>, e o Esqueleto em 2026-09-04
+        /// (ver <c>GolpeDoEsqueletoTests</c>). Sobra o <b>Sseth</b>.</para>
         /// </summary>
         private FavelaAmarela.Runtime.Combat.Hitbox ArmarHitboxDoInimigo(float raio, float alcance)
         {
