@@ -248,6 +248,69 @@ namespace FavelaAmarela.Tests.EditMode
                 "Sem todos, o rito de selamento nunca completa e o chefe fica invencível.");
         }
 
+        /// <summary>
+        /// Cada <c>EcoDeCarcosa</c> da cena precisa ter <b>quadros para mostrar</b>.
+        ///
+        /// <para><b>O defeito que isto pega (2026-09-04).</b>
+        /// <c>OsSistemasDoCastelo_EstaoInstanciados</c>, logo acima, já contava os dois Ecos e
+        /// passava verde — eles <i>estavam</i> na cena. O que ele não podia ver é que os dois
+        /// tinham <b>zero filhos e nenhum <c>SpriteRenderer</c></b>, e que
+        /// <c>EcoDeCarcosa.AtivarEco()</c> mostra o vulto ligando os <b>filhos</b> do objeto.
+        /// Resultado medido no YAML: o Eco se manifestava, drenava 3 de Resiliência Mental por
+        /// segundo e <b>nada aparecia na tela</b>.</para>
+        ///
+        /// <para>Isso não é falta de arte, é uma regra que o jogador não tem como aprender: ele
+        /// para para ler a Biblioteca, a sanidade cai, e a única pista do porquê era um
+        /// <c>Debug.Log</c> no console do Editor. Resiliência zerada é derrota.</para>
+        ///
+        /// <para><b>Por que o guarda é pelos QUADROS e não pelo <c>SpriteRenderer</c>.</b> O
+        /// renderer passou a ser garantido em runtime por <c>EcoDeCarcosa.GarantirVisual</c>,
+        /// justamente para uma cena futura não repetir isto. O que o código não tem como
+        /// inventar é a arte — e um renderer sem sprite é tão invisível quanto nenhum.</para>
+        /// </summary>
+        [Test]
+        public void CadaEcoDeCarcosa_TemQuadrosParaMostrar()
+        {
+            string guid = GuidDoScript("EcoDeCarcosa");
+            Assert.IsNotNull(guid, "Script EcoDeCarcosa não encontrado — o guarda não se verifica.");
+
+            var falhas = new List<string>();
+            int encontrados = 0;
+
+            // Em blocos, e não no arquivo inteiro: uma regex solta atravessa o separador do
+            // YAML e passa a medir o componente do objeto seguinte.
+            foreach (var bloco in File.ReadAllText(Cena)
+                         .Split(new[] { "--- " }, System.StringSplitOptions.None))
+            {
+                if (!Regex.IsMatch(bloco, @"^!u!114 &\d+")) continue;
+                if (!bloco.Contains(guid)) continue;
+
+                encontrados++;
+
+                // Populado, o array vira uma lista de linhas "  - {fileID: ...}".
+                // Vazio, a Unity grava "quadros: []" numa linha só -- que não casa aqui, e é
+                // exatamente o estado que este teste existe para reprovar.
+                var lista = Regex.Match(bloco,
+                    @"(?m)^  quadros:\s*\n((?:  - \{fileID:[^\n]*\n)+)");
+
+                int n = lista.Success
+                    ? Regex.Matches(lista.Groups[1].Value, @"guid: [0-9a-f]{32}").Count
+                    : 0;
+
+                if (n == 0)
+                    falhas.Add("um EcoDeCarcosa está sem quadros — ele vai drenar Resiliência " +
+                               "Mental sem aparecer na tela");
+            }
+
+            Assert.AreEqual(2, encontrados,
+                $"Esperava 2 EcoDeCarcosa no Castelo e achei {encontrados}. Ou a Biblioteca " +
+                "perdeu um, ou o componente foi renomeado e este guarda parou de guardar.");
+
+            Assert.IsEmpty(falhas,
+                string.Join("\n  ", falhas) +
+                "\n\nConserto: 'Tools/FavelaAmarela/Cena: vestir os Ecos de Carcosa'.");
+        }
+
         private static string GuidDoScript(string nome)
         {
             var arquivo = Directory

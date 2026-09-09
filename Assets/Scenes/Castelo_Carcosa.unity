@@ -45287,6 +45287,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1965bddb501c834e8a9b13f78bab818, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EcoDeCarcosa
+  quadros:
+  - {fileID: 21300000, guid: 1c88ced266b04bd4997dc6359036b8ee, type: 3}
+  - {fileID: 21300000, guid: 789305ae80074190b4a6cfb2f9401a12, type: 3}
+  - {fileID: 21300000, guid: 69140aac0c1f48a6804fd32a0f9eb98e, type: 3}
+  - {fileID: 21300000, guid: 3e25d95aa5214c5ebbd7db842717d897, type: 3}
+  quadrosPorSegundo: 6
   tempoMaximoImovel: 5
   taxaDrenoRMPorSegundo: 3
 --- !u!114 &1200183801
@@ -70667,6 +70673,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1965bddb501c834e8a9b13f78bab818, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EcoDeCarcosa
+  quadros:
+  - {fileID: 21300000, guid: 1c88ced266b04bd4997dc6359036b8ee, type: 3}
+  - {fileID: 21300000, guid: 789305ae80074190b4a6cfb2f9401a12, type: 3}
+  - {fileID: 21300000, guid: 69140aac0c1f48a6804fd32a0f9eb98e, type: 3}
+  - {fileID: 21300000, guid: 3e25d95aa5214c5ebbd7db842717d897, type: 3}
+  quadrosPorSegundo: 6
   tempoMaximoImovel: 5
   taxaDrenoRMPorSegundo: 3
 --- !u!114 &1931631048
