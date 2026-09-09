@@ -136,6 +136,13 @@ namespace FavelaAmarela.Tests.EditMode
                 "o que aconteceu com o AudioDeCombate, que exigia EnemyBase e por isso só " +
                 "alcançava 2 dos prefabs do elenco.");
 
+            StringAssert.Contains("PodeSerFerido", codigo,
+                "A Hurtbox parou de perguntar se o golpe VAI CONTAR antes de soar. Alvos que " +
+                "recusam golpe -- a Byakhee imune em voo, o Abdul de escudo levantado, o " +
+                "Damião invulnerável em cutscene -- voltam a soar como se tivessem sido " +
+                "feridos. Numa luta cuja regra é 'espere a janela', o som passa a dizer que a " +
+                "regra não existe.");
+
             StringAssert.Contains("SomDoJogo.EntidadeAbatida", codigo,
                 "O som de ABATE saiu da Hurtbox. Ele exige que IDanificavel exponha " +
                 "EstaAbatido, para a Hurtbox comparar antes e depois de entregar o golpe — " +

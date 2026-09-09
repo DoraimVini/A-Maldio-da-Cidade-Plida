@@ -92,14 +92,18 @@ namespace FavelaAmarela.Runtime.Combat
         /// </summary>
         public void Receber(ArmaResult resultado)
         {
-            if (resultado.Dano > 0f)
+            // Este golpe VAI contar? Perguntado ANTES de entregar, porque depois o alvo já
+            // mudou de estado -- e sem a pergunta, a Hurtbox soa contato que o alvo recusou.
+            //
+            // Foi o defeito de 2026-09-09: a Byakhee é imune em voo e o Abdul é imune de escudo
+            // levantado, e nos dois casos o jogador OUVIA o acerto conectar sem nada acontecer.
+            // Numa luta cuja regra inteira é "espere a janela", isso não é falta de polimento:
+            // é o jogo dizendo que a regra não existe.
+            bool vaiContar = _dono != null && _dono.PodeSerFerido;
+
+            if (vaiContar && resultado.Dano > 0f)
                 Audio.MixerDeAudio.Instancia?.Tocar(
                     Audio.SomDoJogo.EntidadeFerida, transform.position);
-
-            // O estado ANTES do golpe. Sem isto não dá para distinguir "morreu agora" de
-            // "já estava morto e levou mais uma pancada" -- e a segunda tocaria o som de
-            // abate a cada golpe num corpo caído.
-            bool estavaDePe = _dono != null && !_dono.EstaAbatido;
 
             _dono?.ReceberGolpe(resultado);
 
@@ -110,7 +114,7 @@ namespace FavelaAmarela.Runtime.Combat
             //
             // Limite conhecido: isto reconhece morte POR GOLPE. Quem cai por sangramento,
             // por expirar o tempo de vida ou por Colapso mental não passa por aqui.
-            if (estavaDePe && _dono.EstaAbatido)
+            if (vaiContar && _dono.EstaAbatido)
                 Audio.MixerDeAudio.Instancia?.Tocar(
                     Audio.SomDoJogo.EntidadeAbatida, transform.position);
         }

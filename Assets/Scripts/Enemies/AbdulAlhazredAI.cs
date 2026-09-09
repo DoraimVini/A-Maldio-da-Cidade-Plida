@@ -235,6 +235,16 @@ namespace FavelaAmarela.Runtime.Enemies
         /// <inheritdoc />
         public bool EstaAbatido => _vitalidade != null && _vitalidade.EstaAbatido;
 
+        /// <inheritdoc />
+        /// <remarks>
+        /// Os <b>dois</b> motivos de recusa dele, na mesma ordem em que <c>ReceberGolpe</c> os
+        /// aplica: a trégua (<c>_poupado</c> — o golpe que trai desperta a luta e não fere) e o
+        /// <b>Escudo Mágico</b>, que é a regra central da Fase 1: fora da janela de
+        /// vulnerabilidade, nada entra, e quebrar Pedra de Poder é o único jeito de abri-la.
+        /// </remarks>
+        public bool PodeSerFerido =>
+            !_poupado && _fsm != null && _fsm.PodeReceberDano && !EstaAbatido;
+
         private void Awake()
         {
             // A caixa de diálogo vive no prefab persistente do HUD desde 2026-08-22.

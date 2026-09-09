@@ -72,6 +72,13 @@ namespace FavelaAmarela.Runtime.Enemies
         public bool EhAparicaoPrimordial => ehAparicaoPrimordial;
         public bool IgnorarDano { get; set; }
 
+        /// <inheritdoc />
+        /// <remarks>
+        /// <c>IgnorarDano</c> é o que o <c>ByakheeAI</c> liga e desliga conforme a FSM para
+        /// implementar a imunidade em voo — ver <c>SincronizarVulnerabilidade</c>.
+        /// </remarks>
+        public bool PodeSerFerido => !IgnorarDano && !EstaAbatido;
+
         /// <summary>
         /// Aplica um golpe de arma nos <b>dois canais</b> descritos em <see cref="FichaDeAtributos"/>:
         /// o dano físico é mitigado pela Defesa e fere a Vitalidade; o Trauma de Anomalia é

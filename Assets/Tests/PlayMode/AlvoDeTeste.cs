@@ -56,6 +56,13 @@ namespace FavelaAmarela.Tests.PlayMode
         public bool EstaAbatido { get; set; }
 
         /// <summary>
+        /// Escrevível como o <see cref="EstaAbatido"/>, e pelo mesmo motivo: é um dublê, o teste
+        /// dita o estado. Começa <b>true</b> para que um rig que não se importa com recusa
+        /// continue medindo acerto normalmente.
+        /// </summary>
+        public bool PodeSerFerido { get; set; } = true;
+
+        /// <summary>
         /// Garante a própria hurtbox, exatamente como <c>EsqueletoInvocado</c>,
         /// <c>PedraDePoder</c> e <c>AbdulAlhazredAI</c> fazem.
         ///

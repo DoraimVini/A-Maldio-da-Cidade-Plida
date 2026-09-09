@@ -85,6 +85,10 @@ namespace FavelaAmarela.Runtime.Enemies
         /// <inheritdoc />
         public bool EstaAbatido => _vitalidade != null && _vitalidade.EstaAbatido;
 
+        /// <inheritdoc />
+        /// <remarks>O Esqueleto não tem escudo nem janela: de pé, sempre aceita.</remarks>
+        public bool PodeSerFerido => !EstaAbatido;
+
         /// <summary>
         /// Animador, se este Esqueleto tiver um.
         ///

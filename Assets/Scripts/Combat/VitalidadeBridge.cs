@@ -251,6 +251,13 @@ namespace FavelaAmarela.Runtime.Combat
         /// <inheritdoc />
         public bool EstaAbatido => Vitalidade.EstaAbatido;
 
+        /// <inheritdoc />
+        /// <remarks>
+        /// <c>IgnorarDano</c> aqui é a invulnerabilidade de cutscene, propagada pelo
+        /// <c>CutsceneController</c>.
+        /// </remarks>
+        public bool PodeSerFerido => !IgnorarDano && !EstaAbatido;
+
         public void ReceberGolpe(ArmaResult resultado)
         {
             // Golpe de arma contra esta unidade: só o canal de dano físico por ora.

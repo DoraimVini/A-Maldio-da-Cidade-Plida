@@ -60,6 +60,9 @@ namespace FavelaAmarela.Runtime.Enemies
         /// <remarks>Para a Pedra, ser abatida é <b>estilhaçar</b>. Mesmo estado, outro nome.</remarks>
         public bool EstaAbatido => Quebrada;
 
+        /// <inheritdoc />
+        public bool PodeSerFerido => !Quebrada;
+
         private void Awake()
         {
             // Área atingível derivada do sprite — as Pedras do Abdul são alvos legítimos do golpe.

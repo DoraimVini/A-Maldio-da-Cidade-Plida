@@ -40,5 +40,26 @@ namespace FavelaAmarela.Core.Combat
         /// Hurtbox, e continua caindo calado.</para>
         /// </summary>
         bool EstaAbatido { get; }
+
+        /// <summary>
+        /// Se um golpe entregue <b>agora</b> seria de fato aplicado.
+        ///
+        /// <para><b>Não é o mesmo que <see cref="EstaAbatido"/> invertido.</b> Cada
+        /// implementador recusa golpe por motivos próprios: o Byakhee é <b>imune em voo</b>, o
+        /// Abdul recusa enquanto o Escudo Mágico está de pé e enquanto está "poupado" pela
+        /// trégua, o Damião é invulnerável durante cutscene. Todos esses são "o golpe chegou e
+        /// não vai contar".</para>
+        ///
+        /// <para><b>O defeito que isto fecha (2026-09-09).</b> O som de impacto passou a sair da
+        /// <c>Hurtbox</c>, que é o ponto por onde todo golpe atravessa — mas ela tocava
+        /// <b>antes</b> de entregar o golpe, e portanto antes de o alvo poder recusá-lo. Contra
+        /// a Byakhee no ar, o jogador <b>ouvia o acerto conectar e ela não perdia nada</b>:
+        /// feedback que mente, justamente na luta cuja regra inteira é "espere ela pousar". O
+        /// mesmo valia para o Abdul de escudo levantado, que é a regra central da Fase 1 dele.</para>
+        ///
+        /// <para>Recusar em silêncio é a informação certa: nenhum som de carne quer dizer que
+        /// nada entrou.</para>
+        /// </summary>
+        bool PodeSerFerido { get; }
     }
 }
