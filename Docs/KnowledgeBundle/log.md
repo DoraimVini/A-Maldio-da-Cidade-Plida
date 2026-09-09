@@ -4,6 +4,39 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — Os Fragmentos de Yhtill deixam de ser quadrado branco
+
+Último item da lista de acabamento. Os três eram o caso mais grave de
+`ArteNasCenasTests.ConhecidosSemArte`: **objetos que a Canção Incompleta manda o jogador
+ACHAR**, desenhados com o quadrado branco embutido da Unity e tingidos de creme.
+
+### A ideia
+
+Cacos de **uma mesma tábua quebrada** — a canção de Cassilda, partida em três. As quebras são
+complementares: `_0` quebrado à direita, `_1` dos dois lados, `_2` à esquerda. Encostados, leem
+como uma peça só, que é a leitura que a quest quer.
+
+> **A primeira tentativa ficou parecendo balde.** Silhueta pouco quebrada e uma faixa escura na
+> base que lia como objeto separado. Renderizei sobre a areia real antes de aceitar — e foi a
+> imagem que disse, não a intenção.
+
+Osso pálido sobre a areia (o contraste que um item procurável precisa), glifos em âmbar escuro
+desenhados **antes** do contorno para o contorno vencer nas bordas. O creme que a cena autorava
+como *tinta* virou a cor da *arte*, e o `m_Color` do renderer voltou ao branco: cor de item mora
+no item.
+
+### A guarda fez o trabalho na direção certa
+
+`ArteNasCenasTests` reprovou — não por faltar arte, mas por os três **ainda estarem na lista**
+depois de ganharem: *"JÁ TEM ARTE, mas continua na lista — tire-o de ConhecidosSemArte, senão a
+lista vira depósito"*. Uma lista de dívida que só cresce para de dizer qualquer coisa.
+
+Sobram nela três entradas, todas estruturais: `Passagem_ParaOCastelo`, `Piso` do Santuário e
+`VisualDoEscudo` do Abdul.
+
+EditMode 1110 · PlayMode 64.
+
+
 ## 2026-09-09 — Três acabamentos: fundo das cenas, nome do arquivo, e o trauma que não tinha porta
 
 Itens sinalizados ao longo do dia e nunca fechados.

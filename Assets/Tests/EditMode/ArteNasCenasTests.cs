@@ -39,10 +39,10 @@ namespace FavelaAmarela.Tests.EditMode
         private static readonly Dictionary<string, string> ConhecidosSemArte =
             new Dictionary<string, string>
             {
-                ["Fragmento_0"] = "Fragmento de Yhtill (Deserto) — item de quest que o jogador " +
-                                  "precisa ACHAR, desenhado como quadrado branco",
-                ["Fragmento_1"] = "Fragmento de Yhtill (Tumba) — idem",
-                ["Fragmento_2"] = "Fragmento de Yhtill (Tumba) — idem",
+                // Os três Fragmentos de Yhtill SAÍRAM daqui em 2026-09-09: ganharam arte
+                // própria (cacos de uma mesma tábua quebrada, com glifos), e a lista existe
+                // para encolher. Eram o caso mais grave dela — itens que a quest manda o
+                // jogador ACHAR, desenhados como quadrado branco.
 
                 ["Passagem_ParaOCastelo"] = "o portal dos Portões para a última fase do jogo",
 
