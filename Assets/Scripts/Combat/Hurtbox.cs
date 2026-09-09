@@ -63,8 +63,41 @@ namespace FavelaAmarela.Runtime.Combat
         /// <summary>
         /// Entrega o golpe a quem esta área protege. Chamado pela <see cref="Hitbox"/> que a
         /// atingiu, não por trigger — o disparo é da hitbox, que sabe a janela ativa.
+        ///
+        /// <para><b>E toca o som do impacto.</b> Aqui, e não no prefab de cada inimigo, porque
+        /// <b>este é o único ponto por onde todo golpe que acerta passa</b> — nos dois sentidos:
+        /// o golpe do Damião (<c>MaoFisicaBridge</c> → <c>Hitbox</c>) e o golpe do inimigo
+        /// (<c>EnemyCombat</c>, <c>ByakheeAI</c>, <c>EsqueletoInvocado</c> → <c>Hitbox</c>)
+        /// terminam os dois em <c>Hurtbox.Receber</c>.</para>
+        ///
+        /// <para><b>O que isto conserta (2026-09-04).</b> O som de acerto vinha do
+        /// <c>AudioDeCombate</c>, que traz <c>[RequireComponent(typeof(EnemyBase))]</c> — e
+        /// <b>só dois prefabs do projeto têm <c>EnemyBase</c></b>, o Cultista e o Byakhee.
+        /// Medido: acertar o <b>Abdul</b>, um <b>Esqueleto Invocado</b>, uma <b>Pedra de
+        /// Poder</b>, um <b>Cortesão Pálido</b> ou o <b>Espectro</b> não fazia som nenhum — e
+        /// <b>o Damião apanhar</b> também não. Só o assobio da lâmina saía
+        /// (<c>AudioDoJogador</c> toca <c>GolpeDesferido</c> ao desferir, acerte ou não), então
+        /// acertar e errar soavam <b>idênticos</b>: o feedback mais básico de um ARPG faltava em
+        /// quase todo o elenco, inclusive nas duas lutas de chefe da Tumba e do Castelo.</para>
+        ///
+        /// <para>Pôr o componente nos outros prefabs não resolveria: eles não têm
+        /// <c>EnemyBase</c>, implementam <c>IDanificavel</c> por conta própria. Uma lista de
+        /// prefabs a manter à mão é o modo de falha mais repetido deste projeto; o ponto de
+        /// passagem obrigatório não é.</para>
+        ///
+        /// <para><b>É o som do CONTATO, não o da dor.</b> Toca com o golpe que chega carregando
+        /// dano, antes de o dono decidir o que fazer com ele — mitigar até zero, ignorar por
+        /// invulnerabilidade de cutscene. Silêncio nesses casos leria como "meu golpe passou
+        /// branco", que é a informação errada: ele acertou.</para>
         /// </summary>
-        public void Receber(ArmaResult resultado) => _dono?.ReceberGolpe(resultado);
+        public void Receber(ArmaResult resultado)
+        {
+            if (resultado.Dano > 0f)
+                Audio.MixerDeAudio.Instancia?.Tocar(
+                    Audio.SomDoJogo.EntidadeFerida, transform.position);
+
+            _dono?.ReceberGolpe(resultado);
+        }
 
         // ── Construção automática ─────────────────────────────────────────────
 

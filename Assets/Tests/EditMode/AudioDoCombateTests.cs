@@ -20,6 +20,13 @@ namespace FavelaAmarela.Tests.EditMode
     /// <para>Não era bug de mixagem. Era wiring ausente — sistema inteiro escrito e ligado em
     /// ponta nenhuma, o modo de falha mais repetido deste projeto.</para>
     ///
+    /// <para><b>Segunda rodada (2026-09-04).</b> O primeiro teste desta classe passou verde por
+    /// cima de uma versão mais fina do mesmo defeito: <c>EntidadeFerida</c> tinha disparador, e
+    /// ainda assim <b>quase todo o elenco apanhava em silêncio</b>, porque o único disparador
+    /// exigia <c>EnemyBase</c> — que só dois prefabs têm. "Alguém dispara este som" e "este som
+    /// toca quando devia" são perguntas diferentes; ver
+    /// <see cref="OSomDeImpacto_SaiDaHurtbox_QueTodoGolpeAtravessa"/>.</para>
+    ///
     /// <para><b>Este teste mede disparo, não existência.</b> Um guarda que só verificasse "o
     /// enum tem nove valores" teria passado durante todo o período em que o combate era mudo.
     /// O que importa é alguém <b>chamar</b> <c>Tocar</c> com cada som.</para>
@@ -94,6 +101,60 @@ namespace FavelaAmarela.Tests.EditMode
                 "Assets/FavelaAmarela/Art/Enemies/Byakhee.prefab",
                 "AudioDeCombate",
                 "acertar e abater o chefe não produz som");
+
+        /// <summary>
+        /// O som de <b>impacto</b> tem de sair da <c>Hurtbox</c>, e não de um componente posto
+        /// prefab a prefab.
+        ///
+        /// <para><b>O buraco que este teste fecha, e que o de cima não pegava.</b>
+        /// <c>TodoSomDeCombate_TemQuemODispare</c> mede se <i>alguém</i> dispara cada som —
+        /// e ficou verde durante todo o período em que <c>EntidadeFerida</c> era disparado por
+        /// um único componente, o <c>AudioDeCombate</c>, que traz
+        /// <c>[RequireComponent(typeof(EnemyBase))]</c>. Só o <b>Cultista</b> e o <b>Byakhee</b>
+        /// têm <c>EnemyBase</c>. Ou seja: um disparador existia, o teste passava, e acertar o
+        /// Abdul, um Esqueleto Invocado, uma Pedra de Poder, um Cortesão Pálido ou o Espectro
+        /// — e o Damião apanhar — não fazia som nenhum. Como <c>AudioDoJogador</c> toca
+        /// <c>GolpeDesferido</c> ao desferir, acerte ou não, <b>acertar e errar soavam
+        /// idênticos</b>.</para>
+        ///
+        /// <para>Por isso o guarda é pelo <b>ponto de disparo</b> e não pela existência dele.
+        /// <c>Hurtbox.Receber</c> é o único lugar por onde todo golpe que acerta passa, nos dois
+        /// sentidos: o golpe do Damião (<c>MaoFisicaBridge</c> → <c>Hitbox</c>) e o golpe do
+        /// inimigo (<c>EnemyCombat</c>, <c>ByakheeAI</c>, <c>EsqueletoInvocado</c> →
+        /// <c>Hitbox</c>) terminam os dois nela.</para>
+        /// </summary>
+        [Test]
+        public void OSomDeImpacto_SaiDaHurtbox_QueTodoGolpeAtravessa()
+        {
+            const string hurtbox = "Assets/Scripts/Combat/Hurtbox.cs";
+
+            Assert.IsTrue(File.Exists(hurtbox), $"Arquivo ausente: {hurtbox}");
+
+            StringAssert.Contains("SomDoJogo.EntidadeFerida", File.ReadAllText(hurtbox),
+                "O som de impacto saiu da Hurtbox. Onde quer que ele tenha ido, alcança MENOS " +
+                "gente: a Hurtbox é o único ponto por onde todo golpe que acerta passa, nos " +
+                "dois sentidos. Um componente por prefab deixa mudo quem não o carrega — foi " +
+                "o que aconteceu com o AudioDeCombate, que exige EnemyBase e por isso só " +
+                "alcançava 2 dos prefabs do elenco.");
+        }
+
+        /// <summary>
+        /// O contrário do teste acima: o <c>AudioDeCombate</c> <b>não pode voltar</b> a tocar o
+        /// som de dano, senão Cultista e Byakhee tocam duas vezes no mesmo acerto.
+        /// </summary>
+        [Test]
+        public void OAudioDeCombate_NaoDuplicaOSomDeImpacto()
+        {
+            const string componente = "Assets/Scripts/Audio/AudioDeCombate.cs";
+
+            Assert.IsTrue(File.Exists(componente), $"Arquivo ausente: {componente}");
+
+            StringAssert.DoesNotContain("SomDoJogo.EntidadeFerida", File.ReadAllText(componente),
+                "O AudioDeCombate voltou a tocar o som de impacto, que agora também sai da " +
+                "Hurtbox. Cultista e Byakhee — os dois únicos prefabs com EnemyBase — passam a " +
+                "tocar DUAS VEZES por acerto, e só eles: o defeito soa como problema de " +
+                "mixagem naqueles dois inimigos, não como duplicação.");
+        }
 
         private static void AssertPrefabTemComponente(string prefab, string componente,
                                                       string consequencia)
