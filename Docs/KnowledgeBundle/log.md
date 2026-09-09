@@ -4,6 +4,88 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — Zona morta retangular, e a mutação silenciosa dentro do Shake
+
+Uma spec de `CameraFollow` genérica chegou com oito itens. **Seis já estavam prontos** desde a
+rodada anterior, um seria uma regressão, e um está barrado pelo `PixelPerfectCamera`. Sobraram
+dois — e um deles apontou para um defeito real que a spec não menciona.
+
+### O item que valia: a zona morta era um círculo
+
+A spec pedia um retângulo. O motivo dela era vago, mas o motivo **medido** é forte:
+
+| eixo | meia-vista (16:9, `orthographicSize` 4,21875) | raio 0,75 como fração |
+|---|---|---|
+| horizontal | 7,500 | **10,0%** |
+| vertical | 4,219 | **17,8%** |
+
+O mesmo raio em unidades valia **78% mais na vertical**. A zona morta trabalhava muito mais num
+eixo que no outro, e ninguém tinha decidido isso — era o efeito colateral de usar um círculo
+numa tela que não é quadrada.
+
+**E o movimento deste jogo é horizontalmente dominante.** `BaseIsometrica.ParaMundo` normaliza a
+saída, então as 8 direções de input caem em 0°, ±26,57°, 90°, 153,43°, 180° e 270° de tela.
+Somando as componentes: **1,47 de horizontal para cada 1 de vertical**. O eixo que mais recebe
+movimento era justamente o que tinha menos folga.
+
+> A anisotropia é 1,47 e não 2:1 justamente **por causa do `.normalized`** — a projeção achata
+> 2:1, mas normalizar devolve parte disso. Eu ia escrever 2:1 de cabeça; a medição corrigiu.
+
+Agora a zona é uma **fração da meia-vista** (0,178), não um número em unidades. Ela ocupa a mesma
+parte da tela nos dois eixos, dá 1,33 × 0,75 un na cena padrão — **a vertical fica idêntica à
+que estava commitada**, o que muda é só a folga horizontal — e acompanha sozinha os dois
+`orthographicSize` do projeto, pelo mesmo raciocínio que já normaliza o tremor pelo zoom.
+
+**Os eixos passaram a ser independentes**, e essa é a diferença que importa. No círculo, andar
+só para o lado encurtava o vetor inteiro e puxava a câmera na vertical junto. Guarda:
+`ZonaMorta_OsEixosSaoIndependentes`.
+
+### O defeito que a spec não pediu: `Shake` escrevia num campo serializado
+
+Pedir um `AddTrauma` público expôs isto:
+
+```csharp
+amplitudeDoTremor = Mathf.Max(amplitudeDoTremor, magnitude);   // ← campo [SerializeField]
+```
+
+`Shake(duration, magnitude)` **mutava permanentemente a amplitude do tremor** a partir do
+argumento de uma chamada. Um `Shake` alto deixaria **todos os golpes do resto da cena** tremendo
+mais forte, para sempre e sem aviso.
+
+Hoje isso não acontece **por sorte**: o único chamador (`QuedaZ4Z5Trigger`) pede magnitude 0,15
+contra uma amplitude de 0,35, então o `Max` é no-op. É exatamente o tipo de armadilha que espera
+o segundo chamador. Agora `Shake` não escreve mais no campo, e avisa quando a magnitude pedida
+passa do teto em vez de subir o teto calado.
+
+`AcrescentarTrauma(float)` entra como a porta pública honesta — golpe já entra sozinho por
+`HitStop.OnImpacto`; isto é para o que não é golpe. **Não tem chamador ainda**, e fica
+registrado: o candidato natural é o `MergulhoDeGarras` do Byakhee **quando erra** — hoje um
+mergulho que acerta sacode a tela pelo dano, e um que racha o chão ao lado do jogador não faz
+nada.
+
+### O que foi recusado, e por quê
+
+- **`Bounds` serializado no Inspector.** Seria uma regressão: os limites hoje são **derivados**
+  dos `Limite_*` da cena, e é assim justamente porque o mapa já dobrou de tamanho uma vez —
+  quatro números escritos à mão teriam ficado no meio do mapa novo, em silêncio. O campo
+  autorado existe como `Collider2D` opcional, para a cena que precise contrariar.
+- **`SetTargetZoom(orthoSize, duration)`.** O `PixelPerfectCamera` reescreve `orthographicSize`
+  a cada `OnPreCull`. Um zoom por ali seria desfeito no mesmo quadro, sem erro nenhum. O
+  `SetZoom` que existe **avisa** em vez de fingir; o caminho real continua sendo a resolução de
+  referência.
+- **Um `CameraFollow` novo.** Seriam dois controladores de câmera no projeto, com a aritmética
+  duplicada fora do POCO que a torna testável.
+
+### Nota de serialização
+
+Só `smoothTime` está gravado nas cenas — nenhum campo da rodada anterior chegou ao YAML, porque
+a Unity não abriu desde então. Renomear `zonaMorta` → `fracaoDaZonaMorta` não perdeu valor
+nenhum. Na próxima vez que o Editor abrir e salvar, todos os campos novos são gravados com os
+padrões do C#.
+
+EditMode 1083 (1060 passando) · PlayMode 52/52.
+
+
 ## 2026-09-09 — Auditoria da câmera: cinco pontos que não se aplicavam, três defeitos que existiam
 
 Auditoria pedida sobre um texto que se declarava inferido — "likely", "assumption", "unknown".

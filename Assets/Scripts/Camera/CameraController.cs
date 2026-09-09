@@ -29,8 +29,10 @@ namespace FavelaAmarela.CameraSystem
                  "arremesso da Tempestade). 0 = sem teto.")]
         [SerializeField] private float velocidadeMaxima = 24f;
 
-        [Tooltip("Raio, em unidades, dentro do qual o jogador se move sem arrastar a câmera.")]
-        [SerializeField] private float zonaMorta = 0.75f;
+        [Tooltip("Zona morta como fração da meia-vista: o jogador se move dentro dela sem " +
+                 "arrastar a câmera. 0,178 dá 1,33 x 0,75 un na cena padrão. 0 = desligada.")]
+        [Range(0f, 0.5f)]
+        [SerializeField] private float fracaoDaZonaMorta = 0.178f;
 
         [Tooltip("Quanto a câmera olha à frente, na direção em que o jogador se move.")]
         [SerializeField] private float antecipacao = 1.8f;
@@ -211,10 +213,18 @@ namespace FavelaAmarela.CameraSystem
                 _antecipacaoAtual, desejada, ref _velocidadeDaAntecipacao,
                 suavidadeDaAntecipacao);
 
+            // A meia-vista serve a DUAS contas — a zona morta, que é uma fração dela, e o
+            // travamento nos limites. Calculada uma vez só.
+            float meiaAltura = cam != null ? cam.orthographicSize : 0f;
+            float meiaLargura = cam != null ? meiaAltura * cam.aspect : 0f;
+
             Vector2 alvo = (Vector2)target.position + _antecipacaoAtual;
 
             // ── zona morta: passo curto não arrasta a câmera ──
-            alvo = EnquadramentoDaCamera.AlvoComZonaMorta(alvo, _posicaoSeguida, zonaMorta);
+            alvo = EnquadramentoDaCamera.AlvoComZonaMorta(
+                alvo, _posicaoSeguida,
+                EnquadramentoDaCamera.MeiaExtensaoDaZonaMorta(
+                    meiaLargura, meiaAltura, fracaoDaZonaMorta));
 
             var targetPosition = new Vector3(alvo.x, alvo.y, zOffset);
 
@@ -225,9 +235,6 @@ namespace FavelaAmarela.CameraSystem
 
             if (_temLimites && cam != null)
             {
-                float meiaAltura = cam.orthographicSize;
-                float meiaLargura = meiaAltura * cam.aspect;
-
                 Vector2 presa = EnquadramentoDaCamera.Prender(
                     _posicaoSeguida, _limiteMin, _limiteMax, meiaLargura, meiaAltura);
 
@@ -295,13 +302,40 @@ namespace FavelaAmarela.CameraSystem
             // A assinatura fica: o QuedaZ4Z5Trigger a usa e mudá-la seria retrabalho sem ganho.
             // O que mudou é o modelo por baixo -- de "duração + magnitude constante" para
             // trauma que decai. `duration` vira quanto trauma acumular, considerando o
-            // decaimento; `magnitude` continua sendo a amplitude daquele evento.
+            // decaimento.
             if (duration <= 0f || magnitude <= 0f) return;
 
-            amplitudeDoTremor = Mathf.Max(amplitudeDoTremor, magnitude);
-            _trauma = EnquadramentoDaCamera.Acumular(
-                _trauma, Mathf.Clamp01(duration * decaimentoDoTrauma));
+            // `magnitude` NÃO escreve mais em amplitudeDoTremor. A versão anterior fazia
+            // `amplitudeDoTremor = Max(amplitudeDoTremor, magnitude)` -- mutação PERMANENTE de
+            // um campo serializado a partir do argumento de uma chamada. Um Shake alto deixaria
+            // todos os golpes do resto da cena tremendo mais forte, para sempre e em silêncio.
+            // Hoje isso não acontece por sorte (o único chamador pede 0,15 contra 0,35 de
+            // amplitude, então o Max é no-op), e é exatamente esse tipo de armadilha que espera
+            // o segundo chamador.
+            if (magnitude > amplitudeDoTremor)
+                Debug.LogWarning($"[IsometricCameraController] Shake pediu magnitude " +
+                                 $"{magnitude}, acima da amplitude do tremor " +
+                                 $"({amplitudeDoTremor}). O tremor sai no teto. Para um evento " +
+                                 "mais violento, suba 'Amplitude Do Tremor' no Inspector.", this);
+
+            AcrescentarTrauma(Mathf.Clamp01(duration * decaimentoDoTrauma));
         }
+
+        /// <summary>
+        /// Acrescenta trauma à câmera: a entrada pública do tremor, para eventos que não são
+        /// golpe.
+        ///
+        /// <para>Golpe já entra sozinho por <c>HitStop.OnImpacto</c>. Isto é para o resto —
+        /// a aterrissagem do Byakhee, um portão batendo, o rugido do Rei em Amarelo. Sem ela, o
+        /// único caminho era o <c>Shake</c> legado, que fala em duração e magnitude e não em
+        /// trauma.</para>
+        ///
+        /// <para>Acumula com teto: dois eventos próximos somam em vez de o segundo reiniciar o
+        /// primeiro.</para>
+        /// </summary>
+        /// <param name="quantidade">De 0 a 1. 1 é o tremor cheio.</param>
+        public void AcrescentarTrauma(float quantidade)
+            => _trauma = EnquadramentoDaCamera.Acumular(_trauma, quantidade);
 
         /// <summary>
         /// Muda o zoom em tempo de execução (a ideia original era o efeito do Salto Dimensional).

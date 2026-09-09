@@ -104,8 +104,37 @@ namespace FavelaAmarela.Core.Camera
         }
 
         /// <summary>
-        /// O alvo efetivo depois da <b>zona morta</b>: enquanto o jogador estiver dentro do
-        /// raio, a câmera não persegue.
+        /// A meia-extensão da zona morta, como uma <b>fração da meia-vista</b>.
+        ///
+        /// <para><b>Por que uma fração e não um número em unidades (2026-09-09).</b> A primeira
+        /// versão era um raio fixo de 0,75 un — um <b>círculo</b>. Medido contra a vista real do
+        /// jogo (meia-vista 7,50 × 4,22 a 16:9), esse raio é <b>17,8% da meia-altura mas só
+        /// 10,0% da meia-largura</b>: a mesma folga em unidades vale quase o dobro na vertical,
+        /// e a zona morta trabalhava 78% mais num eixo que no outro sem que ninguém tivesse
+        /// decidido isso.</para>
+        ///
+        /// <para><b>E o movimento do jogo é horizontalmente dominante.</b>
+        /// <c>BaseIsometrica.ParaMundo</c> normaliza a saída, então as 8 direções de input caem
+        /// em 0°, ±26,57°, 90°, 153,43°, 180°, 270° de tela — somando as componentes,
+        /// <b>1,47 de horizontal para cada 1 de vertical</b>. O eixo que mais recebe movimento
+        /// era justamente o que tinha menos folga.</para>
+        ///
+        /// <para>Expressa como fração, a zona ocupa a mesma parte da tela nos dois eixos e
+        /// acompanha os dois <c>orthographicSize</c> do projeto (4,21875 e 5,625) sozinha — o
+        /// mesmo raciocínio que já normaliza o tremor pelo zoom.</para>
+        /// </summary>
+        public static Vector2 MeiaExtensaoDaZonaMorta(float meiaLargura, float meiaAltura,
+                                                      float fracao)
+        {
+            if (fracao <= 0f) return Vector2.zero;
+
+            return new Vector2(Mathf.Max(0f, meiaLargura) * fracao,
+                               Mathf.Max(0f, meiaAltura) * fracao);
+        }
+
+        /// <summary>
+        /// O alvo efetivo depois da <b>zona morta</b>: enquanto o jogador estiver dentro da
+        /// caixa, a câmera não persegue.
         ///
         /// <para><b>Por quê.</b> Sem zona morta, cada passo do jogador move a câmera, e num
         /// isométrico onde andar em diagonal é o normal isso vira um balanço constante de
@@ -115,17 +144,28 @@ namespace FavelaAmarela.Core.Camera
         /// <para>Devolve o ponto <b>na borda</b> da zona, e não o jogador: assim a câmera para
         /// assim que o alcança, em vez de continuar até centralizá-lo e reabrir a folga do
         /// outro lado — que faria a zona morta oscilar em vez de segurar.</para>
+        ///
+        /// <para><b>Os eixos são independentes</b>, e é a diferença que importa entre esta
+        /// caixa e o círculo que ela substitui. No círculo, andar para o lado puxava a câmera
+        /// na vertical junto, porque o vetor inteiro era encurtado. Aqui, só o eixo que
+        /// transbordou se move — andar na horizontal não sacode o enquadramento vertical.</para>
         /// </summary>
-        public static Vector2 AlvoComZonaMorta(Vector2 alvo, Vector2 camera, float raio)
+        /// <param name="meiaExtensao">
+        /// Meia-largura e meia-altura da caixa. Zero num eixo desliga a zona morta nele.
+        /// </param>
+        public static Vector2 AlvoComZonaMorta(Vector2 alvo, Vector2 camera, Vector2 meiaExtensao)
+            => new Vector2(EixoComZonaMorta(alvo.x, camera.x, meiaExtensao.x),
+                           EixoComZonaMorta(alvo.y, camera.y, meiaExtensao.y));
+
+        private static float EixoComZonaMorta(float alvo, float camera, float meia)
         {
-            if (raio <= 0f) return alvo;
+            if (meia <= 0f) return alvo;
 
-            Vector2 daCameraAoAlvo = alvo - camera;
-            float distancia = daCameraAoAlvo.magnitude;
+            float folga = alvo - camera;
 
-            if (distancia <= raio) return camera;
+            if (Mathf.Abs(folga) <= meia) return camera;
 
-            return alvo - daCameraAoAlvo / distancia * raio;
+            return alvo - Mathf.Sign(folga) * meia;
         }
 
         /// <summary>

@@ -157,14 +157,18 @@ namespace FavelaAmarela.Tests.EditMode
 
         // ── zona morta ───────────────────────────────────────────────────────
 
+        /// <summary>A meia-vista da cena padrão do projeto: orthographicSize 4,21875 a 16:9.</summary>
+        private static readonly Vector2 MeiaVistaPadrao = new Vector2(7.5f, 4.21875f);
+
         [Test]
         public void DentroDaZonaMorta_ACameraNaoSeMexe()
         {
             var camera = new Vector2(10f, 5f);
-            var alvo = camera + new Vector2(0.4f, 0.3f);   // 0,5 de distância
+            var alvo = camera + new Vector2(0.4f, 0.3f);
+            var zona = new Vector2(1.335f, 0.75f);
 
             Assert.AreEqual(camera,
-                EnquadramentoDaCamera.AlvoComZonaMorta(alvo, camera, 0.75f),
+                EnquadramentoDaCamera.AlvoComZonaMorta(alvo, camera, zona),
                 "Passo curto dentro da zona morta arrastou a câmera. É o balanço de fundo " +
                 "constante que a zona existe para evitar.");
         }
@@ -179,11 +183,12 @@ namespace FavelaAmarela.Tests.EditMode
         {
             var camera = Vector2.zero;
             var alvo = new Vector2(3f, 0f);
+            var zona = new Vector2(1.335f, 0.75f);
 
-            var efetivo = EnquadramentoDaCamera.AlvoComZonaMorta(alvo, camera, 0.75f);
+            var efetivo = EnquadramentoDaCamera.AlvoComZonaMorta(alvo, camera, zona);
 
-            Assert.AreEqual(2.25f, efetivo.x, 0.0001f,
-                "Deveria parar a 0,75 do jogador (3 − 0,75), e não em cima dele.");
+            Assert.AreEqual(1.665f, efetivo.x, 0.0001f,
+                "Deveria parar a 1,335 do jogador (3 − 1,335), e não em cima dele.");
             Assert.AreEqual(0f, efetivo.y, 0.0001f);
         }
 
@@ -193,7 +198,79 @@ namespace FavelaAmarela.Tests.EditMode
             var alvo = new Vector2(3f, -2f);
 
             Assert.AreEqual(alvo,
-                EnquadramentoDaCamera.AlvoComZonaMorta(alvo, Vector2.zero, 0f));
+                EnquadramentoDaCamera.AlvoComZonaMorta(alvo, Vector2.zero, Vector2.zero));
+        }
+
+        /// <summary>
+        /// <b>A diferença que motivou trocar o círculo pela caixa.</b> Num círculo, andar só na
+        /// horizontal encurtava o vetor inteiro e puxava a câmera na vertical junto. Aqui os
+        /// eixos são independentes: transbordar em X não mexe em Y.
+        /// </summary>
+        [Test]
+        public void ZonaMorta_OsEixosSaoIndependentes()
+        {
+            var camera = new Vector2(4f, 9f);
+            var zona = new Vector2(1.335f, 0.75f);
+
+            // Muito fora em X, e dentro da folga em Y.
+            var alvo = camera + new Vector2(6f, 0.5f);
+
+            var efetivo = EnquadramentoDaCamera.AlvoComZonaMorta(alvo, camera, zona);
+
+            Assert.AreEqual(camera.y, efetivo.y, 0.0001f,
+                "Andar na horizontal sacudiu o enquadramento vertical — é exatamente o defeito " +
+                "do círculo que a caixa veio consertar.");
+            Assert.AreEqual(alvo.x - 1.335f, efetivo.x, 0.0001f);
+        }
+
+        /// <summary>
+        /// A propriedade que dá sentido à fração: a zona ocupa <b>a mesma parte da tela</b> nos
+        /// dois eixos.
+        ///
+        /// <para>O raio fixo de 0,75 un que isto substitui não tinha essa propriedade —
+        /// era 17,8% da meia-altura e 10,0% da meia-largura, e portanto trabalhava 78% mais
+        /// num eixo que no outro sem que ninguém tivesse decidido isso.</para>
+        /// </summary>
+        [Test]
+        public void ZonaMorta_OcupaAMesmaFracaoDaTelaNosDoisEixos()
+        {
+            const float fracao = 0.178f;
+
+            var zona = EnquadramentoDaCamera.MeiaExtensaoDaZonaMorta(
+                MeiaVistaPadrao.x, MeiaVistaPadrao.y, fracao);
+
+            Assert.AreEqual(fracao, zona.x / MeiaVistaPadrao.x, 0.0001f);
+            Assert.AreEqual(fracao, zona.y / MeiaVistaPadrao.y, 0.0001f);
+
+            Assert.Greater(zona.x, zona.y,
+                "A vista é mais larga que alta, então a zona morta precisa ser mais larga que " +
+                "alta para ocupar a mesma fração dos dois lados.");
+        }
+
+        /// <summary>
+        /// A zona acompanha os dois <c>orthographicSize</c> do projeto sozinha — mesmo
+        /// raciocínio que já normaliza o tremor pelo zoom.
+        /// </summary>
+        [Test]
+        public void ZonaMorta_CresceComOZoomDeCadaCena()
+        {
+            const float fracao = 0.178f;
+
+            var perto = EnquadramentoDaCamera.MeiaExtensaoDaZonaMorta(7.5f, 4.21875f, fracao);
+            var longe = EnquadramentoDaCamera.MeiaExtensaoDaZonaMorta(10f, 5.625f, fracao);
+
+            Assert.Greater(longe.x, perto.x);
+            Assert.Greater(longe.y, perto.y);
+
+            Assert.AreEqual(perto.x / perto.y, longe.x / longe.y, 0.0001f,
+                "A proporção da zona não pode mudar entre as cenas.");
+        }
+
+        [Test]
+        public void ZonaMorta_FracaoZeroDesligaAZona()
+        {
+            Assert.AreEqual(Vector2.zero,
+                EnquadramentoDaCamera.MeiaExtensaoDaZonaMorta(7.5f, 4.21875f, 0f));
         }
 
         // ── antecipação ──────────────────────────────────────────────────────
