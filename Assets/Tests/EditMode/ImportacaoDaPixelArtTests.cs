@@ -171,6 +171,71 @@ namespace FavelaAmarela.Tests.EditMode
                 "esconde.");
         }
 
+        /// <summary>
+        /// Todo tile de <b>chão</b> tem de gerar malha <c>FullRect</c>.
+        ///
+        /// <para><b>O que <c>Tight</c> faz e por que aqui é errado.</b> A doc da Unity define os
+        /// dois: <i>FullRect — malha retangular igual ao tamanho da sprite</i>;
+        /// <i>Tight — malha ajustada aos valores de alfa do pixel, cortando o máximo de pixels
+        /// excedentes</i>. Um tile de chão isométrico é um <b>losango dentro de um retângulo
+        /// 32 × 16</b>: os quatro cantos são transparentes. Com <c>Tight</c>, a malha para de ser
+        /// a célula e passa a ser o losango — e duas células vizinhas encostam malha com malha,
+        /// onde antes encostavam retângulo com retângulo. É de lá que sai o fio de fundo entre
+        /// tiles.</para>
+        ///
+        /// <para><b>Medido em 2026-09-09:</b> 3 dos 14 sprites de <c>Art/Tiles</c> estavam em
+        /// <c>Tight</c>. Dois eram chão — <c>arena_piso_placeholder</c>, que pinta as 4 096
+        /// células da Arena de Testes, e <c>santuario_piso_placeholder</c> — e foram corrigidos.
+        /// O terceiro é o <c>wall_stone</c>, e ele é a <b>exceção legítima</b>: pivô
+        /// <c>BottomCenter</c>, ou seja, é parede e não chão. Parede não ladrilha lado a lado no
+        /// plano do piso, e recortar a malha ao alfa lá poupa overdraw sem abrir costura.</para>
+        ///
+        /// <para>Por isso o guarda discrimina pelo <b>pivô</b>, e não por nome de arquivo: pivô
+        /// central é chão, <c>BottomCenter</c> é coisa que fica em pé. É a mesma distinção que o
+        /// resto do projeto já usa, e ela não envelhece quando alguém acrescentar um tile
+        /// novo.</para>
+        /// </summary>
+        [Test]
+        public void TileDeChao_UsaMalhaFullRect()
+        {
+            const string pastaDeTiles = "Assets/FavelaAmarela/Art/Tiles";
+
+            Assert.IsTrue(Directory.Exists(pastaDeTiles),
+                $"Pasta de tiles ausente: {pastaDeTiles}");
+
+            var falhas = new List<string>();
+            int conferidos = 0;
+
+            foreach (var png in Directory.EnumerateFiles(pastaDeTiles, "*.png",
+                                                         SearchOption.AllDirectories))
+            {
+                string meta = png + ".meta";
+                if (!File.Exists(meta)) continue;
+
+                string t = File.ReadAllText(meta);
+
+                // Pivô central = chão. BottomCenter = parede, e aí Tight é escolha legítima.
+                if (Campo(t, @"(?m)^  alignment: (-?\d+)") != "0") continue;
+
+                conferidos++;
+
+                if (Campo(t, @"(?m)^  spriteMeshType: (-?\d+)") == "0") continue;
+
+                falhas.Add($"{Path.GetFileName(png)}: malha Tight num tile de chão — a malha " +
+                           "vira o losango em vez da célula, e os vizinhos deixam de encostar");
+            }
+
+            Assert.Greater(conferidos, 0,
+                "Nenhum tile de chão foi conferido. Ou a pasta mudou de lugar, ou todos os " +
+                "tiles passaram a ter pivô BottomCenter — e aí a distinção deste guarda parou " +
+                "de valer.");
+
+            Assert.IsEmpty(falhas,
+                "Tile de chão com malha Tight:\n  " + string.Join("\n  ", falhas) +
+                "\n\nConserto: selecione o arquivo no Project e ponha Mesh Type = Full Rect no " +
+                "Inspector.");
+        }
+
         private static string Campo(string texto, string padrao)
         {
             var m = Regex.Match(texto, padrao);
