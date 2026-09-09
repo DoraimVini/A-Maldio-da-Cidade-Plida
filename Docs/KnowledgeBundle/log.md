@@ -4,6 +4,66 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — O chão do Deserto: costura 0,00 usando os pixels do próprio pack
+
+O Vini: *"eu quero que o mapa seja inteiriço, sem o espaço entre as tiles"*. E depois, quando
+apresentei a técnica: *"não temos artista, isso é um pack baixado da internet"*.
+
+### O que a medição derrubou primeiro
+
+**Não havia espaço nenhum.** Empilhados na malha isométrica da Unity, os losangos cobrem o plano
+com **0,0% de buraco e 0,0% de sobreposição**. O import já estava correto — Full Rect, Point, sem
+compressão, PPU 32, 32×16 px = exatamente o `cellSize` de 1 × 0,5.
+
+O que se via era desenho: **contorno de 1 px a −86 de luminância** (23% dos pixels do tile) e
+**gradiente interno de −93** do topo à base, idêntico nos cinco.
+
+### A armadilha que quase me fez piorar
+
+Eu recomendei tirar o contorno. Medido depois:
+
+| estado | grad. interno | grad. na costura |
+|---|---|---|
+| como estava | 4,8 | **0,0** |
+| sem contorno | 4,8 | **63,9** |
+
+**O contorno não era o defeito, era o disfarce.** Com ele, todo pixel de borda encontrava outro
+pixel escuro igual. Removê-lo sozinho expunha uma descontinuidade **treze vezes** maior que a
+variação interna. Os tiles do pack nunca foram desenhados para casar.
+
+### O que funcionou
+
+O losango de 256 px é **domínio fundamental exato** da malha gerada por (16, 8) e (−16, 8) —
+verificado: toda vizinhança de todo pixel tem representante. O tile já era, topologicamente, uma
+textura em toro; faltava ser **contínua** ao dar a volta.
+
+Solução de **Poisson no toro da malha**, preservando os gradientes originais do miolo e
+redistribuindo o salto pelo tile inteiro. Mais **borda comum às cinco variantes**: os 60 px de
+borda caem em **14 órbitas do wrap**, e cada órbita recebeu uma cor só.
+
+```
+costura ......................... 0,00 nos cinco tiles
+desacordo entre variantes ....... 0,0000 na borda
+variação interna preservada ..... 2,4 a 11,0
+```
+
+> **Uma correção minha no meio do caminho.** Reportei "0,0000 de desacordo" a partir do modelo em
+> ponto flutuante. Gravados os PNGs, medi de novo **nos arquivos do repositório**: era **4,78** —
+> quantizar para a paleta de 18 cores tinha quebrado o acordo exato. Só depois de unificar a
+> borda por órbita o número virou o que eu já tinha dito. Medir o artefato, e não o modelo.
+
+### As invariantes conferidas depois de gravar
+
+Máscara alfa **idêntica nos cinco**, 256 px opacos, zero alfa parcial — é o que garante a
+tesselação. **Nenhuma cor inventada**: tudo da paleta do próprio pack. Os `.meta` intocados, então
+os GUIDs seguem e a `RuleTile_Areia` continua ligada sem rewiring — as 25.252 células mudam de
+aparência sem uma repintada.
+
+Registro em `Art/Tiles/PROCEDENCIA.md`, com o comando de reverter.
+
+EditMode 1104 · PlayMode 64.
+
+
 ## 2026-09-09 — Os botões em branco: 1,3 px de margem entre funcionar e não
 
 O Vini mandou a captura da tela de Colapso: a frase aparecia e os **dois botões saíam vazios**,
