@@ -4,6 +4,97 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-04 — Três coisas que o jogador sentia e nenhum teste via
+
+Rodada de implementação por ordem de prioridade, com o critério sendo **o que atrapalha quem
+está jogando o caminho crítico**, e não o que está mais aberto na lista. As três eram do mesmo
+feitio: sistema escrito, sistema ligado, sistema com suíte verde por cima — e mesmo assim
+errado na tela.
+
+### 1. O Esqueleto Invocado era o último golpe instantâneo
+
+`EsqueletoInvocado.TentarGolpear` chamava `_vitalidadeDoAlvo.ReceberDanoFisico(ataque)` assim
+que a cadência estourava. A única condição era um `Vector2.Distance` medido no `FixedUpdate` —
+sem janela, sem direção, sem geometria, apesar de o golpe ter **cinco quadros de animação com
+arco de lâmina**.
+
+E a consequência era maior que "não dava para esquivar no tempo". Os quadros de invencibilidade
+da Esquiva neste projeto são implementados **desligando o colisor da hurtbox**
+(`EsquivaBridge.EsquivaIFramesCoroutine`): o dano chega por consulta, então sumir da consulta é
+ficar imune. Batendo direto na bridge, o Esqueleto **não consultava nada** — *rolar por cima
+dele custava vida do mesmo jeito*. E os Esqueletos existem justamente para pressionar o jogador
+enquanto ele procura as Pedras de Poder na luta do Abdul, que é quando mais se rola.
+
+Migrado para `Hitbox` com janela e direção, a mesma receita já aplicada ao Byakhee, ao Cultista
+e ao Cortesão. Guarda nova: `GolpeDoEsqueletoTests` (PlayMode, 2 testes) — um mede que ele
+continua ferindo, o outro desliga o colisor da hurtbox e exige dano zero.
+
+Sobra **um** inimigo com golpe instantâneo, o `SsethFarejadorAI` — e ele, o `NagarajaAI` e o
+`AvatarDeSetAI` não estão em **nenhuma cena do Build Settings**. São do Templo do Povo-Serpente,
+item 14, fora do Vertical Slice.
+
+### 2. Quase todo o elenco apanhava em silêncio
+
+O som de acerto vinha do `AudioDeCombate`, que traz `[RequireComponent(typeof(EnemyBase))]`. E
+`EnemyBase` existe em **dois prefabs do projeto inteiro**: `Cultista.prefab` e `Byakhee.prefab`.
+
+Medido: acertar o **Abdul**, um **Esqueleto**, uma **Pedra de Poder**, um **Cortesão Pálido** ou
+o **Espectro** não fazia som nenhum — e **o Damião apanhar** também não. Como `AudioDoJogador`
+toca `GolpeDesferido` ao desferir, acerte ou não, **acertar e errar soavam idênticos**. É o
+feedback mais básico de um ARPG, faltando nas duas lutas de chefe da Tumba e do Castelo.
+
+Pôr o componente nos outros prefabs não resolveria — eles não têm `EnemyBase`, implementam
+`IDanificavel` por conta própria. O som de impacto foi para **`Hurtbox.Receber`**, que é o único
+ponto por onde todo golpe que acerta passa, **nos dois sentidos**: o golpe do Damião
+(`MaoFisicaBridge` → `Hitbox`) e o do inimigo (`EnemyCombat`, `ByakheeAI`, `EsqueletoInvocado` →
+`Hitbox`) terminam os dois nela. O `AudioDeCombate` ficou só com o abate, que a `Hurtbox` não
+tem como saber.
+
+> **O teste que já existia passava verde por cima disto.**
+> `AudioDoCombateTests.TodoSomDeCombate_TemQuemODispare` mede se *alguém* dispara cada som.
+> Alguém disparava. "Alguém dispara este som" e "este som toca quando devia" são perguntas
+> diferentes. Guardas novos: `OSomDeImpacto_SaiDaHurtbox_QueTodoGolpeAtravessa` e
+> `OAudioDeCombate_NaoDuplicaOSomDeImpacto`.
+
+**Dívida que fica:** quem não tem `EnemyBase` continua **morrendo** em silêncio.
+
+### 3. O Eco de Carcosa drenava sanidade sem aparecer
+
+`EcoDeCarcosa` é o anti-camping do Castelo: o jogador fica parado, ele se manifesta **nas
+costas** dele e drena Resiliência Mental por segundo. `AtivarEco()` mostra o vulto fazendo
+`foreach (Transform child in transform) child.SetActive(true)`.
+
+Medido no YAML: `Eco_De_Carcosa_0` e `Eco_De_Carcosa_1`, os dois da Biblioteca (Z3), tinham
+**zero filhos e nenhum `SpriteRenderer`**. O `foreach` ligava um conjunto vazio. O Eco se
+manifestava, drenava 3 por segundo e **nada aparecia na tela** — sanidade caindo sem causa
+visível, num jogo em que Resiliência zerada é derrota. A única pista era um `Debug.Log`.
+
+- **Arte:** `Art/Enemies/EcoDeCarcosa/Eco_0..3.png`, 32 × 64 a PPU 32, desenhada por script
+  (`eco_de_carcosa.py`). Vulto encapuzado sem rosto, que se desfaz em fumaça antes do chão, com
+  o Sinal Amarelo pulsando nas costas — o pulso é o único aviso na tela de que a drenagem está
+  acontecendo. Paleta do Castelo (preto e ouro manchado) mais o amarelo do Sinal.
+- **Código:** `EcoDeCarcosa.GarantirVisual()`, no padrão de `Hurtbox.GarantirPara` — a cena pode
+  chegar sem nada e o objeto se monta. O que ele não pode inventar são os quadros, e sem eles
+  reclama alto.
+- **Cena:** `Tools/FavelaAmarela/Cena: vestir os Ecos de Carcosa`. Conferido no disco, não pelo
+  log da ferramenta: os dois Ecos carregam os 4 GUIDs.
+- **Guarda:** `CasteloDeCarcosaTests.CadaEcoDeCarcosa_TemQuadrosParaMostrar`.
+
+> `OsSistemasDoCastelo_EstaoInstanciados` contava os dois Ecos e passava verde. Eles *estavam*
+> na cena. Contar instância não é o mesmo que perguntar se ela funciona.
+
+### Ainda greybox no Castelo
+
+Medido resolvendo `m_Sprite` por GUID: **6 Nobres Fossilizados** e **3 Espelhos de Aldebaran**
+desenham o sprite embutido da Unity (`fileID: 10905`, guid de recursos internos) e não têm
+componente que troque isso em runtime. Os 3 Pontos Focais e o Refúgio pareciam iguais no YAML e
+**não são** — `PontoFocalDeReliquia` e `RefugioDeLuz` escrevem o sprite no `Awake`.
+
+### Suíte
+
+EditMode 1053 → **1056** · PlayMode 50 → **52**. As duas verdes.
+
+
 ## 2026-09-04 — Quebrei as paredes do Deserto, e a suíte não viu
 
 ### O incidente
