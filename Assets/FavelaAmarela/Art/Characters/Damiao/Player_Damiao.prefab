@@ -26,6 +26,7 @@ GameObject:
   - component: {fileID: 1065975709646073976}
   - component: {fileID: 3692641686616710655}
   - component: {fileID: 6558171560229444613}
+  - component: {fileID: 5749536183087477047}
   m_Layer: 8
   m_Name: Player_Damiao
   m_TagString: Player
@@ -253,7 +254,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8115426f2e1201478182a2323bcdc99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Player.MaoFisicaBridge
-  armaInicialParaTeste: 0
   alcance: 1.2
   camadaInimigos:
     serializedVersion: 2
@@ -449,6 +449,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3130f44e24a99fe49a06c66e15264c98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Audio.AudioDoJogador
+--- !u!114 &5749536183087477047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6566763281958862316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b8658f99fb5fc4cbbc3bb02c6eae5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.SombraDeChao
+  sprite: {fileID: 21300000, guid: e74845c438ce408080754df5f502158d, type: 3}
+  largura: 0.9
+  opacidade: 0.5
+  deslocamento: {x: 0, y: 0}
+  alturaDeDesaparecimento: 4
 --- !u!1 &9187971798914079711
 GameObject:
   m_ObjectHideFlags: 0

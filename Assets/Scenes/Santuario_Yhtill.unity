@@ -3013,8 +3013,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.CameraSystem.IsometricCameraController
   target: {fileID: 811061146}
   smoothTime: 0.15
+  velocidadeMaxima: 24
+  fracaoDaZonaMorta: 0.178
+  antecipacao: 1.8
+  velocidadeDeAntecipacaoCheia: 7.5
+  suavidadeDaAntecipacao: 0.35
   zOffset: -10
   orthographicSize: 4.21875
+  limitesDoMapa: {fileID: 0}
+  prenderNosLimites: 1
+  amplitudeDoTremor: 0.35
+  decaimentoDoTrauma: 1.6
+  danoDeReferencia: 40
+  traumaPorGolpe: 0.45
 --- !u!81 &618664470
 AudioListener:
   m_ObjectHideFlags: 0
@@ -3301,9 +3312,9 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: -1000
+  m_SortingLayerID: 1900200
+  m_SortingLayer: -1
+  m_SortingOrder: 0
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}

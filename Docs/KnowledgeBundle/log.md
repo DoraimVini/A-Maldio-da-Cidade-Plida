@@ -4,6 +4,82 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — Camadas de ordenação e sombra de chão
+
+O Vini pediu profundidade e fundo para as cenas. Medido antes de sugerir, o quadro era
+estrutural: **zero** scripts de sombra no projeto, pipeline built-in sem `Light2D`, **uma única
+sorting layer** para o jogo inteiro, três das cinco câmeras em `ClearFlags: Skybox` sem material
+de skybox, e **23 `SpriteRenderer`** num Deserto de 88 × 64 unidades.
+
+### A bomba-relógio que ninguém tinha visto
+
+O chão é desenhado em `sortingOrder −1000`, número escolhido à mão. Os atores sortam em
+`−y × 10`. O Castelo de Carcosa já alcança `y = +71` — ordem **−710**.
+
+**Restavam 290 de folga.** Um mapa que crescesse 30 unidades ao norte faria os atores de lá
+desenharem *atrás do chão* e sumirem da tela, sem erro nenhum. E este projeto **já dobrou um
+mapa de tamanho** uma vez, em 2026-09-01.
+
+Agora são quatro camadas — `Fundo`, `Chao`, `Default`, `Frente` — e o chão saiu da disputa por
+número inteiro com os atores.
+
+> **A ferramenta mediu antes de mexer, e o motivo é real.** Inserir camadas *antes* de `Default`
+> muda o índice dela na lista, e todo `SpriteRenderer` grava **os dois**: `m_SortingLayerID` (0,
+> que não muda) e `m_SortingLayer` (o índice, que muda). Eu não sabia qual a Unity resolve
+> primeiro ao carregar, e errar isso reordenaria o jogo em silêncio. Então a ferramenta
+> fotografou a camada dos **78 renderers** das seis cenas, criou as camadas, e conferiu de novo.
+> Nenhum escorregou — só então ela mexeu no chão.
+
+### Sombra de chão
+
+Não existia nenhuma. Num 2D sem sombra todo sprite flutua, porque o Y-sort resolve *quem está na
+frente* e não *a que altura*.
+
+**E não é estética, é leitura de combate.** O Byakhee voa, e a única diferença visual entre ele
+voando e pousado era a **cor** (`corPousado`, `corFrenesi`) — ele não sobe, não escala, não
+projetava nada. O relato do Vini foi *"a hurtbox dela é muito difícil de atingir"*; parte disso é
+não haver nada na tela dizendo onde o bicho está no chão.
+
+A sombra é posicionada pelo `transform` do ator — a posição de **solo** —, não pelo visual dele.
+`SombraDeChao.Altura` encolhe e clareia conforme sobe, que é o gancho para o voo ganhar altura de
+verdade. Ordem = a do dono menos um, lendo a ordem já resolvida em vez de recalcular `−y × 10`,
+para não existirem duas contas de profundidade divergindo.
+
+Nove atores. O **Espectro de Hali ficou de fora de propósito**: espectro que projeta sombra
+sólida contradiz a ficção, e há um teste que falha se alguém puser sem decidir.
+
+Arte: `sombra_chao.png`, 32 × 16, alfa em **cinco degraus** — alfa liso não é pixel art.
+
+### A correção que o Vini me arrancou
+
+Eu tinha desaconselhado migrar para URP dizendo que "toca todo material — inclusive o seu
+shader". Ele perguntou o custo, e medido:
+
+| superfície | |
+|---|---|
+| Materiais no projeto inteiro | **1** (`OcclusionDither`) |
+| Shaders customizados | **1**, `Lighting Off`, unlit |
+| Testes que tocam o que a migração move | **4** de 165 |
+
+O custo não está em volume, está concentrado em três coisas: o `PixelPerfectCamera` (a
+identidade visual inteira depende dele), o shader do dither, e aqueles 4 testes. **Um dia com
+risco concentrado, não uma semana.**
+
+E a ordem certa fica registrada: camadas e sombra **antes** (sorting layers são idênticas na URP,
+e a sombra é leitura de altura, que luz não dá), URP **depois**, e só então tinta atmosférica e
+escurecimento de contato — esses dois são versões à mão do que a luz faz, e fazê-los agora seria
+retrabalho.
+
+### O que fica registrado e não foi feito
+
+- Três câmeras em `ClearFlags: Skybox` sem material de skybox. A doc da 6.4 só diz *"Clear with
+  the skybox"* e não descreve o fallback, então não afirmo o que aparece — mas a cor de fundo
+  autorada só governa com certeza em `SolidColor`, e ter 2 cenas num modo e 3 no outro não foi
+  decisão de ninguém.
+- 23 `SpriteRenderer` em 88 × 64. Nenhuma técnica de sombra salva um espaço sem nada para
+  projetar sombra.
+
+
 ## 2026-09-09 — O travamento da câmera funcionava em uma cena de seis
 
 Uma spec pedia uma ferramenta de Editor que definisse os limites da câmera pelo maior Tilemap da

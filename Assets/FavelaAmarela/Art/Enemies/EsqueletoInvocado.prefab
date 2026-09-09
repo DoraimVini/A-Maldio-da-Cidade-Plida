@@ -67,7 +67,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1.0}
+  m_Offset: {x: 0, y: 1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 7663135862166218245}
   - component: {fileID: 5909442056959582888}
   - component: {fileID: 7800000000000000000}
+  - component: {fileID: 3578743262495012237}
   m_Layer: 6
   m_Name: EsqueletoInvocado
   m_TagString: Untagged
@@ -256,7 +257,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 1, y: 1.5}
+    oldSize: {x: 3, y: 3}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -282,6 +283,8 @@ MonoBehaviour:
   velocidade: 2.2
   alcanceDeGolpe: 0.9
   cadenciaDeAtaque: 1.5
+  janelaDoGolpe: 0.15
+  raioDoGolpe: 0.5
   tempoDeVida: 20
   mostrarNumerosDeDano: 1
   corDoDano: {r: 0.9, g: 0.9, b: 0.85, a: 1}
@@ -358,3 +361,20 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 12568bbf4f8a4b729551c434cf4db79f, type: 3}
   quadrosPorSegundo: 10
   velocidadeMinimaParaAndar: 0.05
+--- !u!114 &3578743262495012237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8380616875347976551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b8658f99fb5fc4cbbc3bb02c6eae5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.SombraDeChao
+  sprite: {fileID: 21300000, guid: e74845c438ce408080754df5f502158d, type: 3}
+  largura: 0.9
+  opacidade: 0.5
+  deslocamento: {x: 0, y: 0}
+  alturaDeDesaparecimento: 4

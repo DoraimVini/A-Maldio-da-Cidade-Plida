@@ -109,6 +109,7 @@ GameObject:
   - component: {fileID: 2390158227983014455}
   - component: {fileID: 5226382639780997738}
   - component: {fileID: 3256518779656013734}
+  - component: {fileID: 1135108067769585894}
   m_Layer: 6
   m_Name: Abdul_Alhazred
   m_TagString: Untagged
@@ -230,7 +231,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 3.5310345, y: 1.5}
+    oldSize: {x: 2.2559388, y: 2.875}
     newSize: {x: 4, y: 4}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -363,6 +364,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Progression.ExposicaoAoAbater
   exposicao: 150
+--- !u!114 &1135108067769585894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3629304085953094325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b8658f99fb5fc4cbbc3bb02c6eae5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.SombraDeChao
+  sprite: {fileID: 21300000, guid: e74845c438ce408080754df5f502158d, type: 3}
+  largura: 0.9
+  opacidade: 0.5
+  deslocamento: {x: 0, y: 0}
+  alturaDeDesaparecimento: 4
 --- !u!1 &7700000000000000000
 GameObject:
   m_ObjectHideFlags: 0

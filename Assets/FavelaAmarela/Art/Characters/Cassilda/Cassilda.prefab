@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8277635742005883891}
   - component: {fileID: 3106386539858383823}
   - component: {fileID: 8200198013122566276}
+  - component: {fileID: 6169183028210617087}
   m_Layer: 0
   m_Name: Cassilda
   m_TagString: Untagged
@@ -230,3 +231,20 @@ MonoBehaviour:
   falaDeConclusao: "Tome. O Patu\xE1 das Luas G\xEAmeas \u2014 feito com fios das
     vestes de Yhtill. Ele desacelera o que o escuro faz com a sua mente. Use as pausas
     que ele lhe d\xE1."
+--- !u!114 &6169183028210617087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8573535587847996819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b8658f99fb5fc4cbbc3bb02c6eae5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.SombraDeChao
+  sprite: {fileID: 21300000, guid: e74845c438ce408080754df5f502158d, type: 3}
+  largura: 0.9
+  opacidade: 0.5
+  deslocamento: {x: 0, y: 0}
+  alturaDeDesaparecimento: 4

@@ -161,6 +161,7 @@ GameObject:
   - component: {fileID: 4383678035820145529}
   - component: {fileID: 8963580533039878870}
   - component: {fileID: 3420742979077037208}
+  - component: {fileID: 1615672923796559014}
   m_Layer: 6
   m_Name: Byakhee
   m_TagString: Untagged
@@ -318,6 +319,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.ByakheeAI
   centroDaArena: {fileID: 0}
   raioDeVoo: 3
+  raioDaArena: 12
+  velocidadeNoChao: 2.6
   velocidadeRasante: 6
   velocidadeMergulho: 9
   velocidadeCircundando: 4
@@ -442,3 +445,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Combat.CorpoImpregnado
   resistenciaAImpulso: 0.75
+--- !u!114 &1615672923796559014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5445350593436559665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b8658f99fb5fc4cbbc3bb02c6eae5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.SombraDeChao
+  sprite: {fileID: 21300000, guid: e74845c438ce408080754df5f502158d, type: 3}
+  largura: 0.9
+  opacidade: 0.5
+  deslocamento: {x: 0, y: 0}
+  alturaDeDesaparecimento: 4

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7274526852814612185}
   - component: {fileID: 7420087792121602580}
   - component: {fileID: 9197244023910230844}
+  - component: {fileID: 3273786613222221910}
   m_Layer: 6
   m_Name: CoisaDoCemiterio
   m_TagString: Untagged
@@ -230,3 +231,20 @@ MonoBehaviour:
   toleranciaDoAlvo: 1.5
   raioDeChegada: 0.25
   desenharCaminho: 0
+--- !u!114 &3273786613222221910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8530644607433014112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b8658f99fb5fc4cbbc3bb02c6eae5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.SombraDeChao
+  sprite: {fileID: 21300000, guid: e74845c438ce408080754df5f502158d, type: 3}
+  largura: 0.9
+  opacidade: 0.5
+  deslocamento: {x: 0, y: 0}
+  alturaDeDesaparecimento: 4
