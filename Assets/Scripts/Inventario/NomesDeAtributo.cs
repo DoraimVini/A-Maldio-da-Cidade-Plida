@@ -55,6 +55,23 @@ namespace FavelaAmarela.Inventario
         }
 
         /// <summary>Nome diegético do atributo.</summary>
+        /// <summary>
+        /// O nome que o jogador lê para cada slot do corpo. <c>MaoSecundaria</c> em texto cru na
+        /// tela (2026-09-10) era o enum vazando — e a única pista de que o slot existia, porque o
+        /// rótulo do Corpo tinha 9 px de altura e não desenhava nada.
+        /// </summary>
+        public static string De(EquipmentSlot slot) => slot switch
+        {
+            EquipmentSlot.Arma => "Arma",
+            EquipmentSlot.Elmo => "Elmo",
+            EquipmentSlot.Peitoral => "Peitoral",
+            EquipmentSlot.Grevas => "Grevas",
+            EquipmentSlot.Amuleto => "Amuleto",
+            EquipmentSlot.Anel => "Anel",
+            EquipmentSlot.MaoSecundaria => "Mão Secundária",
+            _ => slot.ToString(),
+        };
+
         public static string De(StatType stat) => stat switch
         {
             StatType.VitMaxima => "Vitalidade",
@@ -70,6 +87,12 @@ namespace FavelaAmarela.Inventario
             StatType.DrenoRM => "Dreno de Resiliência",
             StatType.VigorMaximo => "Vigor",
             StatType.RegeneracaoVigor => "Recuperação de Vigor",
+            StatType.CustoEsquivaVigor => "Vigor por Esquiva",
+            StatType.CustoCorridaVigor => "Vigor por Corrida",
+            StatType.ChanceCritica => "Chance Crítica",
+            StatType.DanoCritico => "Dano Crítico",
+            StatType.Precisao => "Precisão",
+            StatType.AumentoDeDanoFisico => "Dano Físico",
             _ => stat.ToString(),
         };
     }

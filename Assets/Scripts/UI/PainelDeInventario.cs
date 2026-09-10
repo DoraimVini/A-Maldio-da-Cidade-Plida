@@ -398,9 +398,14 @@ namespace FavelaAmarela.Runtime.UI
                        EstaSelecionado(Origem.Corpo, i));
 
                 // O rótulo mostra que parte do corpo é, mesmo com o slot vazio — senão o
-                // jogador não descobre que existe um lugar para elmo até achar um.
+                // jogador não descobre que existe um lugar para elmo até achar um. Com item, o
+                // nome dele vem junto: a linha do Corpo tem 600 px de largura e só um ícone de 65
+                // a preencher — o resto era vazio (2026-09-10).
                 if (visual.rotulo != null && i < _inventario.Equipment.Capacidade)
-                    visual.rotulo.text = _inventario.Equipment.GetSlotType(i).ToString();
+                {
+                    string slot = NomesDeAtributo.De(_inventario.Equipment.GetSlotType(i));
+                    visual.rotulo.text = item?.Def != null ? $"{slot} — {item.Def.Nome}" : slot;
+                }
             }
         }
 

@@ -162,7 +162,9 @@ namespace FavelaAmarela.Runtime.UI
                     escreveuCabecalho = true;
                 }
 
-                _sb.Append(stat).Append(": ")
+                // Nome que o jogador lê, não o do enum: "VitMaxima: +6" na tela era o C# vazando
+                // (2026-09-10). NomesDeAtributo é a fonte única desses nomes.
+                _sb.Append(NomesDeAtributo.De(stat)).Append(": ")
                    .Append(bonus > 0f ? "+" : "").Append(bonus.ToString("0.##"));
 
                 // "PASSIVO" não é preserva-verdade decorativo: RMMaxima, por exemplo, funciona
