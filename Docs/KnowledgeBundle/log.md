@@ -4,6 +4,61 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — A arena povoada, e os portões viram a parede norte
+
+Última frente da arena: cobertura e densidade. A cena tinha **quatro** `SpriteRenderer` — numa
+luta de chefe. Agora tem **22**.
+
+### Cobertura: sem colisor, e isso é decisão
+
+Medido, **nada nesta luta é barrado por geometria**:
+
+| ataque | por que colisor não ajuda |
+|---|---|
+| `GritoDirecionado` | é `Vector2.Distance <= alcanceDoGrito` — um **raio**, sem ângulo e sem *raycast* |
+| `MergulhoDeGarras` | persegue o jogador; obstáculo não intercepta |
+| `Rasante` | é aéreo |
+
+Num cenário assim colisor **obstrui sem proteger**: o jogador esquivando de um mergulho encosta
+num pilar e morre por causa do pilar. É saldo negativo. Todos os 18 objetos são visuais.
+
+> **Correção de rumo minha, no meio do caminho.** Eu tinha dito que o grito era um "cone que
+> mente". Medindo melhor: o telégrafo de 1 s **funciona** — você escapa saindo do raio 4, o que a
+> corrida do Damião faz sobrando. É mal-nomeado ("cone" sem ângulo), não quebrado. Se um dia
+> ganhar cone e linha de visão, os mesmos objetos ganham colisor e viram cobertura de verdade;
+> a colocação já está pensada para isso.
+
+### Os portões viram a parede norte, e a planta é que disse
+
+O Vini pediu muros de cada lado. A medição justificava: o colisor `Os_Portoes` tem **18 de
+largura** e a arte do portão tem **8** — sobravam **5 unidades de parede invisível de cada
+lado**. Um portão sem muro é um arco solto que se contorna.
+
+Mas ao desenhar a planta apareceu um erro meu maior: com os portões em **y = 8** e a câmera
+mostrando 11,25 de altura, o topo do quadro está em **y = 5,6**. Eles ficavam **acima da tela** —
+só apareciam quando o jogador empurrava para o norte. Não eram fundo da luta; eram um lugar aonde
+se ia.
+
+A leitura certa é mais simples: **os portões SÃO a parede norte da arena.** A elipse termina em
+y = +5; eles ficam em **5,5**, meio passo além, e o jogador os vê enquanto luta.
+
+`Ruin_1` (colunas quebradas de pé, 4 × 4) ladeia o portão; `Ruin_3` fecha as pontas dos 18. As
+`Ruins_*` do *CursedLand* ficaram de fora: são arcos orgânicos avermelhados, do bioma errado.
+
+### O resto
+
+Seis marcos de borda na elipse a 1,08 do semi-eixo — dizem onde a arena acaba sem estorvar. Oito
+peças de textura no anel interno, nada no miolo onde a luta acontece. Nenhum ao norte (é dos
+portões) nem no corredor sul (é por onde o jogador chega).
+
+Todos com `sortingOrder = -y × 10`, a mesma regra da geometria estática — sem isso empatam com os
+atores e piscam.
+
+Ferramenta idempotente: `Tools/FavelaAmarela/Arena: povoar a arena da Byakhee`.
+
+EditMode 1115 · PlayMode 64.
+
+
 ## 2026-09-09 — A arena da Byakhee: forma errada para a câmera, e os portões na frente da luta
 
 O Vini pediu para achar os portões que ele pôs na cena, fazê-los caber na arena e ficarem ao
