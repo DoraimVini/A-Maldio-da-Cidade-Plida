@@ -7,29 +7,75 @@ description: Mandatory QA pipeline for compiling and testing changes in the Fave
 
 Whenever a C# file or asset is altered, you MUST execute the following pipeline strictly in order. Do NOT advance to any other task or module until this cycle closes with success.
 
-## Primary path: MCP `mcp-unity` (Editor aberto)
+## Caminho primário: Unity CLI + Pipeline (Editor aberto) — desde 2026-09-10
 
-O fluxo real deste projeto assume o Unity Editor **aberto** durante o desenvolvimento — é o que o MCP `mcp-unity` exige para funcionar. Use-o como caminho padrão:
+O fluxo real deste projeto tem o Unity Editor **aberto** durante o desenvolvimento. Desde
+2026-09-10 o projeto carrega o pacote `com.unity.pipeline` (Unity 6+) e a máquina tem o
+**Unity CLI** (`unity`, canal beta): o Editor aberto é **dirigido pelo terminal**, e a suíte
+roda **sem fechar a Unity**. Medido no dia da instalação: 1155 testes EditMode em 113 s pelo
+Editor vivo, resultado idêntico ao batch.
 
-1. **SAVE**: Ensure the altered file is saved (handled inherently when writing tools succeed).
-2. **COMPILE**: Chame `mcp__mcp-unity__recompile_scripts`. Erro de compilação retornado = FAILURE, vá para o passo 5.
-3. **TEST**: Chame `mcp__mcp-unity__run_tests` (testMode `EditMode`). Prefira rodar a suíte inteira (sem `testFilter`) em vez de filtrar por classe — um filtro que não casa o nome completo (namespace + classe) às vezes devolve `0/0` mesmo com o teste existindo.
-4. **SUCCESS -> REPORT**: Se os testes passarem (0 falhas), reporte o resultado ao usuário e aguarde pedido explícito para commitar. NUNCA rode `git add`/`git commit` automaticamente nesta etapa.
-5. **FAILURE -> FIX**: Se houver falha de compilação ou de testes real (não flakiness — ver abaixo), corrija imediatamente o erro na respectiva classe e volte ao Passo 1.
+1. **SAVE**: garanta o arquivo salvo (inerente às ferramentas de escrita).
+2. **STATUS**: `unity status --format json --no-banner` — o Editor tem de aparecer com
+   `state: "ready"`. Se não aparecer, veja "Sem Editor" abaixo.
+3. **COMPILE**: `unity command recompile` e depois `unity command recompile_status` até
+   `status: completed` — atenção: `data.result` desse comando é uma **string JSON**
+   (`"{\"status\":\"completed\",\"failed\":false,\"errors\":[]}"`), não um objeto; faça
+   `json.loads` duas vezes. `failed: true` ou `errors` não vazio = FAILURE, passo 6.
+4. **TEST**:
+   ```
+   unity command run_tests --mode editor --timeout 500 --format json --no-banner
+   ```
+   Leia `data.result.Summary` (`Total/Passed/Failed/Skipped`) e `data.result.Results[]`.
+   Prefira a suíte inteira; `--filter <Classe>` casa substring do nome, serve para iterar.
+   PlayMode: `--mode playmode`. **Cuidado:** os testes de cena fazem `OpenScene` e **trocam a
+   cena aberta do Vini** — confira `unity command list_open_scenes` (`isDirty`) antes de rodar
+   a suíte inteira, e avise se houver cena suja.
+5. **SUCCESS -> REPORT**: 0 falhas → reporte as contagens. Commit só com aprovação (o Vini deu
+   aprovação permanente para commit ao fim de cada rodada verde; `git push` não).
+6. **FAILURE -> FIX**: corrija e volte ao passo 1.
 
-### Flakiness conhecida do MCP `mcp-unity` — não é falha real
+### Ferramentas de cena pelo Editor vivo (em vez de patchar YAML)
 
-`recompile_scripts` e `run_tests` falham de forma intermitente e **não relacionada ao seu código**:
-- Timeout de 120s sem resposta.
-- `Connection failed: Unknown error`.
-- Resultado ambíguo `0/0 passed - 0/0 failed` com `testCount` maior que zero (comum na 1ª chamada logo após uma recompilação).
+Toda ferramenta `[MenuItem("Tools/FavelaAmarela/...")]` roda no Editor aberto:
+```
+unity command menu --path "Tools/FavelaAmarela/UI: achar rótulos que não cabem" --format json --no-banner --timeout 120
+unity command console --format json --no-banner        # ler o que ela logou (marcador!)
+```
+E a **verdade da cena** vem do Editor, não do meu parse do YAML: `get_scene_hierarchy`,
+`find_gameobjects`, `get_component_properties`, `set_transform`, `set_serialized_field`,
+`save_scene`. Duas armadilhas que isto fecha por construção: posição **local ≠ mundo** (o
+portão dos Portões ficou 5,5 un fora da tela por um dia por causa disso) e **prefab ≠
+instância**. `unity command` (sem argumentos) lista os 149 comandos; `--query <termo>` filtra.
 
-Nesses três casos, **repita a mesma chamada uma ou duas vezes** antes de tratar como falha real. Se persistir após ~3 tentativas, informe ao usuário que o bridge MCP está instável (não que o teste falhou) e ofereça o caminho alternativo abaixo.
+Regra da própria skill do CLI, que vale aqui: **nunca editar `.unity`/`.prefab`/`.asset` à mão
+enquanto houver Editor alcançável** — e, quando não houver, dizer explicitamente que se está
+editando o arquivo direto.
 
-## Caminho alternativo: script batch (só com o Editor fechado)
+### Sem Editor (`STATUS_NO_INSTANCES`) — duas causas, duas saídas
 
-`C:\Users\Vini\Desktop\Peregrino_Amarelo\Peregrino_Amarelo\Tools\run_qa_tests.ps1` roda os testes em batch mode e é mais determinístico (sem flakiness de MCP), mas **falha imediatamente com "another Unity instance running"** se o Editor estiver aberto. Use-o só quando:
-- O usuário pedir explicitamente uma rodada de QA "limpa"/definitiva (ex.: antes de um commit importante), ou
-- O MCP estiver genuinamente indisponível após as tentativas acima.
+- **Safe Mode**: erro de compilação faz o Editor abrir sem o Pipeline. `unity pipeline list`
+  mostra `safeMode`. Corrija o C# e peça para reabrir a Unity — não caia para o batch.
+- **Unity fechada**: use o caminho batch abaixo. É o único caso em que ele é o caminho.
 
-Nesses casos, peça ao usuário para fechar o Editor antes de rodar o script — não assuma que ele está fechado.
+### Render de verdade (URP)
+
+Para validar **o que o jogador vê**, não use a captura de EditMode (`Camera.Render()` sem
+quadros reais mentiu em 2026-09-10: material *lit* sem luz e atlas não reempacotado). Com o
+Editor aberto: `unity command editor_play` → `unity command capture_game_view` →
+`unity command editor_stop`. Sem Editor: PlayMode com GPU,
+`.\Tools\run_qa_tests.ps1 -TestPlatform PlayMode -ComGraficos` (o `AArenaDosPortoesNaTelaTests`
+é o modelo).
+
+## Caminho alternativo: script batch (só com o Editor FECHADO)
+
+> Antes de 2026-09-10 o caminho primário era o bridge de terceiros `mcp-unity`
+> (`com.gamelovers.mcp-unity`), que raramente estava conectado e tinha flakiness
+> documentada (timeouts, `0/0 passed`). O Unity CLI oficial o substituiu.
+
+`C:\Users\Vini\Desktop\Peregrino_Amarelo\Peregrino_Amarelo\Tools\run_qa_tests.ps1` roda os testes em batch mode e é mais determinístico (sem flakiness de MCP), mas **falha imediatamente com "another Unity instance running"** se o Editor estiver aberto. Use-o só quando a Unity estiver **fechada** (`unity status` → `STATUS_NO_INSTANCES` e
+`unity pipeline list` → `isRunning: false`). Com o Editor aberto ele falha em `EDITOR ABERTO`
+antes de rodar — e a resposta certa é o caminho primário acima, não pedir para fechar.
+
+**Ferramenta que renderiza** (`CapturaDeCena`) precisa da Unity **sem `-nographics`**: com a
+flag, `TilemapRendererGeometryJob` dá access violation ao desenhar o primeiro Tilemap.

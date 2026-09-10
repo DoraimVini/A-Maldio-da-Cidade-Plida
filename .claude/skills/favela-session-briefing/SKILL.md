@@ -22,9 +22,13 @@ proposing or writing any code.
    the next real thing to build. Do not re-derive priority order from scratch; the roadmap
    already has it, plus a "Próximos passos recomendados" note in the Studio Knowledge Base
    mirror (`Projeto_Amarelo/sistemas_implementados.md`) if it's been kept in sync.
-4. **MCP Unity check:** verify whether `mcp__mcp-unity__*` tools are available/connected.
-   If not, say so upfront — don't propose gameplay changes that need compiling/testing
-   until the Vini reconnects the Editor bridge.
+4. **Editor check (Unity CLI):** rode `unity status --format json --no-banner`. `state: "ready"` =
+   o Editor está aberto e o Pipeline carregado → a suíte e as ferramentas rodam **pelo Editor**
+   (ver `favela-qa-pipeline`). `STATUS_NO_INSTANCES` → confira `unity pipeline list`: se
+   `isRunning: true` sem servidor, é Safe Mode (erro de compilação) ou o pacote ainda
+   importando; se `isRunning: false`, a Unity está fechada e o batch é o caminho. As
+   ferramentas MCP do servidor `unity-editor-mcp` (`mcp__unity-editor-mcp__*`) só aparecem
+   em sessão nova do Claude Code; o CLI funciona sempre.
 5. **Summarize and confirm:** in a few lines, tell the Vini: current branch/git state, what
    was done last session, and the recommended next item — then ask if that's what he wants
    to tackle before writing any code. Do not start implementing until he confirms or
