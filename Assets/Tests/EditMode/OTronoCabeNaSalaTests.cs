@@ -44,7 +44,7 @@ namespace FavelaAmarela.Tests.EditMode
 
         private static Tilemap Chao()
         {
-            var mapa = Object.FindObjectsByType<Tilemap>(FindObjectsSortMode.None)
+            var mapa = Object.FindObjectsByType<Tilemap>()
                              .FirstOrDefault(t => t.name == "Piso_Castelo");
 
             Assert.NotNull(mapa, "Tilemap 'Piso_Castelo' não encontrado — sem ele não há como " +
@@ -61,7 +61,7 @@ namespace FavelaAmarela.Tests.EditMode
         public void ORei_TemChaoDebaixoDosPes()
         {
             Abrir();
-            var rei = Object.FindFirstObjectByType<ReiEmAmareloAI>();
+            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
             Assert.NotNull(rei, "Nenhum ReiEmAmareloAI na cena do Castelo.");
 
             Assert.IsTrue(TemChao(Chao(), rei.transform.position),
@@ -89,11 +89,11 @@ namespace FavelaAmarela.Tests.EditMode
         public void OCorpoDoRei_FicaMajoritariamenteDentroDaSala()
         {
             Abrir();
-            var rei = Object.FindFirstObjectByType<ReiEmAmareloAI>();
+            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
             var sprite = rei.GetComponent<SpriteRenderer>();
             Assert.NotNull(sprite, "O Rei perdeu o SpriteRenderer.");
 
-            var parede = Object.FindObjectsByType<Tilemap>(FindObjectsSortMode.None)
+            var parede = Object.FindObjectsByType<Tilemap>()
                                .FirstOrDefault(m => m.name == "Colisao");
             Assert.NotNull(parede, "Tilemap 'Colisao' não encontrado — é ele que fecha a sala.");
 
@@ -124,7 +124,7 @@ namespace FavelaAmarela.Tests.EditMode
         public void ORei_CabeNaTela()
         {
             Abrir();
-            var sprite = Object.FindFirstObjectByType<ReiEmAmareloAI>()
+            var sprite = Object.FindAnyObjectByType<ReiEmAmareloAI>()
                                .GetComponent<SpriteRenderer>();
 
             Assert.Less(sprite.bounds.size.y, AlturaDaTela,
@@ -136,7 +136,7 @@ namespace FavelaAmarela.Tests.EditMode
 
         private static EscudoDeReliquia[] Abrigos()
         {
-            var escudos = Object.FindObjectsByType<EscudoDeReliquia>(FindObjectsSortMode.None);
+            var escudos = Object.FindObjectsByType<EscudoDeReliquia>();
             Assert.IsNotEmpty(escudos,
                 "Nenhum EscudoDeReliquia na cena. Rode " +
                 "Tools/FavelaAmarela/Trono: montar os abrigos das relíquias.");
@@ -151,7 +151,7 @@ namespace FavelaAmarela.Tests.EditMode
         public void CadaReliquiaExigida_TemOSeuAbrigo()
         {
             Abrir();
-            var rei = Object.FindFirstObjectByType<ReiEmAmareloAI>();
+            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
             var abrigos = Abrigos();
 
             foreach (var id in rei.ReliquiasExigidas)
@@ -197,7 +197,7 @@ namespace FavelaAmarela.Tests.EditMode
         public void ATravessiaMaisLonga_CabeNaCalmaria()
         {
             Abrir();
-            var rei = Object.FindFirstObjectByType<ReiEmAmareloAI>();
+            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
             var abrigos = Abrigos();
 
             float calmaria = new SerializedObject(rei)
@@ -235,7 +235,7 @@ namespace FavelaAmarela.Tests.EditMode
         public void OsCiclos_SaoUmPorReliquia()
         {
             Abrir();
-            var rei = Object.FindFirstObjectByType<ReiEmAmareloAI>();
+            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
 
             int ciclos = new SerializedObject(rei).FindProperty("ciclosDeSelamento").intValue;
 

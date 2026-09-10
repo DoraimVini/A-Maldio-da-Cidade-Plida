@@ -85,8 +85,7 @@ namespace FavelaAmarela.Runtime.Environment
 
             float maxX = 0f, maxY = 0f;
 
-            foreach (var t in FindObjectsByType<Transform>(FindObjectsInactive.Include,
-                                                           FindObjectsSortMode.None))
+            foreach (var t in FindObjectsByType<Transform>(FindObjectsInactive.Include))
             {
                 if (!t.name.StartsWith("Limite_")) continue;
 

@@ -166,8 +166,9 @@ namespace FavelaAmarela.EditorTools
                 return $"{nome}: NENHUMA pasta válida ({string.Join(", ", ausentes)})";
 
             var atlas = new SpriteAtlasAsset();
-            atlas.SetIncludeInBuild(true);
             atlas.Add(objetos.ToArray());
+            // includeInBuild fica no IMPORTER (abaixo), como tudo o mais que persiste na V2 —
+            // SpriteAtlasAsset.SetIncludeInBuild é obsoleto na 6000.4 e não gravava nada.
 
             string caminho = $"{PastaDosAtlas}/{nome}.spriteatlasv2";
             SpriteAtlasAsset.Save(atlas, caminho);

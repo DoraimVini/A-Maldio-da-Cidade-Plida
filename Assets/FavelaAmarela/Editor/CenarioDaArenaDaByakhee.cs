@@ -284,7 +284,7 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static void LigarAColeiraNaSala()
         {
-            var byakhee = Object.FindFirstObjectByType<ByakheeAI>();
+            var byakhee = Object.FindAnyObjectByType<ByakheeAI>();
             if (byakhee == null)
             {
                 Debug.LogWarning($"{Marcador} nenhum ByakheeAI na cena — coleira não ligada.");
@@ -294,7 +294,7 @@ namespace FavelaAmarela.EditorTools
             // O mesmo critério da IA e do teste: mais células PINTADAS, não a maior caixa —
             // pela caixa, o anel de paredes ganhava do chão.
             var chao = ByakheeAI.ChaoComMaisTiles(
-                Object.FindObjectsByType<Tilemap>(FindObjectsSortMode.None));
+                Object.FindObjectsByType<Tilemap>());
             int maisCelulas = chao != null ? CelulasPintadas(chao) : 0;
 
             var muralha = GameObject.Find("Os_Portoes");

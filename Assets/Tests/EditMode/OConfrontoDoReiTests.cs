@@ -182,8 +182,8 @@ namespace FavelaAmarela.Tests.EditMode
         {
             EditorSceneManager.OpenScene(Cena, OpenSceneMode.Single);
 
-            var rei = UnityEngine.Object.FindFirstObjectByType<ReiEmAmareloAI>();
-            var abrigos = UnityEngine.Object.FindObjectsByType<EscudoDeReliquia>(FindObjectsSortMode.None);
+            var rei = UnityEngine.Object.FindAnyObjectByType<ReiEmAmareloAI>();
+            var abrigos = UnityEngine.Object.FindObjectsByType<EscudoDeReliquia>();
             Assert.IsNotEmpty(abrigos, "Sem abrigos na cena.");
 
             var so = new SerializedObject(rei);
@@ -259,14 +259,14 @@ namespace FavelaAmarela.Tests.EditMode
             float golpes = GolpesParaDerrubar(rei, bruto);
 
             EditorSceneManager.OpenScene(Cena, OpenSceneMode.Single);
-            var ai = UnityEngine.Object.FindFirstObjectByType<ReiEmAmareloAI>();
+            var ai = UnityEngine.Object.FindAnyObjectByType<ReiEmAmareloAI>();
             var so = new SerializedObject(ai);
             float calmaria = so.FindProperty("intervaloNoConfronto").floatValue;
             if (calmaria <= 0f) calmaria = so.FindProperty("intervaloEntreCiclos").floatValue;
 
             Vector2 pontoDeGolpe = (Vector2)ai.transform.position + Vector2.down;
             float menorIdaEVolta = UnityEngine.Object
-                .FindObjectsByType<EscudoDeReliquia>(FindObjectsSortMode.None)
+                .FindObjectsByType<EscudoDeReliquia>()
                 .Min(e => 2f * AbrigoDeReliquia.SegundosParaAlcancar(
                     pontoDeGolpe, e.transform.position, VelocidadeCorrendo, e.SemiEixoX, e.SemiEixoY));
 
@@ -287,7 +287,7 @@ namespace FavelaAmarela.Tests.EditMode
         public void ACalmariaDoConfronto_EhMaisCurtaQueADoSelamento()
         {
             EditorSceneManager.OpenScene(Cena, OpenSceneMode.Single);
-            var so = new SerializedObject(UnityEngine.Object.FindFirstObjectByType<ReiEmAmareloAI>());
+            var so = new SerializedObject(UnityEngine.Object.FindAnyObjectByType<ReiEmAmareloAI>());
 
             float selamento = so.FindProperty("intervaloEntreCiclos").floatValue;
             float confronto = so.FindProperty("intervaloNoConfronto").floatValue;

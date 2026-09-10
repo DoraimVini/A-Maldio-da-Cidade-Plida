@@ -33,8 +33,18 @@ namespace FavelaAmarela.Tests.PlayMode
         private const string Cena = "Portoes_Das_Ruinas";
         private const string Captura = "Capturas/playmode/Portoes_Das_Ruinas.png";
 
-        /// <summary>Linha do portão, em unidades: acima dela é Carcosa; abaixo, a arena.</summary>
-        private const float YDosPortoes = 3f;
+        /// <summary>
+        /// Onde a escuridão começa: a base do sprite <c>Escuridao_AlemDosPortoes</c>, lida da
+        /// cena. Era uma constante (3) — a linha do portão da MINHA composição; o Vini moveu a
+        /// escuridão para y ≈ 11 ao recompor os Portões em 2026-09-10, e um teste que mede numa
+        /// altura fixa passa a medir chão comum e reprova o que está certo.
+        /// </summary>
+        private static float BaseDaEscuridao()
+        {
+            var escuridao = GameObject.Find("Escuridao_AlemDosPortoes");
+            Assert.NotNull(escuridao, "'Escuridao_AlemDosPortoes' não está na cena dos Portões.");
+            return escuridao.transform.position.y;
+        }
 
         private static bool SemGpu => SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null;
 
@@ -77,13 +87,18 @@ namespace FavelaAmarela.Tests.PlayMode
             // Deixa Start e alguns LateUpdate correrem: sombras nascem, animadores acertam o quadro.
             for (int i = 0; i < 5; i++) yield return null;
 
+            // A câmera olha do centro da escuridão para baixo: a faixa escura fica no topo do
+            // quadro e a arena logo abaixo da base dela, na mesma largura.
+            float base_ = BaseDaEscuridao();
+            cam.transform.position = new Vector3(0f, base_ - 2f, -10f);
+            yield return null;
+
             var tela = Fotografar(cam);
             Directory.CreateDirectory(Path.GetDirectoryName(Captura));
             File.WriteAllBytes(Captura, tela.EncodeToPNG());
 
-            // Duas faixas horizontais, uma de cada lado da linha do portão, na mesma largura.
-            float alemDosPortoes = LuminanciaMedia(tela, cam, yMin: YDosPortoes + 0.8f, yMax: YDosPortoes + 2.2f);
-            float naArena = LuminanciaMedia(tela, cam, yMin: -3.5f, yMax: -1.5f);
+            float alemDosPortoes = LuminanciaMedia(tela, cam, yMin: base_ + 1.5f, yMax: base_ + 3f);
+            float naArena = LuminanciaMedia(tela, cam, yMin: base_ - 6f, yMax: base_ - 4f);
 
             TestContext.WriteLine($"além dos portões: {alemDosPortoes:F1} | arena: {naArena:F1} | " +
                                   $"captura em {Captura}");

@@ -145,11 +145,19 @@ namespace FavelaAmarela.Runtime.Diagnostico
             }
         }
 
+        /// <summary>
+        /// Id da janela IMGUI. Era <c>GetInstanceID()</c>; na 6000.4 ele é obsoleto em favor de
+        /// <c>GetEntityId()</c>, cuja conversão para <c>int</c> é <b>também</b> obsoleta — trocar
+        /// um pelo outro só adiaria o aviso. <c>GUILayout.Window</c> quer um inteiro único entre
+        /// janelas do mesmo quadro, e este console é a única janela IMGUI do jogo.
+        /// </summary>
+        private const int IdDaJanela = 0x0CA7C05A;
+
         private void OnGUI()
         {
             if (!_aberto) return;
 
-            _janela = GUILayout.Window(GetInstanceID(), _janela, Desenhar,
+            _janela = GUILayout.Window(IdDaJanela, _janela, Desenhar,
                                        "Carcosa Debugger — runtime (F12 fecha)");
         }
 
@@ -569,7 +577,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
 
             var maquinas = Object.FindObjectsByType<
                     FavelaAmarela.Runtime.Enemies.EnemyStateMachine>(
-                    FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                    FindObjectsInactive.Exclude);
 
             if (maquinas.Length == 0)
             {

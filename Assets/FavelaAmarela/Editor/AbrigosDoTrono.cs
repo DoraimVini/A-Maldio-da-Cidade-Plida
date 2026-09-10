@@ -65,7 +65,7 @@ namespace FavelaAmarela.EditorTools
                 return;
             }
 
-            var pontos = Object.FindObjectsByType<PontoFocalDeReliquia>(FindObjectsSortMode.None);
+            var pontos = Object.FindObjectsByType<PontoFocalDeReliquia>();
             if (pontos.Length == 0)
             {
                 Debug.LogError($"{Marcador} nenhum PontoFocalDeReliquia na cena.");
@@ -149,7 +149,7 @@ namespace FavelaAmarela.EditorTools
 
         private static void LigarNoRei(List<EscudoDeReliquia> escudos)
         {
-            var rei = Object.FindFirstObjectByType<ReiEmAmareloAI>();
+            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
             if (rei == null)
             {
                 Debug.LogWarning($"{Marcador} nenhum ReiEmAmareloAI na cena — os abrigos ficam " +

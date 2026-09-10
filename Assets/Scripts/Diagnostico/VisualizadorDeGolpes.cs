@@ -234,7 +234,7 @@ namespace FavelaAmarela.Runtime.Diagnostico
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             var colisores = FindObjectsByType<Collider2D>(
-                FindObjectsInactive.Include, FindObjectsSortMode.None);
+                FindObjectsInactive.Include);
 
             var texto = new System.Text.StringBuilder();
             texto.AppendLine($"[AuditoriaDeColisores] {colisores.Length} colisor(es) na cena.");
@@ -352,12 +352,12 @@ namespace FavelaAmarela.Runtime.Diagnostico
             {
                 _proximaVarredura = Agora + IntervaloDeVarredura;
                 _colisores = FindObjectsByType<Collider2D>(
-                    FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                    FindObjectsInactive.Exclude);
             }
             else if (!Application.isPlaying)
             {
                 _colisores = FindObjectsByType<Collider2D>(
-                    FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                    FindObjectsInactive.Exclude);
             }
 
             // Poda TAMBÉM aqui. Em Edit mode o Update de um [ExecuteAlways] só roda quando o

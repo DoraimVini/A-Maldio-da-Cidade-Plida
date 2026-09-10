@@ -380,7 +380,7 @@ namespace FavelaAmarela.Runtime.Enemies
         {
             if (chaoDaArena != null) return;
 
-            chaoDaArena = ChaoComMaisTiles(FindObjectsByType<Tilemap>(FindObjectsSortMode.None));
+            chaoDaArena = ChaoComMaisTiles(FindObjectsByType<Tilemap>());
 
             if (chaoDaArena == null)
                 Debug.LogWarning("[Byakhee] Nenhum Tilemap na cena — sem chão, a coleira está " +

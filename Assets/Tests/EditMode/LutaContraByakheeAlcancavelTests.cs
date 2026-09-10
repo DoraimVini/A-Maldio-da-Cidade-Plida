@@ -115,7 +115,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             EditorSceneManager.OpenScene(CenaDosPortoes, OpenSceneMode.Single);
 
-            var byakhee = Object.FindFirstObjectByType<FavelaAmarela.Runtime.Enemies.ByakheeAI>();
+            var byakhee = Object.FindAnyObjectByType<FavelaAmarela.Runtime.Enemies.ByakheeAI>();
             Assert.IsNotNull(byakhee, "Nenhum ByakheeAI na cena dos Portões.");
 
             var so = new SerializedObject(byakhee);
@@ -130,7 +130,7 @@ namespace FavelaAmarela.Tests.EditMode
             // sala. Pela caixa envolvente, o anel de paredes ganharia, e a coleira apontaria
             // para onde NÃO há chão.
             var maior = FavelaAmarela.Runtime.Enemies.ByakheeAI.ChaoComMaisTiles(
-                Object.FindObjectsByType<Tilemap>(FindObjectsSortMode.None));
+                Object.FindObjectsByType<Tilemap>());
 
             Assert.AreSame(maior, chao,
                 $"A coleira aponta para '{chao.name}', mas o chão da sala é '{maior.name}'. " +
@@ -162,13 +162,15 @@ namespace FavelaAmarela.Tests.EditMode
             var batente = colisor.transform.Find("Batente");
             Assert.IsNotNull(batente, "'Batente' deixou de ser filho de 'Os_Portoes'.");
 
-            // A arte é um DIORAMA: plataforma de pedra embaixo (2,7 un na arte, à escala 2) e
-            // os pilares em cima. A linha que tem de coincidir com o colisor é a dos PILARES,
-            // não a base — com a base no colisor, da arena só se via a plataforma (uma faixa
-            // bege). O 2,7 é medido no PNG e documentado em CenarioDaArenaDaByakhee.
-            const float AlturaDaPlataformaNaArte = 2.7f;
+            // A arte é um DIORAMA: plataforma de pedra embaixo e os pilares em cima. A linha que
+            // tem de coincidir com o colisor é a dos PILARES, não a base — com a base no colisor,
+            // da arena só se via a plataforma (uma faixa bege). A plataforma tem 2,7 un à escala
+            // 2 (medido no PNG); a conta segue a escala que a cena tiver — o Vini compôs os
+            // Portões à escala 4,68 em 2026-09-10, e o guarda mede a composição dele, não a minha.
+            const float AlturaDaPlataformaNaEscala2 = 2.7f;
+            float alturaDaPlataforma = AlturaDaPlataformaNaEscala2 * (batente.lossyScale.y / 2f);
 
-            float pilares = batente.position.y + AlturaDaPlataformaNaArte;
+            float pilares = batente.position.y + alturaDaPlataforma;
             float colisao = colisor.transform.position.y;
 
             Assert.AreEqual(colisao, pilares, 0.01f,

@@ -43,8 +43,7 @@ namespace FavelaAmarela.Tests.EditMode
                 // própria (cacos de uma mesma tábua quebrada, com glifos), e a lista existe
                 // para encolher. Eram o caso mais grave dela — itens que a quest manda o
                 // jogador ACHAR, desenhados como quadrado branco.
-
-                ["Passagem_ParaOCastelo"] = "o portal dos Portões para a última fase do jogo",
+                // Passagem_ParaOCastelo SAIU em 2026-09-10: o Vini deu arte a ela na cena.
 
                 ["Piso"] = "o piso do Santuário de Yhtill — já registrado no roadmap como " +
                            "pendência de arte da quest da Cassilda",

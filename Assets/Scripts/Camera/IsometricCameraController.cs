@@ -212,8 +212,7 @@ namespace FavelaAmarela.CameraSystem
                 return;
             }
 
-            var paredes = FindObjectsByType<Collider2D>(FindObjectsInactive.Include,
-                                                        FindObjectsSortMode.None)
+            var paredes = FindObjectsByType<Collider2D>(FindObjectsInactive.Include)
                 .Where(c => PrefixosDeParede.Any(
                     p => c.name.StartsWith(p, System.StringComparison.Ordinal)))
                 .ToArray();
@@ -227,8 +226,7 @@ namespace FavelaAmarela.CameraSystem
                 return;
             }
 
-            var mapas = FindObjectsByType<Tilemap>(FindObjectsInactive.Include,
-                                                   FindObjectsSortMode.None);
+            var mapas = FindObjectsByType<Tilemap>(FindObjectsInactive.Include);
 
             if (mapas.Length > 0)
             {

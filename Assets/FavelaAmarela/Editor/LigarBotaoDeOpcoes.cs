@@ -62,7 +62,7 @@ namespace FavelaAmarela.EditorTools
             var cena = EditorSceneManager.OpenScene(CenaDoMenu, OpenSceneMode.Single);
 
             var menu = Object.FindObjectsByType<MenuPrincipal>(
-                    FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    FindObjectsInactive.Include)
                 .FirstOrDefault();
 
             if (menu == null) return "Cena_Menu: nenhum MenuPrincipal encontrado";

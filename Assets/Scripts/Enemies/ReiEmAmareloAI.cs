@@ -337,8 +337,7 @@ namespace FavelaAmarela.Runtime.Enemies
         private void ResolverEscudos()
         {
             if (escudos == null || escudos.Length == 0)
-                escudos = FindObjectsByType<FavelaAmarela.Runtime.Itens.EscudoDeReliquia>(
-                    FindObjectsSortMode.None);
+                escudos = FindObjectsByType<FavelaAmarela.Runtime.Itens.EscudoDeReliquia>();
 
             if (escudos == null || escudos.Length == 0)
             {
