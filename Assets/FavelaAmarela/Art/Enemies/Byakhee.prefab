@@ -330,7 +330,7 @@ MonoBehaviour:
   alcanceDasGarras: 1.5
   hitboxDasGarras: {fileID: 1232626060124713561}
   janelaDasGarras: 0.25
-  corNoAr: {r: 0.35, g: 0.3, b: 0.45, a: 1}
+  corNoAr: {r: 1, g: 1, b: 1, a: 1}
   corPousado: {r: 0.85, g: 0.75, b: 0.25, a: 1}
   corFrenesi: {r: 0.85, g: 0.2, b: 0.15, a: 1}
 --- !u!114 &3096421289379231945

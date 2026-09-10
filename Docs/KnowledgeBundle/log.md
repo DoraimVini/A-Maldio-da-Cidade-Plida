@@ -4,6 +4,64 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — O Byakhee: o estado imune era o marcante, e a janela de dano não tinha sinal
+
+Terceiro item da fila, medido antes de tocar no chefe.
+
+### O que a medição achou, e não era o que eu esperava
+
+O `ByakheeAI` muda **uma** coisa visualmente: `_sprite.color`, numa linha só. Mas existe um
+`AnimadorDoByakhee` com **26 quadros por estado**, todos ligados no prefab — e a documentação
+dele diz que *"substitui o tingimento por cor que o `ByakheeAI` usava como placeholder"* e que
+*"arte real não se tinge"*.
+
+**Os dois estavam rodando juntos, e o placeholder venceu.**
+
+| tinta | estados | brilho resultante |
+|---|---|---|
+| `corNoAr (0.35, 0.30, 0.45)` | Rasante, Mergulho, Grito, Espreita, Circundando | **32%** |
+| `corPousado (0.85, 0.75, 0.25)` | **Pousado — a única janela de dano** | 74% |
+| `corFrenesi (0.85, 0.20, 0.15)` | abaixo de 10% | 33% |
+
+E a arte do Byakhee **já é dourada e vermelha**. Tinta dourada sobre arte dourada produz quase a
+mesma imagem: o sinal da janela de dano era **quase nenhum**, enquanto o estado imune ficava
+escurecido a um terço.
+
+**Estava invertido.** O que o jogador precisa notar não tinha marca; o que ele deve evitar tinha.
+
+### Por que a correção não foi com cor
+
+Tinta multiplicativa **só escurece**. Sobre arte já brilhante, dava para apagar o chefe e nunca
+para destacá-lo — o sinal era fraco **por construção**, não por escolha de valor.
+
+A resposta foi a **sombra**, e ela cai redonda: dos oito estados, `Pousado` é o **único** em que
+ele está no chão — `Espreita` é *"pousado no topo do arco"*, que é alto. Sombra fechada e escura
+significa que ele desceu, e é exatamente quando pode ser ferido.
+
+```
+Pousado ............ 0,0   <- A janela de dano
+Derrotado .......... 0,0
+MergulhoDeGarras ... 1,2   <- descendo: a sombra aperta antes de cair
+Frenesi ............ 2,0
+Rasante / Grito / Circundando ... 2,5
+Espreita ........... 3,0   <- topo do arco
+```
+
+O mergulho ficar **baixo mas não zero** é deliberado: a sombra apertando telegrafa onde ele vai
+cair, e ele continua imune no caminho.
+
+### O gancho já existia
+
+`SombraDeChao.Altura` foi construída hoje mais cedo e **não tinha ninguém escrevendo nela**. Esta
+é a primeira escritora — e era exatamente para isto que ela existia.
+
+> **A cor está no prefab, não só no C#.** Mudar o valor padrão no código não teria efeito nenhum:
+> `corNoAr` está serializado no `Byakhee.prefab` e é ele que manda. É a armadilha que este
+> repositório já registrou três vezes.
+
+EditMode 1110 → **1114** · PlayMode 64.
+
+
 ## 2026-09-09 — O chão da tempestade: item recusado por uma pergunta do Vini
 
 Segundo item da fila, e ele **não deveria existir**. Eu ia pintar as ~25 000 células do Deserto

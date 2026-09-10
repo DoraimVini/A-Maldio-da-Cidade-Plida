@@ -91,13 +91,24 @@ namespace FavelaAmarela.Runtime.Enemies
         [SerializeField] private float janelaDasGarras = 0.25f;
 
         [Header("Cores de leitura (provisórias, até haver arte)")]
-        [SerializeField] private Color corNoAr = new Color(0.35f, 0.30f, 0.45f);
+        /// <summary>
+        /// Tinta dos estados de voo. <b>Branco: a arte não se tinge.</b>
+        ///
+        /// <para><b>Era <c>(0.35, 0.30, 0.45)</c> até 2026-09-09</b> — roxo-acinzentado que,
+        /// multiplicado, deixava o chefe a <b>32% do brilho</b> durante a maior parte da luta.
+        /// A tinta era placeholder de quando não havia arte; o <c>AnimadorDoByakhee</c> chegou
+        /// com 26 quadros por estado, e a documentação dele diz que <i>"substitui o tingimento
+        /// por cor"</i> e que <i>"arte real não se tinge"</i>. Os dois ficaram rodando juntos, e
+        /// o placeholder venceu.</para>
+        /// </summary>
+        [SerializeField] private Color corNoAr = Color.white;
         [SerializeField] private Color corPousado = new Color(0.85f, 0.75f, 0.25f);
         [SerializeField] private Color corFrenesi = new Color(0.85f, 0.20f, 0.15f);
 
         private ByakheeFSM _fsm;
         private EnemyBase _enemyBase;
         private SpriteRenderer _sprite;
+        private Runtime.Rendering.SombraDeChao _sombra;
         private Rigidbody2D _rb;
         private Transform _jogador;
         private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
@@ -115,6 +126,7 @@ namespace FavelaAmarela.Runtime.Enemies
 
             _enemyBase = GetComponent<EnemyBase>();
             _sprite = GetComponent<SpriteRenderer>();
+            _sombra = GetComponent<Runtime.Rendering.SombraDeChao>();
             _rb = GetComponent<Rigidbody2D>();
 
             _rb.gravityScale = 0f;
@@ -394,7 +406,39 @@ namespace FavelaAmarela.Runtime.Enemies
                 ByakheeState.Frenesi => corFrenesi,
                 _ => corNoAr
             };
+
+            if (_sombra != null) _sombra.Altura = AlturaDoEstado(atual);
         }
+
+        /// <summary>
+        /// A altura que a sombra mostra em cada estado — <b>o indicador da janela de dano</b>.
+        ///
+        /// <para><b>Por que a sombra e não a cor (2026-09-09).</b> Tinta multiplicativa só
+        /// <i>escurece</i>, e a arte do Byakhee já é dourada e brilhante: o
+        /// <c>corPousado (0.85, 0.75, 0.25)</c> aplicado a ela produzia quase a mesma imagem.
+        /// Dava para escurecer o chefe, nunca para destacá-lo — o sinal da janela de dano era
+        /// fraco <b>por construção</b>, enquanto o estado imune era o marcante. Estava
+        /// invertido.</para>
+        ///
+        /// <para><b>E a leitura cai redonda:</b> dos oito estados, <c>Pousado</c> é o
+        /// <b>único</b> em que ele está no chão — <c>Espreita</c> é "pousado no topo do arco",
+        /// que é alto. Sombra fechada e escura significa que ele desceu, e é exatamente quando
+        /// pode ser ferido. É o que o Vini relatou não conseguir ler: <i>"a hurtbox dela é muito
+        /// difícil de atingir"</i>.</para>
+        ///
+        /// <para>O <c>MergulhoDeGarras</c> fica <b>baixo, mas não zero</b>: a sombra apertando
+        /// enquanto ele desce telegrafa onde o mergulho vai cair, e ele continua imune no
+        /// caminho.</para>
+        /// </summary>
+        private static float AlturaDoEstado(ByakheeState estado) => estado switch
+        {
+            ByakheeState.Pousado => 0f,             // no chão: A janela de dano
+            ByakheeState.Derrotado => 0f,
+            ByakheeState.MergulhoDeGarras => 1.2f,  // descendo — a sombra aperta antes de cair
+            ByakheeState.Frenesi => 2.0f,
+            ByakheeState.Espreita => 3.0f,          // no topo do arco, o mais alto
+            _ => 2.5f,                              // Rasante, GritoDirecionado, Circundando
+        };
 
         /// <summary>
         /// Golpe de garras no instante do pouso.
