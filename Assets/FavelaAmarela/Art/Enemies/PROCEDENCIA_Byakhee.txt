@@ -95,3 +95,24 @@ AnimadorDoByakhee, pela velocidade, com zona morta. Guarda: AFolhaDoByakheeTests
 Consequencia na derrota: os quadros 1 e 3 ficaram iguais aos 0 e 2 -- a animacao de
 derrota vira A A B B (efetivamente 2 quadros a 4 qps). Aceitavel; se incomodar, o prefab
 pode listar so derrota_0 e derrota_2.
+
+ALINHAMENTO PELO TORSO -- 2026-09-10, mais tarde
+------------------------------------------------
+Com todos os quadros olhando para a direita, o corpo ainda SALTAVA de lado: o torso (os 35%
+de baixo do corpo escuro) pulava ate 22 px entre quadros consecutivos -- 1,7 un a escala
+2,47, a 8 qps. A folha foi gerada quadro a quadro sem ancora comum, e o espelhamento dos
+impares ainda inverteu o deslocamento deles (um corpo em x=94 virado para a esquerda vira
+x=70 virado para a direita).
+
+  torso antes (px):  espreita 87 70 81 73 | rasante 86 72 86 71 93 75 | garras 85 83 88 63
+                     grito 84 73 78 67 84 63 | dano 78 95 | derrota 98 98 77 77
+  torso depois:      82 em todos (derrota 83 83 82 82)
+
+Cada quadro foi deslocado horizontalmente, dentro da celula, para o centroide do torso cair
+em x = 82 -- o centro da celula, onde esta o pivo (0.5, 0) e o colisor. Nenhum pixel opaco
+saiu da celula (o deslocamento e limitado pelo bbox opaco; nenhum quadro precisou do limite).
+A cabeca continua se mexendo entre quadros (ate 11 px): e o pescoco do bicho, nao o bicho
+inteiro -- ancorar pelo olho faria o torso saltar no lugar dela.
+
+Script: alinhar_byakhee.py (scratchpad da sessao). Guarda: AFolhaDoByakheeTests.
+OTorso_NaoSaltaEntreQuadrosConsecutivos (limite 4 px) -- provado contra a folha desalinhada.

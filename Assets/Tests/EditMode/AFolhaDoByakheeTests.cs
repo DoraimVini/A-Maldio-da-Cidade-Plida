@@ -25,6 +25,13 @@ namespace FavelaAmarela.Tests.EditMode
     /// <para>Os 12 quadros virados foram espelhados <b>na própria folha</b> em 2026-09-10
     /// (registro em <c>PROCEDENCIA_Byakhee.txt</c>). Se alguém reimportar a folha original, este
     /// teste reprova antes de o jogador ver.</para>
+    ///
+    /// <para><b>Segundo defeito, mesma folha (2026-09-10, mais tarde):</b> com todos olhando para
+    /// a direita, o corpo ainda <i>saltava de lado</i> — o torso pulava até 22 px (1,7 un à
+    /// escala 2,47) entre quadros consecutivos, porque cada quadro foi gerado sem âncora comum
+    /// e o espelhamento ainda inverteu o deslocamento dos ímpares. Cada quadro foi alinhado
+    /// pelo torso (os 35 % de baixo do corpo escuro) ao centro da célula, onde está o pivô.
+    /// <see cref="OTorso_NaoSaltaEntreQuadrosConsecutivos"/> guarda isso.</para>
     /// </summary>
     public sealed class AFolhaDoByakheeTests
     {
@@ -75,7 +82,82 @@ namespace FavelaAmarela.Tests.EditMode
                     $"byakhee_{nome} ficou sem olho medível — a prova de lado não cobre mais o voo.");
         }
 
-        private static List<Lado> MedirLados()
+        /// <summary>Salto do torso entre dois quadros seguidos que ainda se lê como o mesmo bicho parado.</summary>
+        private const float SaltoMaximoDoTorsoPx = 4f;
+
+        [Test]
+        public void OTorso_NaoSaltaEntreQuadrosConsecutivos()
+        {
+            var torsos = MedirTorsos();
+            Assert.IsNotEmpty(torsos, "Nenhum quadro com corpo medível.");
+
+            var porCiclo = new Dictionary<string, List<KeyValuePair<string, float>>>();
+            foreach (var kv in torsos)
+            {
+                string ciclo = kv.Key.Substring(0, kv.Key.LastIndexOf('_'));
+                if (!porCiclo.TryGetValue(ciclo, out var lista)) porCiclo[ciclo] = lista = new List<KeyValuePair<string, float>>();
+                lista.Add(kv);
+            }
+
+            var saltos = new List<string>();
+            foreach (var ciclo in porCiclo)
+            {
+                var q = ciclo.Value.OrderBy(kv => kv.Key).ToList();
+                for (int i = 0; i < q.Count; i++)
+                {
+                    var a = q[i]; var b = q[(i + 1) % q.Count];
+                    float salto = Mathf.Abs(a.Value - b.Value);
+                    if (salto > SaltoMaximoDoTorsoPx) saltos.Add($"{a.Key}→{b.Key}: {salto:F0} px");
+                }
+            }
+
+            TestContext.WriteLine(string.Join("\n", torsos.Select(t => $"{t.Key}: torso x = {t.Value:F1}")));
+
+            Assert.IsEmpty(saltos,
+                "O torso do Byakhee salta de lado entre quadros seguidos: " + string.Join(", ", saltos) +
+                $". Acima de {SaltoMaximoDoTorsoPx} px (à escala 2,47 cada px vale 0,077 un) o " +
+                "jogador vê o corpo tremer para os lados a 8 qps — é o 'oscila lateralmente' de " +
+                "2026-09-10. Realinhe os quadros pelo torso (ver PROCEDENCIA_Byakhee.txt).");
+        }
+
+        /// <summary>Centroide x do torso (35 % de baixo do corpo escuro) de cada sprite, por nome.</summary>
+        private static Dictionary<string, float> MedirTorsos()
+        {
+            var tex = CarregarFolha(out var px, out int largura, out var sprites);
+            var torsos = new Dictionary<string, float>();
+
+            foreach (var s in sprites)
+            {
+                var r = s.rect;
+                int yMin = int.MaxValue, yMax = int.MinValue;
+                var corpo = new List<Vector2Int>();
+
+                for (int y = (int)r.yMin; y < (int)r.yMax; y++)
+                for (int x = (int)r.xMin; x < (int)r.xMax; x++)
+                {
+                    var c = px[y * largura + x];
+                    if (c.a > 40 && (c.r + c.g + c.b) / 3 < 90)
+                    {
+                        corpo.Add(new Vector2Int(x, y));
+                        if (y < yMin) yMin = y;
+                        if (y > yMax) yMax = y;
+                    }
+                }
+
+                if (corpo.Count == 0) continue;
+
+                // (0,0) em baixo: o torso são os 35 % de baixo do corpo, logo os y MENORES.
+                float teto = yMin + (yMax - yMin) * 0.35f;
+                float soma = 0f; int n = 0;
+                foreach (var p in corpo) if (p.y <= teto) { soma += p.x - r.xMin; n++; }
+                if (n > 0) torsos[s.name] = soma / n;
+            }
+
+            Object.DestroyImmediate(tex);
+            return torsos;
+        }
+
+        private static Texture2D CarregarFolha(out Color32[] px, out int largura, out List<Sprite> sprites)
         {
             Assert.IsTrue(File.Exists(Folha), $"Folha ausente: {Folha}");
 
@@ -84,14 +166,20 @@ namespace FavelaAmarela.Tests.EditMode
             var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             Assert.IsTrue(ImageConversion.LoadImage(tex, File.ReadAllBytes(Folha)),
                 "O PNG da folha não carregou.");
-            var px = tex.GetPixels32();
-            int largura = tex.width;
+            px = tex.GetPixels32();
+            largura = tex.width;
 
-            var sprites = AssetDatabase.LoadAllAssetRepresentationsAtPath(Folha)
-                                       .OfType<Sprite>()
-                                       .OrderBy(s => s.name)
-                                       .ToList();
+            sprites = AssetDatabase.LoadAllAssetRepresentationsAtPath(Folha)
+                                   .OfType<Sprite>()
+                                   .OrderBy(s => s.name)
+                                   .ToList();
             Assert.IsNotEmpty(sprites, "A folha não está fatiada em sprites.");
+            return tex;
+        }
+
+        private static List<Lado> MedirLados()
+        {
+            var tex = CarregarFolha(out var px, out int largura, out var sprites);
 
             var lados = new List<Lado>();
             foreach (var s in sprites)
