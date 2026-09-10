@@ -4,6 +4,68 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — O escudo equipa; 24 avisos a zero; os Portões passam a ser do Vini
+
+Três coisas num commit (`a04c36ba`), porque nasceram na mesma rodada com o Editor aberto e a
+suíte só roda por ele agora.
+
+### O escudo não equipava — e a suíte estava verde
+
+O Vini: *"o escudo não dá para ser equipado."* Reproduzido em dez segundos no Editor vivo:
+`Equipment.IndiceDoSlot(MaoSecundaria) == -1`. O C# do `InventoryManager` declara **sete**
+slots na `anatomia`; o `InventoryManager.prefab` tinha **seis** serializados (`01..06`). O sétimo
+entrou no default do código quando a Mão Secundária foi criada, e o prefab — que é quem vale —
+ficou para trás. A UI tinha o `Corpo_6`; o modelo por baixo não. **O escudo nunca pôde ser
+equipado, por ninguém, desde que existe**, e a suíte não reprovava porque nenhum teste equipava
+um escudo.
+
+O padrão de novo: valor serializado mandando sobre o default (`anatomia` 6 vs 7, como a escala
+2,9041 do Rei ontem). Correção: `anatomia` ganha `07000000`. Guarda:
+`OEscudoEquipaTests` (PlayMode) instancia o **prefab** de `Resources`, põe o Broquel na mochila e
+chama `Equipar` — o caminho da UI. 2/2 passaram no Editor vivo; com o prefab de seis, reprovam.
+
+Achado lateral que vale registrar: **nada no mundo entrega o Broquel** — nenhuma tabela de drop,
+baú ou cena o referencia. Só o Carcosa Debugger. O único escudo do jogo é inalcançável jogando.
+
+### 24 avisos → 0
+
+Pedido do Vini: *"resolva os warnings que o editor indicou."* Todos CS0618 (API obsoleta na
+6000.4): `FindFirstObjectByType` → `FindAnyObjectByType`; `FindObjectsByType<T>(SortMode)` →
+`FindObjectsByType<T>()`; `GetInstanceID` no `GUILayout.Window` do Console → id constante
+(`0x0CA7C05A`); `SpriteAtlasAsset.SetIncludeInBuild` removido do `MontarSpriteAtlas` (o
+importer já faz `includeInBuild = true` na linha 227). Doze arquivos. Confirmado com recompile
+limpo + `get_console_logs --severity warning`: zero.
+
+Armadilha operacional registrada no caminho: a primeira tentativa de troca em massa passou por
+heredoc no bash, que consumiu uma barra e gravou o byte `\x01` em cinco arquivos C# (7 CS1056).
+Restaurado do HEAD, refeito por script em arquivo. Regra: substituição em massa vai em `.py`,
+nunca em heredoc.
+
+### Os Portões, agora na composição do Vini
+
+Ele recompôs a cena à mão (portão à escala 4,68, escuridão em y ≈ 11, Refúgio em frente,
+Passagem com arte própria) e disse *"Eu mesmo alterei."* Eu tinha rodado os guardas da cena sem
+checar disco/dirty e lido as reprovações como defeito — eram a composição dele contra a minha
+codificada em constantes. Os três guardas passam a **medir a cena, não a minha ideia dela**:
+
+- `AArteDoPortao_EstaNaLinhaDoColisor`: a linha dos pilares sai da escala real do `Batente`
+  (`2,7 × lossyScale.y / 2`), não de um 2,7 fixo para escala 2.
+- `AlemDosPortoes_EhEscuroEAArenaNao`: mede a partir da base do `Escuridao_AlemDosPortoes` onde
+  ele estiver, com a câmera posicionada pelo teste; uma foto só.
+- `ArteNasCenasTests`: `Passagem_ParaOCastelo` sai de `ConhecidosSemArte`.
+
+O que ele deixou por engano (*"erro meu"*): `Os_Portoes` virou **trigger** de 9,47 × 1,68 em
+y = 3 — a barreira da arena não barrava, e o portão estava em y ≈ 13. Corrigido **no Editor,
+sem salvar**: colisor sólido de 17,51 × 1 na linha dos pilares (y = 12,97), Batente com a base
+mantida em 6,65. A cena está suja no Editor dele, com Undo — a decisão de salvar é dele. Até
+salvar (ou desfazer), a suíte de cena não roda: `list_open_scenes` diz `isDirty: true`, e
+`OpenScene` descartaria a mudança.
+
+**Pendências abertas desta rodada:** hurtbox da Byakhee de 8,97 × 10,72 (canvas 164 × 164) contra
+um corpo de 4,86 × 5,24 — derivar do desenho, decisão pendente; quatro PlayMode reprovando no
+Editor vivo (`AHitbox_SaiDoCorpoENaoDoPe` 49 % vs 50 %, caixas de diálogo, títulos do inventário
+"INVENTÁRIO" 70 > 64 e "MOCHILA"/"CORPO" 46 > 40); a crítica ao inventário que ele pediu.
+
 ## 2026-09-10 — O Rei no controle: "detestei, está muito repetitiva"
 
 O Vini jogou a versão de hoje — três ciclos de abrigo, depois o Confronto com o mesmo ciclo e o
