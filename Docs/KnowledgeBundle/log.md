@@ -4,6 +4,48 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — URP mesclada, e a primeira build em 12 dias
+
+O Vini perguntou o que faltava para entregar o VS. A lista de features fechou em 20/08; o que
+separava o repositório de uma build eram cinco coisas, e duas fecharam hoje.
+
+### O merge da URP
+
+O Vini achava que o merge tinha sido feito ontem à noite. Não tinha — tinha sido feito o
+**spike** (`7d669f1b`, um commit em cima de 09/09). Decisão dele: mesclar.
+
+O merge era limpo (nenhum arquivo tocado dos dois lados nos 15 commits desde a base), mas
+"não conflita" não é "não quebra": os 15 commits mexeram em render. A prova do spike foi
+**refeita no estado de hoje** — capturar as 6 cenas antes do merge (built-in), mesclar,
+capturar depois (URP), comparar. **6 de 6 idênticas, 0 pixels, delta 0.** Suíte sob URP:
+1152 EditMode + 66 PlayMode.
+
+**Achado no caminho:** a captura cai com `-nographics` (access violation em
+`TilemapRendererJobs::TilemapRendererGeometryJob`) ao desenhar o primeiro Tilemap. Suspeitei
+dos tiles de areia que reescrevi ontem — conferi as referências antes de acusar (todas
+íntegras) e depois rodei sem a flag: funciona. É o batch sem GPU, não o jogo. O
+`run_editor_tool.ps1` usa `-nographics`; qualquer ferramenta que **renderize** precisa chamar
+a Unity sem ela.
+
+### A build
+
+Última build era de **29/08** — **115 commits** atrás, tudo desta semana só rodado no Editor.
+`Build: ENTREGA` gerada sob URP: **OK, 133 MB, 156 s, 12 avisos** (todos `CS0618` de
+`FindObjectsSortMode` deprecado e `CS0414` de campos sem uso no `VisualizadorDeGolpes`).
+Console F1 ausente, como deve ser na entrega.
+
+### O que ainda separa da entrega (medido, não lido do roadmap)
+
+1. **Playtest na build, não no Editor** — nunca foi jogada ponta a ponta; o Confronto do Rei
+   nunca foi jogado por ninguém.
+2. **Três licenças pendentes, e são o protagonista e dois chefes**: Damião animado ("4
+   directional character"), Abdul ("sorcerer villain", autor não identificável), Rei (Moonstone
+   Keeper, SUCART). Cada `LICENCA_PENDENTE.txt` diz o que falta.
+3. **Branch**: `develop_progression` está 105 commits à frente de `develop_manager`, que não
+   tem nada a mais — fast-forward. E há commits sem push.
+4. Conhecido e não bloqueante: 3 placeholders (`Passagem_ParaOCastelo`, piso do Santuário,
+   `VisualDoEscudo` do Abdul — cuja arte existe no prefab; a instância da cena ficou para trás).
+
 ## 2026-09-10 — A quarta fase do Rei: depois dos três escudos, ele sangra
 
 Pedido do Vini: *"depois dos três escudos, abre-se uma fase de combate contra ele"*.
