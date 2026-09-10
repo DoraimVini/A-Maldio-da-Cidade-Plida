@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "mcp-unity": {
-      "command": "node",
-      "args": [
-        "Library/PackageCache/com.gamelovers.mcp-unity@c523d75b086d/Server~/build/index.js"
-      ]
-    },
     "aseprite-bridge": {
       "command": "node",
       "args": [
