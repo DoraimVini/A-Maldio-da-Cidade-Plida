@@ -35,10 +35,13 @@ namespace FavelaAmarela.EditorTools
     /// aos dois. <c>Best Fit</c> escolhe o tamanho por caixa e por fala, que é exatamente a
     /// pergunta que estava sendo respondida à mão — e errada nas duas pontas.</para>
     ///
-    /// <para><b>E o overflow vertical vira Overflow, não Truncate.</b> Com Truncate, texto que
-    /// não cabe é <b>cortado sem aviso</b> — o jogador perde o fim da frase e nada denuncia.
-    /// Transbordar é feio e é <i>visível</i>; cortar é limpo e é mentira. Entre um defeito que
-    /// se vê e um que não se vê, este projeto já pagou caro demais pelo segundo.</para>
+    /// <para><b>O overflow vertical é Truncate</b> (revertido em 2026-09-10; a versão anterior
+    /// escrevia Overflow com o argumento de que "cortar é mentira, transbordar é visível"). O
+    /// argumento estava errado na mecânica: com Overflow a Unity <b>não encolhe por altura</b>, o
+    /// BestFit fica ligado e nunca é acionado — foi o poema da Cassilda atravessando a tela em
+    /// 2026-09-02 (<c>ConsertarACaixaDeDialogo</c>, item 2). Quem garante que a fala inteira
+    /// aparece é o <b>tamanho da caixa</b>, medido contra a fala mais longa
+    /// (<c>LayoutDaUiTests.ACaixaDeDialogoComportaAFalaMaisLonga</c>), não o overflow.</para>
     ///
     /// <para><b>⚠ ESTA FERRAMENTA JÁ SE CORROMPEU SOZINHA — e por isso ela agora se recusa a
     /// escrever no escuro.</b> Em batch mode, a <c>AssetDatabase</c> serve o artefato em cache do
@@ -316,10 +319,20 @@ namespace FavelaAmarela.EditorTools
             Ajustar(fonte, "m_BestFit", 1, notas, onde, texto.name, "Best Fit");
             Ajustar(fonte, "m_MinSize", TamanhoMinimo, notas, onde, texto.name, "mínimo");
             Ajustar(fonte, "m_MaxSize", TamanhoMaximo, notas, onde, texto.name, "máximo");
+
+            // fontSize também, e não só o teto do BestFit (2026-09-10): o TutorialHintUI estava
+            // com fontSize 96 e máximo 70, e ao reserializar o prefab (LoadPrefabContents +
+            // SaveAsPrefabAsset, que qualquer ferramenta faz) a Unity subiu o máximo para 96 —
+            // TipografiaDeDialogoTests reprovou sem ninguém ter tocado no texto.
+            Ajustar(fonte, "m_FontSize", TamanhoMaximo, notas, onde, texto.name, "fontSize");
             Ajustar(fonte, "m_HorizontalOverflow", 0, notas, onde, texto.name, "horizontal (Wrap)");
 
-            // Truncate corta a fala sem avisar. Ver o resumo desta classe.
-            Ajustar(fonte, "m_VerticalOverflow", 1, notas, onde, texto.name, "vertical (Overflow)");
+            // TRUNCATE, e não Overflow (corrigido em 2026-09-10; antes esta linha escrevia 1).
+            // Com Overflow a Unity não encolhe por altura e o BestFit nunca é acionado — a fala
+            // atravessa a tela (ConsertarACaixaDeDialogo, item 2; guarda
+            // TipografiaDeDialogoTests.TodoTextoDeDialogo_UsaTruncateParaOBestFitFuncionar). A
+            // caixa comportar a fala mais longa é garantido pelo tamanho da caixa, não pelo overflow.
+            Ajustar(fonte, "m_VerticalOverflow", 0, notas, onde, texto.name, "vertical (Truncate)");
 
             if (notas.Count > 0) so.ApplyModifiedPropertiesWithoutUndo();
 
