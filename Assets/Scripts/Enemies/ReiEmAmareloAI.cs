@@ -60,9 +60,9 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Segundos de calmaria entre um desvelar e o próximo.")]
         [SerializeField] private float intervaloEntreCiclos = 6f;
 
-        [Tooltip("Quão de costas o jogador precisa estar. -1 = perfeito, 0 = de perfil. " +
-                 "-0,5 aceita ~60° de desvio da direção oposta ao Rei.")]
-        [SerializeField] private float limiarDeCostas = -0.5f;
+        [Header("Os abrigos")]
+        [Tooltip("Os escudos dos pontos focais. Vazio: procurados na cena ao começar. [CENA]")]
+        [SerializeField] private FavelaAmarela.Runtime.Itens.EscudoDeReliquia[] escudos;
 
         [Header("Cores de leitura (provisórias, até haver arte)")]
         [SerializeField] private Color corEmRitual = new Color(0.5f, 0.4f, 0.7f);
@@ -82,7 +82,9 @@ namespace FavelaAmarela.Runtime.Enemies
         private SpriteRenderer _sprite;
         private Transform _jogador;
         private FavelaAmarela.Runtime.Combat.ResilienciaBridge _mente;
-        private PlayerMovement _movimentoDoJogador;
+
+        /// <summary>O escudo aceso agora — um por vez, por decisão de design.</summary>
+        private FavelaAmarela.Runtime.Itens.EscudoDeReliquia _abrigoDoCiclo;
 
         /// <summary>A FSM do confronto, para HUD, cutscenes e o Carcosa Debugger observarem.</summary>
         public ReiEmAmareloFSM Fsm => _fsm;
@@ -124,6 +126,7 @@ namespace FavelaAmarela.Runtime.Enemies
             _fsm.OnReliquiaAtivada += HandleReliquiaAtivada;
             _fsm.OnComecouADesvelar += HandleComecouADesvelar;
             _fsm.OnCicloSobrevivido += HandleCicloSobrevivido;
+            _fsm.OnEscudoAceso += HandleEscudoAceso;
         }
 
         private void Start()
@@ -144,11 +147,7 @@ namespace FavelaAmarela.Runtime.Enemies
             if (_mente == null)
                 Debug.LogError("[ReiEmAmarelo] Damião sem ResilienciaBridge — o Colapso final " +
                                "não teria efeito.", this);
-            _movimentoDoJogador = jogadorGo.GetComponent<PlayerMovement>();
-
-            if (_movimentoDoJogador == null)
-                Debug.LogError("[ReiEmAmarelo] Player sem PlayerMovement — sem LookDirection, " +
-                               "a Máscara Pálida nunca poderia ser evitada.", this);
+            ResolverEscudos();
 
             // O RITO COMEÇA AQUI (2026-09-02). Antes, `IniciarRitual()` tinha UM chamador em
             // todo o projeto: o Carcosa Debugger, que é janela de Editor. Nada no jogo o
@@ -173,6 +172,7 @@ namespace FavelaAmarela.Runtime.Enemies
             _fsm.OnReliquiaAtivada -= HandleReliquiaAtivada;
             _fsm.OnComecouADesvelar -= HandleComecouADesvelar;
             _fsm.OnCicloSobrevivido -= HandleCicloSobrevivido;
+            _fsm.OnEscudoAceso -= HandleEscudoAceso;
         }
 
         /// <summary>
@@ -201,24 +201,106 @@ namespace FavelaAmarela.Runtime.Enemies
                 || _fsm.CurrentState == ReiEmAmareloState.Colapso)
                 return;
 
-            bool deCostas = CalcularSeEstaDeCostas();
-            _fsm.Tick(Time.deltaTime, deCostas);
+            bool abrigado = _abrigoDoCiclo != null
+                            && _jogador != null
+                            && _abrigoDoCiclo.Protege(_jogador.position);
+
+            _fsm.Tick(Time.deltaTime, abrigado);
         }
 
         /// <summary>
-        /// Geometria pura (<see cref="DetectorDeCostas"/>) alimentada com posições e olhar
-        /// reais. Fora do rito ainda diz a verdade — só importa de verdade durante o
-        /// desvelar, que é quando a FSM realmente olha para este valor.
+        /// Acha os escudos dos pontos focais se ninguém os arrastou no Inspector.
+        ///
+        /// <para><c>FindObjectsByType</c> é caro e proibido em caminho quente — aqui roda uma
+        /// vez, no <c>Start</c>, pela mesma razão que o alvo é resolvido uma vez: campo de cena
+        /// vazio é o modo de falha número um deste projeto, e um abrigo que não é encontrado é
+        /// uma luta impossível de vencer.</para>
         /// </summary>
-        private bool CalcularSeEstaDeCostas()
+        private void ResolverEscudos()
         {
-            if (_jogador == null || _movimentoDoJogador == null) return false;
+            if (escudos == null || escudos.Length == 0)
+                escudos = FindObjectsByType<FavelaAmarela.Runtime.Itens.EscudoDeReliquia>(
+                    FindObjectsSortMode.None);
 
-            return DetectorDeCostas.EstaDeCostas(
-                _jogador.position,
-                _movimentoDoJogador.LookDirection,
-                transform.position,
-                limiarDeCostas);
+            if (escudos == null || escudos.Length == 0)
+            {
+                Debug.LogError("[ReiEmAmarelo] Nenhum EscudoDeReliquia na cena — sem abrigo, " +
+                               "o rito de selamento não tem resposta possível.", this);
+                return;
+            }
+
+            foreach (var escudo in escudos)
+                if (escudo != null) escudo.Apagar();
+        }
+
+        /// <summary>
+        /// Uma relíquia ergueu o abrigo deste ciclo: acende o dela e apaga os outros.
+        ///
+        /// <para><b>Um por vez</b> é a mecânica inteira — dois acesos dariam ao jogador uma
+        /// escolha, e o que a luta pede é uma corrida.</para>
+        /// </summary>
+        private void HandleEscudoAceso(string artefatoId)
+        {
+            _abrigoDoCiclo = null;
+            if (escudos == null) return;
+
+            foreach (var escudo in escudos)
+            {
+                if (escudo == null) continue;
+
+                if (escudo.ArtefatoId == artefatoId)
+                {
+                    escudo.Acender();
+                    _abrigoDoCiclo = escudo;
+                }
+                else
+                {
+                    escudo.Apagar();
+                }
+            }
+
+            if (_abrigoDoCiclo == null)
+            {
+                Debug.LogError($"[ReiEmAmarelo] Nenhum escudo com artefatoId '{artefatoId}' — " +
+                               "este ciclo não teria abrigo nenhum.", this);
+                return;
+            }
+
+            AnunciarOAbrigo(artefatoId);
+        }
+
+        /// <summary>
+        /// Diz para onde correr, pelo <b>nome diegético</b> da relíquia.
+        ///
+        /// <para>Não é conforto: a sala do Trono tem 30 unidades de largura e a câmera mostra
+        /// 20 — os dois altares das pontas estão a 20 unidades um do outro, então
+        /// <b>de um deles não se enxerga o outro</b>. Sem esta fala, um terço dos ciclos
+        /// começaria com o abrigo fora da tela. A cúpula tem 7,5 unidades de altura de
+        /// propósito pelo mesmo motivo: ela aparece por cima da borda do quadro antes de o
+        /// altar aparecer.</para>
+        /// </summary>
+        private void AnunciarOAbrigo(string artefatoId)
+        {
+            string nome = NomeDaReliquia(artefatoId);
+
+            // O primeiro ciclo ensina a regra; os seguintes só dizem para onde.
+            Dizer(_fsm.CiclosSobrevividos == 0
+                ? $"{nome} ergue um clarão. Não o encares — abriga-te dentro antes que ele se " +
+                  "desvele."
+                : $"{nome} arde. Corre para o clarão.", 4f);
+        }
+
+        /// <summary>
+        /// O nome diegético da relíquia. "anel_sinal_amarelo" não é coisa que se diga — mesma
+        /// regra que o <c>PontoFocalDeReliquia</c> já segue ao falar com o jogador.
+        /// </summary>
+        private string NomeDaReliquia(string artefatoId)
+        {
+            var artefatos = _jogador != null
+                ? _jogador.GetComponent<ArtefatosBridge>()
+                : null;
+
+            return artefatos?.Def(artefatoId)?.Nome ?? "A relíquia";
         }
 
         /// <summary>
@@ -269,9 +351,8 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void HandleEstadoMudou(ReiEmAmareloState anterior, ReiEmAmareloState atual)
         {
-            if (_sprite == null) return;
-
-            _sprite.color = atual switch
+            if (_sprite != null)
+                _sprite.color = atual switch
             {
                 ReiEmAmareloState.AtivandoReliquias => corEmRitual,
                 ReiEmAmareloState.Selando => corSelando,
@@ -285,12 +366,9 @@ namespace FavelaAmarela.Runtime.Enemies
             // respeitada DENTRO da ResilienciaBridge, num lugar só, em vez de replicada aqui.
             if (atual == ReiEmAmareloState.Colapso) _mente?.ForcarColapso();
 
-            // A regra da luta não está escrita em lugar nenhum que o jogador alcance, e ela é
-            // contraintuitiva: dar as costas ao chefe. Sem esta linha, os três primeiros ciclos
-            // são adivinhação — e cada erro é morte súbita.
-            if (atual == ReiEmAmareloState.Selando && anterior != ReiEmAmareloState.Selando)
-                Dizer("As relíquias arderam. Não o encares — dá-lhe as costas quando ele se " +
-                      "desvelar.", 5f);
+            // Fim do rito, de um jeito ou de outro: nenhum abrigo fica aceso.
+            if (atual == ReiEmAmareloState.Selado || atual == ReiEmAmareloState.Colapso)
+                ApagarTodosOsEscudos();
 
             TocarAnimacaoDo(atual);
         }
@@ -334,6 +412,15 @@ namespace FavelaAmarela.Runtime.Enemies
             internal static readonly int Desvelo = Animator.StringToHash("desvelo");
             internal static readonly int Dano = Animator.StringToHash("dano");
             internal static readonly int Queda = Animator.StringToHash("queda");
+        }
+
+        private void ApagarTodosOsEscudos()
+        {
+            _abrigoDoCiclo = null;
+            if (escudos == null) return;
+
+            foreach (var escudo in escudos)
+                if (escudo != null) escudo.Apagar();
         }
 
         private void HandleSelado()

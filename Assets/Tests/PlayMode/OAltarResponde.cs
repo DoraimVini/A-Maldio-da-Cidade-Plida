@@ -90,6 +90,14 @@ namespace FavelaAmarela.Tests.PlayMode
             _ponto = _altar.AddComponent<FavelaAmarela.Runtime.Itens.PontoFocalDeReliquia>();
             Definir(_ponto, "artefatoId", Id);
             Definir(_ponto, "rei", rei);
+
+            // Desde 2026-09-10 um ponto focal de verdade ERGUE UM ABRIGO: e nele que Damiao
+            // precisa estar quando o Rei se desvela ("cada artefato gera um escudo por vez").
+            // Montar o escudo aqui segue a mesma regra que ja rege este rig -- dar a tag Player,
+            // dar o PlayerMovement: o rig parece com o jogo em vez de empilhar excecoes de log.
+            new GameObject("Escudo").transform.SetParent(_altar.transform, false);
+            _altar.AddComponent<FavelaAmarela.Runtime.Itens.EscudoDeReliquia>();
+
             _altar.SetActive(true);
 
             yield return null;

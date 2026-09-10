@@ -43,6 +43,15 @@ namespace FavelaAmarela.Runtime.Itens
         [Tooltip("Caixa onde o ponto focal responde ao jogador. Se vazia, usa a do HUD. [CENA]")]
         [SerializeField] private TutorialHintUI caixaDeTexto;
 
+        /// <summary>
+        /// O id do artefato que este ponto focal exige.
+        ///
+        /// <para>Público para que o <see cref="EscudoDeReliquia"/> irmão saiba de qual relíquia
+        /// é o abrigo dele sem manter uma segunda cópia do id — cópia que sairia de sincronia
+        /// em silêncio e acenderia o escudo no altar errado.</para>
+        /// </summary>
+        public string ArtefatoId => artefatoId;
+
         private bool _ativado;
 
         /// <summary>

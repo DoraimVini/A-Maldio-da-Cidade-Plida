@@ -9,9 +9,26 @@ namespace FavelaAmarela.Core.Enemies
     ///
     /// <para><b>Duas metades, naturezas opostas.</b> Primeiro <see cref="AtivarReliquia"/>
     /// pela arena — sem pressão, sem relógio. Depois de todas ativas, o rito de selamento
-    /// começa: o Rei se desvela em ciclos, e cada um é um teste de reação puro. Não existe
-    /// dano nem barra — <see cref="Tick"/> pede um booleano só, "o jogador está de costas
-    /// agora?", e decide sobreviver ou colapsar com base nisso.</para>
+    /// começa: o Rei se desvela em ciclos, e cada um é um teste de posição. Não existe dano
+    /// nem barra — <see cref="Tick"/> pede um booleano só, "o jogador está abrigado agora?",
+    /// e decide sobreviver ou colapsar com base nisso.</para>
+
+    /// <para><b>Cada artefato ergue um escudo por vez</b> (pedido do Vini, 2026-09-10). A cada
+    /// ciclo uma das relíquias ativadas acende o abrigo dela — <see cref="ReliquiaDoCiclo"/> —
+    /// e Damião precisa estar dentro quando o Rei se desvelar. As relíquias se revezam na
+    /// <b>ordem em que foram ativadas</b>, uma por ciclo, dando a volta se os ciclos passarem
+    /// da conta.</para>
+
+    /// <para><b>O que isto substituiu, e por quê.</b> A resposta era dar as costas ao Rei
+    /// (<c>DetectorDeCostas</c>). O Vini jogou e relatou: <i>"Não tem como evitar o ataque do
+    /// Rei, nem de costas."</i> Aquela mecânica lia <c>PlayerMovement.LookDirection</c>, que só
+    /// é atualizada <b>enquanto o jogador anda</b>; quem parava para ler o aviso na tela ficava
+    /// com o olhar preso no Rei e morria sem ter o que fazer. O abrigo não tem esse buraco:
+    /// posição é posição, parado ou andando.</para>
+
+    /// <para><b>E o escudo acende no começo da calmaria, não no desvelo.</b> É o que transforma
+    /// os 6 s de espera em corrida — medido na cena do Trono, a travessia mais longa entre dois
+    /// altares é 20 unidades, ou 4,44 s andando. Cabe, e sobra pouco.</para>
     ///
     /// <para><b>A lista de relíquias exigidas é dado, não constante.</b> O design pede 4
     /// (Anel, Coroa, Patuá, Necronomicon), mas a Coroa de Ossos não tem fonte jogável ainda
@@ -26,6 +43,13 @@ namespace FavelaAmarela.Core.Enemies
     {
         private readonly HashSet<string> _reliquiasExigidas;
         private readonly HashSet<string> _reliquiasAtivas = new HashSet<string>();
+
+        /// <summary>
+        /// As relíquias na ordem em que o jogador as ativou — é essa ordem que o revezamento
+        /// dos escudos segue. <c>HashSet</c> não guarda ordem, e "qual escudo acende agora"
+        /// precisa ser determinístico para o jogador aprender a luta e para o teste medir.
+        /// </summary>
+        private readonly List<string> _ordemDeAtivacao = new List<string>();
 
         private readonly int _ciclosDeSelamento;
         private readonly float _duracaoDaJanela;
@@ -50,6 +74,12 @@ namespace FavelaAmarela.Core.Enemies
         /// <summary>Se todas as relíquias exigidas já foram ativadas.</summary>
         public bool TodasAsReliquiasAtivas => _reliquiasAtivas.Count >= _reliquiasExigidas.Count;
 
+        /// <summary>
+        /// A relíquia que ergue o escudo <b>neste</b> ciclo, ou <c>null</c> fora do rito de
+        /// selamento. É onde Damião precisa estar quando o Rei se desvelar.
+        /// </summary>
+        public string ReliquiaDoCiclo { get; private set; }
+
         /// <summary>Quantos ciclos de desvelar já foram sobrevividos.</summary>
         public int CiclosSobrevividos => _ciclosSobrevividos;
 
@@ -61,6 +91,13 @@ namespace FavelaAmarela.Core.Enemies
 
         /// <summary>Uma relíquia foi ativada com sucesso. (id, quantas faltam)</summary>
         public event Action<string, int> OnReliquiaAtivada;
+
+        /// <summary>
+        /// Um escudo acendeu: esta relíquia abriga o ciclo que começa. Disparado na entrada de
+        /// <see cref="ReiEmAmareloState.Selando"/>, ou seja, no <b>começo da calmaria</b> — a
+        /// corrida até lá é a calmaria inteira, não a janela do desvelo.
+        /// </summary>
+        public event Action<string> OnEscudoAceso;
 
         /// <summary>O Rei começou a se desvelar — a janela de reação abriu agora.</summary>
         public event Action OnComecouADesvelar;
@@ -123,6 +160,7 @@ namespace FavelaAmarela.Core.Enemies
             if (string.IsNullOrWhiteSpace(id)) return false;
             if (!_reliquiasExigidas.Contains(id)) return false;
             if (!_reliquiasAtivas.Add(id)) return false; // já estava ativa
+            _ordemDeAtivacao.Add(id);
 
             int faltam = _reliquiasExigidas.Count - _reliquiasAtivas.Count;
             OnReliquiaAtivada?.Invoke(id, faltam);
@@ -137,11 +175,12 @@ namespace FavelaAmarela.Core.Enemies
         /// Avança o relógio do confronto.
         /// </summary>
         /// <param name="deltaTime">Segundos desde o último Tick.</param>
-        /// <param name="jogadorEstaDeCostas">
-        /// Se o jogador está de costas para o Rei <b>agora</b>. Só importa durante
-        /// <see cref="ReiEmAmareloState.Desvelado"/> — fora dessa janela, é ignorado.
+        /// <param name="jogadorEstaAbrigado">
+        /// Se o jogador está dentro do escudo da <see cref="ReliquiaDoCiclo"/> <b>agora</b>. Só
+        /// importa durante <see cref="ReiEmAmareloState.Desvelado"/> — fora dessa janela, é
+        /// ignorado.
         /// </param>
-        public void Tick(float deltaTime, bool jogadorEstaDeCostas)
+        public void Tick(float deltaTime, bool jogadorEstaAbrigado)
         {
             if (deltaTime <= 0f) return;
 
@@ -161,10 +200,10 @@ namespace FavelaAmarela.Core.Enemies
                     break;
 
                 case ReiEmAmareloState.Desvelado:
-                    // De costas SALVA assim que acontecer — não precisa estar de costas do
-                    // início ao fim da janela. É um reflexo pontual, não um estado a manter,
-                    // o que casa com "1,5 s para reagir" em vez de "1,5 s parado de costas".
-                    if (jogadorEstaDeCostas) _sobreviveuOCicloAtual = true;
+                    // Estar abrigado SALVA assim que acontecer — não precisa se manter do
+                    // início ao fim da janela. Quem chegou correndo e pisou dentro no último
+                    // instante sobrevive, e quem já estava lá sobrevive no primeiro quadro.
+                    if (jogadorEstaAbrigado) _sobreviveuOCicloAtual = true;
 
                     if (_sobreviveuOCicloAtual)
                     {
@@ -202,6 +241,20 @@ namespace FavelaAmarela.Core.Enemies
             var anterior = CurrentState;
             CurrentState = novo;
             _timerDoEstado = 0f;
+
+            if (novo == ReiEmAmareloState.Selando)
+            {
+                // O ciclo que COMEÇA é o de índice _ciclosSobrevividos. Dá a volta na lista se
+                // o rito pedir mais ciclos do que há relíquias — o padrão é um por relíquia.
+                ReliquiaDoCiclo = _ordemDeAtivacao.Count == 0
+                    ? null
+                    : _ordemDeAtivacao[_ciclosSobrevividos % _ordemDeAtivacao.Count];
+
+                if (ReliquiaDoCiclo != null) OnEscudoAceso?.Invoke(ReliquiaDoCiclo);
+            }
+
+            if (novo == ReiEmAmareloState.Selado || novo == ReiEmAmareloState.Colapso)
+                ReliquiaDoCiclo = null;
 
             if (novo == ReiEmAmareloState.Desvelado)
             {

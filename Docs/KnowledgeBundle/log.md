@@ -4,6 +4,101 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — Um escudo por artefato, e o Rei de volta para dentro da sala
+
+Duas frentes no confronto final, as duas vindas de relato de playtest do Vini.
+
+### 1. "Não tem como evitar o ataque do Rei, nem de costas"
+
+A resposta do rito era `DetectorDeCostas`: dar as costas dentro da janela de 1,5 s. O buraco
+estava um nível abaixo, no `PlayerMovement`:
+
+```csharp
+if (isMoving)
+{
+    LookDirection = direcaoNoMundo;
+}
+```
+
+**`LookDirection` só é atualizada enquanto Damião anda.** Quem parava para ler a caixa de aviso
+— que dizia, ela mesma, *"dá-lhe as costas quando ele se desvelar"* — ficava com o olhar preso
+no Rei e morria sem resposta possível. Uma luta cujo único sinal exige olhar, cuja resposta
+certa é não olhar, e cuja leitura congela quando se para: invencível pelo terceiro caminho.
+
+### A mecânica nova (pedido do Vini): um escudo por artefato, e você se protege dentro
+
+| peça | camada |
+|---|---|
+| `Core.Enemies.AbrigoDeReliquia` | POCO, geometria pura (10 testes) |
+| `ReiEmAmareloFSM` | ganhou `ReliquiaDoCiclo` e `OnEscudoAceso` |
+| `Runtime.Itens.EscudoDeReliquia` | no ponto focal: acende, apaga, responde "está dentro?" |
+| `Tools/FavelaAmarela/Trono: montar os abrigos das relíquias` | monta as cúpulas na cena |
+
+A cada ciclo **uma** relíquia acende o abrigo dela, na ordem em que foram ativadas. Três
+relíquias, três ciclos: cada artefato abriga exatamente uma vez.
+
+**O escudo acende no começo da calmaria, não no desvelo.** É a decisão que faz a mecânica
+funcionar: os 6 s que antes eram espera viram a corrida. Medido na cena do Trono, a travessia
+mais longa entre dois altares é **20 un — 4,44 s andando**, e cabe. O
+`OTronoCabeNaSalaTests.ATravessiaMaisLonga_CabeNaCalmaria` guarda essa conta: afastar um altar
+quebra o teste em vez de o jogador descobrir sozinho que não dava para chegar.
+
+**O abrigo é uma elipse (2 × 1 un), não um círculo** — terceira vez na semana que a mesma lição
+aparece: a vista é 20 × 11,25 e espaço de jogo redondo lê torto. A meia-largura testada é a
+meia-largura **desenhada** da cúpula, e a base desenhada encontra a borda sul da elipse testada.
+"Eu estava dentro e morri" é o pior desfecho possível numa mecânica de abrigo.
+
+**Arte: nenhuma criada.** O `Escudo_Magico` do Abdul já era 12 quadros a PPU 32, com **alpha
+médio de 20%** — dá para ver Damião lá dentro, que é a condição para um abrigo em que se entra.
+À escala 2,5 a cúpula tem 5 × 7,5 un: alta de propósito, porque os altares das pontas estão a
+20 un um do outro e a câmera só mostra 20 — a cúpula aparece por cima da borda do quadro antes
+de o altar aparecer. A fala nomeia a relíquia pelo mesmo motivo.
+
+### 2. "O rei se encontra fora da arena"
+
+Estava, literalmente.
+
+| | |
+|---|---|
+| sprite `rei_idle` | 88 × 129 px @ PPU 32, pivô no pé → **2,75 × 4,03 un** |
+| escala no **prefab** | **1,0** (correta) |
+| escala **na cena** | **2,9041092** → **7,99 × 11,71 un** |
+| posição | (0, 67) |
+
+A sala do Trono é um **losango** (o `Castelo_Grid` tem `m_CellLayout: 2`, Isometric — célula não
+é coordenada de mundo), largo 30 un em y = 62 e afunilando até um ponto em y = 69,5. O Rei
+ocupava de y = 67 a **y = 78,7**: **oito unidades dele desenhadas sobre o vazio**. E a câmera
+mostra 11,25 un de altura — ele era mais alto que a tela inteira.
+
+Corrigido para escala **1** e posição **(0, 65)**, onde o chão tem 18 un de largura e a cabeça
+dele fica 1,5 un abaixo da ponta da parede. Continua o maior corpo do jogo: 4,03 un contra 1,50
+de Damião (2,7×) e 2,69 do Cultista.
+
+**Registrado, não consertado:** a varredura das seis cenas achou **21 escalas arrastadas à mão**
+(Byakhee 2,2896; Abdul 1,2349; Lago_De_Hali 5,1238; `VisualDoEscudo` 2,6454; e 17 entre 0,75 e
+1,23). As outras estão perto de 1 — ajuste fino, não deslocamento — e mexer nelas muda hitbox e
+enquadramento de lutas que o Vini já validou jogando.
+
+### Correção minha, no meio do caminho
+
+Li o Tilemap do Castelo como se fosse retangular e **afirmei que o chão inteiro estava 124
+unidades a leste** — que as salas Z1, Z3 e Z5 estavam todas sobre o vazio. Estava errado: o
+Grid é isométrico, célula (124,124) é mundo (0, 62), e o chão está exatamente onde deveria. O
+defeito era só a escala do Rei.
+
+### Testes
+
+| arquivo | testes |
+|---|---|
+| `AbrigoDeReliquiaTests` | 10 (novo) |
+| `OTronoCabeNaSalaTests` | 7 (novo) |
+| `ReiEmAmareloFSMTests` | 13 → 18 |
+| `OAltarResponde` | rig ganhou abrigo — altar de verdade agora ergue um |
+
+**1137 EditMode + 64 PlayMode, verdes.** Os dois guardas do Rei foram verificados **mordendo**:
+com a escala 2,9041 reposta, `OCorpoDoRei_NaoPassaDaSala` falha em 78,71 vs 70,00 e
+`ORei_CabeNaTela` em 11,71 vs 11,25.
+
 ## 2026-09-09 — A arena povoada, e os portões viram a parede norte
 
 Última frente da arena: cobertura e densidade. A cena tinha **quatro** `SpriteRenderer` — numa

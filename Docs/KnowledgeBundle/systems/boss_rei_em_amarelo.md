@@ -23,8 +23,8 @@ Duas metades, naturezas opostas:
 
 1. **Ritual das relíquias** — sem pressão, sem relógio. O jogador ativa cada relíquia exigida
    num `PontoFocalDeReliquia` da arena (interação deliberada, botão E).
-2. **Selamento** — o Rei se desvela em ciclos. Cada um é um teste de reação puro: dar as
-   costas a tempo sobrevive o ciclo; não dar, `Colapso` instantâneo.
+2. **Selamento** — o Rei se desvela em ciclos. Cada um é um teste de **posição**: estar dentro
+   do escudo que uma relíquia ergueu sobrevive o ciclo; estar fora, `Colapso` instantâneo.
 
 ## O ritual das relíquias
 
@@ -43,21 +43,60 @@ que não tem cena. `ReiEmAmareloFSM` recebe a lista de ids exigidos no construto
 (`necronomicon`, `patua_luas_gemeas`, `anel_sinal_amarelo`) — trocar para os 4 reais é uma
 alteração de um array serializado no Inspector, não de código, assim que a Coroa tiver fonte.
 
-## A Mecânica da Máscara Pálida
+## A Mecânica do Abrigo (desde 2026-09-10)
 
-Ao se desvelar (`Desvelado`), o jogador tem **1,5 s** (único número que o design doc realmente
-especifica) para estar de costas para o Rei. `DetectorDeCostas.EstaDeCostas` decide isso por
-produto escalar entre a direção do olhar (`PlayerMovement.LookDirection`) e o vetor
-jogador→Rei: `-1` seria alinhamento perfeito (impossível de acertar por input), `0` aceitaria
-só um perfil de lado. O padrão, `-0,5`, aceita ~60° de desvio da direção oposta ao Rei —
-folgado o bastante para não parecer injusto, apertado o bastante para "de lado" não contar
-como "de costas".
+> **Substituiu a Máscara Pálida**, que era dar as costas ao Rei. Pedido do Vini:
+> *"cada artefato gera um escudo por vez e você tem que se proteger dentro"*.
 
-**De costas salva assim que acontece**, não precisa se manter até o fim da janela — é reflexo
-pontual, coerente com "1,5 s para reagir" em vez de "1,5 s parado".
+**Cada relíquia ativada ergue um abrigo no ponto focal dela**, e a cada ciclo **uma** delas
+acende — na ordem em que foram ativadas (`ReiEmAmareloFSM.ReliquiaDoCiclo`). Três relíquias,
+três ciclos: cada artefato abriga exatamente uma vez. Mais ciclos do que relíquias dá a volta
+na lista, em vez de deixar um ciclo sem resposta possível.
 
-Sobreviver todos os ciclos de desvelar (default 3, com 6 s de calmaria entre eles) sela o Rei —
-vitória. Falhar um único ciclo é derrota instantânea, via
+**O escudo acende no começo da calmaria, não no desvelo** (`OnEscudoAceso` dispara na entrada
+de `Selando`). É a decisão que faz a mecânica funcionar: os 6 s de calmaria são o tempo de
+travessia. Medido na cena do Trono, a corrida mais longa entre dois altares é **20 un — 4,44 s
+andando** (4,5 u/s), e cabe. Guardado por
+`OTronoCabeNaSalaTests.ATravessiaMaisLonga_CabeNaCalmaria`.
+
+Ao se desvelar (`Desvelado`), valem os mesmos **1,5 s** — único número que o design doc
+realmente especifica — mas agora a pergunta é *"está dentro?"*. **Estar dentro salva assim que
+acontece**, não precisa se manter até o fim da janela: quem chegou correndo e pisou no abrigo
+no último instante sobrevive.
+
+### A geometria: `Core.Enemies.AbrigoDeReliquia`
+
+O abrigo é uma **elipse de 2 × 1 un**, não um círculo — a vista do jogo é 20 × 11,25 unidades e
+espaço de jogo redondo num quadro largo lê torto (a mesma lição da arena da Byakhee e da zona
+morta da câmera). A meia-largura testada é a meia-largura **desenhada** da cúpula: o
+`Escudo_Magico` tem 51 px de bolha opaca em 64 de largura, a PPU 32, e à escala 2,5 isso dá
+exatamente 4,0 un. **A zona testada nunca pode ser menor que a bolha desenhada** — *"eu estava
+dentro e morri"* é o pior desfecho possível numa mecânica de abrigo.
+
+### Por que a mecânica antiga foi trocada
+
+O Vini jogou e relatou: *"Não tem como evitar o ataque do Rei, nem de costas."* Estava certo. O
+`DetectorDeCostas` lia `PlayerMovement.LookDirection`, e essa propriedade **só é atualizada
+enquanto o jogador anda**:
+
+```csharp
+if (isMoving)
+{
+    LookDirection = direcaoNoMundo;
+}
+```
+
+Quem parava para ler a caixa de aviso — que dizia, ela mesma, *"dá-lhe as costas quando ele se
+desvelar"* — ficava com o olhar preso no Rei e morria sem resposta possível. Somando ao problema
+já registrado de que o único telégrafo era visual numa luta cuja resposta certa é não olhar, a
+mecânica tinha três caminhos para ser injusta. Posição não tem esse buraco: parado ou andando,
+estar dentro é estar dentro.
+
+O `DetectorDeCostas` **continua no projeto** (POCO, 7 testes) — não custa nada e pode servir a
+outra coisa —, mas não governa mais o rito.
+
+Sobreviver todos os ciclos de desvelar (3 — **um por relíquia**, com 6 s de calmaria entre
+eles) sela o Rei — vitória. Falhar um único ciclo é derrota instantânea, via
 `GameManager.Instance.Resiliencia.ForcarColapso()` (mesmo mecanismo do `ColapsoTrigger`).
 
 ## Por que ciclos e intervalo não foram calibrados por simulação (diferente do Byakhee)
@@ -73,9 +112,11 @@ calibrar **ao vivo**, na `Cena_ArenaDeTestes`, e não por simulação externa.
 | Peça | Camada |
 |---|---|
 | `ReiEmAmareloFSM`, `ReiEmAmareloState` | Core (POCO, 13 testes) |
-| `DetectorDeCostas` | Core (POCO, geometria pura, 7 testes) |
-| `ReiEmAmareloAI` | Runtime — sem `EnemyBase`/`Vitalidade`; liga o `Tick`, computa "de costas", aplica Colapso, expõe vitória |
+| `AbrigoDeReliquia` | Core (POCO, geometria pura, 10 testes) |
+| `DetectorDeCostas` | Core (POCO, 7 testes) — **aposentado do rito** desde 2026-09-10 |
+| `ReiEmAmareloAI` | Runtime — sem `EnemyBase`/`Vitalidade`; liga o `Tick`, acende um abrigo por ciclo, aplica Colapso, expõe vitória |
 | `PontoFocalDeReliquia` | Runtime — `IInteragivel`, checa posse real da relíquia antes de ativar |
+| `EscudoDeReliquia` | Runtime — no ponto focal: acende, apaga, responde "está dentro?" |
 
 ## Infraestrutura de teste (2026-08-11)
 
