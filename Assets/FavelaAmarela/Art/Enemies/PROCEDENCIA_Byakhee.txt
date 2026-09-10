@@ -68,3 +68,30 @@ origem antes da submissao do edital.
 
 IMPORT: o meta anterior foi preservado inteiro, entao PPU, filtro e compressao continuam
 como estavam.
+
+ESPELHAMENTO DE 12 QUADROS -- 2026-09-10
+-----------------------------------------
+O Vini: "a sprite da Byakhee esta virando de um lado para outro". Nenhum codigo virava o
+sprite (medido no Editor vivo por 600 quadros: flipX, escala e rotacao constantes). Era a
+folha: gerada em PARES, cada pose uma vez para cada lado, e fatiada como sequencia. Medido
+pelo olho (a unica cor 252,0,0) contra o centroide do corpo escuro:
+
+  espreita  D E D E
+  rasante   D E D E D E
+  garras    D E D ?      (garras_3 sem olho; julgado pela silhueta: E)
+  grito     D E f f D E  (f = frontal, boca aberta)
+  dano      D E
+  derrota   D E ? ?      (derrota_1 e o espelho EXATO de derrota_0; derrota_3 de derrota_2)
+
+A 8 quadros por segundo, o bicho virava 4 vezes por segundo.
+
+Os quadros E foram espelhados horizontalmente NA PROPRIA CELULA (164x164, pivo central):
+espreita 1,3; rasante 1,3,5; garras 1,3; grito 1,5; dano 1; derrota 1,3. Nada mais mudou:
+rects, nomes, spriteIDs, meta e os demais 14 quadros sao byte a byte os mesmos (verificado
+pelo script, espelhar_byakhee.py, no scratchpad da sessao; a folha original esta no git,
+commit anterior a este). A folha inteira agora olha para a DIREITA; quem vira e o flipX do
+AnimadorDoByakhee, pela velocidade, com zona morta. Guarda: AFolhaDoByakheeTests.
+
+Consequencia na derrota: os quadros 1 e 3 ficaram iguais aos 0 e 2 -- a animacao de
+derrota vira A A B B (efetivamente 2 quadros a 4 qps). Aceitavel; se incomodar, o prefab
+pode listar so derrota_0 e derrota_2.

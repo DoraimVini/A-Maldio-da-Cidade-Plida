@@ -4,6 +4,63 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — A Byakhee "virando de um lado para outro": a folha, e um animador surdo
+
+O Vini: *"A sprite da Byakhee está virando de um lado para outro, cheque isso e resolva. A
+rotation tá freezada no Z."* Ele estava certo em descartar a rotação — e o código também não
+virava nada: sondei o corpo por 600 quadros no Editor vivo (`flipX`, `localScale`, `eulerAngles`,
+velocidade) e nada mudou. Dois defeitos, nenhum deles onde se olhava primeiro.
+
+### 1. A folha alterna o lado a cada quadro
+
+Medido pelo olho — a única cor (252,0,0) da folha — contra o centroide do corpo escuro: espreita
+**D-E-D-E**, rasante **D-E-D-E-D-E**, garras D-E-D-E, grito D-E-f-f-D-E, dano D-E, derrota
+D-E (e `derrota_1` é o espelho *exato* de `derrota_0`). A folha foi gerada em **pares** — cada
+pose uma vez para cada lado — e o fatiador leu os pares como sequência. A 8 qps o bicho virava
+quatro vezes por segundo.
+
+Correção **na folha**: os 12 quadros virados foram espelhados dentro da própria célula (rects,
+nomes, spriteIDs e meta intactos; os outros 14 quadros são byte a byte os mesmos). Tudo olha para
+a direita agora, e quem vira é o `flipX` do `AnimadorDoByakhee`, pela velocidade horizontal, com
+zona morta de 0,5 un/s — pairando, a velocidade cruza zero o tempo todo e sem zona morta o flip
+traria o defeito de volta. Registro em `PROCEDENCIA_Byakhee.txt`.
+
+Guarda: `AFolhaDoByakheeTests.TodoQuadroComOlhoVisivel_OlhaParaADireita` — lê o PNG cru, mede o
+lado de cada sprite e reprova qualquer um virado. **Provado contra a folha original** (restaurada
+do HEAD): reprova nomeando 8 quadros. Com a espelhada: 2/2.
+
+### 2. O animador nunca ouviu a FSM
+
+Achado pela sonda, não pelo relato: em `Rasante`, o sprite era `espreita_*`. Reflexão no Editor
+vivo: `ByakheeFSM.OnStateChanged` tinha **um** inscrito — o próprio `ByakheeAI`. O
+`AnimadorDoByakhee` se inscrevia no `OnEnable` lendo `_ai.Fsm`, que o `ByakheeAI` cria no `Awake`
+dele; a Unity não ordena o Awake de um componente antes do OnEnable de outro. Resultado: a luta
+inteira, desde que a arte entrou, tocava os quatro quadros da espreita — rasante, garras e grito
+nunca apareceram, e ninguém notou porque nenhum teste instanciava o prefab e olhava o sprite
+depois de uma transição. O mesmo padrão frágil estava no `AnimadorDoEspectro`; corrigido junto.
+
+Correção: inscrição idempotente (`InscreverNaFsm`) chamada no `OnEnable` **e** no `Start`, onde
+todos os Awakes já rodaram; `EstaInscritoNaFsm` exposto para os guardas. Guarda:
+`OAnimadorDoByakheeOuveAFsmTests` (PlayMode, **cena real** dos Portões, porque a ordem de
+inicialização é o que se testa): inscrito depois do Start, e o sprite vira `rasante_*` um quadro
+depois de `IniciarLuta()`. 2/2. Sonda depois da correção: Rasante → 6 quadros de rasante, Pousado
+→ espreita, uma troca de `flipX` em 5 s, ao voar para a esquerda a −6 un/s.
+
+### Duas armadilhas de ferramenta, registradas
+
+- **Play mode sem foco congela.** `editor_play` pela CLI entra em Play com a Unity em segundo
+  plano; com *Run In Background* desligado o Editor honra o ajuste e o player loop não anda
+  (`Time.frameCount` preso em 1 por minutos, `EditorApplication.update` a 10 Hz). Perdi tempo
+  culpando um Inspector flutuante travado na Byakhee, que só cuspia `MissingReferenceException`
+  (é a "parede" que o Vini colou hoje: o Inspector segura o objeto que a troca de cena destrói).
+  Solução no eval: `Application.runInBackground = true` na sessão. Não mudei o PlayerSettings.
+- **Heredoc longo é truncado** pela ferramenta em torno de ~180 linhas — dois scripts saíram
+  cortados e um deles rodou pela metade. Arquivo grande vai pelo Write, não por heredoc.
+
+**Pendente do Vini:** a cena dos Portões está suja no Editor com a **Byakhee desparentada e em
+escala não uniforme (2,47 × 2,21; no disco, 2,43 uniforme)** — parece um arrasto acidental. Até
+ele salvar ou desfazer, a suíte de cena não roda; os guardas desta rodada rodaram filtrados.
+
 ## 2026-09-10 — O escudo equipa; 24 avisos a zero; os Portões passam a ser do Vini
 
 Três coisas num commit (`a04c36ba`), porque nasceram na mesma rodada com o Editor aberto e a

@@ -19,6 +19,23 @@ namespace FavelaAmarela.Runtime.Enemies
     /// <para><b>Substitui o tingimento por cor</b> que o <c>ByakheeAI</c> usava como
     /// placeholder enquanto não havia arte. Arte real não se tinge — mesma regra já aplicada
     /// à Cassilda e ao Rei em Amarelo.</para>
+    ///
+    /// <para><b>Dois defeitos medidos em 2026-09-10</b> (o Vini: <i>"a sprite da Byakhee está
+    /// virando de um lado para outro"</i>):</para>
+    /// <list type="number">
+    /// <item><b>A inscrição na FSM não acontecia.</b> Ela era feita em <c>OnEnable</c>, lendo
+    /// <c>_ai.Fsm</c> — que o <c>ByakheeAI</c> só cria no <c>Awake</c> dele. A Unity não garante
+    /// que o Awake de um componente rode antes do OnEnable de outro no mesmo objeto; no Editor
+    /// vivo, <c>OnStateChanged</c> tinha um único inscrito (o próprio AI), e a luta inteira era
+    /// tocada com os quatro quadros da espreita. Agora a inscrição é idempotente e repetida no
+    /// <c>Start</c>, quando todos os Awakes já rodaram.</item>
+    /// <item><b>A folha alternava o lado a cada quadro.</b> Medido pelo olho (252,0,0) contra o
+    /// centroide do corpo: espreita D-E-D-E, rasante D-E-D-E-D-E, e assim por diante — a folha
+    /// foi gerada em pares (cada pose para cada lado) e fatiada como sequência. A 8 qps o bicho
+    /// virava 4 vezes por segundo. Os quadros virados para a esquerda foram espelhados <b>na
+    /// própria folha</b> (ver <c>PROCEDENCIA_Byakhee.txt</c>); quem vira agora é o
+    /// <c>flipX</c>, pela velocidade, com zona morta — guarda: <c>AFolhaDoByakheeTests</c>.</item>
+    /// </list>
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer))]
     [AddComponentMenu("Favela Amarela/Enemies/Animador do Byakhee")]
@@ -56,9 +73,18 @@ namespace FavelaAmarela.Runtime.Enemies
         [Min(0f)]
         [SerializeField] private float duracaoDaReacao = 0.18f;
 
+        [Header("Lado")]
+        [Tooltip("Velocidade horizontal (un/s) abaixo da qual o sprite NÃO vira. Pairando, a " +
+                 "velocidade oscila em torno de zero — sem zona morta, o flip viraria de novo o " +
+                 "que a folha corrigida deixou de virar.")]
+        [Min(0f)]
+        [SerializeField] private float velocidadeMinimaParaVirar = 0.5f;
+
         private SpriteRenderer _sprite;
+        private Rigidbody2D _rb;
         private ByakheeAI _ai;
         private EnemyBase _enemyBase;
+        private bool _inscritoNaFsm;
 
         private Sprite[] _cicloAtual;
         private float _relogio;
@@ -72,6 +98,7 @@ namespace FavelaAmarela.Runtime.Enemies
         private void Awake()
         {
             _sprite = GetComponent<SpriteRenderer>();
+            _rb = GetComponent<Rigidbody2D>();
             _ai = GetComponent<ByakheeAI>();
             _enemyBase = GetComponent<EnemyBase>();
 
@@ -84,7 +111,7 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void OnEnable()
         {
-            if (_ai?.Fsm != null) _ai.Fsm.OnStateChanged += HandleEstadoMudou;
+            InscreverNaFsm();
             if (_enemyBase != null)
             {
                 _enemyBase.OnDanoSofrido += HandleDano;
@@ -94,7 +121,7 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void OnDisable()
         {
-            if (_ai?.Fsm != null) _ai.Fsm.OnStateChanged -= HandleEstadoMudou;
+            DesinscreverDaFsm();
             if (_enemyBase != null)
             {
                 _enemyBase.OnDanoSofrido -= HandleDano;
@@ -104,11 +131,35 @@ namespace FavelaAmarela.Runtime.Enemies
 
         private void Start()
         {
+            // Segunda chance de inscrição: aqui TODOS os Awakes já rodaram, então a FSM existe.
+            // No OnEnable ela pode não existir ainda — e foi assim que a luta inteira ficou nos
+            // quadros da espreita sem ninguém notar (ver o resumo da classe).
+            InscreverNaFsm();
             if (_ai?.Fsm != null) TrocarCiclo(CicloDe(_ai.Fsm.CurrentState), reiniciar: true);
         }
 
+        /// <summary>Inscreve na FSM uma vez só, quando ela existir. Seguro chamar repetido.</summary>
+        private void InscreverNaFsm()
+        {
+            if (_inscritoNaFsm || _ai?.Fsm == null) return;
+            _ai.Fsm.OnStateChanged += HandleEstadoMudou;
+            _inscritoNaFsm = true;
+        }
+
+        private void DesinscreverDaFsm()
+        {
+            if (!_inscritoNaFsm || _ai?.Fsm == null) return;
+            _ai.Fsm.OnStateChanged -= HandleEstadoMudou;
+            _inscritoNaFsm = false;
+        }
+
+        /// <summary>Se este animador está ouvindo a FSM do Byakhee. Para os guardas.</summary>
+        public bool EstaInscritoNaFsm => _inscritoNaFsm;
+
         private void Update()
         {
+            VirarParaOndeVoa();
+
             if (_cicloAtual == null || _cicloAtual.Length == 0) return;
 
             if (_reacaoRestante > 0f)
@@ -137,6 +188,22 @@ namespace FavelaAmarela.Runtime.Enemies
 
             _quadro %= _cicloAtual.Length;
             _sprite.sprite = _cicloAtual[_quadro];
+        }
+
+        /// <summary>
+        /// A folha inteira olha para a direita; o <c>flipX</c> vira o corpo para onde ele voa.
+        /// Só decide acima da zona morta — pairando, a velocidade cruza zero o tempo todo, e
+        /// virar a cada cruzamento traria de volta exatamente o defeito que a folha corrigida
+        /// tirou. Abaixo dela o lado anterior fica.
+        /// </summary>
+        private void VirarParaOndeVoa()
+        {
+            if (_derrotado || _rb == null) return;
+
+            float vx = _rb.linearVelocity.x;
+            if (Mathf.Abs(vx) < velocidadeMinimaParaVirar) return;
+
+            _sprite.flipX = vx < 0f;
         }
 
         private void HandleEstadoMudou(ByakheeState anterior, ByakheeState atual)

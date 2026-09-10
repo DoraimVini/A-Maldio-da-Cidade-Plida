@@ -48,19 +48,36 @@ namespace FavelaAmarela.Runtime.Enemies
             _ai = GetComponent<EspectroAI>();
         }
 
-        private void OnEnable()
-        {
-            if (_ai.Fsm != null) _ai.Fsm.OnStateChanged += HandleEstadoMudou;
-        }
+        private void OnEnable() => InscreverNaFsm();
 
-        private void OnDisable()
-        {
-            if (_ai.Fsm != null) _ai.Fsm.OnStateChanged -= HandleEstadoMudou;
-        }
+        private void OnDisable() => DesinscreverDaFsm();
 
         private void Start()
         {
+            // Segunda chance: no OnEnable a FSM pode ainda não existir -- o EspectroAI a cria no
+            // Awake dele, e a Unity não ordena o Awake de um componente antes do OnEnable de
+            // outro. Foi exatamente assim que o AnimadorDoByakhee ficou surdo à FSM (2026-09-10).
+            InscreverNaFsm();
             if (_ai.Fsm != null) TrocarCiclo(CicloDe(_ai.Fsm.CurrentState));
+        }
+
+        private bool _inscritoNaFsm;
+
+        /// <summary>Se este animador está ouvindo a FSM do Espectro. Para os guardas.</summary>
+        public bool EstaInscritoNaFsm => _inscritoNaFsm;
+
+        private void InscreverNaFsm()
+        {
+            if (_inscritoNaFsm || _ai == null || _ai.Fsm == null) return;
+            _ai.Fsm.OnStateChanged += HandleEstadoMudou;
+            _inscritoNaFsm = true;
+        }
+
+        private void DesinscreverDaFsm()
+        {
+            if (!_inscritoNaFsm || _ai == null || _ai.Fsm == null) return;
+            _ai.Fsm.OnStateChanged -= HandleEstadoMudou;
+            _inscritoNaFsm = false;
         }
 
         private void Update()
