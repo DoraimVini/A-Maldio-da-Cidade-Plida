@@ -4,6 +4,41 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — A lista da noite: build, créditos, inventário plano A, suítes inteiras, push
+
+O Vini: *"Pode fazer sim, tudo o que você propôs e em ordem."* A ordem era C.10 → C.11 → build →
+resto. Feito, com os desvios anotados.
+
+- **Build ENTREGA gerada** (20:34): OK, 147 MB, 118 s, 4 avisos (3 `CS0414` do
+  `VisualizadorDeGolpes`, 1 do Pipeline sem `RuntimePipelineConfig` — esperado), console de
+  runtime **ausente**. `Builds/Entrega/CaminhoParaCarcosa.exe`. O playtest de ponta a ponta é do
+  Vini — a build está lá.
+- **`com.gamelovers.mcp-unity` removido** (manifest, lock, `.mcp.json`): nada em Assets o
+  referenciava; subia um WebSocket a cada Play e ia para a build.
+- **Tela de Créditos** — condição de licença do Sucart ("as long as you credit me") e do Warren
+  Clark. `Resources/CREDITOS.txt` (editável), `PainelDeCreditos` singleton, ferramenta
+  `MontarPainelDeCreditos`, botão no menu por `LigarBotaoDeOpcoes` parametrizada, Esc respeitado
+  pela pausa. Guardas: `CreditosTests` (todo autor com licença no repo é citado) e
+  `OPainelDeCreditosTests`. Descoberta no caminho: um `HorizontalLayoutGroup` novo nasce com
+  `childForceExpandHeight = true` e reporta `flexibleHeight = 1` à coluna — os botões engordavam
+  com o espaço livre (255 px) e a rolagem ficava espremida. Corrigido nas duas ferramentas.
+- **Inventário, plano A** (detalhe no commit `18186f7e`): rótulos do Corpo visíveis e diegéticos
+  com o item equipado na linha, títulos que cabem, janela opaca, ficha sem enum cru
+  (`NomesDeAtributoTests`). Plano B (grade por `LayoutGroup`, painel do item) fica.
+- **Correção de registro:** "nada no mundo entrega o Broquel" (a04c36ba) estava **errado** —
+  procurei o id em texto, e as tabelas referenciam `ItemDef` por GUID. `Drop_BauDeYhtill` o
+  entrega garantido; o save do Vini já o tem equipado. B.9 (hurtbox da Byakhee): medida ao vivo,
+  5,4 × 3,6 un — menor que o corpo desenhado; nada a fazer.
+- **Suítes completas:** PlayMode **79/79**; EditMode **1148/1174, 3 reprovações**, todas do
+  Castelo: a escala do Rei na cena (15,2 un; 61 % dentro da sala — edição do Vini, ainda no
+  disco e fora dos commits) e o guarda de balanceamento do Confronto no nível 4 (luta parada por
+  decisão dele). Pelo caminho, dois estragos meus achados e corrigidos: `TutorialHintUI` com
+  fontSize 96 acima do teto 70 (a reserialização do prefab subiu o teto; a ferramenta
+  `PadronizarTextoDeDialogo` agora escreve fontSize e **Truncate** — a doc dela defendia Overflow
+  e estava errada na mecânica) e o Créditos abaixo do Sair (Sair volta a ser o último).
+- **Push** de `develop_progression` e fast-forward de `develop_manager`, autorizados pelo Vini
+  nesta mesma frase.
+
 ## 2026-09-10 — O mergulho vibrava em cima do Damião; o rasante acaba onde faz sentido; PlayMode 77/77
 
 ### O achado (pelo DetectorDeOscilacao)
