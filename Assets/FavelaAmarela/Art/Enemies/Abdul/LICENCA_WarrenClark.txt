@@ -1,0 +1,67 @@
+LICENCA - "Sorcerer / Villain", por Warren Clark (lionheart963)
+===============================================================
+
+Fonte:      https://lionheart963.itch.io/sorcerer-villain
+Autor:      Warren Clark  (perfil itch.io: lionheart963)  -- o MESMO autor do Damiao
+Preco:      "Name your own price" (gratuito, doacao opcional)
+Download:   "sorcerer villain.zip" (19 kB). O nosso chamava "sorcerer villain (1).zip":
+            o "(1)" e o Windows numerando um segundo download do mesmo arquivo.
+Capturado:  2026-09-10, texto copiado da pagina no dia
+
+Este arquivo substitui o LICENCA_PENDENTE.txt de 2026-09-03, que dizia "autor
+nao identificado". Identificado: o zip da pagina tem o mesmo nome e o mesmo
+conteudo (12 PNGs, idle + ataque com FX). O autor nao assina os PNGs -- e o
+mesmo habito do pacote do Damiao, que tambem e dele.
+
+
+O QUE O AUTOR ESCREVEU (verbatim)
+---------------------------------
+
+Descricao do pacote, nesta pagina:
+
+  "Just experimenting with an enemy for a sidescroller game, feel free to use
+   and improve on and again any comments or suggestions would be appreciated.
+   Cheers."
+
+Nesta pagina, as perguntas "¿Licencia?" (carlosalf1997, ha 5 anos), "Can i use
+this for commercial projects???" (Gericho, ha 7 anos) e uma sobre copyright
+(SPACEY-J, ha 8 anos) ficaram SEM RESPOSTA do autor.
+
+Mas na pagina do outro pacote dele, "4 Directional character"
+(https://lionheart963.itch.io/4-directional-character), o autor escreveu,
+respondendo a um pedido de uso com credito:
+
+  "Cheers man all my work on here is free to use in any way ud like and
+   credit would be awesome cheers."
+
+"All my work on here" -- todo o trabalho dele no itch.io -- inclui este pacote.
+A captura completa dessa declaracao esta em
+Art/Characters/Damiao/Animado/LICENCA_WarrenClark.txt.
+
+
+O QUE ISSO SIGNIFICA, SEM VENDER
+--------------------------------
+
+- NAO e uma licenca formal.
+- E permissao escrita do autor para todo o trabalho dele, publica, sem
+  restricao de uso, com pedido de credito -- pedido, nao exigencia.
+- E mais fraca que a do Damiao por um degrau: a declaracao geral esta em OUTRA
+  pagina do mesmo autor, e nesta as perguntas especificas ficaram sem resposta.
+  Registrado como esta.
+- Este projeto DA o credito.
+
+
+O QUE ESTA EM USO NESTE PROJETO
+-------------------------------
+
+A arte animada do Abdul Alhazred (idle e ataque), nesta pasta.
+NAO confundir com LICENCA_AshDeal.txt, que cobre outro pacote desta pasta.
+
+
+CREDITO A DAR NO JOGO
+---------------------
+
+  Abdul Alhazred (sprite): Warren Clark (lionheart963)
+  https://lionheart963.itch.io/sorcerer-villain
+
+PENDENCIA: o jogo nao tem tela nem texto de creditos (conferido em 2026-09-10).
