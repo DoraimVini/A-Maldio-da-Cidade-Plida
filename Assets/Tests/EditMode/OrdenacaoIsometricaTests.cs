@@ -160,5 +160,63 @@ namespace FavelaAmarela.Tests.EditMode
             foreach (var c in Directory.GetFiles("Assets", "*.prefab", SearchOption.AllDirectories))
                 yield return c;
         }
+
+        // ── URP: o Renderer2D tem o PROPRIO modo, e e ele que manda ─────────
+
+        private const string Renderer2D = "Assets/Settings/URP_Renderer2D.asset";
+
+        /// <summary>
+        /// Sob URP, o <c>Renderer2D</c> tem <b>seu próprio</b> <c>m_TransparencySortMode</c>, e é
+        /// ele que vale — o do <c>GraphicsSettings</c>, que os testes acima guardam, vira letra
+        /// morta. O spike da URP (09/09) provou identidade pixel a pixel nas 6 cenas e passou
+        /// batido: o desempate por eixo só aparece entre atores a menos de 0,1 un de altura, e
+        /// cena parada não exercita isso. Descoberto em 2026-09-10 investigando outra coisa
+        /// (sprites novos nascendo <i>lit</i>).
+        /// </summary>
+        [Test]
+        public void SobURP_ORenderer2DTambemOrdenaPorEixoY()
+        {
+            if (!File.Exists(Renderer2D))
+                Assert.Ignore("Sem Renderer2D: o projeto não está na URP.");
+
+            string yaml = File.ReadAllText(Renderer2D);
+
+            var modo = Regex.Match(yaml, @"^\s*m_TransparencySortMode:\s*(\d+)\s*$", RegexOptions.Multiline);
+            Assert.IsTrue(modo.Success, "m_TransparencySortMode não existe no Renderer2D.");
+            Assert.AreEqual("3", modo.Groups[1].Value,
+                "O Renderer2D da URP não está em CustomAxis. Sob URP é ELE que decide o desempate " +
+                "de sorting — o GraphicsSettings é ignorado — e sem o eixo (0,1,0) dois atores a " +
+                "menos de 3 px de altura alternam a ordem a cada quadro.");
+
+            var eixo = Regex.Match(yaml,
+                @"^\s*m_TransparencySortAxis:\s*\{x:\s*(\S+?),\s*y:\s*(\S+?),\s*z:\s*(\S+?)\}\s*$",
+                RegexOptions.Multiline);
+            Assert.IsTrue(eixo.Success, "m_TransparencySortAxis não existe no Renderer2D.");
+            Assert.AreEqual(("0", "1", "0"),
+                (eixo.Groups[1].Value, eixo.Groups[2].Value, eixo.Groups[3].Value),
+                "O eixo do Renderer2D tem de ser (0,1,0), como o do GraphicsSettings.");
+        }
+
+        /// <summary>
+        /// Num projeto <b>sem luz</b>, sprite novo não pode nascer <i>lit</i>. Sob URP,
+        /// <c>AddComponent&lt;SpriteRenderer&gt;</c> recebe o material padrão do Renderer2D; com
+        /// <c>Lit</c> ele amostra uma textura de luz que ninguém escreve — e todo sprite que uma
+        /// ferramenta criar depois do merge fica diferente dos que já existiam
+        /// (<c>Sprites-Default</c>). Medido em 2026-09-10: o mesmo <c>Ruin_1</c>, na mesma cena,
+        /// escuro com um material e pálido com o outro.
+        /// </summary>
+        [Test]
+        public void SobURP_SpriteNovoNasceUnlit()
+        {
+            if (!File.Exists(Renderer2D))
+                Assert.Ignore("Sem Renderer2D: o projeto não está na URP.");
+
+            var tipo = Regex.Match(File.ReadAllText(Renderer2D),
+                @"^\s*m_DefaultMaterialType:\s*(\d+)\s*$", RegexOptions.Multiline);
+            Assert.IsTrue(tipo.Success, "m_DefaultMaterialType não existe no Renderer2D.");
+            Assert.AreEqual("1", tipo.Groups[1].Value,
+                "O material padrão do Renderer2D não é Unlit (1). Este jogo não tem Light2D: " +
+                "sprite lit sem luz é sprite que depende do que estiver na memória da GPU.");
+        }
     }
 }

@@ -4,6 +4,71 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — A Byakhee presa numa faixa, e a coleira que era a câmera e não a sala
+
+O Vini: *"a cena da Byakhee continua toda errada, e a Byakhee desde a mudança na fase está presa a
+uma faixa da arena e não andando livremente."* Os dois relatos eram meus.
+
+### A coleira
+
+`Circundar`, `MergulhoDeGarras` e `ArrastarAteOJogador` miram o **jogador**; `ManterNaArena`
+devolvia a velocidade para dentro de uma elipse de **9 × 5** a cada `FixedUpdate`. O jogador
+não tem coleira, e a sala dos Portões é um losango de **63 × 31**: bastava pisar 5 unidades ao
+norte do centro e o chefe ficava pregado na borda — mirando, sendo empurrado, mirando. Eu
+dimensionei a coleira para caber na **câmera**; a câmera segue o jogador. Tinha de caber na
+**sala**.
+
+A coleira agora **é a sala**: onde há tile pintado no `PortoesFloor` ele pode voar, com teto na
+linha dos Portões. Onde o jogador pode pisar, ela pode voar — não há como pregar, por construção.
+`ByakheeAI.ChaoComMaisTiles` escolhe o Tilemap com mais células **pintadas** (pela caixa
+envolvente, o anel de paredes `Colisao` ganhava, e a coleira apontaria para onde não há chão —
+pior que o defeito). Guardas: `AColeiraDoByakhee_EhOChaoQueOJogadorPisa`; o antigo
+`AArena_CabeNoQueACameraMostra` **saiu** — passava verde guardando a causa do defeito.
+
+### A cena
+
+- **O portão estava 5,5 unidades acima da tela.** `Batente` é filho de `Os_Portoes`; em 09/09
+  escrevi nele a posição local 5,5 achando que era mundo. Guarda: `AArteDoPortao_EstaNaLinhaDoColisor`.
+- **A linha do portão foi para y = 3**: com a base em 5,5 e o topo da câmera em 5,6, o portão
+  era 0,1 unidade de borda — "fundo da luta" é o que se vê *durante* a luta.
+- **A arte é um diorama** (plataforma de pedra + pilares): a base fica 2,7 abaixo da linha, para
+  os **pilares** coincidirem com o colisor e a plataforma entrar na arena como chão de pedra.
+- **Muralha** de `Ruin_1` a cada 4 un de ±6 a ±22, bases `Ruin_3` nos vãos, colisor de
+  `Os_Portoes` alargado de 18 para **52** (a sala tem 51 de largura nessa linha — parede que se
+  contorna não é parede). As `stoneWall*` da Kenney foram medidas e descartadas: a face corre na
+  diagonal iso; numa linha de y constante dão zigue-zague.
+- **Escuridão além dos portões**: gradiente 4 × 64 (Point, PPU 32) em `Chao`/1, do transparente
+  na linha ao quase-opaco 14 un acima. A arena passa a acabar; a luz do portão tem contra o que
+  brilhar; o Refúgio vira um poste aceso no escuro.
+
+### A URP mordeu duas vezes no mesmo dia, e a captura de EditMode mentiu nas duas
+
+1. `AddComponent<SpriteRenderer>` passou a dar **`Sprite-Lit-Default`** (padrão do Renderer2D).
+   Sem `Light2D`, o material amostra uma textura de luz que ninguém escreve: na captura por
+   `Camera.Render()` em EditMode, o mesmo `Ruin_1` saiu **escuro em y = 0 e pálido em y = 5**.
+   Corrigido na raiz: `m_DefaultMaterialType: 1` (Unlit) no `URP_Renderer2D`.
+2. O gradiente novo caiu no **`Atlas_Cenario`** (que empacota `Art/Environment`), e atlas não
+   reempacotado em batch desenhou a região de outro sprite — glifos dourados onde devia haver
+   escuridão. Movido para `Art/Vfx`, fora de atlas.
+3. **E o spike deixou passar**: o `Renderer2D` tem o **próprio** `m_TransparencySortMode`, e sob
+   URP é ele que manda — estava em `0`, e o Custom Axis (0,1,0) do `GraphicsSettings` virou letra
+   morta. Identidade pixel a pixel em cena parada não exercita desempate entre atores. Corrigido
+   para `3`; guardas novos em `OrdenacaoIsometricaTests`.
+
+**O oráculo honesto é PlayMode**: `AArenaDosPortoesNaTelaTests` carrega a cena, renderiza pelo
+loop real e **mede** que além dos portões é mais escuro que a arena (ignora-se sem GPU;
+`WaitForEndOfFrame` não existe em batch, a foto vem de `Camera.Render()` numa RenderTexture).
+É o primeiro teste PlayMode que carrega uma cena de verdade, e por isso descarrega a cena e
+derruba o `Player` sobrevivente — sem isso o rig do `OAltarResponde` achava o Damião real.
+
+### Licenças
+
+Os três guardas de `LICENCA_PENDENTE` viraram guardas das licenças **capturadas**, exigindo a
+frase do autor no arquivo. O do Rei pegou um erro real: eu tinha quebrado a frase do Sucart em
+duas linhas — verbatim é verbatim.
+
+**1155 EditMode + 67 PlayMode, verdes.**
+
 ## 2026-09-10 — As três licenças pendentes, e o Damião que o Vini achava que estava no jogo
 
 ### "Damião é uma sprite feita pelo Antigravity, não tem licença mesmo"

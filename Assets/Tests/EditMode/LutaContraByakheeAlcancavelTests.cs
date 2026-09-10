@@ -3,6 +3,10 @@ using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace FavelaAmarela.Tests.EditMode
 {
@@ -38,7 +42,6 @@ namespace FavelaAmarela.Tests.EditMode
         {
             float velocidadeRasante = CampoDoPrefab("velocidadeRasante");
             float velocidadeNoChao = CampoDoPrefab("velocidadeNoChao");
-            float semiEixoX = CampoDoPrefab("semiEixoDaArenaX");
 
             float duracaoRasante = PadraoDaFsm("duracaoRasante");
             float menorJanela = PadraoDaFsm("duracaoPousoFase2");
@@ -68,50 +71,109 @@ namespace FavelaAmarela.Tests.EditMode
                 "Saídas: encurtar o rasante, acelerar o arrasto no chão (velocidadeNoChao), ou " +
                 "alongar a janela da fase 2.");
 
-            Assert.LessOrEqual(distanciaDoRasante, semiEixoX * 2f,
-                $"Um rasante percorre {distanciaDoRasante:0.##} unidades e a arena tem " +
-                $"{semiEixoX * 2f:0.##} de largura. O chefe atravessa a arena inteira num " +
-                "movimento só e passa a viver colado na coleira, brigando com ela em vez de " +
-                "voar o padrão.");
+            // Registro, sem asserção: a coleira agora é a sala inteira (63 de largura), e o
+            // único limite que um rasante encontra é a linha dos Portões ao norte -- uma parede,
+            // que ele respeita como qualquer parede. A asserção que ficava aqui ("rasante cabe
+            // na altura da arena") guardava o defeito da elipse de 9 x 5, que já não existe.
+            float alturaDaArena = AlturaDaArenaNaCena();
+            TestContext.WriteLine(
+                $"rasante {distanciaDoRasante:0.##} un | arena {alturaDaArena:0.##} un do gatilho " +
+                "aos Portões (a largura é a sala, 63)");
         }
 
         /// <summary>
-        /// <b>A arena tem de caber na tela.</b>
+        /// Do <c>Gatilho_DaArena</c> (onde a luta começa) ao <c>Os_Portoes</c> (a muralha que o
+        /// Byakhee não passa), em unidades de mundo, lidos da cena.
+        /// </summary>
+        private static float AlturaDaArenaNaCena()
+        {
+            EditorSceneManager.OpenScene(CenaDosPortoes, OpenSceneMode.Single);
+
+            var gatilho = GameObject.Find("Gatilho_DaArena");
+            var portoes = GameObject.Find("Os_Portoes");
+
+            Assert.IsNotNull(gatilho, "'Gatilho_DaArena' não está na cena dos Portões.");
+            Assert.IsNotNull(portoes, "'Os_Portoes' não está na cena dos Portões.");
+
+            return portoes.transform.position.y - gatilho.transform.position.y;
+        }
+
+        /// <summary>
+        /// <b>Onde o jogador pisa, o Byakhee pode voar.</b> A coleira dele é o mesmo Tilemap
+        /// que barra Damião — logo não existe posição do jogador que a coleira não alcance.
         ///
-        /// <para>Era um círculo de raio 12 — <b>24 × 24</b> — contra uma vista de
-        /// <b>20,00 × 11,25</b>. Não cabia na largura, e cabia menos da metade na altura: o
-        /// chefe podia estar a 12 do centro enquanto a câmera mostrava 5,6 para cima. O jogador
-        /// lutava contra o que não via, e essa foi a terceira causa do
-        /// <i>"a hurtbox dela é muito difícil de atingir"</i> — depois da geometria da hurtbox e
-        /// da tinta que escurecia o chefe a 32%.</para>
-        ///
-        /// <para>A vista aqui é derivada, não escrita: <c>PixelPerfectCamera</c> com PPU 32 e
-        /// referência 640 × 360 dá <c>orthographicSize</c> 5,625, e a 16:9 isso é 20 × 11,25.</para>
-        ///
-        /// <para>E os <b>portões</b> dependem disso: eles são o fundo da luta, e fundo só
-        /// funciona se a luta acontecer na frente dele.</para>
+        /// <para><b>O teste que estava aqui antes afirmava o contrário</b> —
+        /// <c>AArena_CabeNoQueACameraMostra</c> exigia que a coleira coubesse na câmera
+        /// (elipse de 9 × 5). Mas a câmera segue o jogador, e o jogador anda por uma sala de
+        /// 63 × 31: bastava pisar fora da elipse e o chefe ficava pregado na borda mirando
+        /// nele. O Vini relatou em 2026-09-10: <i>"presa a uma faixa da arena e não andando
+        /// livremente"</i>. O teste passava verde enquanto isso acontecia — ele guardava a
+        /// causa do defeito.</para>
         /// </summary>
         [Test]
-        public void AArena_CabeNoQueACameraMostra()
+        public void AColeiraDoByakhee_EhOChaoQueOJogadorPisa()
         {
-            float semiX = CampoDoPrefab("semiEixoDaArenaX");
-            float semiY = CampoDoPrefab("semiEixoDaArenaY");
+            EditorSceneManager.OpenScene(CenaDosPortoes, OpenSceneMode.Single);
 
-            const float TamanhoOrtografico = 360f / (2f * 32f);   // 5,625
-            float meiaLargura = TamanhoOrtografico * 16f / 9f;    // 10,00
+            var byakhee = Object.FindFirstObjectByType<FavelaAmarela.Runtime.Enemies.ByakheeAI>();
+            Assert.IsNotNull(byakhee, "Nenhum ByakheeAI na cena dos Portões.");
 
-            TestContext.WriteLine(
-                $"arena {semiX * 2f:0.##} × {semiY * 2f:0.##} | vista " +
-                $"{meiaLargura * 2f:0.##} × {TamanhoOrtografico * 2f:0.##}");
+            var so = new SerializedObject(byakhee);
+            var chao = so.FindProperty("chaoDaArena").objectReferenceValue as Tilemap;
+            var muralha = so.FindProperty("muralhaNorte").objectReferenceValue as Transform;
 
-            Assert.LessOrEqual(semiX, meiaLargura,
-                $"A arena tem {semiX * 2f:0.##} de largura e a câmera mostra " +
-                $"{meiaLargura * 2f:0.##}. O chefe sai de quadro pelos lados.");
+            Assert.IsNotNull(chao,
+                "A coleira do Byakhee não está ligada a um Tilemap. Rode " +
+                "Tools/FavelaAmarela/Arena: povoar a arena da Byakhee.");
 
-            Assert.LessOrEqual(semiY, TamanhoOrtografico,
-                $"A arena tem {semiY * 2f:0.##} de altura e a câmera mostra " +
-                $"{TamanhoOrtografico * 2f:0.##}. O chefe sai de quadro por cima — e é o eixo " +
-                "mais apertado da vista isométrica, que é larga e baixa.");
+            // O chão da coleira tem de ser o Tilemap com mais células PINTADAS — o que define a
+            // sala. Pela caixa envolvente, o anel de paredes ganharia, e a coleira apontaria
+            // para onde NÃO há chão.
+            var maior = FavelaAmarela.Runtime.Enemies.ByakheeAI.ChaoComMaisTiles(
+                Object.FindObjectsByType<Tilemap>(FindObjectsSortMode.None));
+
+            Assert.AreSame(maior, chao,
+                $"A coleira aponta para '{chao.name}', mas o chão da sala é '{maior.name}'. " +
+                "Coleira que não é o chão prega o chefe — na borda ou no centro.");
+
+            Assert.AreNotEqual("Colisao", chao.name,
+                "A coleira está no anel de PAREDES: HasTile dá falso em todo o chão e o chefe " +
+                "é puxado ao centro sem parar.");
+
+            Assert.IsNotNull(muralha, "Sem muralha norte, o Byakhee voa por cima dos Portões.");
+            Assert.AreEqual("Os_Portoes", muralha.name,
+                "A muralha norte tem de ser o colisor dos Portões — é ele que o jogador não passa.");
+        }
+
+        /// <summary>
+        /// <b>A arte do portão está onde o colisor está.</b> O <c>Batente</c> é filho de
+        /// <c>Os_Portoes</c>; em 09/09 eu escrevi nele uma posição local achando que era mundo,
+        /// e a arte foi parar 5,5 unidades acima da tela — os Portões sumiram da luta enquanto
+        /// o colisor continuava lá. Este guarda mede em mundo, que é o que o jogador vê.
+        /// </summary>
+        [Test]
+        public void AArteDoPortao_EstaNaLinhaDoColisor()
+        {
+            EditorSceneManager.OpenScene(CenaDosPortoes, OpenSceneMode.Single);
+
+            var colisor = GameObject.Find("Os_Portoes");
+            Assert.IsNotNull(colisor, "'Os_Portoes' não está na cena.");
+
+            var batente = colisor.transform.Find("Batente");
+            Assert.IsNotNull(batente, "'Batente' deixou de ser filho de 'Os_Portoes'.");
+
+            // A arte é um DIORAMA: plataforma de pedra embaixo (2,7 un na arte, à escala 2) e
+            // os pilares em cima. A linha que tem de coincidir com o colisor é a dos PILARES,
+            // não a base — com a base no colisor, da arena só se via a plataforma (uma faixa
+            // bege). O 2,7 é medido no PNG e documentado em CenarioDaArenaDaByakhee.
+            const float AlturaDaPlataformaNaArte = 2.7f;
+
+            float pilares = batente.position.y + AlturaDaPlataformaNaArte;
+            float colisao = colisor.transform.position.y;
+
+            Assert.AreEqual(colisao, pilares, 0.01f,
+                $"Os pilares do portão estão em y={pilares:F2} e o colisor em y={colisao:F2}. " +
+                "Ou o jogador bate numa parede invisível, ou vê um portão que não barra nada.");
         }
 
         /// <summary>

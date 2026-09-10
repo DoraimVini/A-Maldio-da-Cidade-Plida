@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using FavelaAmarela.Core.Abilities;
 using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Enemies;
@@ -29,31 +30,31 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Raio que ele percorre ao circundar, em unidades.")]
         [SerializeField] private float raioDeVoo = 3f;
 
-        [Tooltip("Até onde ele pode se afastar do centro da arena, em unidades. Fora disso " +
-                 "ele é forçado a voltar.")]
-        [Min(4f)]
         /// <summary>
-        /// Meia-largura da arena. <b>A arena é uma elipse, não um círculo.</b>
+        /// O chão da arena: <b>onde há tile pintado, ele pode voar</b>. Vazio: o maior Tilemap
+        /// da cena, resolvido uma vez ao começar.
         ///
-        /// <para><b>Por quê (2026-09-09).</b> A vista isométrica deste jogo é
-        /// <b>20,00 × 11,25</b> unidades — larga e baixa. Uma arena circular de raio 12 tem
-        /// 24 × 24: não cabe na largura, e cabe <b>menos da metade</b> na altura. O chefe podia
-        /// estar a 12 do centro enquanto a câmera mostrava 5,6 para cima — ele saía de quadro e
-        /// o jogador lutava contra o que não via. É a queixa do Vini, <i>"a hurtbox dela é muito
-        /// difícil de atingir"</i>, pelo terceiro canal: geometria, leitura visual, e agora
-        /// enquadramento.</para>
+        /// <para><b>A coleira é a SALA, não uma forma inventada (2026-09-10).</b> A versão
+        /// anterior prendia o Byakhee numa elipse de 9 × 5 dimensionada para caber na
+        /// <i>câmera</i>. Mas a câmera segue o jogador, e o jogador não tem coleira nenhuma: a
+        /// sala dos Portões é um losango de <b>63 × 31</b>. Bastava Damião pisar fora da elipse
+        /// — cinco unidades ao norte do centro — e o chefe ficava pregado na borda, mirando nele
+        /// e sendo empurrado de volta a cada quadro. É o que o Vini relatou: <i>"presa a uma
+        /// faixa da arena e não andando livremente"</i>.</para>
         ///
-        /// <para>É a mesma lição da zona morta da câmera, no mesmo dia: <b>o espaço de jogo tem
-        /// de ter a proporção da vista</b>, não ser quadrado.</para>
-        ///
-        /// <para><b>E os portões precisam disso.</b> Eles são o fundo da luta, e fundo só
-        /// funciona se a luta acontecer na frente dele. Com raio 12 o Byakhee voava até y=+12 e
-        /// passava por trás deles.</para>
+        /// <para>Usar o mesmo Tilemap que barra o jogador fecha isso por construção: onde ele
+        /// pode pisar, o Byakhee pode voar. Não há região do jogador que a coleira não alcance.
+        /// O que a elipse resolvia de verdade — rasantes encadeados saindo do mapa — o chão
+        /// resolve igual: fora do chão, ele volta.</para>
         /// </summary>
-        [SerializeField] private float semiEixoDaArenaX = 9f;
+        [SerializeField] private Tilemap chaoDaArena;
 
-        /// <summary>Meia-altura da arena. Ver <see cref="semiEixoDaArenaX"/>.</summary>
-        [SerializeField] private float semiEixoDaArenaY = 5f;
+        /// <summary>
+        /// A linha dos Portões, que o Byakhee não passa: <b>eles são o fundo da luta</b>, e fundo
+        /// só funciona se a luta acontecer na frente dele. Vazio: sem teto. [CENA]
+        /// </summary>
+        [Tooltip("Transform do colisor dos Portões. Acima do y dele, o Byakhee volta. [CENA]")]
+        [SerializeField] private Transform muralhaNorte;
 
         [Tooltip("Velocidade com que ele se arrasta na direção do jogador enquanto está " +
                  "POUSADO e longe demais para ser alcançado.")]
@@ -154,6 +155,7 @@ namespace FavelaAmarela.Runtime.Enemies
             _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
             _centro = centroDaArena != null ? centroDaArena.position : transform.position;
+            ResolverChaoDaArena();
 
             _fsm.OnStateChanged += HandleEstadoMudou;
             _fsm.OnGritoEmitido += EmitirCone;
@@ -335,25 +337,31 @@ namespace FavelaAmarela.Runtime.Enemies
         /// caminha para fora da arena e não volta — o "ela continua saindo do mapa" do
         /// playtest. Esta cena não tem <c>Limite_*</c>: não há parede para segurá-lo.</para>
         ///
+        /// <para><b>A forma da coleira é a sala</b> — ver <see cref="chaoDaArena"/>. Duas
+        /// formas anteriores foram medidas e descartadas: o círculo de raio 12 (deixava o chefe
+        /// sair de quadro) e a elipse de 9 × 5 (cabia na câmera, não na sala, e pregava o chefe
+        /// na borda sempre que o jogador saía dela).</para>
+        ///
         /// <para>Corrige por <b>velocidade</b>, e não escrevendo <c>transform.position</c>: com
         /// <c>Auto Sync Transforms</c> desligado, mover o transform de um corpo deixa o colisor
         /// para trás até o próximo passo de física — e a hurtbox dele iria junto.</para>
         /// </summary>
         private void ManterNaArena()
         {
-            Vector2 doCentro = _rb.position - (Vector2)_centro;
+            Vector2 posicao = _rb.position;
 
-            // Normaliza pelos semi-eixos: dentro da elipse quando (x/a)² + (y/b)² <= 1.
-            float nx = semiEixoDaArenaX > 0f ? doCentro.x / semiEixoDaArenaX : 0f;
-            float ny = semiEixoDaArenaY > 0f ? doCentro.y / semiEixoDaArenaY : 0f;
+            bool foraDoChao = chaoDaArena != null
+                              && !chaoDaArena.HasTile(chaoDaArena.WorldToCell(posicao));
+            bool alemDaMuralha = muralhaNorte != null && posicao.y > muralhaNorte.position.y;
 
-            if (nx * nx + ny * ny <= 1f) return;
+            if (!foraDoChao && !alemDaMuralha) return;
 
-            // A normal de uma elipse NÃO aponta para o centro — aponta na direção do gradiente
-            // de (x/a)² + (y/b)². Usar -doCentro.normalized empurraria de viés nas laterais,
-            // que é onde a arena é mais larga e onde o rasante termina.
-            Vector2 paraDentro = -new Vector2(nx / semiEixoDaArenaX,
-                                              ny / semiEixoDaArenaY).normalized;
+            // Só o teto estourou: volta para o sul, sem puxar para o centro — puxar para o
+            // centro num chefe que está no canto norte-leste o arrastaria para oeste também,
+            // e ele deslizaria ao longo do portão em vez de simplesmente recuar dele.
+            Vector2 paraDentro = foraDoChao
+                ? ((Vector2)_centro - posicao).normalized
+                : Vector2.down;
 
             // Só corrige o que aponta para fora: um movimento que já volta é preservado, senão
             // ele ficaria colado na borda em vez de retomar o padrão.
@@ -361,6 +369,57 @@ namespace FavelaAmarela.Runtime.Enemies
 
             _rb.linearVelocity = paraDentro * Mathf.Max(_rb.linearVelocity.magnitude,
                                                         velocidadeCircundando);
+        }
+
+        /// <summary>
+        /// Acha o chão da arena se ninguém o arrastou: o Tilemap com mais células da cena — o
+        /// mesmo critério do <c>IsometricCameraController</c> para os limites do mapa. Roda
+        /// uma vez; <c>FindObjectsByType</c> é proibido em caminho quente.
+        /// </summary>
+        private void ResolverChaoDaArena()
+        {
+            if (chaoDaArena != null) return;
+
+            chaoDaArena = ChaoComMaisTiles(FindObjectsByType<Tilemap>(FindObjectsSortMode.None));
+
+            if (chaoDaArena == null)
+                Debug.LogWarning("[Byakhee] Nenhum Tilemap na cena — sem chão, a coleira está " +
+                                 "desligada e rasantes encadeados podem sair do mapa.", this);
+        }
+
+        /// <summary>
+        /// O Tilemap com mais células <b>pintadas</b> — o chão da sala.
+        ///
+        /// <para><b>Por que contar tiles e não a caixa (2026-09-10).</b> A primeira versão
+        /// escolhia pelo <c>cellBounds</c>, e escolheu o Tilemap <c>Colisao</c>: o anel de
+        /// paredes tem só 528 células pintadas, mas a caixa dele (68 × 68) envolve a do chão
+        /// (64 × 64, todas pintadas). Com a coleira apontando para o anel, <c>HasTile</c> daria
+        /// falso em todo o chão e o Byakhee seria puxado ao centro o tempo inteiro — pior que o
+        /// defeito que se estava consertando. <c>GetUsedTilesCount</c> também não serve: conta
+        /// <i>tipos</i> de tile, não células.</para>
+        ///
+        /// <para>Público e estático para a ferramenta de cena e o teste usarem o <b>mesmo</b>
+        /// critério — três cópias divergiriam em silêncio.</para>
+        /// </summary>
+        public static Tilemap ChaoComMaisTiles(Tilemap[] mapas)
+        {
+            Tilemap maior = null;
+            int maisPintadas = 0;
+
+            foreach (var mapa in mapas)
+            {
+                mapa.CompressBounds();
+                int pintadas = 0;
+                foreach (var tile in mapa.GetTilesBlock(mapa.cellBounds))
+                    if (tile != null) pintadas++;
+
+                if (pintadas <= maisPintadas) continue;
+
+                maisPintadas = pintadas;
+                maior = mapa;
+            }
+
+            return maior;
         }
 
         /// <summary>

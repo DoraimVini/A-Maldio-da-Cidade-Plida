@@ -17,8 +17,7 @@ O QUE O AUTOR ESCREVEU (verbatim)
 
 Na pagina do pacote:
 
-  "You are free to use this asset pack in any project that you make, as long
-   as you credit me using the name Sucart."
+  "You are free to use this asset pack in any project that you make, as long as you credit me using the name Sucart."
 
   "No generative AI was used"
 

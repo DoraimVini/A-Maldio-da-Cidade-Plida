@@ -136,14 +136,21 @@ namespace FavelaAmarela.Tests.EditMode
         /// da arte. Este teste existe para o aviso não ser apagado por engano.
         /// </summary>
         [Test]
-        public void AvisoDeLicencaPendente_ContinuaNoRepositorio()
+        public void ALicencaCapturada_EstaNoRepositorio_ComACondicaoDeCredito()
         {
-            string caminho = Pasta + "/LICENCA_PENDENTE.txt";
+            // Até 2026-09-10 aqui se guardava o LICENCA_PENDENTE.txt, e o texto dizia: "se os
+            // termos já foram capturados, substitua o arquivo e atualize este teste". Foram.
+            // Para o Sucart o crédito é CONDIÇÃO de uso, então o guarda exige a frase que diz isso.
+            string caminho = Pasta + "/LICENCA_Sucart.txt";
 
             Assert.IsTrue(File.Exists(caminho),
-                "Sumiu o aviso de licença pendente do Moonstone Keeper. O pacote não trouxe " +
-                "termos; se eles já foram capturados, substitua o arquivo por LICENCA_SUCART.txt " +
-                "e atualize este teste.");
+                "Sumiu a licença capturada do Moonstone Keeper (Sucart).");
+
+            string texto = File.ReadAllText(caminho);
+            StringAssert.Contains("as long as you credit me using the name Sucart", texto,
+                "A licença do Rei não traz a condição de crédito do autor — é ela que governa o uso.");
+            StringAssert.Contains("sucart.itch.io", texto,
+                "A licença do Rei não aponta a página de origem.");
         }
     }
 }

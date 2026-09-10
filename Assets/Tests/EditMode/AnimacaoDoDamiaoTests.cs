@@ -15,7 +15,7 @@ namespace FavelaAmarela.Tests.EditMode
         private const string Prefab = "Assets/FavelaAmarela/Art/Characters/Damiao/Player_Damiao.prefab";
         private const string Pasta = "Assets/FavelaAmarela/Art/Characters/Damiao/Animado";
         private const string Componente = "Assets/Scripts/Player/AnimadorDoDamiao.cs";
-        private const string Licenca = Pasta + "/LICENCA_PENDENTE.txt";
+        private const string Licenca = Pasta + "/LICENCA_WarrenClark.txt";
 
         private static readonly string[] Campos =
         {
@@ -233,11 +233,23 @@ namespace FavelaAmarela.Tests.EditMode
                 "esticada:\n  " + string.Join("\n  ", falhas));
         }
 
+        /// <summary>
+        /// Até 2026-09-10 este teste guardava o <c>LICENCA_PENDENTE.txt</c>. Os termos foram
+        /// capturados da página do autor (Warren Clark, lionheart963) e o arquivo virou
+        /// <c>LICENCA_WarrenClark.txt</c>. O guarda agora exige que ele exista <b>e</b> traga a
+        /// frase do autor — um arquivo com o nome certo e sem os termos seria só um nome.
+        /// </summary>
         [Test]
-        public void AvisoDeLicencaPendente_ContinuaNoRepositorio()
+        public void ALicencaCapturada_EstaNoRepositorio_ComAFraseDoAutor()
         {
             Assert.IsTrue(File.Exists(Licenca),
-                "Sumiu o aviso de licença pendente do pacote '4 directional character'.");
+                "Sumiu a licença capturada do pacote '4 directional character' (Warren Clark).");
+
+            string texto = File.ReadAllText(Licenca);
+            StringAssert.Contains("free to use in any way", texto,
+                "A licença do Damião não traz a frase do autor — sem ela o arquivo não prova nada.");
+            StringAssert.Contains("lionheart963.itch.io", texto,
+                "A licença do Damião não aponta a página de origem.");
         }
 
         [Test]
