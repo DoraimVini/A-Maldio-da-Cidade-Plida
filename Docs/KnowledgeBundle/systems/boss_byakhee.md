@@ -153,9 +153,29 @@ células com tile de `colliderType Grid`). O gatilho de luta tem 38 de largura e
 larguras calculadas, não estimadas: o losango afina com Y, e uma faixa estreita demais seria
 contornada pela beirada.
 
+## O abate persiste (2026-09-10)
+
+O Vini: *"não está salvando pós a luta da Byakhee; se você sair e voltar para a masmorra pode
+enfrentar ela de novo e ela vira farm infinito."* Era verdade: a cena dos Portões não tinha um
+único `ObjetoPersistente`, então o `EnemyBase` não gravava o abate, e o gatilho da arena não lia o
+save. Cada visita remontava a luta — 200 de Exposição e o espólio de novo.
+
+Chefe é **marco de quest**, não mob: `ChavesDeSave.ByakheeAbatido` (`Quest.Portoes.ByakheeAbatido`),
+gravada por `ArenaDosPortoes.HandleChefeAbatido` na hora do fato (write-through), e lida em
+`ArenaDosPortoes.Start` → `AplicarEstadoSalvo()`: chefe **desativado** (não destruído — destruir
+dispararia um segundo abate), Portões destrancados, Poste aceso, saída para o Deserto ligada. Se o
+jogador já abriu os Portões (`Quest.Portoes.Abertos`, gravada em `PortaoDosPortoes.Abrir`), eles
+nascem abertos — quem volta do Castelo não os encontra fechados. Mesmo desenho de
+`AbdulAlhazredAI.AplicarEstadoSalvo`.
+
+**O que vai ao disco só no Refúgio**, como todo o resto: dentro da partida a memória basta para sair
+e voltar; o Poste que acende com o abate é o próprio Refúgio, então descansar nele grava a vitória.
+Guarda: `OByakheeNaoEhFarmTests` (PlayMode, cena real) — provado contra a arena antiga.
+
 ## Pendente
-- **Animação de verdade.** Os 26 frames existem e estão nomeados; falta o `Animator`/
-  `AnimatorController` que os reproduza — hoje só o frame de idle é usado.
+- ~~**Animação de verdade.**~~ — feita pelo `AnimadorDoByakhee` (sem Animator, de propósito;
+  ver `AnimacaoDoByakheeTests`). Em 2026-09-10 descobriu-se que ele **não ouvia a FSM** e a luta
+  inteira tocava a espreita; corrigido, e a folha foi espelhada e alinhada (`AFolhaDoByakheeTests`).
 - **Cena de abertura** (o grito antes da forma).
 - ~~Yug-Neth como chave dimensional~~ — **descartado em 2026-08-20** (decisão do Vini). Em
   vez de um bloqueio a mais, o fim da luta libera um **Poste de Luz**: o `RefugioDeLuz` já

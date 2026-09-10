@@ -148,6 +148,10 @@ namespace FavelaAmarela.Runtime.GameLoop
             _abrindo = true;
             _tempoDeAbertura = 0f;
 
+            // Quem volta do Castelo não pode achar os Portões fechados de novo (2026-09-10).
+            FavelaAmarela.Runtime.Persistencia.GerenciadorDeSave.MarcarAconteceu(
+                FavelaAmarela.Core.Persistencia.ChavesDeSave.PortoesAbertos);
+
             // O quadro troca já — o atraso é só para a passagem acender depois, dando um
             // instante de leitura. A barreira cai junto: esperar faria o jogador esbarrar num
             // portão visivelmente aberto.

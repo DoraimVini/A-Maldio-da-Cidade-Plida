@@ -117,6 +117,26 @@ namespace FavelaAmarela.Core.Persistencia
         public const string CassildaConcluida = "Quest.Cassilda.Concluida";
 
         /// <summary>
+        /// O Byakhee dos Portões das Ruínas já foi abatido.
+        ///
+        /// <para><b>Por que existe (2026-09-10).</b> O Vini: <i>"não está salvando pós a luta
+        /// da Byakhee; se você sair e voltar para a masmorra pode enfrentar ela de novo e ela
+        /// vira farm infinito"</i>. O <c>EnemyBase</c> só persiste o abate de quem tem um
+        /// <c>ObjetoPersistente</c> — e a cena dos Portões não tinha nenhum. Mas mesmo com um,
+        /// o chefe sumir não bastaria: os Portões nasceriam trancados, o Poste apagado e a saída
+        /// desligada, sem ninguém para destrancar — um softlock em vez de um farm. Chefe é
+        /// marco de quest, como <see cref="AbdulResolvido"/>: chave própria, lida pelo gatilho
+        /// da arena, que restaura o mundo inteiro em volta.</para>
+        /// </summary>
+        public const string ByakheeAbatido = "Quest.Portoes.ByakheeAbatido";
+
+        /// <summary>
+        /// Os Portões das Ruínas já foram abertos pelo jogador (depois de destrancados). Quem
+        /// volta do Castelo não pode encontrá-los fechados de novo.
+        /// </summary>
+        public const string PortoesAbertos = "Quest.Portoes.Abertos";
+
+        /// <summary>
         /// Prefixo das chaves de "esta criatura já foi abatida". Diferente das constantes
         /// acima, não é uma chave única: cada inimigo tem a sua, formada com o GUID imutável
         /// do próprio objeto (ver <c>ObjetoPersistente</c>).

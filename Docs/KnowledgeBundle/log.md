@@ -4,6 +4,61 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — Opções sem volta, Byakhee tremendo de lado, e o farm infinito
+
+Três relatos do Vini na mesma tarde, três commits (`be05424f`, `f5091258`, e o deste devlog).
+
+### "Não tem como voltar do menu de opções"
+
+Medido em Play a 1920×1080: o botão **Fechar** existia, ligado ao `Fechar()`, em **y = −176…−76 —
+abaixo do monitor**. A coluna da janela tinha `childControlHeight = false`, então os
+`LayoutElement` (54, 34, 30, 40…) não valiam nada e cada linha ficava com os 100 px padrão de um
+RectTransform novo: oito linhas de 100 numa janela de 520. E o Esc não fechava a tela — caía no
+`PausaInputHandler` e **despausava o jogo por baixo** dela. `EstaAberta` existia "para o menu de
+pausa consultar", e ninguém consultava.
+
+- `MontarPainelDeOpcoes`: `childControlHeight = true`, janela 680 × 600 (as linhas somam 536); o
+  botão usa o sprite do *fill* (branco) — o trilho tem luminância 26/255 e Sinal × trilho dava um
+  mostarda quase preto onde o rótulo escuro do Fechar sumia. Prefab reconstruído pela ferramenta.
+- `PainelDeOpcoes.Update` fecha com Esc e expõe `ConsumiuEscNesteQuadro`; `PausaInputHandler`
+  ignora o Esc com as opções abertas ou recém-fechadas neste quadro.
+- Guarda `OPainelDeOpcoesCabeNaJanelaTests` (PlayMode, singleton real): reprovou o prefab velho
+  nomeando 4 linhas fora da janela; 2/2 com o novo.
+
+### "Oscila lateralmente" — não era disputa de flip
+
+O Vini trouxe um roteiro de diagnóstico ("dois sistemas disputando `flipX`/`localScale`").
+Auditado: o único escritor de `flipX` da Byakhee é o `VirarParaOndeVoa` de hoje; ninguém escreve
+`localScale.x`; a sonda em jogo mostrou uma troca em 5 s. O que restava era **arte sem eixo**: com
+todos os quadros olhando para a direita, o torso ainda saltava até **22 px (1,7 un à escala 2,47)**
+entre quadros consecutivos — a folha foi gerada quadro a quadro sem âncora, e o espelhamento
+inverteu o deslocamento dos ímpares. Cada quadro foi deslocado dentro da célula para o torso (35 %
+de baixo do corpo escuro) cair em x = 82, o centro da célula e do pivô. Guarda
+`OTorso_NaoSaltaEntreQuadrosConsecutivos` (limite 4 px) — reprova a folha desalinhada nomeando
+saltos de 17–21 px.
+
+### "Sair e voltar e ela vira farm infinito"
+
+Verdade: a cena dos Portões não tinha um único `ObjetoPersistente` (o `EnemyBase` só grava o abate
+de quem tem um), e o gatilho da arena não lia o save. Mas só pôr um `ObjetoPersistente` trocaria o
+farm por um **softlock**: chefe sumido, Portões trancados, Poste apagado, saída desligada, e ninguém
+para destrancar. Chefe é marco de quest, como Abdul:
+
+- `ChavesDeSave.ByakheeAbatido` e `PortoesAbertos`.
+- `ArenaDosPortoes.HandleChefeAbatido` grava o marco na hora do fato; `Start` →
+  `AplicarEstadoSalvo()` restaura a arena resolvida (chefe **desativado**, não destruído — destruir
+  dispararia um segundo abate com Exposição e espólio); `PortaoDosPortoes.Abrir` grava que abriu.
+- Vai ao disco só no Refúgio, como tudo — e o Poste que acende com o abate é o próprio Refúgio.
+- Guarda `OByakheeNaoEhFarmTests` (PlayMode, cena real, 3 testes): com a arena antiga (HEAD)
+  os três reprovam pelos motivos certos; com a nova, 3/3.
+
+### Ferramenta
+
+- O PlayMode runner aborta com `InvalidOperationException: This cannot be used during play mode`
+  (`SaveModifiedSceneTask`) quando há **cena suja** ao disparar — o Vini estava editando o
+  Castelo. Checar `list_open_scenes` antes de `run_tests --mode playmode` também, não só EditMode.
+- `editor_focus` antes de rodar PlayMode: sem foco e sem *Run In Background*, os testes penduram.
+
 ## 2026-09-10 — A Byakhee "virando de um lado para outro": a folha, e um animador surdo
 
 O Vini: *"A sprite da Byakhee está virando de um lado para outro, cheque isso e resolva. A

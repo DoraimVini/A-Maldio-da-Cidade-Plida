@@ -1,5 +1,7 @@
 using UnityEngine;
+using FavelaAmarela.Core.Persistencia;
 using FavelaAmarela.Runtime.Enemies;
+using FavelaAmarela.Runtime.Persistencia;
 
 namespace FavelaAmarela.Runtime.GameLoop
 {
@@ -24,6 +26,14 @@ namespace FavelaAmarela.Runtime.GameLoop
     /// Portões — ele chama <see cref="PortaoDosPortoes.Destrancar"/>, e a abertura vira uma
     /// interação deliberada no portão. Assim a transição de fase não cai por cima da morte do
     /// chefe, e o gesto final é do jogador.</para>
+    ///
+    /// <para><b>O abate persiste (2026-09-10).</b> Nada gravava a vitória: sair e voltar
+    /// remontava a arena com o chefe inteiro — 200 de Exposição e o espólio a cada visita, o
+    /// "farm infinito" do relato do Vini. Agora <see cref="HandleChefeAbatido"/> grava
+    /// <see cref="ChavesDeSave.ByakheeAbatido"/> na hora do fato (write-through, como todo marco),
+    /// e <see cref="Start"/> restaura a arena resolvida: chefe fora, Portões destrancados (e
+    /// abertos, se o jogador já os abriu), Poste aceso, saída livre. É o mesmo desenho de
+    /// <c>AbdulAlhazredAI.AplicarEstadoSalvo</c> — chefe é marco de quest, não mob.</para>
     ///
     /// <para><b>A luta começa por gatilho, não no <c>Start</c></b>: o dreno do grito
     /// infrassônico é passivo — 2 RM/s enquanto o Byakhee viver, sem precisar acertar ninguém
@@ -97,6 +107,38 @@ namespace FavelaAmarela.Runtime.GameLoop
             ApagarOPoste();
         }
 
+        private void Start()
+        {
+            if (GerenciadorDeSave.JaAconteceu(ChavesDeSave.ByakheeAbatido)) AplicarEstadoSalvo();
+        }
+
+        /// <summary>
+        /// A arena como ela fica <b>depois</b> da vitória, sem a luta: é o que quem volta à cena
+        /// encontra. Tira o chefe antes de qualquer <c>Update</c> dele — desativar, não destruir,
+        /// para o <c>EnemyBase</c> não disparar um segundo abate (com Exposição e espólio de novo).
+        /// </summary>
+        public void AplicarEstadoSalvo()
+        {
+            _lutaComecou = true;
+
+            if (chefe != null) chefe.gameObject.SetActive(false);
+
+            if (portao != null)
+            {
+                portao.Destrancar();
+                if (GerenciadorDeSave.JaAconteceu(ChavesDeSave.PortoesAbertos)) portao.Abrir();
+            }
+
+            AcenderOPoste();
+            if (voltaAoDeserto != null) voltaAoDeserto.SetActive(true);
+
+            Debug.Log("[ArenaDosPortoes] Byakhee já abatido nesta partida — arena restaurada " +
+                      "resolvida, sem luta.", this);
+        }
+
+        /// <summary>Se a arena já está resolvida (chefe abatido nesta partida ou antes dela).</summary>
+        public bool Resolvida => GerenciadorDeSave.JaAconteceu(ChavesDeSave.ByakheeAbatido);
+
         /// <summary>
         /// Deixa o Refúgio inerte no começo. Desligar o <b>componente</b> e o <b>colisor</b>, e
         /// não o GameObject inteiro: um poste que surge do nada ao fim da luta lê como bug, um
@@ -160,6 +202,9 @@ namespace FavelaAmarela.Runtime.GameLoop
 
         private void HandleChefeAbatido()
         {
+            // Na hora do fato, não no CapturarTudo: quem grava é quem sabe que aconteceu.
+            GerenciadorDeSave.MarcarAconteceu(ChavesDeSave.ByakheeAbatido);
+
             if (portao != null) portao.Destrancar();
             AcenderOPoste();
 
