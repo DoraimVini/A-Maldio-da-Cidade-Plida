@@ -30,6 +30,9 @@ namespace FavelaAmarela.EditorTools
         private static readonly Color Tinta = new Color(0.90f, 0.88f, 0.80f, 1f);
         private static readonly Color Sinal = new Color(0.83f, 0.70f, 0.24f, 1f);   // amarelo de Carcosa
 
+        /// <summary>Altura da janela. Ver a conta no corpo de <c>Executar</c>.</summary>
+        public const float AlturaDaJanela = 600f;
+
         [MenuItem("Tools/FavelaAmarela/UI: montar o painel de opções")]
         public static void Executar()
         {
@@ -70,14 +73,24 @@ namespace FavelaAmarela.EditorTools
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = Vector2.zero;
-            rt.sizeDelta = new Vector2(680f, 520f);
+            // 600 de altura: as oito linhas somam 324 de altura preferida + 7 × 20 de espaço
+            // + 72 de padding = 536. Com 520 (o valor anterior) a última linha — a dos botões —
+            // já não cabia nem com o layout certo.
+            rt.sizeDelta = new Vector2(680f, AlturaDaJanela);
             PintarFundo(janela, Painel);
 
             var coluna = janela.AddComponent<VerticalLayoutGroup>();
             coluna.padding = new RectOffset(40, 40, 36, 36);
             coluna.spacing = 20;
             coluna.childControlWidth = true;
-            coluna.childControlHeight = false;
+
+            // childControlHeight TRUE, ou os LayoutElement abaixo não valem nada (2026-09-10).
+            // Com false, a coluna ignora minHeight/preferredHeight e usa a altura própria de
+            // cada filho — que é 100, o padrão de todo RectTransform recém-criado. Oito linhas
+            // de 100 + espaços numa janela de 520: o seletor ficava em y = −56 e a linha dos
+            // botões em y = −176, ABAIXO DA TELA. "Não tem como voltar do menu de opções"
+            // (Vini) era isto: o botão Fechar existia, ligado, fora do monitor.
+            coluna.childControlHeight = true;
             coluna.childForceExpandWidth = true;
             coluna.childForceExpandHeight = false;
 
@@ -382,8 +395,12 @@ namespace FavelaAmarela.EditorTools
             var go = Filho(pai, $"Botao_{texto}");
             Altura(go, 48f);
 
+            // O sprite do botão é o FILL (branco), não o trilho (2026-09-10): o trilho tem
+            // luminância 26/255, e uma Image multiplica a cor pelo sprite — Sinal × trilho dava
+            // um mostarda quase preto, e o rótulo escuro do botão Fechar sumia dentro dele. Com
+            // o fill branco a cor pedida é a cor que aparece.
             var img = go.AddComponent<Image>();
-            img.sprite = Carregar(SpriteDoTrilho);
+            img.sprite = Carregar(SpriteDoFill);
             img.type = Image.Type.Sliced;
             img.color = cor;
 

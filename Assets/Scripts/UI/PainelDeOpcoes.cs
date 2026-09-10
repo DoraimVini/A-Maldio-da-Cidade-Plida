@@ -103,8 +103,33 @@ namespace FavelaAmarela.Runtime.UI
         /// <summary>Fecha a tela.</summary>
         public void Fechar() => Raiz.SetActive(false);
 
-        /// <summary>Se está aberta agora — o menu de pausa consulta para não fechar os dois.</summary>
+        /// <summary>Se está aberta agora — o <c>PausaInputHandler</c> consulta para não despausar por baixo.</summary>
         public bool EstaAberta => Raiz.activeSelf;
+
+        /// <summary>
+        /// Se o Esc deste quadro foi gasto fechando a tela. O <c>PausaInputHandler</c> lê isto
+        /// porque a ordem dos <c>Update</c> não é garantida: se ele rodar depois deste, vê a
+        /// tela já fechada e trataria o mesmo Esc como "despausar".
+        /// </summary>
+        public bool ConsumiuEscNesteQuadro => _quadroDoEsc == Time.frameCount;
+
+        private int _quadroDoEsc = -1;
+
+        private void Update()
+        {
+            // Esc fecha a tela de opções (2026-09-10). Antes não fechava nada aqui: com ela
+            // aberta sobre a pausa, o Esc caía no PausaInputHandler e DESPAUSAVA o jogo por
+            // baixo — a tela ficava aberta, o Damião andando atrás dela, e o único botão que a
+            // fechava estava fora do monitor (ver MontarPainelDeOpcoes). "Não tem como voltar
+            // do menu de opções", relatou o Vini.
+            if (!EstaAberta) return;
+
+            var teclado = UnityEngine.InputSystem.Keyboard.current;
+            if (teclado == null || !teclado.escapeKey.wasPressedThisFrame) return;
+
+            _quadroDoEsc = Time.frameCount;
+            Fechar();
+        }
 
         /// <summary>Abre a tela de opções de qualquer lugar, se ela existir.</summary>
         public static void AbrirSeExistir()

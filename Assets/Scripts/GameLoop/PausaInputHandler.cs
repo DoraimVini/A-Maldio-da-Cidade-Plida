@@ -47,6 +47,13 @@ namespace FavelaAmarela.Runtime.GameLoop
             bool jogoNoComando = FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.JogoNoComando;
             if (!jogoNoComando && _maquina.CurrentState != GameState.Pausado) return;
 
+            // Opções abertas sobre a pausa: o Esc é delas, não da pausa (2026-09-10). Sem isto o
+            // mesmo Esc fechava a tela E despausava o jogo — ou só despausava, deixando a tela
+            // aberta sobre o Damião andando. A segunda condição cobre a ordem de Update em que a
+            // tela já se fechou neste quadro antes de nós lermos a tecla.
+            var opcoes = FavelaAmarela.Runtime.UI.PainelDeOpcoes.Instancia;
+            if (opcoes != null && (opcoes.EstaAberta || opcoes.ConsumiuEscNesteQuadro)) return;
+
             if (_maquina.CurrentState == GameState.Gameplay)
                 _maquina.TryTransition(GameState.Pausado);
             else if (_maquina.CurrentState == GameState.Pausado)

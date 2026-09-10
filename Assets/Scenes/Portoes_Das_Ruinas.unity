@@ -44294,6 +44294,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2061186954}
   - {fileID: 873164401}
   - {fileID: 1641797774}
   - {fileID: 1995965030}
@@ -53569,7 +53570,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 956563406}
     m_Modifications:
     - target: {fileID: 784816125380319016, guid: dba62f518e811f04f983f215af641836, type: 3}
       propertyPath: m_LocalScale.x
@@ -54297,6 +54298,11 @@ Transform:
   - {fileID: 1236874609}
   m_Father: {fileID: 956563406}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &2061186954 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4186377105747419951, guid: dba62f518e811f04f983f215af641836, type: 3}
+  m_PrefabInstance: {fileID: 1769677551}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2089973227
 GameObject:
   m_ObjectHideFlags: 0
@@ -54393,7 +54399,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1799194274}
-  - {fileID: 1769677551}
   - {fileID: 991932282}
   - {fileID: 69865663}
   - {fileID: 266233630}
