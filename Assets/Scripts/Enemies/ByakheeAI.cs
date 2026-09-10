@@ -71,6 +71,16 @@ namespace FavelaAmarela.Runtime.Enemies
         [SerializeField] private float velocidadeMergulho = 9f;
         [SerializeField] private float velocidadeCircundando = 4f;
 
+        [Tooltip("Quanto o rasante segue ALÉM do jogador antes de encerrar (un). Era um relógio " +
+                 "fixo de 12 un: com o jogador perto, ela o atravessava e ia até 12 além, para " +
+                 "voltar se arrastando — 11 meias-voltas em 10 s no playtest de 2026-09-10. " +
+                 "Ainda atravessa (o rasante tem de ser esquivável de lado), mas para logo depois.")]
+        [Min(0.5f)]
+        [SerializeField] private float alcanceAlemDoJogador = 3f;
+
+        /// <summary>Buffer fixo para <c>Rigidbody2D.GetContacts</c> — nada alocado no FixedUpdate.</summary>
+        private readonly ContactPoint2D[] _contatos = new ContactPoint2D[8];
+
         [Header("Combate")]
         [Tooltip("Dano das garras durante o pouso agressivo. FALLBACK: a fonte da verdade e o " +
                  "Ataque da ficha (ver DanoDasGarras). So e usado se a ficha nao autorar Ataque.")]
@@ -225,11 +235,11 @@ namespace FavelaAmarela.Runtime.Enemies
             {
                 case ByakheeState.Rasante:
                     _rb.linearVelocity = _direcaoDoRasante * velocidadeRasante;
+                    if (ORasanteChegouAoFim()) _fsm.EncerrarRasante();
                     break;
 
                 case ByakheeState.MergulhoDeGarras:
-                    var paraJogador = ((Vector2)(_jogador.position - transform.position)).normalized;
-                    _rb.linearVelocity = paraJogador * velocidadeMergulho;
+                    Mergulhar();
                     break;
 
                 case ByakheeState.Circundando:
@@ -249,6 +259,66 @@ namespace FavelaAmarela.Runtime.Enemies
             }
 
             ManterNaArena();
+        }
+
+        /// <summary>
+        /// Mergulha em linha reta até o jogador e <b>para em cima dele</b>.
+        ///
+        /// <para><b>O defeito que isto conserta (2026-09-10, achado pelo DetectorDeOscilacao).</b>
+        /// A versão anterior recalculava a direção até o jogador a cada FixedUpdate e escrevia
+        /// 9 un/s nela. Ao alcançá-lo, passava 0,18 un além num passo de física, invertia, passava
+        /// 0,18 do outro lado, invertia — <b>46 inversões de velocidade em 10 s</b>, todas dentro
+        /// do mergulho, com a criatura vibrando ±0,09 un em cima do Damião a 50 Hz. Com o
+        /// <c>flipX</c> seguindo a velocidade, o sprite piscava de lado a 25 Hz: é o "virando de
+        /// um lado para outro" que sobrava depois de a folha ser corrigida.</para>
+        /// </summary>
+        private void Mergulhar()
+        {
+            Vector2 paraJogador = (Vector2)_jogador.position - _rb.position;
+
+            // Um passo de física a 9 un/s anda 0,18: abaixo disto ela já está no alvo, e mirar
+            // de novo só produziria o vaivém. Para e fica — o mergulho termina pelo relógio da FSM.
+            if (paraJogador.sqrMagnitude <= ChegadaDoMergulho * ChegadaDoMergulho)
+            {
+                _rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
+            _rb.linearVelocity = paraJogador.normalized * velocidadeMergulho;
+        }
+
+        /// <summary>Raio em que o mergulho considera o jogador alcançado (ver <see cref="Mergulhar"/>).</summary>
+        private const float ChegadaDoMergulho = 0.5f;
+
+        /// <summary>
+        /// O rasante acaba quando cumpriu o papel ou quando não tem mais para onde ir: já passou
+        /// <see cref="alcanceAlemDoJogador"/> além do jogador, ou está <b>prensado numa parede</b>
+        /// (contato sólido com normal contra a direção do voo).
+        ///
+        /// <para><b>Medido em 2026-09-10</b>, antes disto: com o jogador junto da muralha leste
+        /// ela passava 2 s do rasante empurrando a parede (2055 de 3000 quadros em contato); com
+        /// o jogador perto, 12 un de ida e uma volta arrastada a cada fase — 11 inversões de
+        /// direção em 10 s. Os dois saem daqui; a FSM só oferece <c>EncerrarRasante</c>.</para>
+        /// </summary>
+        private bool ORasanteChegouAoFim()
+        {
+            if (_jogador != null)
+            {
+                Vector2 paraOJogador = (Vector2)_jogador.position - _rb.position;
+                if (Vector2.Dot(paraOJogador, _direcaoDoRasante) < -alcanceAlemDoJogador) return true;
+            }
+
+            int n = _rb.GetContacts(_contatos);
+            for (int i = 0; i < n; i++)
+            {
+                var c = _contatos[i];
+                if (c.collider == null || c.collider.isTrigger) continue;
+                // A normal do contato aponta do outro colisor para este corpo: parede à frente
+                // tem normal contra a direção do voo.
+                if (Vector2.Dot(c.normal, _direcaoDoRasante) < -0.5f) return true;
+            }
+
+            return false;
         }
 
         /// <summary>

@@ -46,6 +46,10 @@ namespace FavelaAmarela.Tests.PlayMode
         [UnityTest]
         public IEnumerator DamiaoEncostadoNaBarreira_VeOPromptDosPortoes()
         {
+            // O HUD é singleton persistente e outros testes da suíte o destroem no TearDown;
+            // sem ele o GameLoopBootstrap loga um Error na carga e o runner reprova o teste
+            // por "unhandled log message" — sem relação com o que se mede aqui.
+            FavelaAmarela.Runtime.UI.HUDController.GarantirInstancia();
             yield return SceneManager.LoadSceneAsync(Cena, LoadSceneMode.Single);
             yield return null;
 

@@ -4,6 +4,46 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — O mergulho vibrava em cima do Damião; o rasante acaba onde faz sentido; PlayMode 77/77
+
+### O achado (pelo DetectorDeOscilacao)
+
+Com o Damião a 3 un, a Byakhee registrou **46 inversões de velocidade em 10 s** — todas dentro do
+`MergulhoDeGarras`. O mergulho recalculava a direção até o jogador a cada FixedUpdate e escrevia
+9 un/s nela: ao alcançá-lo, passava 0,18 un além, invertia, passava 0,18 do outro lado… ±0,09 un
+a 50 Hz em cima do jogador. Com o `flipX` seguindo a velocidade (de hoje), o sprite piscava de
+lado a 25 Hz — o resto do "virando de um lado para outro" que sobrava depois da folha corrigida.
+Existia antes do flip (posição vibrando, sem o sprite virar): mais sutil, mas era a mesma coisa.
+
+- `ByakheeAI.Mergulhar()`: a 0,5 un do alvo, para (velocidade zero) e deixa o relógio da FSM
+  encerrar o mergulho. **Depois:** 5–6 inversões em 10 s, todas em transição de fase.
+- `ByakheeFSM.EncerrarRasante()` (Core, +2 testes): o adaptador encerra o rasante quando ela
+  passou `alcanceAlemDoJogador` (3 un) além do jogador ou quando está prensada numa parede
+  (contato sólido com normal contra o voo). Era um relógio fixo de 12 un — 2 s empurrando a
+  muralha, ou 12 un além do Damião para voltar se arrastando. Ainda atravessa (o rasante tem de
+  ser esquivável de lado).
+
+O que ainda existe, e é design: a cada fase ela mira o Damião e o atravessa, então **inverte a
+direção a cada 1–2 s**. As opções 2 (arco) e 3 (`Circundando` desde a fase 1) continuam na mesa.
+
+### A suíte PlayMode inteira: 77/77
+
+Antes, 68/77. As nove reprovações eram **isolamento**, não jogo:
+
+- 6 testes das cenas dos Portões reprovavam por `[Error] Nenhum HUDController` — outros testes
+  destroem o HUD singleton no TearDown. Agora chamam `HUDController.GarantirInstancia()` antes
+  de carregar a cena.
+- `OEscudoEquipa` e `Item3_OColetavelAchado` herdavam o **save real do jogador** (o
+  `GerenciadorDeSave` lê `partida.json` no Awake): o Alfanje de duas mãos do Vini na Mão
+  principal fazia a Mão Secundária recusar o escudo — por regra. Inventário limpo em memória
+  antes de medir. (Nota: a UI não diz por que recusa — vai para o plano A do inventário.)
+- `OAnimadorDoByakhee` idem: no save do Vini o Byakhee já está abatido, a arena nasce resolvida
+  e o chefe desativado. Registro limpo em memória.
+- `ACaixaDeDialogoComportaAFalaMaisLonga`: o `PainelDeEscolha` (8 linhas a 38 pedem 232, a caixa
+  tinha 216) — painel de 30 % para 33 % da tela (`anchorMin.y` 0,20 → 0,17), no prefab do HUD.
+
+Nenhum teste grava em disco; o único ponto que salva continua sendo o `RefugioDeLuz`.
+
 ## 2026-09-10 — DetectorDeOscilacao: o facing não é disputado; a Byakhee é que dá meia-volta a cada segundo
 
 Pedido do Vini: um componente de diagnóstico, sem dependências, que grave por N segundos

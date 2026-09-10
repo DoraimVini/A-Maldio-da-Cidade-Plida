@@ -203,6 +203,28 @@ namespace FavelaAmarela.Core.Enemies
             return true;
         }
 
+        /// <summary>
+        /// Encerra o rasante <b>antes do tempo</b>, seguindo para o que viria depois dele
+        /// (pouso, mergulho ou grito, conforme a fase e a alternância) — exatamente como se os
+        /// 2 s tivessem acabado.
+        ///
+        /// <para><b>Por que existe (2026-09-10).</b> O rasante tinha um relógio só: 2 s a 6 un/s,
+        /// 12 unidades em linha reta. Medido em jogo, isso dava duas coisas ruins: com o jogador
+        /// junto da muralha, a criatura ficava <b>2 s prensada na parede</b> empurrando o vazio;
+        /// e com o jogador perto, ela o atravessava e ia até 12 un além, para voltar se
+        /// arrastando — 11 meias-voltas em 10 s, o "virando de um lado para outro" do playtest.
+        /// Quem sabe onde o jogador e a parede estão é o adaptador; a FSM só oferece o
+        /// encerramento.</para>
+        /// </summary>
+        /// <returns>Se havia um rasante para encerrar.</returns>
+        public bool EncerrarRasante()
+        {
+            if (CurrentState != ByakheeState.Rasante) return false;
+
+            DepoisDoVoo();
+            return true;
+        }
+
         /// <summary>Avança o relógio da luta.</summary>
         public void Tick(float deltaTime)
         {

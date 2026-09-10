@@ -47,6 +47,14 @@ namespace FavelaAmarela.Tests.PlayMode
 
             yield return null;
             Assert.NotNull(InventoryManager.Instance, "InventoryManager.Instance não subiu.");
+
+            // Inventário LIMPO (em memória; nenhum teste grava em disco). O GerenciadorDeSave
+            // carrega o save real do jogador no Awake, e o InventoryManager persistente o
+            // aplica: na suíte completa este teste herdava o Alfanje de duas mãos do Vini na
+            // Mão principal — e a Mão Secundária recusa escudo com arma de duas mãos, por
+            // regra. Reprovava dizendo "nenhum slot aceita", que é outro defeito, inexistente.
+            InventoryManager.Instance.Main.LimparTudo();
+            InventoryManager.Instance.Equipment.LimparTudo();
         }
 
         [UnityTearDown]

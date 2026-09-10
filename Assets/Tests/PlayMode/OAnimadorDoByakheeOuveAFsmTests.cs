@@ -25,6 +25,16 @@ namespace FavelaAmarela.Tests.PlayMode
     {
         private const string Cena = "Portoes_Das_Ruinas";
 
+        [UnitySetUp]
+        public IEnumerator Montar()
+        {
+            // O GerenciadorDeSave carrega o save REAL do jogador no Awake; se nele o Byakhee já
+            // foi abatido, a arena nasce resolvida e o chefe desativado — e este teste, que
+            // precisa dele vivo, não teria o que medir. Registro limpo, só em memória.
+            FavelaAmarela.Runtime.Persistencia.GerenciadorDeSave.Instancia?.LimparRegistro();
+            yield return null;
+        }
+
         [UnityTearDown]
         public IEnumerator Desmontar()
         {
@@ -46,6 +56,10 @@ namespace FavelaAmarela.Tests.PlayMode
         [UnityTest]
         public IEnumerator DepoisDoStart_OAnimadorEstaInscrito()
         {
+            // O HUD é singleton persistente e outros testes da suíte o destroem no TearDown;
+            // sem ele o GameLoopBootstrap loga um Error na carga e o runner reprova o teste
+            // por "unhandled log message" — sem relação com o que se mede aqui.
+            FavelaAmarela.Runtime.UI.HUDController.GarantirInstancia();
             yield return SceneManager.LoadSceneAsync(Cena, LoadSceneMode.Single);
             yield return null;
 
@@ -60,6 +74,10 @@ namespace FavelaAmarela.Tests.PlayMode
         [UnityTest]
         public IEnumerator AoComecarALuta_OSpriteTrocaParaORasante()
         {
+            // O HUD é singleton persistente e outros testes da suíte o destroem no TearDown;
+            // sem ele o GameLoopBootstrap loga um Error na carga e o runner reprova o teste
+            // por "unhandled log message" — sem relação com o que se mede aqui.
+            FavelaAmarela.Runtime.UI.HUDController.GarantirInstancia();
             yield return SceneManager.LoadSceneAsync(Cena, LoadSceneMode.Single);
             yield return null;
 

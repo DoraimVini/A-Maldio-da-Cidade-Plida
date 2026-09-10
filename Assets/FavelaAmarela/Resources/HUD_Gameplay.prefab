@@ -10411,7 +10411,7 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 38
-    m_MaxSize: 70
+    m_MaxSize: 96
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -12857,7 +12857,7 @@ RectTransform:
   - {fileID: 2346933577958478347}
   m_Father: {fileID: 7887862485695564538}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.22, y: 0.2}
+  m_AnchorMin: {x: 0.22, y: 0.17}
   m_AnchorMax: {x: 0.78, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}

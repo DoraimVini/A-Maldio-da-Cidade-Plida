@@ -105,6 +105,34 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         [Test]
+        public void EncerrarRasante_SegueParaOQueViriaDepois_SemEsperarORelogio()
+        {
+            var fsm = CriarEmCombate();
+            Assert.AreEqual(ByakheeState.Rasante, fsm.CurrentState);
+
+            fsm.Tick(0.3f);   // longe dos 2 s
+            Assert.IsTrue(fsm.EncerrarRasante(), "Havia um rasante para encerrar.");
+
+            Assert.AreNotEqual(ByakheeState.Rasante, fsm.CurrentState,
+                "Encerrar o rasante tem de sair do Rasante na hora — é o que evita a criatura " +
+                "prensada na parede ou 12 un além do jogador.");
+
+            // O primeiro rasante da fase 1 termina em pouso (DepoisDoVoo alterna a partir daí).
+            Assert.AreEqual(ByakheeState.Pousado, fsm.CurrentState);
+            Assert.AreEqual(0f, fsm.TimeInState, 1e-5f, "O relógio do novo estado começa do zero.");
+        }
+
+        [Test]
+        public void EncerrarRasante_ForaDoRasante_NaoFazNada()
+        {
+            var fsm = CriarEmCombate();
+            AvancarAtePousar(fsm);
+
+            Assert.IsFalse(fsm.EncerrarRasante());
+            Assert.AreEqual(ByakheeState.Pousado, fsm.CurrentState);
+        }
+
+        [Test]
         public void CortarAsa_SoFuncionaNaFase3EEmVoo()
         {
             var fase1 = CriarEmCombate();

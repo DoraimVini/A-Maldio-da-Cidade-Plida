@@ -56,6 +56,10 @@ namespace FavelaAmarela.Tests.PlayMode
         [UnityTest]
         public IEnumerator AbaterOByakhee_GravaOMarcoDaQuest()
         {
+            // O HUD é singleton persistente e outros testes da suíte o destroem no TearDown;
+            // sem ele o GameLoopBootstrap loga um Error na carga e o runner reprova o teste
+            // por "unhandled log message" — sem relação com o que se mede aqui.
+            FavelaAmarela.Runtime.UI.HUDController.GarantirInstancia();
             yield return SceneManager.LoadSceneAsync(Cena, LoadSceneMode.Single);
             yield return null;
 
@@ -85,6 +89,10 @@ namespace FavelaAmarela.Tests.PlayMode
         {
             GerenciadorDeSave.MarcarAconteceu(ChavesDeSave.ByakheeAbatido);
 
+            // O HUD é singleton persistente e outros testes da suíte o destroem no TearDown;
+            // sem ele o GameLoopBootstrap loga um Error na carga e o runner reprova o teste
+            // por "unhandled log message" — sem relação com o que se mede aqui.
+            FavelaAmarela.Runtime.UI.HUDController.GarantirInstancia();
             yield return SceneManager.LoadSceneAsync(Cena, LoadSceneMode.Single);
             yield return null;
             yield return null;
@@ -119,6 +127,10 @@ namespace FavelaAmarela.Tests.PlayMode
             GerenciadorDeSave.MarcarAconteceu(ChavesDeSave.ByakheeAbatido);
             GerenciadorDeSave.MarcarAconteceu(ChavesDeSave.PortoesAbertos);
 
+            // O HUD é singleton persistente e outros testes da suíte o destroem no TearDown;
+            // sem ele o GameLoopBootstrap loga um Error na carga e o runner reprova o teste
+            // por "unhandled log message" — sem relação com o que se mede aqui.
+            FavelaAmarela.Runtime.UI.HUDController.GarantirInstancia();
             yield return SceneManager.LoadSceneAsync(Cena, LoadSceneMode.Single);
             yield return null;
             yield return null;

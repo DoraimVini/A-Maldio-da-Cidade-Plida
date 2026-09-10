@@ -298,7 +298,12 @@ namespace FavelaAmarela.Tests.PlayMode
             Assert.IsTrue(script.PodeInteragir,
                 "O coletável já nasceu marcado como coletado — o teste não teria o que medir.");
 
+            // O banco e a mochila são singletons persistentes: na suíte completa chegam aqui
+            // com o save real do jogador aplicado (e, conforme a ordem, sem o banco). O que se
+            // mede é a coleta, não o estado herdado — então mochila limpa e banco garantido.
+            FavelaAmarela.Inventario.ItemDatabase.GarantirInstancia();
             var inv = FavelaAmarela.Inventario.InventoryManager.Instance;
+            inv?.Main.LimparTudo();
 
             Assert.IsNotNull(inv,
                 "InventoryManager.Instance está nulo em PlayMode. Ele se auto-instancia por " +
