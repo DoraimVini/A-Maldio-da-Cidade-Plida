@@ -36,17 +36,21 @@ namespace FavelaAmarela.EditorTools
         [MenuItem("Tools/FavelaAmarela/UI: montar o painel de opções")]
         public static void Executar()
         {
-            // Resources.GetBuiltinResource, NÃO AssetDatabase.GetBuiltinExtraResource: só o
-            // primeiro serve para fontes. E sem fallback para "Arial.ttf" -- na Unity 6 aquele
-            // nome LANÇA ArgumentException em vez de devolver null, então um `??` não protege
-            // nada: ele avalia o lado direito e a exceção sobe. FonteBuiltinTests guarda isso.
-            var fonte = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            // A fonte do JOGO (Kenney Pixel, via PaletaDaInterface), não a embutida da Unity
+            // (2026-09-10): reconstruir o prefab com LegacyRuntime.ttf pôs 9 Text em Arial numa
+            // interface inteira em Kenney Pixel — UmaFonteSoNoJogoTests reprovou nos dois
+            // guardas. A embutida fica só como último recurso, com erro no console.
+            var fonte = PaletaDaInterface.Fonte;
 
             if (fonte == null)
             {
-                Debug.LogError($"{Marcador} Fonte embutida não encontrada — o painel sairia " +
-                               "sem texto nenhum.");
-                return;
+                Debug.LogError($"{Marcador} Fonte do jogo não encontrada (PaletaDaInterface.Fonte) " +
+                               "— caindo na embutida da Unity; UmaFonteSoNoJogoTests vai reprovar.");
+                // Resources.GetBuiltinResource, NÃO AssetDatabase.GetBuiltinExtraResource: só o
+                // primeiro serve para fontes. E sem "Arial.ttf" -- na Unity 6 aquele nome LANÇA
+                // ArgumentException em vez de devolver null. FonteBuiltinTests guarda isso.
+                fonte = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                if (fonte == null) return;
             }
 
             var raiz = new GameObject("Painel_Opcoes",

@@ -4,6 +4,40 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — Os Portões não abriam mais: a interação medida da origem, não da face
+
+O Vini alteou a barreira dos Portões (1 → 4,3 un, y 9,6…14) para o Damião não entrar por baixo da
+arte, e relatou: *"não tô mais conseguindo atravessar os portões"*. Nada de física: a
+`PosicaoDeInteracao` do `PortaoDosPortoes` era `transform.position`, na linha dos pilares
+(y ≈ 13). Encostado na barreira nova, o Damião para a **3,59 un** da origem, e o
+`SeletorDeInteracao` descarta tudo acima de 1,5. O prompt nunca aparecia; sem prompt, sem abrir;
+sem abrir, sem Castelo.
+
+- `PosicaoDeInteracao` passa a ser a **face sul da barreira** (`barreira.bounds.min.y`) — a
+  interação fica independente da altura que a barreira tiver.
+- Guarda `OsPortoesAbremDeOndeSeEncostaTests` (PlayMode, cena e detector reais): o Damião
+  encostado vê o prompt (`DetectorDeInteracao.AlvoAtual` é o portão). Provado contra a versão
+  anterior: reprova com "3,59 un, alcance 1,50".
+- A barreira ficou com **26 un** de largura (era 17,5): na própria base (y 9,6) o piso tem 25,
+  e uma barreira mais estreita que o piso deixa um bolso de cada lado. O guarda
+  `OGatilhoEOsPortoes_AtravessamOPiso` passa a medir a base (9,6 / 25), não uma linha antiga
+  (11 / 18). Alteração feita no Editor e salva na cena.
+
+### A suíte EditMode inteira, enfim (1160 testes)
+
+Cena limpa pela primeira vez no dia: **1130 passam, 7 reprovam, 23 pulados** (contratos
+migrados para `HudPersistenteTests`). As 7:
+
+- 3 **minhas**, corrigidas nesta rodada: o `PainelDeOpcoes` lia `Keyboard.current` sem falar com
+  o `ArbitroDeFoco` (agora toma/devolve `PainelModal` ao abrir/fechar, como o inventário); o
+  prefab reconstruído saiu com **9 Text em Arial** porque a ferramenta usava a fonte embutida —
+  agora usa `PaletaDaInterface.Fonte` (Kenney Pixel), com a embutida só como último recurso.
+- 1 dos Portões, acima.
+- 3 **do Castelo, do Vini, fora dos meus commits**: o Rei está com escala ≈ 3,7 na cena (15,2 un
+  de altura; a câmera mostra 11,25; 61 % do corpo dentro da sala), e o guarda de balanceamento
+  do Confronto reprova no nível 4 (Alfanje T2: 8,6 golpes cabem na calmaria de 5 s). A luta do
+  Rei está parada por decisão dele — registro, não mexo.
+
 ## 2026-09-10 — Opções sem volta, Byakhee tremendo de lado, e o farm infinito
 
 Três relatos do Vini na mesma tarde, três commits (`be05424f`, `f5091258`, e o deste devlog).

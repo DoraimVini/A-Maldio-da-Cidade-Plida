@@ -104,10 +104,15 @@ namespace FavelaAmarela.Tests.EditMode
             var falhas = new List<string>();
 
             // (nome do objeto, y em que está, largura mínima exigida pelo losango ali)
+            //
+            // Os_Portoes: a barreira é ALTA (o Vini a esticou de 1 para 4,3 un em 2026-09-10,
+            // para o Damião não entrar por baixo da arte), então o que importa é a linha mais
+            // BAIXA dela, y ≈ 9,6 — onde o piso é mais largo (25 un, medido no PortoesFloor).
+            // Uma barreira mais estreita que o piso na própria base deixa um bolso de cada lado.
             foreach (var (nome, y, minimo) in new[]
             {
                 ("Gatilho_DaArena", -7f, 36f),
-                ("Os_Portoes", 11f, 18f),
+                ("Os_Portoes", 9.6f, 25f),
             })
             {
                 float largura = LarguraDoColisor(txt, nome);

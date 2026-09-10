@@ -86,8 +86,22 @@ namespace FavelaAmarela.Runtime.GameLoop
         /// <inheritdoc />
         public int PrioridadeDeInteracao => 0;
 
-        /// <inheritdoc />
-        public Vector2 PosicaoDeInteracao => transform.position;
+        /// <summary>
+        /// Onde o jogador "toca" os Portões: a <b>face sul da barreira</b>, não a origem do
+        /// objeto.
+        ///
+        /// <para><b>O defeito (2026-09-10).</b> O Vini alteou a barreira (de 1 para 4,3 un, para
+        /// o Damião não entrar por baixo da arte) e os Portões deixaram de abrir: <i>"não tô mais
+        /// conseguindo atravessar"</i>. A origem do objeto está na linha dos pilares (y ≈ 13); com
+        /// a barreira descendo até y ≈ 9,6, o jogador para a 3,4 un da origem — e o
+        /// <c>SeletorDeInteracao</c> descarta qualquer alvo a mais de 1,5. O prompt nunca
+        /// aparecia. Medir da face que o jogador encosta torna a interação independente da
+        /// altura que a barreira tiver.</para>
+        /// </summary>
+        public Vector2 PosicaoDeInteracao =>
+            barreira != null && barreira.enabled
+                ? new Vector2(transform.position.x, barreira.bounds.min.y)
+                : (Vector2)transform.position;
 
         /// <inheritdoc />
         public void Interagir(GameObject quemInterage) => Abrir();

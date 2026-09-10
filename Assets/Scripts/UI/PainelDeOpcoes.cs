@@ -81,7 +81,10 @@ namespace FavelaAmarela.Runtime.UI
 
             MontarSeletorDeQuadros();
             Ligar();
-            Fechar();   // nasce fechada: quem abre é o menu
+
+            // Nasce fechada: quem abre é o menu. Direto na raiz, e não por Fechar(): Fechar()
+            // devolve um foco que ninguém tomou ainda.
+            Raiz.SetActive(false);
         }
 
         private void OnDestroy()
@@ -96,12 +99,28 @@ namespace FavelaAmarela.Runtime.UI
         /// <summary>Abre a tela, sincronizando os controles com o estado corrente.</summary>
         public void Abrir()
         {
+            if (EstaAberta) return;
+
             Sincronizar();
             Raiz.SetActive(true);
+
+            // Toma o comando do teclado enquanto está aberta — é o que a tela de inventário faz
+            // e o que o guarda LeitorDeTeclaRespeitaOFocoTests exige de quem lê Keyboard.current:
+            // com a pilha de foco sabendo dela, o jogo por baixo não anda nem ataca, e o Esc que
+            // ela lê no Update é dela por direito, não por sorte de ordem de Update.
+            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Tomar(
+                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
         }
 
-        /// <summary>Fecha a tela.</summary>
-        public void Fechar() => Raiz.SetActive(false);
+        /// <summary>Fecha a tela e devolve o comando a quem o tinha.</summary>
+        public void Fechar()
+        {
+            if (!EstaAberta) return;
+
+            Raiz.SetActive(false);
+            FavelaAmarela.Runtime.Entrada.ArbitroDeFoco.Devolver(
+                FavelaAmarela.Core.Entrada.CamadaDeEntrada.PainelModal);
+        }
 
         /// <summary>Se está aberta agora — o <c>PausaInputHandler</c> consulta para não despausar por baixo.</summary>
         public bool EstaAberta => Raiz.activeSelf;
