@@ -111,6 +111,11 @@ decisão de design, e vivem no asset para serem mexidas sem tocar em código.
   propósito: ele não é mais forte, ele **caça por faro**". O Cultista caiu para 16 e o Sseth
   **não foi junto** — ele é conteúdo do Templo, não da abertura, e o ajuste veio de um playtest
   da abertura. A paridade quebrou; se ela era o ponto, o Sseth precisa cair também.
+
+  > **Decisão do Vini (2026-09-09): fica para a construção do Templo.** Não se mexe no Sseth
+  > agora — ele não aparece em cena nenhuma do build, então o número não afeta ninguém hoje. A
+  > questão volta quando o Templo for montado, e está registrada no item 14 do roadmap para
+  > não se perder.
 - **Nagaraja** — elite nomeado, fala Aklo, é `IInteragivel` (tem conversa antes da luta, como
   o Abdul). É o único do Templo com **mente** (Resiliência 60): dá para derrotá-lo pelo canal
   anômalo, o que é coerente com uma criatura que argumenta. Larga a Coroa de Ossos.

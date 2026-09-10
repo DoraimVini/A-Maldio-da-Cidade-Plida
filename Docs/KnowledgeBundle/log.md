@@ -4,6 +4,53 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — As barras ganham trilho ornado, e a cor de estado sobrevive
+
+Primeiro item da fila de implementação. O `DarkAgesUI` — o pacote que **30 objetos do HUD já
+usam** — tem trilhos com ponta dourada e três preenchimentos coloridos.
+
+### O que quase deu errado
+
+A tentação era usar os **preenchimentos coloridos** do pacote: azul, carmim e verde, exatamente
+três barras. Medido antes, os três scripts **tingem o preenchimento em runtime**, e as cores são
+de **estado**:
+
+| barra | normal | alerta | fim |
+|---|---|---|---|
+| `VitalidadeBar` | vermelho-carne | **crítica** laranja | abatido cinza |
+| `ResilienciaBar` | **amarelo Carcosa** | **pânico** vermelho | colapso quase-preto |
+| `VigorBar` | verde | **exausto** cinza | — |
+
+Preenchimento colorido multiplicaria com a tinta e **destruiria esse aviso** — o jogador deixaria
+de ver que está em pânico ou em estado crítico. A Resiliência, aliás, é **amarela** e não azul: o
+jogo já resolveu isso pela ficção, e eu tinha suposto azul.
+
+Então o preenchimento continua **branco e tingível**. O que mudou é o trilho.
+
+### O trilho, e por que Sliced
+
+`bar_background.png` era um retângulo escuro chapado. Virou o trilho ornado do DarkAgesUI, 84 × 7,
+com as pontas douradas. Medido pelo alfa: o ouro ocupa **10 px à esquerda e 12 à direita**, então
+a borda de 9 fatias é `{10, 1, 12, 1}` e o `m_Type` passou de `0` (Simple) para `1` (Sliced).
+
+Sem isso as pontas esticariam junto com a barra, e um ornamento esticado é pior que nenhum.
+
+Quatro trilhos trocados — as três barras mais a do Companheiro.
+
+> **A guarda de import pegou um erro meu na hora:** herdei o `.meta` do `bar_background`, que
+> está em **PPU 16**, e o padrão do projeto é 32. O `ImportacaoDaPixelArtTests` reprovou com a
+> medida e o conserto na mensagem.
+
+### Registrado, não feito: o Sseth
+
+O `Ataque` do Cultista caiu de 20 para 16 e o **Sseth ficou em 20**, quebrando uma paridade que a
+documentação dizia ser deliberada. **Decisão do Vini: fica para a construção do Templo** — o
+Sseth não está em cena nenhuma do build, então o número não afeta ninguém hoje. Anotado no item
+14 do roadmap e na ficha, para não se perder.
+
+EditMode 1110 · PlayMode 64.
+
+
 ## 2026-09-09 — "Não tem nenhum livro?" — e a pergunta corrigiu o desenho
 
 O Vini perguntou se não havia um ícone dos assets mais compatível para os Fragmentos, e depois:
