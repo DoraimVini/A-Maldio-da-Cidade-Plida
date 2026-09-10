@@ -1,0 +1,66 @@
+LICENCA - "Moonstone Keeper - Eldermoon Grove", por Sucart
+==========================================================
+
+Fonte:      https://sucart.itch.io/moonstone-keeper
+Autor:      Sucart  (perfil itch.io: sucart)
+Preco:      "Name your own price" (gratuito, doacao opcional)
+Download:   "Moonstone_Keeper Eldermoon_Grove - By SUCART.zip" (4,4 MB)
+Capturado:  2026-09-10, texto copiado da pagina no dia
+
+Este arquivo substitui o LICENCA_PENDENTE.txt de 2026-08-19, que registrava que
+o zip nao continha termos. Os termos NAO estao no zip: estao na pagina. Um link
+nao basta como prova de submissao, por isso o texto esta copiado aqui.
+
+
+O QUE O AUTOR ESCREVEU (verbatim)
+---------------------------------
+
+Na pagina do pacote:
+
+  "You are free to use this asset pack in any project that you make, as long
+   as you credit me using the name Sucart."
+
+  "No generative AI was used"
+
+Nos comentarios (ha 2 anos na data da captura), respondendo a carlosalf1997,
+que perguntou sobre licenca e uso comercial:
+
+  "Free to use, though I would appreciate a reference to it!"
+
+
+O QUE ISSO SIGNIFICA, SEM VENDER
+--------------------------------
+
+- NAO e uma licenca formal (nao ha CC-BY, MIT ou texto de termos).
+- E permissao escrita do autor, publica, na pagina oficial, para "any project"
+  -- e a pergunta explicita sobre uso comercial foi respondida pelo autor com
+  "Free to use".
+- O CREDITO E CONDICAO, nao cortesia: "as long as you credit me using the name
+  Sucart". Sem o credito no jogo, o uso esta fora dos termos.
+- O autor declara que nao usou IA generativa -- relevante se o edital perguntar.
+- Nada e dito sobre modificar. Este projeto NAO recolore nem edita a arte do
+  Rei: usa os quadros como vieram.
+
+
+O QUE ESTA EM USO NESTE PROJETO
+-------------------------------
+
+Rei_idle.png, Rei_selar.png, Rei_desvelo.png, Rei_dano.png, Rei_queda.png --
+5 folhas, quadros de 88 x 129 px, e o ReiEmAmarelo_AC.controller que as toca.
+
+O pacote na pagina lista tambem Walk, Run, Jump, Dodge (WIP) e ATTACK (WIP).
+A versao baixada em agosto nao trazia ataque utilizavel; e por isso que o
+Confronto do Rei (2026-09-10) mantem o desvelo como unico ataque dele. Se uma
+versao nova do pacote trouxer os quadros de ataque, a quarta fase pode ganhar
+um golpe sem trocar de arte.
+
+
+CREDITO A DAR NO JOGO (OBRIGATORIO)
+-----------------------------------
+
+  Rei em Amarelo (sprite): Sucart
+  https://sucart.itch.io/moonstone-keeper
+
+PENDENCIA: o jogo nao tem tela nem texto de creditos (conferido em 2026-09-10).
+Para o Sucart isso nao e cosmetico -- e a condicao de uso. Precisa existir
+antes da submissao.

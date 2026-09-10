@@ -1,0 +1,71 @@
+LICENCA - "4 Directional character", por Warren Clark (lionheart963)
+====================================================================
+
+Fonte:      https://lionheart963.itch.io/4-directional-character
+Autor:      Warren Clark  (perfil itch.io: lionheart963)
+Preco:      "Name your own price" (gratuito, doacao opcional)
+Download:   "4 directional character.zip" (36 kB) -- folha + quadros individuais
+Capturado:  2026-09-10, texto copiado da pagina no dia
+
+Este arquivo substitui o LICENCA_PENDENTE.txt de 2026-08-19, que registrava que
+o zip nao continha termos. Os termos NAO estao no zip: estao na pagina, escritos
+pelo autor. Um link nao basta como prova de submissao, por isso o texto esta
+copiado aqui.
+
+
+O QUE O AUTOR ESCREVEU (verbatim)
+---------------------------------
+
+Descricao do pacote, na pagina:
+
+  "My first attempt at animating a four directional sprite very rough
+   animation but will improve in the future. Feel free to use and improve on
+   and again any comments good or bad would be appreciated cheers."
+
+Resposta do autor nos comentarios (ha 8 anos na data da captura), a iftee939,
+que perguntou: "Can I use this in my Game as the Boss? Giving you credits and
+link to your profile would be my pleasure!":
+
+  "Cheers man all my work on here is free to use in any way ud like and
+   credit would be awesome cheers."
+
+
+O QUE ISSO SIGNIFICA, SEM VENDER
+--------------------------------
+
+- NAO e uma licenca formal (nao ha CC0, CC-BY, MIT ou texto de termos).
+- E permissao escrita do proprio autor, publica, na pagina oficial do pacote,
+  sem restricao de uso ("in any way ud like"), com pedido de credito
+  ("credit would be awesome") -- pedido, nao exigencia.
+- Um comentario posterior (DungeonArtist, ha 7 anos) perguntou explicitamente
+  sobre uso comercial e NAO recebeu resposta direta. A declaracao geral acima e
+  anterior e a cobre; fica registrado que a pergunta especifica ficou sem
+  resposta.
+- Este projeto DA o credito (abaixo), por respeito ao pedido e porque e barato.
+
+
+COMO ESTA EM USO NESTE PROJETO
+------------------------------
+
+Damiao_idle.png, Damiao_run_{up,down,left,right}.png,
+Damiao_slice_{up,down,left,right}.png -- 9 folhas, quadros de 88 px de altura.
+
+RECOLORIDO: o manto/tabardo vermelho do original virou o ouro de Carcosa por
+troca exata de 5 tons (nao tingimento), em 2026-08-19. A descricao do autor
+convida a isso ("Feel free to use and improve on"). Um comentario na pagina
+pergunta por uma versao "without the cape & accessorys" -- e a capa que foi
+recolorida, o que confirma a identidade do pacote.
+
+Damiao e o protagonista: esta e a arte que o jogador ve o jogo inteiro.
+
+
+CREDITO A DAR NO JOGO
+---------------------
+
+  Damiao (sprite base): Warren Clark (lionheart963)
+  https://lionheart963.itch.io/4-directional-character
+  Recolorido para Caminho para Carcosa.
+
+PENDENCIA: o jogo nao tem tela nem texto de creditos (conferido em 2026-09-10:
+nada em Cena_Menu nem no HUD). Este credito, o do AshDeal (Abdul), Kenney,
+CraftPix e os demais precisam de um lugar antes da submissao.
