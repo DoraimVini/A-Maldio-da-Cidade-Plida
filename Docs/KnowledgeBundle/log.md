@@ -4,6 +4,24 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — O Rei no controle: "detestei, está muito repetitiva"
+
+O Vini jogou a versão de hoje — três ciclos de abrigo, depois o Confronto com o mesmo ciclo e o
+Rei ferível entre desvelos — e reprovou: *"Eu detestei a luta contra o Rei, está muito
+repetitiva. Não vou mexer nisso agora. Vou pensar melhor como seria a luta."*
+
+Registro sem defesa: eu consertei o que estava **quebrado** (a resposta impossível de dar as
+costas; o chefe sem carne) e o que saiu foi um laço só, repetido oito vezes. Funciona, é
+vencível, e é monótono — a crítica é sobre design, não sobre bug, e é dele.
+
+**Decisão:** o item 12 do roadmap volta a ⚠️. Nada muda no código até a luta ser repensada.
+
+**O que a próxima versão vai encontrar pronto:** a FSM com fases separáveis (`EmConfronto`,
+`PodeReceberDano`, `Abater()`), o Rei como `IDanificavel` com ficha e barra, os abrigos por
+relíquia, a geometria da sala medida, e a restrição que decide tudo — **não há clipe de
+ataque**. O pacote do Sucart lista *Attack (WIP)*: se ele já publicou, a luta ganha um golpe
+sem trocar de arte, e o desenho abre.
+
 ## 2026-09-10 — A Byakhee presa numa faixa, e a coleira que era a câmera e não a sala
 
 O Vini: *"a cena da Byakhee continua toda errada, e a Byakhee desde a mudança na fase está presa a
