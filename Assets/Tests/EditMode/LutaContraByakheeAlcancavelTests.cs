@@ -38,7 +38,7 @@ namespace FavelaAmarela.Tests.EditMode
         {
             float velocidadeRasante = CampoDoPrefab("velocidadeRasante");
             float velocidadeNoChao = CampoDoPrefab("velocidadeNoChao");
-            float raioDaArena = CampoDoPrefab("raioDaArena");
+            float semiEixoX = CampoDoPrefab("semiEixoDaArenaX");
 
             float duracaoRasante = PadraoDaFsm("duracaoRasante");
             float menorJanela = PadraoDaFsm("duracaoPousoFase2");
@@ -68,11 +68,50 @@ namespace FavelaAmarela.Tests.EditMode
                 "Saídas: encurtar o rasante, acelerar o arrasto no chão (velocidadeNoChao), ou " +
                 "alongar a janela da fase 2.");
 
-            Assert.LessOrEqual(distanciaDoRasante, raioDaArena * 2f,
+            Assert.LessOrEqual(distanciaDoRasante, semiEixoX * 2f,
                 $"Um rasante percorre {distanciaDoRasante:0.##} unidades e a arena tem " +
-                $"{raioDaArena * 2f:0.##} de diâmetro. O chefe atravessa a arena inteira num " +
+                $"{semiEixoX * 2f:0.##} de largura. O chefe atravessa a arena inteira num " +
                 "movimento só e passa a viver colado na coleira, brigando com ela em vez de " +
                 "voar o padrão.");
+        }
+
+        /// <summary>
+        /// <b>A arena tem de caber na tela.</b>
+        ///
+        /// <para>Era um círculo de raio 12 — <b>24 × 24</b> — contra uma vista de
+        /// <b>20,00 × 11,25</b>. Não cabia na largura, e cabia menos da metade na altura: o
+        /// chefe podia estar a 12 do centro enquanto a câmera mostrava 5,6 para cima. O jogador
+        /// lutava contra o que não via, e essa foi a terceira causa do
+        /// <i>"a hurtbox dela é muito difícil de atingir"</i> — depois da geometria da hurtbox e
+        /// da tinta que escurecia o chefe a 32%.</para>
+        ///
+        /// <para>A vista aqui é derivada, não escrita: <c>PixelPerfectCamera</c> com PPU 32 e
+        /// referência 640 × 360 dá <c>orthographicSize</c> 5,625, e a 16:9 isso é 20 × 11,25.</para>
+        ///
+        /// <para>E os <b>portões</b> dependem disso: eles são o fundo da luta, e fundo só
+        /// funciona se a luta acontecer na frente dele.</para>
+        /// </summary>
+        [Test]
+        public void AArena_CabeNoQueACameraMostra()
+        {
+            float semiX = CampoDoPrefab("semiEixoDaArenaX");
+            float semiY = CampoDoPrefab("semiEixoDaArenaY");
+
+            const float TamanhoOrtografico = 360f / (2f * 32f);   // 5,625
+            float meiaLargura = TamanhoOrtografico * 16f / 9f;    // 10,00
+
+            TestContext.WriteLine(
+                $"arena {semiX * 2f:0.##} × {semiY * 2f:0.##} | vista " +
+                $"{meiaLargura * 2f:0.##} × {TamanhoOrtografico * 2f:0.##}");
+
+            Assert.LessOrEqual(semiX, meiaLargura,
+                $"A arena tem {semiX * 2f:0.##} de largura e a câmera mostra " +
+                $"{meiaLargura * 2f:0.##}. O chefe sai de quadro pelos lados.");
+
+            Assert.LessOrEqual(semiY, TamanhoOrtografico,
+                $"A arena tem {semiY * 2f:0.##} de altura e a câmera mostra " +
+                $"{TamanhoOrtografico * 2f:0.##}. O chefe sai de quadro por cima — e é o eixo " +
+                "mais apertado da vista isométrica, que é larga e baixa.");
         }
 
         /// <summary>

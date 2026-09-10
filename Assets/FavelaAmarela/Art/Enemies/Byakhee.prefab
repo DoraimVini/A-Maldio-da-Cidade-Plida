@@ -319,7 +319,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.ByakheeAI
   centroDaArena: {fileID: 0}
   raioDeVoo: 3
-  raioDaArena: 12
+  semiEixoDaArenaX: 9
+  semiEixoDaArenaY: 5
   velocidadeNoChao: 2.6
   velocidadeRasante: 6
   velocidadeMergulho: 9

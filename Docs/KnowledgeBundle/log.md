@@ -4,6 +4,71 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — A arena da Byakhee: forma errada para a câmera, e os portões na frente da luta
+
+O Vini pediu para achar os portões que ele pôs na cena, fazê-los caber na arena e ficarem ao
+fundo. E perguntou se eu ainda achava a arena elíptica melhor. A resposta ficou **mais** firme.
+
+### Os portões
+
+A arte é `Entrada_PortoesDeCarcosa.png`, num objeto chamado **`Batente`**. Nativa: 4,00 × 4,12
+unidades. Escala na cena: **10,122 × 9,053**.
+
+```
+renderizavam a  40,5 x 37,3 unidades
+a camera ve     20,0 x 11,25
+```
+
+Duas vezes a largura da tela e mais de três vezes a altura. Três defeitos somados:
+
+| | |
+|---|---|
+| escala **10,122 × 9,053** | não é inteira, e quebra o pixel-perfect que o projeto inteiro sustenta |
+| arte em **y = −3,96** | ao **sul** do centro — estava **na frente** da luta |
+| colisor `Os_Portoes` em **y = +11** | a colisão e a arte do mesmo portão estavam a **15 unidades** uma da outra |
+
+Mais `sortingOrder 0`, que empata com um ator em y=0 e pisca.
+
+Agora: os dois em **y = +8**, escala **2 × 2** (8,0 × 8,2 un), ordem **−80** — que é a mesma
+regra `−y×10` da geometria estática. O pivô é bottom-center, então a base fica em 8 e a arte
+sobe: é como uma estrutura alta se ancora num isométrico.
+
+### A arena: círculo → elipse
+
+| | |
+|---|---|
+| era | círculo raio 12 → **24 × 24** |
+| a câmera mostra | **20,00 × 11,25** |
+| largura | 24 contra 20 — não cabia |
+| altura | 24 contra 11,25 — cabia **menos da metade** |
+
+O chefe podia estar a 12 do centro enquanto a câmera mostrava 5,6 para cima. **O jogador lutava
+contra o que não via.** É a terceira causa do *"a hurtbox dela é muito difícil de atingir"* —
+depois da geometria da hurtbox e da tinta que o escurecia a 32%.
+
+Agora **elipse de semi-eixos 9 × 5** (18 × 10). Cabe nos dois eixos, e o rasante de 12 atravessa
+dois terços da largura — continua exigindo que o jogador ande de lado, que é a defesa que o
+design pede.
+
+> **A normal de uma elipse não aponta para o centro.** Manter `-doCentro.normalized` empurraria
+> de viés nas laterais — justamente onde a arena é mais larga e onde o rasante termina. A coleira
+> usa o gradiente de `(x/a)² + (y/b)²`.
+
+### E é a mesma lição do mesmo dia
+
+A zona morta da câmera era um **círculo** numa vista 16:9, e por isso trabalhava 78% mais num
+eixo que no outro. A arena era um **círculo** na mesma vista, e por isso transbordava. **O espaço
+de jogo tem de ter a proporção da vista.**
+
+Os portões dependem disso: fundo só funciona se a luta acontecer na frente dele. Com raio 12 o
+Byakhee voava até y=+12 e passava por trás deles.
+
+Guarda nova: `AArena_CabeNoQueACameraMostra`, com a vista **derivada** do `PixelPerfectCamera`
+(PPU 32, referência 640 × 360 → 5,625 → 20 × 11,25), não escrita à mão.
+
+EditMode 1114 → **1115** · PlayMode 64.
+
+
 ## 2026-09-09 — O Byakhee: o estado imune era o marcante, e a janela de dano não tinha sinal
 
 Terceiro item da fila, medido antes de tocar no chefe.

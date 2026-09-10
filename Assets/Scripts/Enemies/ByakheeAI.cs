@@ -32,7 +32,28 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Até onde ele pode se afastar do centro da arena, em unidades. Fora disso " +
                  "ele é forçado a voltar.")]
         [Min(4f)]
-        [SerializeField] private float raioDaArena = 12f;
+        /// <summary>
+        /// Meia-largura da arena. <b>A arena é uma elipse, não um círculo.</b>
+        ///
+        /// <para><b>Por quê (2026-09-09).</b> A vista isométrica deste jogo é
+        /// <b>20,00 × 11,25</b> unidades — larga e baixa. Uma arena circular de raio 12 tem
+        /// 24 × 24: não cabe na largura, e cabe <b>menos da metade</b> na altura. O chefe podia
+        /// estar a 12 do centro enquanto a câmera mostrava 5,6 para cima — ele saía de quadro e
+        /// o jogador lutava contra o que não via. É a queixa do Vini, <i>"a hurtbox dela é muito
+        /// difícil de atingir"</i>, pelo terceiro canal: geometria, leitura visual, e agora
+        /// enquadramento.</para>
+        ///
+        /// <para>É a mesma lição da zona morta da câmera, no mesmo dia: <b>o espaço de jogo tem
+        /// de ter a proporção da vista</b>, não ser quadrado.</para>
+        ///
+        /// <para><b>E os portões precisam disso.</b> Eles são o fundo da luta, e fundo só
+        /// funciona se a luta acontecer na frente dele. Com raio 12 o Byakhee voava até y=+12 e
+        /// passava por trás deles.</para>
+        /// </summary>
+        [SerializeField] private float semiEixoDaArenaX = 9f;
+
+        /// <summary>Meia-altura da arena. Ver <see cref="semiEixoDaArenaX"/>.</summary>
+        [SerializeField] private float semiEixoDaArenaY = 5f;
 
         [Tooltip("Velocidade com que ele se arrasta na direção do jogador enquanto está " +
                  "POUSADO e longe demais para ser alcançado.")]
@@ -305,7 +326,7 @@ namespace FavelaAmarela.Runtime.Enemies
             Core.Player.BaseIsometrica.AlturaDeCelulaPadrao * 0.5f;
 
         /// <summary>
-        /// <b>Coleira da arena.</b> Se ele passou do <see cref="raioDaArena"/>, a velocidade que
+        /// <b>Coleira da arena.</b> Se ele passou da elipse da arena, a velocidade que
         /// aponta para fora é trocada por uma que aponta para dentro.
         ///
         /// <para><b>O defeito que isto conserta.</b> Nada limitava a posição dele. O rasante são
@@ -321,9 +342,18 @@ namespace FavelaAmarela.Runtime.Enemies
         private void ManterNaArena()
         {
             Vector2 doCentro = _rb.position - (Vector2)_centro;
-            if (doCentro.sqrMagnitude <= raioDaArena * raioDaArena) return;
 
-            Vector2 paraDentro = -doCentro.normalized;
+            // Normaliza pelos semi-eixos: dentro da elipse quando (x/a)² + (y/b)² <= 1.
+            float nx = semiEixoDaArenaX > 0f ? doCentro.x / semiEixoDaArenaX : 0f;
+            float ny = semiEixoDaArenaY > 0f ? doCentro.y / semiEixoDaArenaY : 0f;
+
+            if (nx * nx + ny * ny <= 1f) return;
+
+            // A normal de uma elipse NÃO aponta para o centro — aponta na direção do gradiente
+            // de (x/a)² + (y/b)². Usar -doCentro.normalized empurraria de viés nas laterais,
+            // que é onde a arena é mais larga e onde o rasante termina.
+            Vector2 paraDentro = -new Vector2(nx / semiEixoDaArenaX,
+                                              ny / semiEixoDaArenaY).normalized;
 
             // Só corrige o que aponta para fora: um movimento que já volta é preservado, senão
             // ele ficaria colado na borda em vez de retomar o padrão.
