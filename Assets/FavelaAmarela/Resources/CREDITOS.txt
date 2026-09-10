@@ -1,0 +1,49 @@
+CAMINHO PARA CARCOSA
+
+Um jogo de Vini.
+Direção, design, código e cenas: Vini.
+Assistência de programação: Claude (Anthropic).
+
+
+ARTE
+
+Rei em Amarelo
+  "Moonstone Keeper – Eldermoon Grove", por Sucart (sucart.itch.io).
+  Sem IA generativa, nas palavras do autor.
+
+Damião e Abdul Alhazred
+  "4 Directional character", por Warren Clark (lionheart963.itch.io).
+
+Cassilda e os Cortesãos Pálidos
+  Pacote "Characters", de licença aberta.
+
+Byakhee
+  Folha "gargoyle_red", de autoria não identificada — se for sua, escreva para nós.
+
+Esqueleto Invocado e Escudo Mágico
+  "Horror Pixel Art Enemy Pack", por AshDeal; "Shader Cylinder 64x96".
+
+Interface (molduras, casas do inventário, painéis)
+  "Dark Ages UI Pixel Art Asset Pack", por Hypnobius (hypnobius.itch.io).
+
+Portões, ícones, blocos e cenários isométricos, fonte Kenney Pixel
+  Kenney (kenney.nl) — Creative Commons Zero.
+
+Tiles, objetos e ícones de itens
+  CraftPix (craftpix.net): Free Undead Tileset, Free Cursed Land Tileset,
+  Undead Loot Icons — com autorização do estúdio.
+
+Desenhados para este jogo, pixel a pixel
+  Fragmentos de Yhtill, Poste de Osso, Eco de Carcosa, Nobres Fossilizados,
+  Espelhos de Aldebaran, altares das relíquias, a escuridão além dos Portões.
+
+
+FERRAMENTAS
+
+Unity 6, Aseprite, Python.
+
+
+AGRADECIMENTOS
+
+A quem publica arte livre e responde a quem pergunta se pode usar.
+A quem jogou cedo e disse o que estava errado.

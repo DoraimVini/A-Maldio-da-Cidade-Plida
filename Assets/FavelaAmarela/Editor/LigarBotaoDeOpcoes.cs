@@ -32,12 +32,25 @@ namespace FavelaAmarela.EditorTools
         [MenuItem("Tools/FavelaAmarela/UI: ligar o botão de Opções")]
         public static void Executar()
         {
-            var resumo = new List<string> { NoHud(), NoMenuPrincipal() };
+            var resumo = new List<string> { NoHud(), NoMenuPrincipal("botaoDeOpcoes", NomeDoBotao, "Opções") };
 
             AssetDatabase.SaveAssets();
 
             string quebra = System.Environment.NewLine + "  ";
             Debug.Log($"{Marcador} Concluído:" + quebra + string.Join(quebra, resumo));
+        }
+
+        /// <summary>
+        /// O botão de <b>Créditos</b>, só no menu principal — créditos não se abrem da pausa.
+        /// Mesma receita: clona um irmão, desce um degrau, liga no campo. Ver <c>PainelDeCreditos</c>
+        /// para o porquê da tela (condição de licença do Sucart e do Warren Clark).
+        /// </summary>
+        [MenuItem("Tools/FavelaAmarela/UI: ligar o botão de Créditos")]
+        public static void ExecutarCreditos()
+        {
+            string resumo = NoMenuPrincipal("botaoDeCreditos", "Botao_Creditos", "Créditos");
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[BotaoDeCreditos] Concluído: {resumo}");
         }
 
         // ── Tela de pausa, dentro do HUD persistente ──────────────────────────
@@ -51,13 +64,13 @@ namespace FavelaAmarela.EditorTools
 
                 if (menu == null) return "HUD: nenhum MenuDePause encontrado";
 
-                return Acrescentar(menu, menu.gameObject, "HUD (tela de pausa)");
+                return Acrescentar(menu, menu.gameObject, "HUD (tela de pausa)", "botaoDeOpcoes", NomeDoBotao, "Opções");
             }
         }
 
         // ── Menu principal, na cena ───────────────────────────────────────────
 
-        private static string NoMenuPrincipal()
+        private static string NoMenuPrincipal(string campo, string nomeDoBotao, string rotulo)
         {
             var cena = EditorSceneManager.OpenScene(CenaDoMenu, OpenSceneMode.Single);
 
@@ -67,7 +80,7 @@ namespace FavelaAmarela.EditorTools
 
             if (menu == null) return "Cena_Menu: nenhum MenuPrincipal encontrado";
 
-            string resultado = Acrescentar(menu, menu.gameObject, "Cena_Menu");
+            string resultado = Acrescentar(menu, menu.gameObject, "Cena_Menu", campo, nomeDoBotao, rotulo);
 
             EditorSceneManager.MarkSceneDirty(cena);
             EditorSceneManager.SaveScene(cena);
@@ -81,13 +94,14 @@ namespace FavelaAmarela.EditorTools
         /// Acha o campo <c>botaoDeOpcoes</c> do menu, e o preenche — clonando um botão irmão
         /// quando ainda não existe um.
         /// </summary>
-        private static string Acrescentar(MonoBehaviour menu, GameObject raiz, string onde)
+        private static string Acrescentar(MonoBehaviour menu, GameObject raiz, string onde,
+                                          string campo, string nomeDoBotao, string rotulo)
         {
             var so = new SerializedObject(menu);
-            var prop = so.FindProperty("botaoDeOpcoes");
+            var prop = so.FindProperty(campo);
 
             if (prop == null)
-                return $"{onde}: campo 'botaoDeOpcoes' não existe em {menu.GetType().Name}";
+                return $"{onde}: campo '{campo}' não existe em {menu.GetType().Name}";
 
             if (prop.objectReferenceValue != null)
             {
@@ -103,22 +117,22 @@ namespace FavelaAmarela.EditorTools
                 var jaLigado = prop.objectReferenceValue as Button;
 
                 if (jaLigado == null)
-                    return $"{onde}: 'botaoDeOpcoes' aponta para algo que não é Button";
+                    return $"{onde}: '{campo}' aponta para algo que não é Button";
 
                 return $"{onde}: já estava ligado{Desempilhar(jaLigado, raiz)}";
             }
 
             // Um botão que já exista com o nome (execução anterior interrompida).
             var existente = raiz.GetComponentsInChildren<Button>(includeInactive: true)
-                .FirstOrDefault(b => b.name == NomeDoBotao);
+                .FirstOrDefault(b => b.name == nomeDoBotao);
 
             if (existente == null)
             {
-                var modelo = EscolherModelo(raiz);
+                var modelo = EscolherModelo(raiz, nomeDoBotao);
                 if (modelo == null) return $"{onde}: nenhum botão para clonar como modelo";
 
                 var clone = Object.Instantiate(modelo.gameObject, modelo.transform.parent);
-                clone.name = NomeDoBotao;
+                clone.name = nomeDoBotao;
                 clone.transform.SetSiblingIndex(modelo.transform.GetSiblingIndex() + 1);
 
                 // Clonar copia as ÂNCORAS junto. Onde não há layout automático, isso põe o
@@ -135,7 +149,7 @@ namespace FavelaAmarela.EditorTools
                 var botao = clone.GetComponent<Button>();
                 botao.onClick = new Button.ButtonClickedEvent();
 
-                Renomear(clone, "Opções");
+                Renomear(clone, rotulo);
 
                 existente = botao;
             }
@@ -144,7 +158,7 @@ namespace FavelaAmarela.EditorTools
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(menu);
 
-            return $"{onde}: '{NomeDoBotao}' criado e ligado";
+            return $"{onde}: '{nomeDoBotao}' criado e ligado";
         }
 
         /// <summary>
@@ -208,18 +222,23 @@ namespace FavelaAmarela.EditorTools
 
             if (degrau <= 0f) return;
 
-            clone.anchorMin = new Vector2(modelo.anchorMin.x, modelo.anchorMin.y - degrau);
-            clone.anchorMax = new Vector2(modelo.anchorMax.x, modelo.anchorMax.y - degrau);
+            // Um degrau abaixo do irmão MAIS BAIXO, não do modelo (2026-09-10): o segundo botão
+            // clonado do "Sair" (Créditos) cairia exatamente onde o primeiro (Opções) já estava.
+            float maisBaixo = irmaos.Length > 0 ? irmaos[irmaos.Length - 1] : modelo.anchorMin.y;
+            float altura = modelo.anchorMax.y - modelo.anchorMin.y;
+
+            clone.anchorMin = new Vector2(modelo.anchorMin.x, maisBaixo - degrau);
+            clone.anchorMax = new Vector2(modelo.anchorMax.x, maisBaixo - degrau + altura);
         }
 
         /// <summary>
         /// O botão a clonar. Prefere "Continuar"/"Sair" — os que certamente têm o estilo final
         /// da tela — e cai em qualquer um.
         /// </summary>
-        private static Button EscolherModelo(GameObject raiz)
+        private static Button EscolherModelo(GameObject raiz, string nomeDoBotao)
         {
             var botoes = raiz.GetComponentsInChildren<Button>(includeInactive: true)
-                .Where(b => b.name != NomeDoBotao)
+                .Where(b => b.name != nomeDoBotao)
                 .ToArray();
 
             if (botoes.Length == 0) return null;

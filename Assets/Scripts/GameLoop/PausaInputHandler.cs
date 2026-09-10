@@ -54,6 +54,9 @@ namespace FavelaAmarela.Runtime.GameLoop
             var opcoes = FavelaAmarela.Runtime.UI.PainelDeOpcoes.Instancia;
             if (opcoes != null && (opcoes.EstaAberta || opcoes.ConsumiuEscNesteQuadro)) return;
 
+            var creditos = FavelaAmarela.Runtime.UI.PainelDeCreditos.Instancia;
+            if (creditos != null && (creditos.EstaAberta || creditos.ConsumiuEscNesteQuadro)) return;
+
             if (_maquina.CurrentState == GameState.Gameplay)
                 _maquina.TryTransition(GameState.Pausado);
             else if (_maquina.CurrentState == GameState.Pausado)

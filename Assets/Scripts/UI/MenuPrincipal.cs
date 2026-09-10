@@ -35,6 +35,9 @@ namespace FavelaAmarela.Runtime.UI
 
         [Tooltip("Abre a tela de Opções (volume, tela cheia, sincronização vertical). [ASSET]")]
         [SerializeField] private Button botaoDeOpcoes;
+
+        [Tooltip("Abre a tela de Créditos — condição de licença de quem desenhou o Rei e o Damião. [ASSET]")]
+        [SerializeField] private Button botaoDeCreditos;
         [Header("Confirmação")]
         [Tooltip("Painel de confirmação de 'Nova peregrinação'. [ASSET]")]
         [SerializeField] private GameObject painelDeConfirmacao;
@@ -53,6 +56,11 @@ namespace FavelaAmarela.Runtime.UI
             // controle de volume não existiu até 2026-08-29.
             if (botaoDeOpcoes != null)
                 botaoDeOpcoes.onClick.AddListener(PainelDeOpcoes.AbrirSeExistir);
+
+            // Créditos: mesma mecânica. Sem o botão, a tela existe e ninguém a alcança — e o
+            // crédito que o Sucart e o Warren Clark pediram não aparece em lugar nenhum.
+            if (botaoDeCreditos != null)
+                botaoDeCreditos.onClick.AddListener(PainelDeCreditos.AbrirSeExistir);
 
             if (botaoConfirmar != null) botaoConfirmar.onClick.AddListener(NovaPartida);
             if (botaoCancelar != null) botaoCancelar.onClick.AddListener(FecharConfirmacao);

@@ -22,13 +22,13 @@ namespace FavelaAmarela.EditorTools
         private const string Marcador = "[PainelDeOpcoes]";
         private const string Destino = "Assets/FavelaAmarela/Resources/Painel_Opcoes.prefab";
 
-        private const string SpriteDoTrilho = "Assets/FavelaAmarela/Art/UI/Sprites/bar_background.png";
-        private const string SpriteDoFill = "Assets/FavelaAmarela/Art/UI/Sprites/bar_fill.png";
+        internal const string SpriteDoTrilho = "Assets/FavelaAmarela/Art/UI/Sprites/bar_background.png";
+        internal const string SpriteDoFill = "Assets/FavelaAmarela/Art/UI/Sprites/bar_fill.png";
 
-        private static readonly Color Fundo = new Color(0.06f, 0.06f, 0.05f, 0.94f);
-        private static readonly Color Painel = new Color(0.11f, 0.11f, 0.09f, 1f);
-        private static readonly Color Tinta = new Color(0.90f, 0.88f, 0.80f, 1f);
-        private static readonly Color Sinal = new Color(0.83f, 0.70f, 0.24f, 1f);   // amarelo de Carcosa
+        internal static readonly Color Fundo = new Color(0.06f, 0.06f, 0.05f, 0.94f);
+        internal static readonly Color Painel = new Color(0.11f, 0.11f, 0.09f, 1f);
+        internal static readonly Color Tinta = new Color(0.90f, 0.88f, 0.80f, 1f);
+        internal static readonly Color Sinal = new Color(0.83f, 0.70f, 0.24f, 1f);   // amarelo de Carcosa
 
         /// <summary>Altura da janela. Ver a conta no corpo de <c>Executar</c>.</summary>
         public const float AlturaDaJanela = 600f;
@@ -110,11 +110,16 @@ namespace FavelaAmarela.EditorTools
             var quadros = Seletor(janela, fonte);
 
             var linhaDeBotoes = Filho(janela, "Botoes");
-            Altura(linhaDeBotoes, 56f);
+            Altura(linhaDeBotoes, 64f);
             var linha = linhaDeBotoes.AddComponent<HorizontalLayoutGroup>();
             linha.spacing = 16;
             linha.childControlWidth = true;
             linha.childForceExpandWidth = true;
+
+            // Sem isto a linha reporta flexibleHeight = 1 e engorda com o espaço livre da coluna
+            // (ver MontarPainelDeCreditos, onde isso espremeu a rolagem).
+            linha.childForceExpandHeight = false;
+            linha.childControlHeight = true;
 
             var restaurar = Botao(linhaDeBotoes, "Restaurar padrões", fonte, Painel);
             var fechar = Botao(linhaDeBotoes, "Fechar", fonte, Sinal);
@@ -151,14 +156,14 @@ namespace FavelaAmarela.EditorTools
 
         // ── Peças ─────────────────────────────────────────────────────────────
 
-        private static GameObject Filho(GameObject pai, string nome)
+        internal static GameObject Filho(GameObject pai, string nome)
         {
             var go = new GameObject(nome, typeof(RectTransform));
             go.transform.SetParent(pai.transform, false);
             return go;
         }
 
-        private static void Esticar(GameObject go)
+        internal static void Esticar(GameObject go)
         {
             var rt = go.GetComponent<RectTransform>();
             rt.anchorMin = Vector2.zero;
@@ -166,13 +171,13 @@ namespace FavelaAmarela.EditorTools
             rt.offsetMin = rt.offsetMax = Vector2.zero;
         }
 
-        private static void Altura(GameObject go, float h)
+        internal static void Altura(GameObject go, float h)
         {
             var le = go.AddComponent<LayoutElement>();
             le.minHeight = le.preferredHeight = h;
         }
 
-        private static void PintarFundo(GameObject go, Color cor)
+        internal static void PintarFundo(GameObject go, Color cor)
         {
             var img = go.AddComponent<Image>();
             img.color = cor;
@@ -184,7 +189,7 @@ namespace FavelaAmarela.EditorTools
             img.type = Image.Type.Sliced;
         }
 
-        private static Sprite Carregar(string caminho)
+        internal static Sprite Carregar(string caminho)
         {
             var direto = AssetDatabase.LoadAssetAtPath<Sprite>(caminho);
             if (direto != null) return direto;
@@ -196,7 +201,7 @@ namespace FavelaAmarela.EditorTools
             return null;
         }
 
-        private static GameObject Titulo(GameObject pai, string texto, Font fonte)
+        internal static GameObject Titulo(GameObject pai, string texto, Font fonte)
         {
             var go = Filho(pai, "Titulo");
             Altura(go, 54f);
@@ -210,7 +215,7 @@ namespace FavelaAmarela.EditorTools
             return go;
         }
 
-        private static GameObject Rotulo(GameObject pai, string texto, Font fonte, int tamanho = 24)
+        internal static GameObject Rotulo(GameObject pai, string texto, Font fonte, int tamanho = 24)
         {
             var go = Filho(pai, $"Rotulo_{texto}");
             Altura(go, tamanho + 12f);
@@ -394,10 +399,10 @@ namespace FavelaAmarela.EditorTools
             return go;
         }
 
-        private static GameObject Botao(GameObject pai, string texto, Font fonte, Color cor)
+        internal static GameObject Botao(GameObject pai, string texto, Font fonte, Color cor)
         {
             var go = Filho(pai, $"Botao_{texto}");
-            Altura(go, 48f);
+            Altura(go, 56f);
 
             // O sprite do botão é o FILL (branco), não o trilho (2026-09-10): o trilho tem
             // luminância 26/255, e uma Image multiplica a cor pelo sprite — Sinal × trilho dava
@@ -424,7 +429,7 @@ namespace FavelaAmarela.EditorTools
             return go;
         }
 
-        private static void Ligar(SerializedObject so, string campo, Object valor)
+        internal static void Ligar(SerializedObject so, string campo, Object valor)
         {
             var prop = so.FindProperty(campo);
 
