@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using FavelaAmarela.Core.Abilities;
+using FavelaAmarela.Core.Combat;
 using FavelaAmarela.Core.Enemies;
 using FavelaAmarela.Player;
 using FavelaAmarela.Runtime.GameLoop;
@@ -10,18 +12,26 @@ namespace FavelaAmarela.Runtime.Enemies
     /// Camada Runtime (MonoBehaviour). Adaptador do <see cref="ReiEmAmareloFSM"/> — o
     /// confronto final, no Trono de Aldebaran.
     ///
-    /// <para><b>Sem `EnemyBase`, sem `Vitalidade`, sem `IDanificavel`</b> — de propósito. O
-    /// design é explícito: "não há barra de vida". Este não é um inimigo que se ataca; é um
-    /// rito que se sobrevive. O par de referência aqui não é `CultistaAI`, é mais perto de
-    /// `ColapsoTrigger`/`CoisaDoCemiterioAI`: alguma coisa que pode matar instantaneamente, e
-    /// cuja "vitória" é um evento, não uma barra chegando a zero.</para>
+    /// <para><b>Sem `EnemyBase`</b> — de propósito, como o Abdul. Até 2026-09-10 também sem
+    /// `Vitalidade` nem `IDanificavel`: o design dizia "não há barra de vida", e o rito era só
+    /// sobrevivido. <b>Isso mudou com a quarta fase</b> (pedido do Vini: <i>"depois dos três
+    /// escudos, abre-se uma fase de combate contra ele"</i>). O Rei agora tem carne — ficha,
+    /// Vitalidade, hurtbox —, mas ela só responde no Confronto, e só entre os desvelos. Quem
+    /// decide isso é a <see cref="ReiEmAmareloFSM.PodeReceberDano"/>; aqui só se lê.</para>
+    ///
+    /// <para><b>Por que `IDanificavel` direto e não `EnemyBase`.</b> Este objeto já é a única
+    /// <see cref="FavelaAmarela.Runtime.Itens.IFonteDeEspolio"/> dele, e o <c>DropAoAbater</c>
+    /// resolve a fonte por <c>GetComponent</c> — uma segunda (a do <c>EnemyBase</c>) faria o
+    /// espólio cair duas vezes ou nenhuma, dependendo da ordem dos componentes. O Abdul tomou o
+    /// mesmo caminho pelo mesmo motivo.</para>
     ///
     /// <para>Toda a regra vive no POCO; aqui só se lê o estado dele, se computa a geometria de
     /// "de costas" a partir de posições reais, e se aplica o resultado (derrota instantânea ou
     /// vitória).</para>
     /// </summary>
     [AddComponentMenu("Favela Amarela/Enemies/Rei em Amarelo AI")]
-    public sealed class ReiEmAmareloAI : MonoBehaviour, FavelaAmarela.Runtime.Itens.IFonteDeEspolio
+    public sealed class ReiEmAmareloAI : MonoBehaviour, IDanificavel,
+                                         FavelaAmarela.Runtime.Itens.IFonteDeEspolio
     {
         [Header("Relíquias exigidas")]
         [Tooltip("Ids dos ItemDef de Artefato que o rito exige (ex.: 'necronomicon'). " +
@@ -60,6 +70,25 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Segundos de calmaria entre um desvelar e o próximo.")]
         [SerializeField] private float intervaloEntreCiclos = 6f;
 
+        [Tooltip("Segundos de calmaria NO CONFRONTO — o tempo de sair do abrigo, ferir e voltar. " +
+                 "0 usa o mesmo intervalo acima. Medido: da cúpula mais próxima ao corpo do Rei " +
+                 "são ~8 un, 2,1 s de ida e volta correndo.")]
+        [Min(0f)]
+        [SerializeField] private float intervaloNoConfronto = 0f;
+
+        [Header("Carne (a quarta fase)")]
+        [Tooltip("Ficha do Rei — só a Vitalidade, a Defesa e a Resistência Anômala importam: ele " +
+                 "não golpeia, o desvelo é o ataque. [ASSET]")]
+        [SerializeField] private FichaAtributosConfig ficha;
+
+        [Tooltip("Nível desta unidade. 1 = exatamente o que a ficha diz.")]
+        [Min(1)]
+        [SerializeField] private int nivelDaUnidade = 1;
+
+        [Tooltip("Barra flutuante ligada à Vitalidade quando o Confronto começa. Vazia: " +
+                 "procurada nos filhos. [ASSET]")]
+        [SerializeField] private FavelaAmarela.Runtime.UI.BarraDeVidaFlutuante barraDeVida;
+
         [Header("Os abrigos")]
         [Tooltip("Os escudos dos pontos focais. Vazio: procurados na cena ao começar. [CENA]")]
         [SerializeField] private FavelaAmarela.Runtime.Itens.EscudoDeReliquia[] escudos;
@@ -85,6 +114,15 @@ namespace FavelaAmarela.Runtime.Enemies
 
         /// <summary>O escudo aceso agora — um por vez, por decisão de design.</summary>
         private FavelaAmarela.Runtime.Itens.EscudoDeReliquia _abrigoDoCiclo;
+
+        private FichaDeAtributos _atributos;
+        private Vitalidade _vitalidade;
+
+        /// <summary>A carne do Rei — para HUD, testes e o Carcosa Debugger.</summary>
+        public Vitalidade Vitalidade => _vitalidade;
+
+        /// <summary>Os atributos resolvidos da ficha, no nível desta unidade.</summary>
+        public FichaDeAtributos Atributos => _atributos;
 
         /// <summary>A FSM do confronto, para HUD, cutscenes e o Carcosa Debugger observarem.</summary>
         public ReiEmAmareloFSM Fsm => _fsm;
@@ -119,8 +157,20 @@ namespace FavelaAmarela.Runtime.Enemies
                 idsDasReliquiasExigidas,
                 ciclosDeSelamento,
                 duracaoDaJanela,
-                intervaloEntreCiclos);
+                intervaloEntreCiclos,
+                intervaloNoConfronto);
 
+            CriarACarne();
+
+            // Área atingível derivada do sprite — o mesmo caminho do Abdul, que também
+            // implementa IDanificavel sem EnemyBase. A garantia vive aqui, no código: lista
+            // de prefabs escrita à mão é o modo de falha mais repetido deste projeto.
+            FavelaAmarela.Runtime.Combat.Hurtbox.GarantirPara(gameObject, "EnemyHurtbox");
+
+            if (barraDeVida == null)
+                barraDeVida = GetComponentInChildren<FavelaAmarela.Runtime.UI.BarraDeVidaFlutuante>(true);
+
+            _fsm.OnComecouOConfronto += HandleComecouOConfronto;
             _fsm.OnStateChanged += HandleEstadoMudou;
             _fsm.OnSelado += HandleSelado;
             _fsm.OnReliquiaAtivada += HandleReliquiaAtivada;
@@ -167,12 +217,80 @@ namespace FavelaAmarela.Runtime.Enemies
         private void OnDestroy()
         {
             if (_fsm == null) return;
+            _fsm.OnComecouOConfronto -= HandleComecouOConfronto;
             _fsm.OnStateChanged -= HandleEstadoMudou;
             _fsm.OnSelado -= HandleSelado;
             _fsm.OnReliquiaAtivada -= HandleReliquiaAtivada;
             _fsm.OnComecouADesvelar -= HandleComecouADesvelar;
             _fsm.OnCicloSobrevivido -= HandleCicloSobrevivido;
             _fsm.OnEscudoAceso -= HandleEscudoAceso;
+        }
+
+        /// <summary>
+        /// Resolve a ficha e cria a Vitalidade. Sem ficha, usa uma de emergência e avisa —
+        /// nunca deixa o Confronto sem carne, que seria uma fase impossível de vencer.
+        /// </summary>
+        private void CriarACarne()
+        {
+            if (ficha == null)
+            {
+                Debug.LogError("[ReiEmAmarelo] Ficha não atribuída. Usando ficha de emergência " +
+                               "(Vitalidade 1000, Defesa 12) — o Confronto precisa de carne.", this);
+                _atributos = new FichaDeAtributos(vitalidadeMax: 1000f, ataque: 0f, defesa: 12f);
+            }
+            else
+            {
+                _atributos = ficha.CriarFicha(nivelDaUnidade);
+            }
+
+            _vitalidade = new Vitalidade(_atributos.VitalidadeMax);
+        }
+
+        // ── IDanificavel ─────────────────────────────────────────────────────
+
+        /// <inheritdoc />
+        public bool EhAparicaoPrimordial => true;
+
+        /// <inheritdoc />
+        public bool EstaAbatido => _vitalidade != null && _vitalidade.EstaAbatido;
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// A regra inteira está na FSM: só no Confronto, e só na calmaria. Fora disso o golpe
+        /// é recusado <b>em silêncio</b> — nenhum som de carne quer dizer que nada entrou, que é
+        /// a informação certa quando o jogador bate no Rei ainda mascarado.
+        /// </remarks>
+        public bool PodeSerFerido => _fsm != null && _fsm.PodeReceberDano && !EstaAbatido;
+
+        /// <inheritdoc />
+        public void ReceberGolpe(ArmaResult resultado)
+        {
+            if (!PodeSerFerido) return;
+            if (resultado.Dano <= 0f) return;
+
+            float danoFinal = MitigacaoDeDano.Aplicar(resultado.Dano, _atributos.Defesa);
+            if (danoFinal <= 0f) return;
+
+            _vitalidade.Ferir(danoFinal);
+
+            if (animator != null && animator.runtimeAnimatorController != null)
+                animator.Play(Anim.Dano, 0, 0f);
+
+            // A Vitalidade zerou: o rito termina por abate. A FSM faz a transição para Selado
+            // e dispara OnSelado, que já leva a vitória e o espólio pelo caminho de sempre.
+            if (_vitalidade.EstaAbatido) _fsm.Abater();
+        }
+
+        /// <summary>
+        /// A Máscara caiu. Liga a barra à carne e diz ao jogador o que mudou — a regra da
+        /// fase é nova e contraintuitiva (sair do abrigo que acabou de aprender a procurar).
+        /// </summary>
+        private void HandleComecouOConfronto()
+        {
+            if (barraDeVida != null) barraDeVida.Bind(_vitalidade);
+
+            Dizer("A Máscara Pálida cai. Ele sangra entre os desvelos — fere-o, e volta ao " +
+                  "clarão antes que ele te encare.", 5f);
         }
 
         /// <summary>
@@ -342,11 +460,14 @@ namespace FavelaAmarela.Runtime.Enemies
         /// </summary>
         private void HandleCicloSobrevivido()
         {
+            // No Confronto a fala é a do escudo que acende — cada ciclo é "corre para o
+            // clarão", e a contagem de selos não faz mais sentido.
+            if (_fsm.EmConfronto) return;
+
             int faltam = Mathf.Max(0, ciclosDeSelamento - _fsm.CiclosSobrevividos);
 
-            Dizer(faltam > 0
-                ? $"O selo aperta. Ainda faltam {faltam}."
-                : "O último selo se fecha.");
+            if (faltam > 0) Dizer($"O selo aperta. Ainda faltam {faltam}.");
+            // faltam == 0: o HandleComecouOConfronto fala, e fala a regra nova.
         }
 
         private void HandleEstadoMudou(ReiEmAmareloState anterior, ReiEmAmareloState atual)

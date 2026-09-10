@@ -29,6 +29,20 @@ namespace FavelaAmarela.Core.Enemies
     /// <para><b>E o escudo acende no começo da calmaria, não no desvelo.</b> É o que transforma
     /// os 6 s de espera em corrida — medido na cena do Trono, a travessia mais longa entre dois
     /// altares é 20 unidades, ou 4,44 s andando. Cabe, e sobra pouco.</para>
+
+    /// <para><b>A quarta fase: o Confronto</b> (pedido do Vini, 2026-09-10 — <i>"depois dos três
+    /// escudos, abre-se uma fase de combate contra ele"</i>). Sobrevividos os ciclos de
+    /// selamento, o rito <b>não termina</b>: entra em <see cref="EmConfronto"/>. O ritmo é o
+    /// mesmo — escudo, calmaria, desvelo — com uma diferença: <b>entre os desvelos, o Rei
+    /// sangra</b> (<see cref="PodeReceberDano"/>). Damião tem de sair do abrigo, ferir e voltar
+    /// antes do próximo desvelo. As três primeiras fases ensinam o relógio; a quarta cobra.</para>
+
+    /// <para><b>Por que o mesmo ritmo, e não um chefe de espada.</b> O Rei tem cinco clipes de
+    /// animação — idle, selar, desvelo, dano, queda — e <b>nenhum de ataque</b>. Um confronto em
+    /// que ele avança e golpeia precisaria de arte que não existe. O desvelo já é o ataque dele,
+    /// e o abrigo já é a resposta; a fase nova só dá ao jogador o que faltava: encostar nele.
+    /// A vitória continua sendo <see cref="ReiEmAmareloState.Selado"/>, agora alcançada por
+    /// <see cref="Abater"/> — quem decide que a Vitalidade zerou é o adaptador.</para>
     ///
     /// <para><b>A lista de relíquias exigidas é dado, não constante.</b> O design pede 4
     /// (Anel, Coroa, Patuá, Necronomicon), mas a Coroa de Ossos não tem fonte jogável ainda
@@ -54,6 +68,7 @@ namespace FavelaAmarela.Core.Enemies
         private readonly int _ciclosDeSelamento;
         private readonly float _duracaoDaJanela;
         private readonly float _intervaloEntreCiclos;
+        private readonly float _intervaloNoConfronto;
 
         private int _ciclosSobrevividos;
         private float _timerDoEstado;
@@ -83,8 +98,24 @@ namespace FavelaAmarela.Core.Enemies
         /// <summary>Quantos ciclos de desvelar já foram sobrevividos.</summary>
         public int CiclosSobrevividos => _ciclosSobrevividos;
 
-        /// <summary>Quantos ciclos o rito de selamento exige.</summary>
+        /// <summary>Quantos ciclos o rito de selamento exige antes do Confronto.</summary>
         public int TotalDeCiclos => _ciclosDeSelamento;
+
+        /// <summary>
+        /// Se o rito já entrou na quarta fase: os escudos continuam se revezando, mas agora o
+        /// Rei pode ser ferido entre os desvelos.
+        /// </summary>
+        public bool EmConfronto { get; private set; }
+
+        /// <summary>
+        /// Se um golpe entregue <b>agora</b> fere o Rei: só no Confronto, e só na calmaria.
+        ///
+        /// <para>Durante o desvelo ele é imune — quem está batendo nele nesse instante está
+        /// fora do abrigo, e o rito já cobra isso. A imunidade existe para a leitura ser uma
+        /// só: <i>"ele sangra entre os desvelos"</i>, como o Byakhee sangra pousado.</para>
+        /// </summary>
+        public bool PodeReceberDano =>
+            EmConfronto && CurrentState == ReiEmAmareloState.Selando;
 
         /// <summary>Disparado a cada transição. (anterior, atual)</summary>
         public event Action<ReiEmAmareloState, ReiEmAmareloState> OnStateChanged;
@@ -104,6 +135,11 @@ namespace FavelaAmarela.Core.Enemies
 
         /// <summary>Um ciclo de desvelar foi sobrevivido (o jogador deu as costas a tempo).</summary>
         public event Action OnCicloSobrevivido;
+
+        /// <summary>
+        /// Os selos fecharam e a Máscara caiu: começa o Confronto. Dispara uma vez.
+        /// </summary>
+        public event Action OnComecouOConfronto;
 
         /// <summary>O rito se completou — vitória.</summary>
         public event Action OnSelado;
@@ -125,11 +161,17 @@ namespace FavelaAmarela.Core.Enemies
         /// minha — é o único número que a doc realmente especifica para este chefe.
         /// </param>
         /// <param name="intervaloEntreCiclos">Segundos de calmaria entre um desvelar e o próximo.</param>
+        /// <param name="intervaloNoConfronto">
+        /// Segundos de calmaria <b>no Confronto</b> — o tempo de ir, ferir e voltar. Zero ou
+        /// negativo usa o mesmo <paramref name="intervaloEntreCiclos"/>. É um número à parte
+        /// porque a fase pede mais do jogador: sair do abrigo, e não só chegar nele.
+        /// </param>
         public ReiEmAmareloFSM(
             IEnumerable<string> reliquiasExigidas,
             int ciclosDeSelamento = 3,
             float duracaoDaJanela = 1.5f,
-            float intervaloEntreCiclos = 6f)
+            float intervaloEntreCiclos = 6f,
+            float intervaloNoConfronto = 0f)
         {
             _reliquiasExigidas = new HashSet<string>(reliquiasExigidas ?? Array.Empty<string>());
             if (_reliquiasExigidas.Count == 0)
@@ -139,6 +181,24 @@ namespace FavelaAmarela.Core.Enemies
             _ciclosDeSelamento = Math.Max(1, ciclosDeSelamento);
             _duracaoDaJanela = duracaoDaJanela;
             _intervaloEntreCiclos = intervaloEntreCiclos;
+            _intervaloNoConfronto = intervaloNoConfronto > 0f ? intervaloNoConfronto
+                                                              : intervaloEntreCiclos;
+        }
+
+        /// <summary>
+        /// O Rei caiu: a Vitalidade dele zerou. Só tem efeito no Confronto — antes dele o Rei
+        /// não pode ser ferido, e depois de Selado ou Colapso não há mais o que abater.
+        /// </summary>
+        /// <returns>Se o abate teve efeito.</returns>
+        public bool Abater()
+        {
+            if (!EmConfronto) return false;
+            if (CurrentState == ReiEmAmareloState.Selado
+                || CurrentState == ReiEmAmareloState.Colapso) return false;
+
+            Transicionar(ReiEmAmareloState.Selado);
+            OnSelado?.Invoke();
+            return true;
         }
 
         /// <summary>Começa o confronto: a arena libera os pontos focais.</summary>
@@ -195,7 +255,8 @@ namespace FavelaAmarela.Core.Enemies
             switch (CurrentState)
             {
                 case ReiEmAmareloState.Selando:
-                    if (_timerDoEstado >= _intervaloEntreCiclos)
+                    if (_timerDoEstado >= (EmConfronto ? _intervaloNoConfronto
+                                                        : _intervaloEntreCiclos))
                         Transicionar(ReiEmAmareloState.Desvelado);
                     break;
 
@@ -223,15 +284,16 @@ namespace FavelaAmarela.Core.Enemies
             _ciclosSobrevividos++;
             OnCicloSobrevivido?.Invoke();
 
-            if (_ciclosSobrevividos >= _ciclosDeSelamento)
+            // O último selo não sela: DESMASCARA. A partir daqui os ciclos continuam, o
+            // revezamento dos escudos continua (dá a volta na lista), e o Rei sangra entre os
+            // desvelos. A vitória vem por Abater(), quando a Vitalidade dele zerar.
+            if (!EmConfronto && _ciclosSobrevividos >= _ciclosDeSelamento)
             {
-                Transicionar(ReiEmAmareloState.Selado);
-                OnSelado?.Invoke();
+                EmConfronto = true;
+                OnComecouOConfronto?.Invoke();
             }
-            else
-            {
-                Transicionar(ReiEmAmareloState.Selando);
-            }
+
+            Transicionar(ReiEmAmareloState.Selando);
         }
 
         private void Transicionar(ReiEmAmareloState novo)

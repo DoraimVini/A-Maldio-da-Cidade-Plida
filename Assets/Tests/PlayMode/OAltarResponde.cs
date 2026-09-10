@@ -82,7 +82,21 @@ namespace FavelaAmarela.Tests.PlayMode
 
             _rei = new GameObject("Rei");
             _rei.SetActive(false);   // segura o Awake ate os campos estarem postos
+
+            // Com a quarta fase o Rei ganhou Hurtbox, e ela deriva a area atingivel do sprite
+            // -- sem corpo desenhado, ela recusa e loga erro. Um sprite branco de 4x4 e corpo
+            // suficiente para o rig; o que se mede aqui e a fala do altar, nao o golpe.
+            _rei.AddComponent<SpriteRenderer>().sprite = Sprite.Create(
+                Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0f));
+
             var rei = _rei.AddComponent<FavelaAmarela.Runtime.Enemies.ReiEmAmareloAI>();
+
+            // Desde 2026-09-10 o Rei tem carne (a quarta fase, o Confronto) e cobra uma ficha
+            // no Awake. Uma ficha de verdade, mesmo com os valores padrao, e mais honesta que
+            // esperar o erro: o rig parece com o jogo.
+            Definir(rei, "ficha",
+                ScriptableObject.CreateInstance<FavelaAmarela.Core.Combat.FichaAtributosConfig>());
+
             _rei.SetActive(true);
 
             _altar = new GameObject("Ponto_Focal", typeof(CircleCollider2D));

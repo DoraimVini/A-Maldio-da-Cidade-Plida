@@ -4,6 +4,57 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — A quarta fase do Rei: depois dos três escudos, ele sangra
+
+Pedido do Vini: *"depois dos três escudos, abre-se uma fase de combate contra ele"*.
+
+### O que decidiu o desenho antes de qualquer opinião
+
+O Rei tem **cinco clipes** — idle, selar, desvelo, dano, queda — e **nenhum de ataque**. Uma
+fase em que ele parte para cima do jogador precisa de arte que não existe. Mas ele já tem um
+ataque (o desvelo) e o jogador já tem a resposta (o escudo). A quarta fase mantém o ritmo que
+as três primeiras ensinaram e acrescenta uma coisa: **entre os desvelos, ele sangra.** Sair do
+abrigo, correr até ele, ferir, voltar antes do próximo desvelo.
+
+| peça | mudança |
+|---|---|
+| `ReiEmAmareloFSM` | `EmConfronto`, `PodeReceberDano` (só na calmaria), `Abater()`, `OnComecouOConfronto`, `intervaloNoConfronto` |
+| `ReiEmAmareloAI` | implementa `IDanificavel` direto (como o Abdul); ficha, `Vitalidade`, `Hurtbox.GarantirPara`, barra |
+| `Ficha_Rei` | Vitalidade 1000, Defesa 12, Res. Anômala 30, **Ataque 0** |
+| `Tools/.../Trono: dar carne ao Rei` | grava ficha e `BarraDeVidaFlutuante` no prefab |
+
+Sobreviver os ciclos **não sela mais** — desmascara. A vitória vem por `Abater()`. Perder o
+desvelo no Confronto continua colapsando: é o risco da fase.
+
+### A calibração, e o que ela mudou
+
+Mesma régua do Byakhee, agora em teste (`OConfrontoDoReiTests`):
+
+- Nível ao chegar no Trono: **4**, somado das cenas (675 de Exposição).
+- Alfanje do baú @ nível 2: 20 golpes → **7 ciclos** a 3 golpes/ciclo.
+- Alfanje T2 @ nível 4: 8,6 golpes → 3 ciclos.
+- Ida e volta do abrigo mais próximo, correndo: 2,4–2,56 s.
+
+**O teste pegou um defeito de design antes de eu ver.** A 6 s de calmaria sobravam 7–8 golpes
+depois de ir e voltar, e a T2 precisa de 8,6: o jogador perfeito matava o Rei **num ciclo só**.
+Subir a Vitalidade puniria quem chega com a arma do baú. A alavanca certa era a que eu tinha
+deixado separada: **`intervaloNoConfronto = 5 s`**. Cabem 5 golpes de qualquer abrigo, a T2
+precisa de dois ciclos no mínimo, e a luta escala — três fases a 6 s, a quarta a 5.
+
+O teto foi corrigido junto: media o "máximo geométrico" (bater os 6 s inteiros sem sair do
+lugar), mas quem não sai do lugar não volta ao abrigo e morre. O jogo perfeito real é o que
+sobra depois de ir e voltar.
+
+### Testes
+
+| arquivo | |
+|---|---|
+| `ReiEmAmareloFSMTests` | 18 → 26; `SobreviverTodosOsCiclos_Sela` virou `..._AbreOConfronto_NaoSela` |
+| `OConfrontoDoReiTests` | 7 (novo): carne, geometria, duração com o piso e o teto, nível de chegada, calmaria mais curta |
+| `OAltarResponde` | rig ganhou ficha e sprite — o Rei de verdade tem os dois |
+
+**1152 EditMode + 64 PlayMode, verdes.**
+
 ## 2026-09-10 — Os botoes da tela de morte, e por que a suite dizia que estava tudo bem
 
 O Vini relatou pela segunda vez: *"A cena de morte continua sem botoes escritos."* Estava certo

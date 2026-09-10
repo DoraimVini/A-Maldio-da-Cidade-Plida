@@ -145,10 +145,17 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.AreEqual(1, fsm.CiclosSobrevividos);
         }
 
+        /// <summary>
+        /// <b>Até 2026-09-10 este teste se chamava <c>SobreviverTodosOsCiclos_Sela</c>.</b>
+        /// Sobreviver os ciclos não sela mais: <b>desmascara</b>. O rito entra no Confronto e
+        /// continua girando — a vitória agora vem por <see cref="ReiEmAmareloFSM.Abater"/>.
+        /// </summary>
         [Test]
-        public void SobreviverTodosOsCiclos_Sela()
+        public void SobreviverTodosOsCiclos_AbreOConfronto_NaoSela()
         {
             var fsm = CriarNoInicioDoSelamento(ciclos: 2, intervalo: 1f, janela: 1.5f);
+            int comecou = 0;
+            fsm.OnComecouOConfronto += () => comecou++;
 
             for (int i = 0; i < 2; i++)
             {
@@ -156,8 +163,150 @@ namespace FavelaAmarela.Tests.EditMode
                 fsm.Tick(0.1f, jogadorEstaAbrigado: true);  // sobrevive
             }
 
-            Assert.AreEqual(ReiEmAmareloState.Selado, fsm.CurrentState);
+            Assert.IsTrue(fsm.EmConfronto, "Os selos fecharam: o Confronto tinha de abrir.");
+            Assert.AreEqual(1, comecou, "OnComecouOConfronto dispara uma vez só.");
+            Assert.AreEqual(ReiEmAmareloState.Selando, fsm.CurrentState,
+                "O ritmo continua: o Confronto começa numa calmaria, com um escudo aceso.");
+            Assert.AreNotEqual(ReiEmAmareloState.Selado, fsm.CurrentState,
+                "Sobreviver não é vencer. Vencer é ferir.");
             Assert.AreEqual(2, fsm.CiclosSobrevividos);
+        }
+
+        // ── O Confronto ──────────────────────────────────────────────────────
+
+        private static ReiEmAmareloFSM CriarNoConfronto(float intervalo = 1f, float janela = 1.5f,
+                                                        float intervaloNoConfronto = 0f)
+        {
+            var fsm = new ReiEmAmareloFSM(TresReliquias, 1, janela, intervalo, intervaloNoConfronto);
+            fsm.Iniciar();
+            foreach (var id in TresReliquias) fsm.AtivarReliquia(id);
+
+            fsm.Tick(intervalo + 0.1f, jogadorEstaAbrigado: false); // abre o único desvelo
+            fsm.Tick(0.1f, jogadorEstaAbrigado: true);             // sobrevive: Confronto
+
+            Assert.IsTrue(fsm.EmConfronto, "O rig não chegou ao Confronto.");
+            return fsm;
+        }
+
+        /// <summary>
+        /// <i>"Ele sangra entre os desvelos"</i>: antes do Confronto, nunca; no Confronto, só
+        /// na calmaria. Durante o desvelo ele é imune — quem está batendo nele nesse instante
+        /// está fora do abrigo, e o rito já cobra isso.
+        /// </summary>
+        [Test]
+        public void ORei_SoSangraNoConfronto_ESoNaCalmaria()
+        {
+            var antes = CriarNoInicioDoSelamento(intervalo: 1f, janela: 1.5f);
+            Assert.IsFalse(antes.PodeReceberDano, "Mascarado, o Rei não pode ser ferido.");
+
+            var fsm = CriarNoConfronto(intervalo: 1f, janela: 1.5f);
+            Assert.AreEqual(ReiEmAmareloState.Selando, fsm.CurrentState);
+            Assert.IsTrue(fsm.PodeReceberDano, "Na calmaria do Confronto, o Rei sangra.");
+
+            fsm.Tick(1.1f, jogadorEstaAbrigado: false); // desvela
+            Assert.AreEqual(ReiEmAmareloState.Desvelado, fsm.CurrentState);
+            Assert.IsFalse(fsm.PodeReceberDano, "Desvelado, ele é imune — a janela é do jogador.");
+        }
+
+        [Test]
+        public void Abater_NoConfronto_Sela()
+        {
+            var fsm = CriarNoConfronto();
+            int selou = 0;
+            fsm.OnSelado += () => selou++;
+
+            Assert.IsTrue(fsm.Abater());
+
+            Assert.AreEqual(ReiEmAmareloState.Selado, fsm.CurrentState);
+            Assert.AreEqual(1, selou, "Selar dispara OnSelado — é por ali que vêm vitória e espólio.");
+            Assert.IsNull(fsm.ReliquiaDoCiclo, "Nenhum escudo fica aceso depois do fim.");
+        }
+
+        /// <summary>Antes do Confronto o Rei não tem carne: abater não tem efeito.</summary>
+        [Test]
+        public void Abater_AntesDoConfronto_NaoTemEfeito()
+        {
+            var fsm = CriarNoInicioDoSelamento();
+
+            Assert.IsFalse(fsm.Abater());
+            Assert.AreEqual(ReiEmAmareloState.Selando, fsm.CurrentState);
+        }
+
+        [Test]
+        public void Abater_DepoisDeColapsar_NaoRessuscitaORito()
+        {
+            var fsm = CriarNoConfronto(intervalo: 1f, janela: 1.5f);
+            fsm.Tick(1.1f, jogadorEstaAbrigado: false);
+            fsm.Tick(1.6f, jogadorEstaAbrigado: false); // fora do abrigo até o fim: Colapso
+            Assert.AreEqual(ReiEmAmareloState.Colapso, fsm.CurrentState);
+
+            Assert.IsFalse(fsm.Abater());
+            Assert.AreEqual(ReiEmAmareloState.Colapso, fsm.CurrentState);
+        }
+
+        /// <summary>
+        /// No Confronto o rito continua a cobrar o abrigo — é o que dá à fase o seu risco:
+        /// sair do escudo para ferir e não voltar a tempo mata do mesmo jeito.
+        /// </summary>
+        [Test]
+        public void NoConfronto_PerderODesvelo_AindaColapsa()
+        {
+            var fsm = CriarNoConfronto(intervalo: 1f, janela: 1.5f);
+
+            fsm.Tick(1.1f, jogadorEstaAbrigado: false);
+            fsm.Tick(1.6f, jogadorEstaAbrigado: false);
+
+            Assert.AreEqual(ReiEmAmareloState.Colapso, fsm.CurrentState);
+        }
+
+        /// <summary>
+        /// Os escudos continuam se revezando no Confronto, dando a volta na lista — um ciclo
+        /// sem abrigo seria morte certa sem resposta possível.
+        /// </summary>
+        [Test]
+        public void NoConfronto_OsEscudosContinuamSeRevezando()
+        {
+            var fsm = CriarNoConfronto(intervalo: 1f, janela: 1.5f);
+            var vistas = new List<string> { fsm.ReliquiaDoCiclo };
+
+            for (int i = 0; i < 3; i++)
+            {
+                fsm.Tick(1.1f, jogadorEstaAbrigado: false);
+                fsm.Tick(0.1f, jogadorEstaAbrigado: true);
+                Assert.IsNotNull(fsm.ReliquiaDoCiclo, $"Ciclo {i + 2} do Confronto sem abrigo.");
+                vistas.Add(fsm.ReliquiaDoCiclo);
+            }
+
+            // 1 ciclo de selamento + 4 de Confronto = indices 0,1,2,0,1 -- a volta completa.
+            CollectionAssert.AreEqual(
+                new[] { TresReliquias[1], TresReliquias[2], TresReliquias[0], TresReliquias[1] },
+                vistas);
+        }
+
+        /// <summary>
+        /// A calmaria do Confronto tem o próprio relógio: a fase pede mais (sair do abrigo, e
+        /// não só chegar nele), e o número tem de poder ser afinado sem mexer no selamento.
+        /// </summary>
+        [Test]
+        public void NoConfronto_ACalmariaTemOProprioRelogio()
+        {
+            var fsm = CriarNoConfronto(intervalo: 1f, janela: 1.5f, intervaloNoConfronto: 3f);
+
+            fsm.Tick(1.1f, jogadorEstaAbrigado: false);
+            Assert.AreEqual(ReiEmAmareloState.Selando, fsm.CurrentState,
+                "1,1 s passou do intervalo do selamento (1 s) mas não do Confronto (3 s).");
+
+            fsm.Tick(2f, jogadorEstaAbrigado: false);
+            Assert.AreEqual(ReiEmAmareloState.Desvelado, fsm.CurrentState);
+        }
+
+        [Test]
+        public void SemIntervaloDoConfronto_UsaODoSelamento()
+        {
+            var fsm = CriarNoConfronto(intervalo: 1f, janela: 1.5f, intervaloNoConfronto: 0f);
+
+            fsm.Tick(1.1f, jogadorEstaAbrigado: false);
+            Assert.AreEqual(ReiEmAmareloState.Desvelado, fsm.CurrentState);
         }
 
         [Test]
@@ -265,9 +414,10 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void AoTerminarORito_NaoSobraReliquiaAbrigando()
         {
-            var selado = CriarNoInicioDoSelamento(ciclos: 1, intervalo: 1f, janela: 1.5f);
-            selado.Tick(1.1f, jogadorEstaAbrigado: false);
-            selado.Tick(0.1f, jogadorEstaAbrigado: true);
+            // Selado vem por abate, desde a quarta fase: sobreviver os ciclos só desmascara.
+            var selado = CriarNoConfronto(intervalo: 1f, janela: 1.5f);
+            Assert.IsNotNull(selado.ReliquiaDoCiclo, "No Confronto há sempre um escudo aceso.");
+            selado.Abater();
             Assert.AreEqual(ReiEmAmareloState.Selado, selado.CurrentState);
             Assert.IsNull(selado.ReliquiaDoCiclo);
 

@@ -14,17 +14,23 @@ tags: [boss, rei-em-amarelo, combate, castelo, final]
 
 ## Não é uma luta — é um rito que se sobrevive
 
-> **Não há barra de vida.** `ReiEmAmareloAI` não tem `EnemyBase`, `Vitalidade` nem
-> `IDanificavel` — de propósito. O par de referência não é `CultistaAI`, é mais perto de
+> **Sem `EnemyBase`** — de propósito, como o Abdul. Até 2026-09-10 também sem `Vitalidade`
+> nem `IDanificavel`: o rito era só sobrevivido. **Isso mudou com a quarta fase** (abaixo).
+> `ReiEmAmareloAI` implementa `IDanificavel` direto, porque já é a única `IFonteDeEspolio`
+> do objeto e o `DropAoAbater` resolve a fonte por `GetComponent` — uma segunda faria o
+> espólio cair duas vezes ou nenhuma. O par de referência não é `CultistaAI`, é mais perto de
 > `ColapsoTrigger`/`CoisaDoCemiterioAI`: algo que mata instantaneamente, e cuja "vitória" é um
 > evento, não uma barra chegando a zero.
 
-Duas metades, naturezas opostas:
+Três metades — a terceira chegou em 2026-09-10:
 
 1. **Ritual das relíquias** — sem pressão, sem relógio. O jogador ativa cada relíquia exigida
    num `PontoFocalDeReliquia` da arena (interação deliberada, botão E).
 2. **Selamento** — o Rei se desvela em ciclos. Cada um é um teste de **posição**: estar dentro
    do escudo que uma relíquia ergueu sobrevive o ciclo; estar fora, `Colapso` instantâneo.
+3. **Confronto** — sobrevividos os ciclos, a Máscara cai. O ritmo continua (escudo, calmaria,
+   desvelo), mas **entre os desvelos o Rei sangra**. Damião sai do abrigo, corre até ele, fere,
+   e volta antes do próximo desvelo. Vitalidade em zero sela o Rei.
 
 ## O ritual das relíquias
 
@@ -64,7 +70,50 @@ realmente especifica — mas agora a pergunta é *"está dentro?"*. **Estar dent
 acontece**, não precisa se manter até o fim da janela: quem chegou correndo e pisou no abrigo
 no último instante sobrevive.
 
-### A geometria: `Core.Enemies.AbrigoDeReliquia`
+### A quarta fase: o Confronto (desde 2026-09-10)
+
+> Pedido do Vini: *"depois dos três escudos, abre-se uma fase de combate contra ele"*.
+
+**Por que o mesmo ritmo, e não um chefe de espada.** O Rei tem cinco clipes — idle, selar,
+desvelo, dano, queda — e **nenhum de ataque**. Um confronto em que ele avança e golpeia
+precisaria de arte que não existe. O desvelo já é o ataque dele e o abrigo já é a resposta; a
+fase nova só dá ao jogador o que faltava: **encostar nele**. As três primeiras fases ensinam o
+relógio; a quarta cobra.
+
+| regra | onde vive |
+|---|---|
+| Sobreviver os ciclos abre o Confronto, **não** sela | `ReiEmAmareloFSM.SobreviverCiclo` → `EmConfronto`, `OnComecouOConfronto` |
+| O Rei só sangra no Confronto, e só na **calmaria** — desvelado é imune | `ReiEmAmareloFSM.PodeReceberDano` |
+| Os escudos continuam se revezando, dando a volta na lista | `ReliquiaDoCiclo` com `%` |
+| Perder o desvelo no Confronto ainda colapsa | inalterado — é o risco da fase |
+| Vitalidade em zero → `Abater()` → `Selado` → `OnSelado` (vitória + espólio) | `ReiEmAmareloAI.ReceberGolpe` |
+| A calmaria do Confronto é **5 s**, a do selamento 6 | `intervaloNoConfronto` no prefab |
+
+**A ficha: `Ficha_Rei` — Vitalidade 1000, Defesa 12, Resistência Anômala 30, Ataque 0.** Ataque
+zero é afirmação, não omissão: o Rei não golpeia, e `OConfrontoDoReiTests` recusa ficha com
+Ataque > 0 como promessa de um moveset sem arte.
+
+**Os números saem da mesma régua do Byakhee**, e o teste os amarra:
+
+| | |
+|---|---|
+| nível ao chegar no Trono | **4** (675 de Exposição, somada das cenas: 11 Cultistas, Abdul, Byakhee) |
+| Alfanje do baú @ nível 2 (o piso) | 63 brutos → 51 após Defesa → **20 golpes → 7 ciclos** a 3 golpes/ciclo |
+| Alfanje T2 @ nível 4 (o teto) | 128 brutos → 116 → **8,6 golpes → 3 ciclos** |
+| ida e volta do abrigo mais próximo, correndo | 2,4 s (Anel) · 2,56 s (Necronomicon, Patuá) |
+| golpes máximos por ciclo a 5 s de calmaria | **5** de qualquer abrigo |
+
+**Por que 5 s e não 6.** A 6 s a calmaria comportava 7–8 golpes depois de ir e voltar, e a
+T2 precisa de 8,6: um jogador perfeito matava o Rei **num ciclo só** depois da Máscara cair.
+Subir a Vitalidade puniria quem chega com a arma do baú (já são 20 golpes). A calmaria mais
+curta limita os golpes por ciclo para todo mundo — a T2 passa a precisar de dois ciclos no
+mínimo — e escala a luta: as três fases a 6 s, a quarta a 5.
+
+**A barra é a `BarraDeVidaFlutuante` do Yug-Neth**, ligada no `OnComecouOConfronto`. Some
+cheia e reaparece a cada golpe — para um chefe isso funciona melhor do que parece: aparece
+exatamente quando o jogador o feriu, e some enquanto ele corre de volta ao abrigo.
+
+## A geometria: `Core.Enemies.AbrigoDeReliquia`
 
 O abrigo é uma **elipse de 2 × 1 un**, não um círculo — a vista do jogo é 20 × 11,25 unidades e
 espaço de jogo redondo num quadro largo lê torto (a mesma lição da arena da Byakhee e da zona
@@ -117,6 +166,9 @@ calibrar **ao vivo**, na `Cena_ArenaDeTestes`, e não por simulação externa.
 | `ReiEmAmareloAI` | Runtime — sem `EnemyBase`/`Vitalidade`; liga o `Tick`, acende um abrigo por ciclo, aplica Colapso, expõe vitória |
 | `PontoFocalDeReliquia` | Runtime — `IInteragivel`, checa posse real da relíquia antes de ativar |
 | `EscudoDeReliquia` | Runtime — no ponto focal: acende, apaga, responde "está dentro?" |
+| `Ficha_Rei` | asset — Vitalidade 1000, Defesa 12, Res. Anômala 30, Ataque 0 |
+| `Tools/FavelaAmarela/Trono: dar carne ao Rei` | grava ficha e barra no prefab |
+| `OConfrontoDoReiTests` | 7 testes: geometria, duração da luta, nível de chegada |
 
 ## Infraestrutura de teste (2026-08-11)
 
