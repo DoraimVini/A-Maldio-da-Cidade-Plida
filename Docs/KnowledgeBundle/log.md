@@ -4,6 +4,50 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — "Não tem nenhum livro?" — e a pergunta corrigiu o desenho
+
+O Vini perguntou se não havia um ícone dos assets mais compatível para os Fragmentos, e depois:
+*"não tem nenhum livro?"*.
+
+### O que a busca respondeu
+
+Varri os packs baixados e os já importados. **Nada melhor para o objeto de mundo:** as lápides do
+CraftPix são *lápides* — na Tumba, cheia delas, leriam como cenário; os cristais leem bem como
+item procurável mas são verde saturado, e tingir de âmbar dá oliva sujo; a Kenney é 256×512 de
+render 3D, escala e estilo incompatíveis.
+
+**Mas a segunda pergunta acertou o alvo.** O `Necronomicon.png` já existe no projeto como objeto
+de mundo, 16×16, e é livro. E fragmento de uma **canção** é **página, não pedra** — canção é
+escrita, e escrita mora em papel.
+
+As três viraram páginas rasgadas com rasgos complementares, cinco linhas de tinta e uma inicial
+iluminada em ouro. A paleta foi **extraída do próprio Necronomicon** — página `(206,191,215)`,
+tinta `(46,34,47)`, ouro `(184,143,72)` — para pertencerem à mesma família visual do livro que o
+jogo já mostra.
+
+### E as barras
+
+O Vini pediu para procurar barras de vida, vigor e RM. **A resposta estava dentro de casa:** o
+`DarkAgesUI`, o pacote que **30 objetos do HUD já usam**, tem trilhos com ponta dourada, um com
+coroa ornamentada, e **três preenchimentos — azul, carmim e verde**, exatamente as três barras.
+
+E o estado atual é pior do que parecia: `bar_background.png` é um retângulo escuro e
+`bar_fill.png` é um **retângulo branco liso**, tingido em runtime. As barras não têm arte
+nenhuma.
+
+Descartados, com motivo: Kenney UI RPG tem estrutura ótima (9 fatias) mas é vetorial suave e
+briga com as molduras do próprio HUD; FantasyUI é pixel art escura mas é **um dragão**, e são
+quadros fixos em vez de 9 fatias; as do Godot são barras chapadas de tutorial.
+
+**A troca não foi feita** — é mudança visível no HUD e espera decisão.
+
+> **Lição de processo:** fui procurar fora antes de olhar dentro, nas duas perguntas. O livro
+> estava em `Art/Items` e as barras em `ThirdParty/DarkAgesUI`, ambos já importados. Varrer o
+> projeto é mais barato que varrer a pasta de downloads, e foi o que respondeu.
+
+EditMode 1110 · PlayMode 64.
+
+
 ## 2026-09-09 — Os Fragmentos de Yhtill deixam de ser quadrado branco
 
 Último item da lista de acabamento. Os três eram o caso mais grave de
