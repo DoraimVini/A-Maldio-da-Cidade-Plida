@@ -4,6 +4,58 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — Os botoes da tela de morte, e por que a suite dizia que estava tudo bem
+
+O Vini relatou pela segunda vez: *"A cena de morte continua sem botoes escritos."* Estava certo
+nas duas, e nas duas a suite estava **verde**.
+
+### A conta, agora exata
+
+| | |
+|---|---|
+| `CanvasScaler` do HUD | ScaleWithScreenSize, referencia **1920 x 1080**, match 0,5 |
+| `Botao_Menu` | ancoras 0,145..0,215 -> 0,07 x 1080 = **75,6 px** |
+| rotulo dentro dele | `sizeDelta (-48,-48)` -> 75,6 - 48 = **27,6 px** |
+| `resizeTextMinSize` | **27** |
+
+**0,6 px de margem.** Abaixo do minimo o Best Fit nao desenha nada, sem erro nenhum.
+
+### Por que a ferramenta e o teste nao pegavam
+
+Os dois mediam na resolucao errada. Em batch mode o canvas do Editor da **1663 x 1247** (4:3), e
+o test runner outra coisa; a mesma caixa da **39 px** ali. A minha propria correcao anterior
+escreveu `minSize = floor(39 x 0,6) = 27` **achando que deixava 40% de folga** — contra os 27,6
+px reais, deixou 2%.
+
+Os dois passaram a forcar o canvas para a **resolucao de referencia do proprio CanvasScaler**
+(`RenderMode.WorldSpace` desliga o scaler e faz o `RectTransform` mandar; `Screen.SetResolution`
+nao tem efeito sem janela). Na resolucao certa, **13 rotulos** falhavam, nao 2.
+
+### O conserto, em dois grupos porque a causa e diferente
+
+- **5 botoes de fluxo** (Continuar, Sair, Opcoes, Retomar, Menu): a caixa e que estava errada —
+  24 px de recuo por lado comiam 63% de um botao de 75,6. `sizeDelta.y -48 -> -32`, que e
+  **exatamente a borda de 16 px da moldura**: o `LayoutDaUiTests` recusou o -16 que tentei
+  antes, e recusou com razao. Caixa de **43,6 px** contra MinSize 27.
+- **8 teclas da barra de itens**: caixa de 26,5 px e sem folga para alargar — ali baixar o
+  MinSize (21 -> 15) e o certo.
+
+### O teste agora prova que olhou
+
+`TodoRotuloComBestFit_TemFolgaNaCaixa` ganhou uma asserção de que **mediu** os rotulos do
+Colapso. Sem ela, a lista de reprovados fica vazia por ausencia em vez de por saude — basta o
+`Ligar` falhar ou uma tela mudar de nome. Verificado mordendo: repondo o `-48` so no
+`Botao_Menu`, o teste falha nomeando `Tela_Colapso/Painel/Opcoes/Botao_Menu/Rotulo: caixa 27,6
+px, MinSize 27`.
+
+### O guarda do Rei, afinado
+
+O Vini reposicionou o Rei em (0, 67) depois de jogar e vencer, mantendo a escala 1. O guarda que
+eu escrevi exigia que **nada** do corpo passasse do chao pintado e reprovou meia unidade de
+chapeu — mais rigido que o defeito que protege. Passou a medir **fracao do corpo dentro da
+sala**, contra a **parede** e nao contra o chao: 87% hoje, contra **30%** no defeito de escala
+2,9041 que originou o guarda. O piso e 80%.
+
 ## 2026-09-10 — Um escudo por artefato, e o Rei de volta para dentro da sala
 
 Duas frentes no confronto final, as duas vindas de relato de playtest do Vini.

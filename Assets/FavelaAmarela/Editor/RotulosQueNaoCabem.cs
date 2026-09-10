@@ -78,11 +78,12 @@ namespace FavelaAmarela.EditorTools
                     var vivo = Object.Instantiate(raiz);
 
                     LigarTudo(vivo.transform);
+                    ForcarResolucaoDeReferencia(vivo);
                     Canvas.ForceUpdateCanvases();
 
                     var cv = vivo.GetComponentInChildren<Canvas>(true);
                     if (cv != null)
-                        Debug.Log($"{Marcador} canvas de {caminho.Split('/').Last()}: " +
+                        Debug.Log($"{Marcador} canvas medido de {caminho.Split('/').Last()}: " +
                                   $"{cv.GetComponent<RectTransform>().rect.width:0} x " +
                                   $"{cv.GetComponent<RectTransform>().rect.height:0}");
 
@@ -151,6 +152,47 @@ namespace FavelaAmarela.EditorTools
         /// objeto inativo não tem layout resolvido — mediria zero e passaria batido. Nada é
         /// salvo com o estado ativo: quem é salvo é o prefab original, intocado nisso.
         /// </summary>
+        /// <summary>
+        /// Põe o canvas na <b>resolução de referência do próprio CanvasScaler</b> antes de
+        /// medir.
+        ///
+        /// <para><b>Este método existe por causa de um erro meu, medido em 2026-09-10.</b> Em
+        /// batch mode o canvas do Editor dá <b>1663 × 1247</b> — 4:3. O jogo roda 16:9 com
+        /// referência 1920 × 1080 e <c>match 0,5</c>, o que fixa o canvas lógico em 1080 de
+        /// altura. Os botões de fluxo têm 0,07 de altura ancorada:</para>
+        ///
+        /// <list type="bullet">
+        ///   <item>no batch: 0,07 × 1247 = <b>87 px</b> de botão, <b>39 px</b> de rótulo</item>
+        ///   <item>no jogo: 0,07 × 1080 = <b>75,6 px</b> de botão, <b>27,6 px</b> de rótulo</item>
+        /// </list>
+        ///
+        /// <para>A primeira passada desta ferramenta escreveu <c>minSize = floor(39 × 0,6) =
+        /// 27</c> achando que deixava 40% de folga. Contra os 27,6 px reais, a folga era de
+        /// <b>0,6 px</b> — e a tela de Colapso continuou chegando ao jogador com os botões
+        /// vazios. O Vini relatou duas vezes.</para>
+        ///
+        /// <para><c>WorldSpace</c> desliga o <c>CanvasScaler</c> e faz o <c>RectTransform</c>
+        /// mandar no tamanho, que é a única forma de escolher a resolução em batch mode —
+        /// <c>Screen.SetResolution</c> não tem efeito sem janela.</para>
+        /// </summary>
+        private static void ForcarResolucaoDeReferencia(GameObject vivo)
+        {
+            foreach (var canvas in vivo.GetComponentsInChildren<Canvas>(true))
+            {
+                var escala = canvas.GetComponent<UnityEngine.UI.CanvasScaler>();
+                Vector2 alvo = escala != null && escala.uiScaleMode ==
+                               UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize
+                    ? escala.referenceResolution
+                    : new Vector2(1920f, 1080f);
+
+                canvas.renderMode = RenderMode.WorldSpace;
+                canvas.GetComponent<RectTransform>().sizeDelta = alvo;
+
+                Debug.Log($"{Marcador} {canvas.name}: medindo a {alvo.x} x {alvo.y} " +
+                          "(a resolução de referência, não a do batch).");
+            }
+        }
+
         private static void LigarTudo(Transform t)
         {
             t.gameObject.SetActive(true);

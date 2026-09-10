@@ -55,6 +55,7 @@ namespace FavelaAmarela.Tests.PlayMode
         public IEnumerator TodoRotuloComBestFit_TemFolgaNaCaixa()
         {
             var apertados = new List<string>();
+            var inspecionados = new List<string>();
 
             foreach (var nome in Prefabs())
             {
@@ -76,6 +77,7 @@ namespace FavelaAmarela.Tests.PlayMode
                 // não tem layout, mediria zero, e o defeito passaria batido — que é exatamente
                 // como ele chegou ao jogador.
                 Ligar(vivo.transform);
+                MedirNaResolucaoDeReferencia(vivo);
 
                 yield return null;
                 Canvas.ForceUpdateCanvases();
@@ -88,11 +90,24 @@ namespace FavelaAmarela.Tests.PlayMode
                     float altura = t.rectTransform.rect.height;
                     if (altura <= 0f) continue;
 
+                    inspecionados.Add(Caminho(t.transform, vivo.transform));
+
                     if (t.resizeTextMinSize > altura * Folga)
                         apertados.Add($"{nome} · {Caminho(t.transform, vivo.transform)}: " +
                                       $"caixa {altura:0.0} px, MinSize {t.resizeTextMinSize}");
                 }
             }
+
+            // PROVA DE QUE OLHOU. Sem isto o teste passa verde quando não mede nada: basta o
+            // Ligar falhar, o singleton derrubar a cópia errada, ou a tela de fluxo mudar de
+            // nome, e a lista de apertados fica vazia por ausência em vez de por saúde. É o
+            // mesmo motivo pelo qual as ferramentas deste projeto exigem marcador no log.
+            foreach (var exigido in new[] { "Botao_Retomar/Rotulo", "Botao_Menu/Rotulo" })
+                Assert.IsTrue(inspecionados.Any(c => c.EndsWith(exigido)),
+                    $"O teste não chegou a medir '{exigido}'. São os botões da tela de Colapso " +
+                    "— exatamente os que o Vini relatou vazios, duas vezes. Um teste que não " +
+                    $"os alcança não os guarda.\n  Mediu {inspecionados.Count} rótulo(s): " +
+                    string.Join(", ", inspecionados));
 
             Assert.IsEmpty(apertados,
                 "Rótulos sem folga — abaixo do mínimo o Best Fit não desenha NADA, e sem erro " +
@@ -103,6 +118,45 @@ namespace FavelaAmarela.Tests.PlayMode
         /// Os botões das telas de fluxo precisam ter <b>texto</b>. Um botão em branco é
         /// indistinguível de um botão quebrado, e foi assim que o menu de pause ficou sem saída.
         /// </summary>
+        /// <summary>
+        /// Põe o canvas na <b>resolução de referência do CanvasScaler</b> antes de medir.
+        ///
+        /// <para><b>Sem isto o teste mede a resolução errada e passa verde com o defeito
+        /// dentro</b> — foi o que aconteceu. O <c>CanvasScaler</c> do HUD é
+        /// <c>ScaleWithScreenSize</c> com referência 1920 × 1080 e <c>match 0,5</c>, o que fixa
+        /// o canvas lógico do jogo em 1080 de altura. O test runner em batch mode entrega outra
+        /// coisa, e os botões de fluxo (0,07 de altura ancorada) mudam de tamanho junto:</para>
+        ///
+        /// <list type="bullet">
+        ///   <item>canvas do batch, 1247 de altura: botão 87 px, rótulo <b>39 px</b> — passa</item>
+        ///   <item>canvas do jogo, 1080 de altura: botão 75,6 px, rótulo <b>27,6 px</b> — com
+        ///   MinSize 27, o Best Fit não desenha</item>
+        /// </list>
+        ///
+        /// <para>O Vini relatou a tela de Colapso com os botões vazios <b>duas vezes</b>, e nas
+        /// duas a suíte estava verde. Este método é a diferença entre um teste que mede e um
+        /// teste que confirma.</para>
+        ///
+        /// <para><c>WorldSpace</c> desliga o <c>CanvasScaler</c> e faz o <c>RectTransform</c>
+        /// mandar no tamanho: é a única forma de escolher a resolução sem janela
+        /// (<c>Screen.SetResolution</c> não tem efeito em batch mode).</para>
+        /// </summary>
+        private static void MedirNaResolucaoDeReferencia(GameObject vivo)
+        {
+            foreach (var canvas in vivo.GetComponentsInChildren<Canvas>(true))
+            {
+                var escala = canvas.GetComponent<CanvasScaler>();
+
+                Vector2 alvo = escala != null &&
+                               escala.uiScaleMode == CanvasScaler.ScaleMode.ScaleWithScreenSize
+                    ? escala.referenceResolution
+                    : new Vector2(1920f, 1080f);
+
+                canvas.renderMode = RenderMode.WorldSpace;
+                canvas.GetComponent<RectTransform>().sizeDelta = alvo;
+            }
+        }
+
         [UnityTest]
         public IEnumerator OsBotoesDeFluxo_TemRotuloEscrito()
         {

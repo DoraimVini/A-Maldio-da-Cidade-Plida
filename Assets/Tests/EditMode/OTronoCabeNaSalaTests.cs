@@ -69,29 +69,52 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// O corpo inteiro do Rei tem de ficar <b>dentro</b> da sala. É a queixa do Vini
-        /// literalmente: com escala 2,9 o corpo dele passava oito unidades além da parede norte,
-        /// desenhado sobre o vazio.
+        /// O corpo do Rei tem de estar <b>majoritariamente dentro</b> da sala.
+        ///
+        /// <para><b>Por que uma fração e não "nada pode passar" (afinado em 2026-09-10).</b> A
+        /// primeira versão deste guarda exigia que o topo do sprite não passasse do chão
+        /// pintado. Era mais rígido do que o defeito que ele protege: o Vini reposicionou o Rei
+        /// em y = 67 depois de jogar e vencer, e ali <b>meia unidade de chapéu</b> passa da
+        /// ponta da parede — num isométrico isso lê como estar de pé na frente do fundo, não
+        /// como estar fora.</para>
+        ///
+        /// <para>O defeito real era de outra ordem de grandeza: com o override de escala
+        /// 2,9041092 o Rei tinha 11,71 un e <b>só 30% do corpo</b> ficava na sala. 80% separa
+        /// os dois casos com folga larga dos dois lados — 87% hoje, 30% no defeito.</para>
+        ///
+        /// <para>E mede contra a <b>parede</b> (o Tilemap de colisão), não contra o chão: é a
+        /// parede que fecha a sala, e ela vai meia unidade além do último piso.</para>
         /// </summary>
         [Test]
-        public void OCorpoDoRei_NaoPassaDaSala()
+        public void OCorpoDoRei_FicaMajoritariamenteDentroDaSala()
         {
             Abrir();
             var rei = Object.FindFirstObjectByType<ReiEmAmareloAI>();
             var sprite = rei.GetComponent<SpriteRenderer>();
             Assert.NotNull(sprite, "O Rei perdeu o SpriteRenderer.");
 
-            var chao = Chao();
-            chao.CompressBounds();
-            float topoDaSala = chao.localBounds.max.y + chao.transform.position.y;
+            var parede = Object.FindObjectsByType<Tilemap>(FindObjectsSortMode.None)
+                               .FirstOrDefault(m => m.name == "Colisao");
+            Assert.NotNull(parede, "Tilemap 'Colisao' não encontrado — é ele que fecha a sala.");
 
-            float topoDoRei = sprite.bounds.max.y;
+            parede.CompressBounds();
+            float topoDaSala = parede.localBounds.max.y + parede.transform.position.y;
 
-            Assert.LessOrEqual(topoDoRei, topoDaSala,
-                $"O corpo do Rei chega a y={topoDoRei:F2} e o chão do Castelo acaba em " +
-                $"y={topoDaSala:F2} — o que passa disso está desenhado sobre o vazio. " +
-                "Causa provável: override de escala na instância de cena (o prefab é escala 1).");
+            float pe = sprite.bounds.min.y;
+            float topo = sprite.bounds.max.y;
+            float altura = topo - pe;
+
+            float dentro = Mathf.Clamp(topoDaSala - pe, 0f, altura);
+            float fracao = altura > 0f ? dentro / altura : 0f;
+
+            Assert.GreaterOrEqual(fracao, FracaoMinimaDentroDaSala,
+                $"Só {fracao:P0} do corpo do Rei está dentro da sala. Ele vai de y={pe:F2} a " +
+                $"y={topo:F2} e a parede acaba em y={topoDaSala:F2}. Causa provável: override " +
+                "de escala na instância de cena (o prefab é escala 1).");
         }
+
+        /// <summary>Ver <see cref="OCorpoDoRei_FicaMajoritariamenteDentroDaSala"/>.</summary>
+        private const float FracaoMinimaDentroDaSala = 0.8f;
 
         /// <summary>
         /// Um chefe mais alto que a tela não pode ser lido. A câmera das arenas mostra 11,25

@@ -399,6 +399,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: ReiEmAmarelo
       objectReference: {fileID: 0}
+    - target: {fileID: 3391826082878673162, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
+      propertyPath: m_Radius
+      value: 0.27453792
+      objectReference: {fileID: 0}
+    - target: {fileID: 3391826082878673162, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
+      propertyPath: m_Offset.x
+      value: -1.0499474
+      objectReference: {fileID: 0}
+    - target: {fileID: 3391826082878673162, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
+      propertyPath: m_Offset.y
+      value: 1.3130194
+      objectReference: {fileID: 0}
     - target: {fileID: 4654559023530953403, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
       propertyPath: escudos.Array.size
       value: 3
@@ -429,7 +441,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5510025001677826721, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5510025001677826721, guid: 2b92d7d0fc48a914c86e061803b24013, type: 3}
       propertyPath: m_LocalPosition.z
@@ -43767,7 +43779,7 @@ Transform:
   m_GameObject: {fileID: 753043324}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: -1, z: 0}
+  m_LocalPosition: {x: 8.68, y: 1.07, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -45286,7 +45298,7 @@ Transform:
   m_GameObject: {fileID: 1192290018}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10, y: -1, z: 0}
+  m_LocalPosition: {x: -8.92, y: 0.63, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -46085,7 +46097,7 @@ Transform:
   m_GameObject: {fileID: 1459513185}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -6, z: 0}
+  m_LocalPosition: {x: 0, y: -2.17, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
