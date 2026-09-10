@@ -143,3 +143,38 @@ Tiles, então o tipo não resolvia mesmo com o pacote instalado. `Unity.2D.Tilem
 
 - [Auditoria da malha](https://claude.ai/code/artifact/aa47ff6f-cc7e-4eb7-b0c2-c3b444dc4067) — o plano em sete fases que originou este trabalho
 - [Ficha de Atributos](ficha_de_atributos.md) — o padrão "um dono por número", que a ponte de navegação segue
+
+
+## Tingir o chão por setor de tempestade — **considerado e recusado (2026-09-09)**
+
+A ideia era pintar as ~25 000 células do Deserto com uma tinta por setor, para o gradiente de
+tempestade (0 a 0,95 entre os seis setores) aparecer no chão. Ficou aberta o dia inteiro sobre a
+premissa de que **nada na tela mostrava a tempestade**.
+
+**A premissa era falsa, e a pergunta do Vini a derrubou:** *"mas os setores da tempestade não são
+em triggers? o chão precisa ficar pintado?"*
+
+Medido:
+
+| | |
+|---|---|
+| `TempestadeZonaTrigger` | `OnTriggerEnter2D` → `DefinirFaixa(min, max)`. O setor define uma **faixa**, não um valor |
+| `TempestadeAmbiente` | **oscila** dentro da faixa: `velocidadeCiclo 0.3`, rajadas de força 0,35 a cada 8–20 s, suavização 1,2 |
+| `TempestadeVisualOverlay` | **já existe e está ligado** no Deserto, com `Bind` feito pelo `GameLoopBootstrap` |
+| efeito | véu de tela cheia, `alpha = intensidade × 0,5` — **47% de poeira opaca** no pico |
+
+Três motivos para não pintar o chão:
+
+1. **Seria estático.** A tempestade é um valor vivo que oscila e dá rajadas; tinta assada
+   congelaria uma amostra arbitrária e contradiria o que a tela mostra.
+2. **Seria redundante.** O overlay já comunica a intensidade, e com força.
+3. **Custaria 25 252 células** de dado de cena para um efeito que uma propriedade resolve.
+
+**Se um dia se quiser a tempestade lendo no chão**, o caminho não é assar: é escrever
+`Tilemap.color` no evento `OnStormIntensityChanged` — **uma** escrita por mudança, que oscila
+junto e não deixa dado morto na cena. O `RuleTile` trava `LockTransform` mas **não** `LockColor`,
+então a propriedade está disponível.
+
+> Os seis setores cobrem **24%** da área jogável, e não 100% — o roadmap dizia que eles
+> "ladrilham o mapa sem sobrepor". São ilhas. Isso não é defeito enquanto o efeito for de tela
+> (o valor persiste ao sair do volume), mas seria se alguém tentasse derivar geometria deles.

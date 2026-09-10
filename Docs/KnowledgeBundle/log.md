@@ -4,6 +4,45 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-09 — O chão da tempestade: item recusado por uma pergunta do Vini
+
+Segundo item da fila, e ele **não deveria existir**. Eu ia pintar as ~25 000 células do Deserto
+para o gradiente de tempestade aparecer no chão. O Vini perguntou: *"mas os setores da tempestade
+não são em triggers? o chão precisa ficar pintado?"*
+
+Medido, a resposta é **não**, por três motivos:
+
+| | |
+|---|---|
+| `TempestadeZonaTrigger` | define uma **faixa**, não um valor — `DefinirFaixa(min, max)` no `OnTriggerEnter2D` |
+| `TempestadeAmbiente` | **oscila** dentro dela: ciclo 0,3, rajadas de força 0,35 a cada 8–20 s |
+| `TempestadeVisualOverlay` | **já existe, está no Deserto e está ligado** pelo `GameLoopBootstrap` |
+| o efeito | véu de tela cheia, `alpha = intensidade × 0,5` — **47% de poeira** no pico |
+
+1. Tinta assada seria **estática** e contradiria um valor que se move.
+2. Seria **redundante** — o overlay já comunica, e com força.
+3. Custaria **25 252 células** de dado de cena para o que uma propriedade resolve.
+
+### A correção é minha
+
+Hoje cedo eu escrevi que "os 6 setores vão de 0 a 0,95 e **nada na tela mostra isso**". **Mostra.**
+Eu não tinha procurado o consumidor do `EnvironmentState.StormIntensity` — se tivesse, teria
+achado o overlay antes de propor o trabalho. É a mesma falha das duas perguntas sobre assets:
+**procurei fora antes de olhar dentro.**
+
+O caminho registrado, se um dia se quiser a tempestade lendo no chão: escrever `Tilemap.color` no
+evento `OnStormIntensityChanged` — **uma** escrita por mudança, que oscila junto e não deixa dado
+morto. O `RuleTile` trava `LockTransform` mas não `LockColor`, então a propriedade está livre.
+
+### Um achado lateral que fica
+
+Os seis setores cobrem **24%** da área jogável, não 100% — o roadmap dizia que eles "ladrilham o
+mapa sem sobrepor". São ilhas. Não é defeito enquanto o efeito for de tela, porque o valor
+persiste ao sair do volume; seria, se alguém derivasse geometria deles.
+
+Nada de código mudou. Registro em `systems/navegacao_e_tiles.md`.
+
+
 ## 2026-09-09 — As barras ganham trilho ornado, e a cor de estado sobrevive
 
 Primeiro item da fila de implementação. O `DarkAgesUI` — o pacote que **30 objetos do HUD já
