@@ -4,6 +4,39 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — As três licenças pendentes, e o Damião que o Vini achava que estava no jogo
+
+### "Damião é uma sprite feita pelo Antigravity, não tem licença mesmo"
+
+Medido: **não é o que está no jogo.** O `Player_Damiao.prefab`, nas 6 cenas, desenha das folhas
+em `Art/Characters/Damiao/Animado/` — o cavaleiro do pacote **"4 Directional character"**,
+recolorido em 19/08. As seis folhas geradas pelo Antigravity (`damiao_cutout_spritesheet`,
+`damiao_hd2d_spritesheet`, `damiao_spritesheet_full`, `damiao_spritesheet_cultist` e duas em
+`Arte/Inbox/`) eram o Damião **anterior** e **ninguém referenciava** — prefab, cena, animação,
+script, teste ou doc. Apagadas. O Vini confirmou: tinha esquecido da troca.
+
+### As três origens, achadas pelo nome do zip
+
+| arte | pacote | autor | termos capturados |
+|---|---|---|---|
+| Damião | "4 Directional character" | **Warren Clark** (lionheart963) | *"all my work on here is free to use in any way ud like and credit would be awesome cheers"* |
+| Abdul | "Sorcerer / Villain" | **Warren Clark** — o mesmo | nesta página, sem resposta; coberto pelo *"all my work on here"* da outra |
+| Rei | "Moonstone Keeper — Eldermoon Grove" | **Sucart** | *"free to use ... in any project ... as long as you credit me using the name Sucart"*; *"No generative AI was used"* |
+
+Cada zip da página tem o **nome exato** do que foi baixado — o "(1)" do Abdul era o Windows
+numerando um segundo download. Os textos estão copiados nos três `LICENCA_*.txt` (um link não
+basta como prova de submissão). Nenhuma é licença formal; todas são permissão escrita do autor
+na página oficial.
+
+**Achado no caminho:** o pacote do Sucart lista *Attack (WIP)*. A versão baixada em agosto não
+trazia — é por isso que o Confronto usa o desvelo como único ataque. Se uma versão nova trouxer
+os quadros, a quarta fase pode ganhar um golpe sem trocar de arte.
+
+### O que os três arquivos abrem: o jogo não tem créditos
+
+Conferido: nada em `Cena_Menu`, nada no HUD. Para Warren Clark é pedido; para o **Sucart é
+condição de uso**. Item novo de entrega, e barato.
+
 ## 2026-09-10 — URP mesclada, e a primeira build em 12 dias
 
 O Vini perguntou o que faltava para entregar o VS. A lista de features fechou em 20/08; o que
