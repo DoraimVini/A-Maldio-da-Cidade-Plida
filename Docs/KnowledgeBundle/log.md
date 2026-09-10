@@ -4,6 +4,37 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — DetectorDeOscilacao: o facing não é disputado; a Byakhee é que dá meia-volta a cada segundo
+
+Pedido do Vini: um componente de diagnóstico, sem dependências, que grave por N segundos
+`localScale.x`, `flipX`, `linearVelocity` e `position.x` a cada quadro e, no fim, conte trocas de
+sinal e amplitude — com o aviso *"Facing está sendo reescrito por múltiplas fontes."* se `flipX`
+ou `localScale.x` trocarem mais de 2 vezes na janela.
+
+`Assets/Scripts/Diagnostico/DetectorDeOscilacao.cs`: buffers de capacidade fixa no `Awake`
+(nada alocado no `Update`), relógio em tempo real (sai relatório mesmo pausado), análise numa
+função estática pura (`Analisar`) com 6 testes (`DetectorDeOscilacaoTests`). Além do pedido,
+conta **piscadas órfãs** — `flipX` mudando sem inversão de `velocity.x` a até 2 quadros —, que é
+o que de fato separa "duas fontes" de "um escritor acompanhando a virada real".
+
+Anexado à Byakhee em luta (Play, via CLI; o corpo reativado à mão porque o save do Vini já a tem
+abatida):
+
+```
+2 s  (rasante):  flipX 0 piscadas | velocity.x 0 trocas | Δx 0 inversões | amplitude 11,8 un
+10 s (jogador a 3 un): flipX 11 piscadas, 1 órfã | velocity.x 11 trocas | Δx 11 inversões
+                       | amplitude 17,2 un | maior |Δx| numa inversão 0,067 un
+```
+
+Leitura: o aviso disparou pela regra pedida (11 > 2), mas **11 piscadas = 11 inversões de
+velocidade** — um escritor só (`VirarParaOndeVoa`), fazendo o que deve. Não há jitter (o maior
+passo numa inversão é 0,067 un, contra 17 de amplitude). O que há é a **luta**: com o jogador
+perto, cada fase da FSM mira nele e o atravessa — Rasante para um lado, Pousado arrastando de
+volta, Rasante de novo, Mergulho — e ela **dá meia-volta a cada ~0,9 s**. É provavelmente isto que
+o Vini vê como "virando de um lado para outro" e "movimentação errada": não o sprite, o padrão.
+Decisão de design, dele: rasante que termina perto do jogador em vez de 12 un além; ou fases que
+mantêm a direção (arco) em vez de inverter; ou o `Circundando` entrar entre ataques já na fase 1.
+
 ## 2026-09-10 — Os Portões não abriam mais: a interação medida da origem, não da face
 
 O Vini alteou a barreira dos Portões (1 → 4,3 un, y 9,6…14) para o Damião não entrar por baixo da
