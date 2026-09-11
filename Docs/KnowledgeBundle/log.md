@@ -4,6 +4,25 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-10 — O Rei grande é intenção: a cena do Castelo do Vini entra, os guardas medem a decisão
+
+O Vini: *"Faça todos os commits e o push. Eu quis o Rei com uma escala maior, mesmo."* A
+`Castelo_Carcosa.unity` que ele salvou hoje (Rei em escala ≈ 3,7 → 15,2 un; Refúgio, Nobres e
+um placeholder branco removido) entra como está. Dois guardas codificavam a MINHA composição e
+passam a medir a dele, como já aconteceu com os Portões:
+
+- `OCorpoDoRei_FicaMajoritariamenteDentroDaSala`: 80 % → **50 %**, mais a asserção de que os
+  **pés** estão dentro da sala. O defeito original (escala 2,9041) era o corpo *fora* (30 %); o
+  gigante com a cabeça acima da parede do fundo (61 %) é leitura de chefe.
+- `ORei_CabeNaTela` → `ORei_NaoPassaDeDuasTelasDeAltura`: teto de sanidade (22,5 un) contra
+  escala digitada errada; 15,2 passa.
+- `OConfrontoDoReiTests.ComUmaArmaT2NoNivelDeChegada_ORei_NaoCaiNumCicloSo`: `Assert.Ignore`
+  com a razão — a luta está parada por decisão dele e o balanceamento será refeito com a luta
+  nova; um vermelho diário de um guarda de algo que vai mudar só ensina a ignorar vermelhos.
+
+**EditMode: 1174 testes, 1150 passam, 0 reprovam, 24 pulados** (23 contratos migrados + este).
+PlayMode 79/79 na rodada anterior. Push de `develop_progression` e `develop_manager`.
+
 ## 2026-09-10 — A lista da noite: build, créditos, inventário plano A, suítes inteiras, push
 
 O Vini: *"Pode fazer sim, tudo o que você propôs e em ordem."* A ordem era C.10 → C.11 → build →

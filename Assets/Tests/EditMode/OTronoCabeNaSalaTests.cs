@@ -84,6 +84,13 @@ namespace FavelaAmarela.Tests.EditMode
         ///
         /// <para>E mede contra a <b>parede</b> (o Tilemap de colisão), não contra o chão: é a
         /// parede que fecha a sala, e ela vai meia unidade além do último piso.</para>
+        ///
+        /// <para><b>Afinado de novo em 2026-09-10, à noite.</b> O Vini pôs o Rei em escala ≈ 3,7
+        /// (15,2 un) e disse: <i>"Eu quis o Rei com uma escala maior, mesmo."</i> Um gigante cuja
+        /// cabeça passa da parede do fundo é a intenção, não o defeito — o defeito de 2,9041 era
+        /// o corpo <b>fora</b> da sala (30 %). Com a escala dele, 61 % do corpo fica dentro e os
+        /// pés estão no chão da sala; 50 % separa a intenção do defeito. O que este guarda pega
+        /// agora é um Rei que <i>saiu</i> da sala, não um Rei grande.</para>
         /// </summary>
         [Test]
         public void OCorpoDoRei_FicaMajoritariamenteDentroDaSala()
@@ -107,29 +114,38 @@ namespace FavelaAmarela.Tests.EditMode
             float dentro = Mathf.Clamp(topoDaSala - pe, 0f, altura);
             float fracao = altura > 0f ? dentro / altura : 0f;
 
+            Assert.Less(pe, topoDaSala,
+                $"Os pés do Rei (y={pe:F2}) estão ACIMA da parede do fundo (y={topoDaSala:F2}): " +
+                "ele está fora da sala, não só grande.");
+
             Assert.GreaterOrEqual(fracao, FracaoMinimaDentroDaSala,
                 $"Só {fracao:P0} do corpo do Rei está dentro da sala. Ele vai de y={pe:F2} a " +
-                $"y={topo:F2} e a parede acaba em y={topoDaSala:F2}. Causa provável: override " +
-                "de escala na instância de cena (o prefab é escala 1).");
+                $"y={topo:F2} e a parede acaba em y={topoDaSala:F2}. Um Rei grande passa da " +
+                "parede com a cabeça (intenção do Vini, 2026-09-10); um Rei FORA da sala não.");
         }
 
-        /// <summary>Ver <see cref="OCorpoDoRei_FicaMajoritariamenteDentroDaSala"/>.</summary>
-        private const float FracaoMinimaDentroDaSala = 0.8f;
+        /// <summary>Ver <see cref="OCorpoDoRei_FicaMajoritariamenteDentroDaSala"/>: 61 % com a escala escolhida, 30 % no defeito.</summary>
+        private const float FracaoMinimaDentroDaSala = 0.5f;
 
         /// <summary>
-        /// Um chefe mais alto que a tela não pode ser lido. A câmera das arenas mostra 11,25
-        /// unidades de altura; com o override de 2,9 o Rei tinha 11,71.
+        /// Teto de sanidade para a escala do Rei: até <b>duas telas</b> de altura.
+        ///
+        /// <para>A versão anterior exigia caber numa tela (11,25). O Vini escolheu um Rei de
+        /// 15,2 un de propósito (2026-09-10: <i>"Eu quis o Rei com uma escala maior, mesmo"</i>) —
+        /// o gigante que não cabe no quadro é leitura de chefe, não defeito. O que este guarda
+        /// ainda pega é uma escala digitada errada (29 em vez de 2,9 é o tipo de erro que já
+        /// aconteceu com 2,9041): acima de duas telas, ninguém vê nem os pés dele.</para>
         /// </summary>
         [Test]
-        public void ORei_CabeNaTela()
+        public void ORei_NaoPassaDeDuasTelasDeAltura()
         {
             Abrir();
             var sprite = Object.FindAnyObjectByType<ReiEmAmareloAI>()
                                .GetComponent<SpriteRenderer>();
 
-            Assert.Less(sprite.bounds.size.y, AlturaDaTela,
-                $"O Rei tem {sprite.bounds.size.y:F2} un de altura e a câmera mostra " +
-                $"{AlturaDaTela} — ele não cabe no quadro em que se luta contra ele.");
+            Assert.Less(sprite.bounds.size.y, AlturaDaTela * 2f,
+                $"O Rei tem {sprite.bounds.size.y:F2} un de altura — mais de duas telas de " +
+                $"{AlturaDaTela}. A escala escolhida pelo Vini dá ~15,2; isto é outra coisa.");
         }
 
         // ── Os abrigos ───────────────────────────────────────────────────────

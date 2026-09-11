@@ -251,6 +251,14 @@ namespace FavelaAmarela.Tests.EditMode
         [Test]
         public void ComUmaArmaT2NoNivelDeChegada_ORei_NaoCaiNumCicloSo()
         {
+            // Parado com a luta (decisão do Vini, 2026-09-10: "detestei, muito repetitiva; vou
+            // pensar melhor como seria"). O guarda mede o balanceamento de um Confronto que vai
+            // ser redesenhado; reprová-lo agora só faria a suíte mentir vermelho todo dia. Volta
+            // a valer -- reescrito -- junto com a luta nova. Hoje ele diria: Alfanje T2 no nível 4
+            // (675 de Exposição no caminho) mata em 8,6 golpes, e a calmaria de 5 s comporta 9.
+            Assert.Ignore("Luta do Rei parada por decisão do Vini (2026-09-10); o balanceamento " +
+                          "do Confronto será refeito com a luta nova.");
+
             var rei = FichaDoRei();
             int nivel = NivelAoChegarNoTrono(out string memoria);
 
