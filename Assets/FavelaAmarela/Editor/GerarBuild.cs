@@ -107,13 +107,46 @@ namespace FavelaAmarela.EditorTools
                 return;
             }
 
+            string limpeza = ApagarOQueNaoSeEntrega(pasta);
+
             Debug.Log($"{Marcador} OK — {resumo.result}, " +
                       $"{resumo.totalSize / (1024 * 1024)} MB, " +
                       $"{resumo.totalTime.TotalSeconds:0} s, " +
                       $"{resumo.totalWarnings} aviso(s).\n" +
                       $"{Marcador} Console de runtime (F1): " +
                       $"{(desenvolvimento ? "PRESENTE" : "AUSENTE — não foi compilado")}\n" +
+                      $"{Marcador} {limpeza}\n" +
                       $"{Marcador} Saída: {Path.GetFullPath(opcoes.locationPathName)}");
+        }
+
+        /// <summary>
+        /// Apaga da pasta de saída o que a Unity gera ao lado da build e <b>manda não enviar</b>:
+        /// as pastas <c>*_BurstDebugInformation_DoNotShip</c> (e
+        /// <c>*_BackUpThisFolder_ButDontShipItWithYourGame</c>, do IL2CPP).
+        ///
+        /// <para><b>O que havia nela (2026-09-10, o Vini perguntou).</b> Um único
+        /// <c>lib_burst_generated.txt</c> de 240 KB: o log do compilador Burst — opções, a lista
+        /// de funções compiladas dos pacotes da Unity, e <b>19 caminhos absolutos da máquina</b>
+        /// (<c>C:/Users/Vini/...</c>). Não roda nada e o jogo não a lê; serve para casar um crash
+        /// do Burst com o símbolo. Fora do zip de entrega, sempre.</para>
+        /// </summary>
+        private static string ApagarOQueNaoSeEntrega(string pasta)
+        {
+            if (!Directory.Exists(pasta)) return "nada a limpar";
+
+            var apagadas = new System.Collections.Generic.List<string>();
+            foreach (var dir in Directory.GetDirectories(pasta))
+            {
+                string nome = Path.GetFileName(dir);
+                if (!nome.EndsWith("_DoNotShip") && !nome.Contains("ButDontShipItWithYourGame")) continue;
+
+                Directory.Delete(dir, recursive: true);
+                apagadas.Add(nome);
+            }
+
+            return apagadas.Count == 0
+                ? "nada marcado como DoNotShip ao lado da build"
+                : $"apagado(s) da saída: {string.Join(", ", apagadas)}";
         }
     }
 }
