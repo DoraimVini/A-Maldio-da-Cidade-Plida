@@ -1,0 +1,20 @@
+{
+    "name": "FavelaAmarela.Editor",
+    "rootNamespace": "FavelaAmarela.Editor",
+    "references": [
+        "FavelaAmarela.Core",
+        "FavelaAmarela.Runtime",
+        "FavelaAmarela.Level",
+        "Unity.InputSystem",
+        "Unity.2D.Sprite.Editor"
+    ],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

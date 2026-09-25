@@ -169,5 +169,31 @@ namespace FavelaAmarela.Level.Core
         [Header("Zona 5: Transição Dimensional (Sul da Praça)")]
         public float Zone5Length = 10f;
         public float Zone5Width = 8f;
+
+        // Zonas 6-9: descida de combate abaixo da Z5 (o "jogo de verdade" abre aqui,
+        // culminando na arena do miniboss). Length = largura em X, Width = altura em Y.
+        [Header("Zona 6: Cripta dos Primeiros (arena)")]
+        public float Zone6Length = 12f;
+        public float Zone6Width = 10f;
+
+        [Header("Zona 7: Fenda dos Sussurros (corredor)")]
+        public float Zone7Length = 4f;
+        public float Zone7Width = 4.5f;
+
+        [Header("Zona 8: Ossário (arena maior)")]
+        public float Zone8Length = 14f;
+        public float Zone8Width = 14f;
+
+        [Header("Zona 9: Tumba de Abdul (arena do boss)")]
+        public float Zone9Length = 16f;
+        public float Zone9Width = 12f;
+
+        // Câmara lateral pendurada a LESTE da Zona 6, logo após a entrada da dungeon.
+        // Guarda o baú da Tumba: o jogador pega a arma antes de encarar os Cultistas do
+        // caminho (Zonas 6-8). É lateral de propósito — pendurar aqui não desloca
+        // nenhuma zona existente, então os inimigos já posicionados na cena não se mexem.
+        [Header("Zona 6b: Câmara do Baú (sala lateral da Cripta)")]
+        public float Zone6bLength = 7f;
+        public float Zone6bWidth = 6f;
     }
 }

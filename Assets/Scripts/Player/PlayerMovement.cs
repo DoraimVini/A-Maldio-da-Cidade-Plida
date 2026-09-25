@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using FavelaAmarela.Core.Stealth;
 using FavelaAmarela.Core.Environment;
+using FavelaAmarela.Core.Player;
+using FavelaAmarela.Runtime.Config;
 
 namespace FavelaAmarela.Player
 {
@@ -18,9 +20,17 @@ namespace FavelaAmarela.Player
     /// </summary>
     public class PlayerStealthState
     {
+        /// <summary>
+        /// Quanto a tempestade abafa o ruído do jogador (0 = não abafa, 1 = abafa tudo
+        /// na intensidade máxima). Constante de game-feel; nomeada aqui para não ficar
+        /// como literal solto dentro do cálculo.
+        /// </summary>
+        private const float FatorAbafamentoTempestade = 0.6f;
+
         public MovementMode CurrentMode { get; private set; } = MovementMode.Walking;
         public float Speed { get; private set; }
         public float NoiseRadius { get; private set; }
+        public bool IsOdorMasked { get; set; } = false;
 
         private readonly float sneakSpeed;
         private readonly float sneakNoise;
@@ -72,7 +82,7 @@ namespace FavelaAmarela.Player
         /// </summary>
         public static float AplicarAbafamentoTempestade(float raioBase, float stormIntensity)
         {
-            float dampening = 1.0f - Mathf.Clamp01(stormIntensity * 0.6f);
+            float dampening = 1.0f - Mathf.Clamp01(stormIntensity * FatorAbafamentoTempestade);
             return raioBase * dampening;
         }
     }
@@ -90,6 +100,12 @@ namespace FavelaAmarela.Player
         [Header("Movement Settings")]
         [SerializeField] private bool useIsometricGridAlignment = true;
 
+        [Tooltip("Asset de velocidades/ruídos por modo furtivo. Se vazio, usa os defaults do POCO.")]
+        [SerializeField] private LocomocaoConfig locomocaoConfig;
+
+        // Período (s) entre broadcasts de som ao andar. Nomeado para não ficar como literal no FixedUpdate.
+        private const float IntervaloBroadcastSom = 0.15f;
+
         [Header("Esquiva")]
         [Tooltip("Raio de ruído emitido no instante da Esquiva. Antes deste fix a Esquiva era 100% silenciosa (o early-return do FixedUpdate pulava o bloco de som), o que deixava o combo Furtivo+Esquiva quebrar a percepção do Cultista na hora.")]
         [SerializeField] private float esquivaNoiseRadius = 6.5f;
@@ -105,32 +121,40 @@ namespace FavelaAmarela.Player
         private Vector2 inputDirection;
         private bool isMoving;
 
+        // Fonte única de verdade das ações exclusivas (Esquiva/Salto/Ataque).
+        // Substitui as antigas flags-espelho isLeaping/isEsquivando/isAtacando.
+        private PlayerStateMachine _fsm;
+
         // Input System actions (cached in Awake)
         private InputAction moveAction;
         private InputAction sneakAction;
         private InputAction runAction;
 
-        // --- Leap State ---
-        private AnomalyPowerBridge anomalyBridge;
-        private bool isLeaping;
-        private Vector2 leapVelocity;
-        private InputAction leapAction;
-        private int _leapIntangibleLayer;
-        private int _originalLayer;
-
         // --- Esquiva (dodge) State ---
         private EsquivaBridge esquivaBridge;
-        private bool isEsquivando;
         private Vector2 esquivaVelocity;
         private InputAction dodgeAction;
 
+        // --- Congelamento (imposto pelos Cones de Gelo do Abdul) ---
+        private CongelamentoBridge congelamentoBridge;
+
         // --- Mão Física (ataque) State ---
         private MaoFisicaBridge maoFisicaBridge;
-        private bool isAtacando;
         private InputAction attackAction;
+        private InputAction habilidadeArmaAction;
+
+        // --- Artefatos (F1–F4, um por slot equipado) ---
+        private ArtefatosBridge artefatosBridge;
+        private readonly InputAction[] artefatoActions =
+            new InputAction[FavelaAmarela.Core.Artefatos.InventarioDeArtefatos.TotalDeSlots];
+        
+        private float _odorMaskTimer = 0f;
+        private float _silencioTimer = 0f;
+        private GerenciadorDeVigor _vigor;
 
         public PlayerStealthState StealthState => stealthState;
         public bool IsMoving => isMoving;
+        public Vector2 LookDirection { get; private set; } = Vector2.right;
 
         // --- Injected Services ---
         private SoundBroadcastService _soundBroadcaster;
@@ -141,10 +165,21 @@ namespace FavelaAmarela.Player
         {
             _soundBroadcaster = broadcaster;
             _environment = env;
+
+            // Sem estes dois, Damião anda em silêncio absoluto: como a percepção dos
+            // inimigos é 100% sonora, nenhum deles jamais o caçaria — e o sintoma em
+            // playtest é "a IA está quebrada", não "faltou injeção".
+            if (_soundBroadcaster == null || _environment == null)
+                Debug.LogError("[PlayerMovement] Bind recebeu dependência nula — Damião não " +
+                               "vai emitir som e nenhum inimigo vai caçá-lo.", this);
         }
 
         private void Awake()
         {
+            // FSM de ações exclusivas criada antes de qualquer early-return abaixo, para
+            // nunca ficar nula em Update/FixedUpdate mesmo se o Awake abortar cedo (ex.: rb nulo).
+            _fsm = new PlayerStateMachine();
+
             // --- Rigidbody2D setup for top-down 2D ---
             rb = GetComponent<Rigidbody2D>();
             if (rb == null)
@@ -156,19 +191,32 @@ namespace FavelaAmarela.Player
             rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-            anomalyBridge = GetComponent<AnomalyPowerBridge>();
             esquivaBridge = GetComponent<EsquivaBridge>();
             maoFisicaBridge = GetComponent<MaoFisicaBridge>();
+            artefatosBridge = GetComponent<ArtefatosBridge>();
+            congelamentoBridge = GetComponent<CongelamentoBridge>();
 
-            // Cacheia a layer original do Damião (definida no Inspector) para restaurá-la
-            // após o Salto Dimensional, em vez de assumir um nome fixo. A camada de
-            // intangibilidade do Salto ("Ignore Raycast") faz o Damião atravessar
-            // barreiras anômalas durante o dash.
-            _originalLayer = gameObject.layer;
-            _leapIntangibleLayer = LayerMask.NameToLayer("Ignore Raycast");
+            // FSM injetada nos bridges, que passam a consultá-la para exclusão mútua
+            // em vez de manter flags próprias.
+            if (esquivaBridge != null) esquivaBridge.BindStateMachine(_fsm);
+            if (maoFisicaBridge != null) maoFisicaBridge.BindStateMachine(_fsm);
+            if (congelamentoBridge != null) congelamentoBridge.BindStateMachine(_fsm);
+
+            _vigor = GetComponent<GerenciadorDeVigor>();
 
             // --- POCO init ---
-            stealthState = new PlayerStealthState();
+            if (locomocaoConfig != null)
+            {
+                stealthState = new PlayerStealthState(
+                    locomocaoConfig.SneakSpeed, locomocaoConfig.SneakNoise,
+                    locomocaoConfig.WalkSpeed, locomocaoConfig.WalkNoise,
+                    locomocaoConfig.RunSpeed, locomocaoConfig.RunNoise);
+            }
+            else
+            {
+                Debug.LogWarning("[PlayerMovement] LocomocaoConfig não atribuído; usando defaults do POCO.", this);
+                stealthState = new PlayerStealthState();
+            }
 
             // --- Input System: safe lookup via FindAction (returns null, never throws) ---
             var playerInput = GetComponent<PlayerInput>();
@@ -177,9 +225,13 @@ namespace FavelaAmarela.Player
                 moveAction  = playerInput.actions.FindAction("Move");
                 sneakAction = playerInput.actions.FindAction("Crouch");
                 runAction   = playerInput.actions.FindAction("Sprint");
-                leapAction  = playerInput.actions.FindAction("SaltoDimensional"); // botão direito do mouse
                 dodgeAction = playerInput.actions.FindAction("Esquiva"); // Espaço
                 attackAction = playerInput.actions.FindAction("Attack"); // botão esquerdo do mouse
+                habilidadeArmaAction = playerInput.actions.FindAction("HabilidadeArma"); // tecla Q / ombro direito
+
+                // Uma habilidade por Artefato equipado — teclas F1 a F4.
+                for (int i = 0; i < artefatoActions.Length; i++)
+                    artefatoActions[i] = playerInput.actions.FindAction($"HabilidadeArtefato{i + 1}");
 
                 if (moveAction == null)
                     Debug.LogWarning("[PlayerMovement] 'Move' action not found in Input Actions asset.", this);
@@ -192,60 +244,22 @@ namespace FavelaAmarela.Player
 
         private void OnEnable()
         {
-            if (anomalyBridge != null)
-            {
-                anomalyBridge.OnDimensionalLeapActivated += HandleLeapActivated;
-            }
             if (esquivaBridge != null)
             {
                 esquivaBridge.OnEsquivaActivada += HandleEsquivaActivated;
-            }
-            if (maoFisicaBridge != null)
-            {
-                maoFisicaBridge.OnAtaqueExecutado += HandleAtaqueExecutado;
             }
         }
 
         private void OnDisable()
         {
-            if (anomalyBridge != null)
-            {
-                anomalyBridge.OnDimensionalLeapActivated -= HandleLeapActivated;
-            }
             if (esquivaBridge != null)
             {
                 esquivaBridge.OnEsquivaActivada -= HandleEsquivaActivated;
             }
-            if (maoFisicaBridge != null)
-            {
-                maoFisicaBridge.OnAtaqueExecutado -= HandleAtaqueExecutado;
-            }
-        }
-
-        private void HandleLeapActivated(Vector2 direction, float duration, float speedMultiplier)
-        {
-            isLeaping = true;
-            
-            // Convert leap direction to isometric if needed
-            Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
-            leapVelocity = finalDirection * (stealthState.Speed * speedMultiplier);
-
-            // Torna o Damião intangível durante o Salto (atravessa barreiras anômalas)
-            gameObject.layer = _leapIntangibleLayer;
-
-            Invoke(nameof(EndLeap), duration);
-        }
-
-        private void EndLeap()
-        {
-            isLeaping = false;
-            gameObject.layer = _originalLayer; // Restaura a layer capturada no Awake
         }
 
         private void HandleEsquivaActivated(Vector2 direction, float duration, float speedMultiplier)
         {
-            isEsquivando = true;
-
             // Esquiva é movimento físico comum: colide com paredes normalmente,
             // diferente do Salto (que fica intangível). Nenhuma troca de layer aqui.
             Vector2 finalDirection = useIsometricGridAlignment ? ConvertToIsometric(direction) : direction.normalized;
@@ -259,82 +273,115 @@ namespace FavelaAmarela.Player
                 float noise = PlayerStealthState.AplicarAbafamentoTempestade(esquivaNoiseRadius, _environment.StormIntensity);
                 _soundBroadcaster.Emitir(new SomEmitido(transform.position, noise));
             }
-
-            Invoke(nameof(EndEsquiva), duration);
         }
 
-        private void EndEsquiva()
-        {
-            isEsquivando = false;
-        }
-
-        private void HandleAtaqueExecutado(Vector2 direction, float duration)
-        {
-            isAtacando = true;
-            Invoke(nameof(EndAtaque), duration);
-        }
-
-        private void EndAtaque()
-        {
-            isAtacando = false;
-        }
+        /// <summary>
+        /// Trava movimento e as ações exclusivas por completo — usado por diálogo
+        /// ramificado (<c>PainelDeEscolha</c>) enquanto o jogador navega opções com o
+        /// mesmo eixo de movimento, para "cima/baixo" não andar o Damião pela cena.
+        /// </summary>
+        public bool MovimentoBloqueado { get; set; }
 
         private void Update()
         {
-            if (isLeaping || isEsquivando || isAtacando) return; // Lock input durante ações exclusivas
+            if (_odorMaskTimer > 0)
+            {
+                _odorMaskTimer -= Time.deltaTime;
+                if (_odorMaskTimer <= 0)
+                {
+                    StealthState.IsOdorMasked = false;
+                }
+            }
+
+            if (_silencioTimer > 0f) _silencioTimer -= Time.deltaTime;
+
+            // Avança o relógio das ações exclusivas (substitui os Invoke(EndX) do modelo antigo).
+            _fsm.Tick(Time.deltaTime);
+
+            if (MovimentoBloqueado)
+            {
+                inputDirection = Vector2.zero;
+                isMoving = false;
+                return;
+            }
+
+            if (!_fsm.EstaLivre) return; // Lock de input enquanto uma ação exclusiva está em curso
 
             // Read input from New Input System only
             inputDirection = moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
             isMoving = inputDirection.sqrMagnitude > 0.01f;
-
-            // Trigger Leap
-            if (leapAction != null && leapAction.WasPressedThisFrame() && anomalyBridge != null)
+            
+            if (isMoving)
             {
-                anomalyBridge.TryActivateLeap(inputDirection);
-                if (anomalyBridge.IsLeaping) return; // Successful leap
+                LookDirection = inputDirection.normalized;
             }
 
             // Trigger Esquiva
             if (dodgeAction != null && dodgeAction.WasPressedThisFrame() && esquivaBridge != null)
             {
                 esquivaBridge.TryActivateEsquiva(inputDirection);
-                if (esquivaBridge.IsEsquivando) return; // Successful esquiva
+                if (!_fsm.EstaLivre) return; // Esquiva pegou
             }
 
             // Trigger Ataque (Mão Física)
             if (attackAction != null && attackAction.WasPressedThisFrame() && maoFisicaBridge != null)
             {
                 maoFisicaBridge.TryAtacar(inputDirection);
-                if (maoFisicaBridge.IsAtacando) return; // Ataque bem-sucedido
+                if (!_fsm.EstaLivre) return; // Ataque pegou
+            }
+
+            // Trigger Habilidade da Arma (botão separado do ataque básico)
+            if (habilidadeArmaAction != null && habilidadeArmaAction.WasPressedThisFrame() && maoFisicaBridge != null)
+            {
+                maoFisicaBridge.TryUsarHabilidade(inputDirection);
+                if (!_fsm.EstaLivre) return; // Habilidade pegou
+            }
+
+            // Trigger das habilidades de Artefato (F1–F4, uma por slot equipado).
+            // Não travam a FSM: invocar um Artefato não é ação exclusiva como golpear.
+            if (artefatosBridge != null)
+            {
+                for (int i = 0; i < artefatoActions.Length; i++)
+                {
+                    if (artefatoActions[i] != null && artefatoActions[i].WasPressedThisFrame())
+                        artefatosBridge.TryUsarArtefato(i);
+                }
             }
 
             // Determine stealth mode from modifier keys
+            bool podeCorrer = _vigor == null || (!_vigor.EstaExausto && _vigor.VigorAtual > 0f);
+
             if (sneakAction != null && sneakAction.IsPressed())
+            {
                 stealthState.SetMode(MovementMode.Sneaking);
-            else if (runAction != null && runAction.IsPressed())
+            }
+            else if (runAction != null && runAction.IsPressed() && podeCorrer)
+            {
                 stealthState.SetMode(MovementMode.Running);
+                if (isMoving && _vigor != null)
+                {
+                    _vigor.ConsumirCorrida(Time.deltaTime);
+                }
+            }
             else
+            {
                 stealthState.SetMode(MovementMode.Walking);
+            }
         }
 
         private void FixedUpdate()
         {
-            if (isLeaping)
+            switch (_fsm.CurrentState)
             {
-                rb.linearVelocity = leapVelocity;
-                return;
-            }
-
-            if (isEsquivando)
-            {
-                rb.linearVelocity = esquivaVelocity;
-                return;
-            }
-
-            if (isAtacando)
-            {
-                rb.linearVelocity = Vector2.zero;
-                return;
+                case PlayerState.Esquivando:
+                    rb.linearVelocity = esquivaVelocity;
+                    return;
+                case PlayerState.Atacando:
+                    rb.linearVelocity = Vector2.zero; // ataque trava Damião no lugar
+                    return;
+                case PlayerState.Congelado:
+                    rb.linearVelocity = Vector2.zero; // congelado não anda nem age
+                    return;
             }
 
             if (!isMoving)
@@ -354,11 +401,11 @@ namespace FavelaAmarela.Player
             if (_soundBroadcaster != null && _environment != null)
             {
                 _soundTimer += Time.fixedDeltaTime;
-                if (_soundTimer >= 0.15f)
+                if (_soundTimer >= IntervaloBroadcastSom)
                 {
                     _soundTimer = 0f;
                     float currentNoise = stealthState.GetCurrentNoiseEmission(isMoving, _environment.StormIntensity);
-                    if (currentNoise > 0f)
+                    if (currentNoise > 0f && !PassosSilenciados)
                     {
                         _soundBroadcaster.Emitir(new SomEmitido(transform.position, currentNoise));
                     }
@@ -391,6 +438,31 @@ namespace FavelaAmarela.Player
             // Outline
             Gizmos.color = new Color(1f, 0.92f, 0.016f, 0.7f);
             Gizmos.DrawWireSphere(transform.position, currentNoise);
+        }
+        public void MascararOdor(float duracaoSegundos)
+        {
+            if (StealthState != null)
+            {
+                StealthState.IsOdorMasked = true;
+                _odorMaskTimer = duracaoSegundos;
+            }
+        }
+
+        /// <summary>
+        /// Se os passos de Damião estão calados neste instante — o Resguardo do Sinal.
+        /// </summary>
+        public bool PassosSilenciados => _silencioTimer > 0f;
+
+        /// <summary>
+        /// Cala os passos por um tempo: Damião continua andando, mas deixa de emitir ruído.
+        /// Vale só para o broadcast contínuo do caminhar — a Esquiva segue fazendo barulho de
+        /// propósito, senão Resguardo + Esquiva viraria um apagão sonoro completo.
+        /// </summary>
+        /// <param name="duracaoSegundos">Renova o silêncio se já houver um em curso mais curto.</param>
+        public void SilenciarPassos(float duracaoSegundos)
+        {
+            if (duracaoSegundos <= 0f) return;
+            _silencioTimer = Mathf.Max(_silencioTimer, duracaoSegundos);
         }
     }
 }

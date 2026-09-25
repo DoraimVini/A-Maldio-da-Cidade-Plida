@@ -19,8 +19,7 @@ namespace FavelaAmarela.Core.Abilities
 
     /// <summary>
     /// POCO com a lógica matemática da Esquiva: um pulso curto de movimento físico
-    /// comum, sem relação com o Salto Dimensional. Diferente de <see cref="DimensionalLeap"/>,
-    /// não consome Resiliência Mental — Damião não está distorcendo a realidade de
+    /// comum. Não consome Resiliência Mental — Damião não está distorcendo a realidade de
     /// Carcosa, só se jogando pro lado. Por isso não implementa <see cref="IAnomalyPower"/>
     /// (essa interface exige um custo de resiliência que não se aplica aqui).
     /// </summary>

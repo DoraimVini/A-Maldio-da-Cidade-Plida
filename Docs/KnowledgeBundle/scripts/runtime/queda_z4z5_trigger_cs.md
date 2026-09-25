@@ -12,7 +12,9 @@ timestamp: 2026-07-07T17:00:00Z
 **Namespace:** `FavelaAmarela.Runtime.GameLoop`
 **Tipo:** `public class` (herda de `MonoBehaviour`)
 
-Trigger (`Collider2D` + `CompareTag("Player")`) que dispara a sequência completa da [Queda Z4 → Z5](../../systems/queda_z4_z5.md), uma única vez (`_disparado`). Mirror do padrão de `ColapsoTrigger`, mas com uma corrotina de efeitos em vez de uma ação imediata.
+> ⚠️ **Componente sem instância na cena atual (2026-07-30).** A queda Z4→Z5 foi removida da Tumba de Alhazred, que virou uma dungeon única e fechada. O script continua no projeto (pode ser reaproveitado noutra fase), mas não está mais instanciado em `Playtest_RuinasPalidas.unity`.
+
+Trigger (`Collider2D` + `CompareTag("Player")`) que dispara a sequência completa da queda Z4 → Z5, uma única vez (`_disparado`). Mirror do padrão de `ColapsoTrigger`, mas com uma corrotina de efeitos em vez de uma ação imediata.
 
 ## Sequência (`SequenciaDeQueda`)
 

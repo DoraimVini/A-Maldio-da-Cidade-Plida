@@ -13,6 +13,15 @@ GameObject:
   - component: {fileID: 2290442817582334515}
   - component: {fileID: 2290442817582334516}
   - component: {fileID: 2290442817582334517}
+  - component: {fileID: 2290442817582334520}
+  - component: {fileID: 5069879413216543389}
+  - component: {fileID: 6186456781152706504}
+  - component: {fileID: 1405882491007918945}
+  - component: {fileID: 1318061846628413486}
+  - component: {fileID: 9220689360430143524}
+  - component: {fileID: 6360046265921058457}
+  - component: {fileID: 4695545914089126774}
+  - component: {fileID: 4727924443773620933}
   m_Layer: 6
   m_Name: Cultista
   m_TagString: Untagged
@@ -30,7 +39,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.8, y: 1.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -84,7 +93,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 616077234486404143, guid: 9c00e124f5688004094767ded8b69559, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ed5e938c6dce7994b9dd7c52b7f37351, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -119,8 +128,8 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 0
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!114 &2290442817582334516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,14 +140,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bdb1c7d67516ee14cbbdf0b06d038723, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.CultistaAI
-  waypoints: []
-  velocidadeErrante: 1
-  velocidadeCaca: 3.5
   corErrante: {r: 1, g: 1, b: 1, a: 1}
   corAlerta: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   corCaca: {r: 1, g: 0, b: 0, a: 1}
+  corAtacar: {r: 0.75, g: 0, b: 0.2, a: 1}
+  corHurt: {r: 1, g: 0, b: 1, a: 1}
 --- !u!61 &2290442817582334517
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -177,7 +185,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 0.32, y: 0.32}
+    oldSize: {x: 0.5, y: 1}
     newSize: {x: 0.32, y: 0.32}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -185,3 +193,141 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.32, y: 0.32}
   m_EdgeRadius: 0
+--- !u!114 &2290442817582334520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 828427ee7839cee4a97d51f9c5059441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Rendering.DynamicYSort
+  fator: 10
+  offsetPes: 0
+--- !u!114 &5069879413216543389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c78e21417e14e24a80040c0d42ef897, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyBase
+  ficha: {fileID: 11400000, guid: 01b505d918c6fb06a0a1fe2a5b6a8e61, type: 2}
+  ehAparicaoPrimordial: 0
+  mostrarNumerosDeDano: 1
+  corDoDano: {r: 1, g: 0.35, b: 0.35, a: 1}
+--- !u!114 &6186456781152706504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9b99072770f7a249aa6a7f8adc7cc42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyMovement
+  velocidadeErrante: 1.5
+  velocidadeCaca: 3.5
+  usarAceleracao: 0
+  aceleracao: 10
+--- !u!114 &1405882491007918945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8102adc49fa8268408452b0652c7e1fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyCombat
+  alcanceDeGolpe: 1.2
+  cadenciaDeAtaque: 1.2
+  danoDoGolpe: 20
+  camadaDoJogador:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &1318061846628413486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e8e11b593b51bf4eb1d2277f6915f2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyPerception
+  raioAudicao: 10
+  taxaSuspeita: 0.4
+  limiarAlerta: 0.3
+  limiarCaca: 0.7
+--- !u!114 &9220689360430143524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd17e0a884206694bbc1905f9e8ccb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyStateMachine
+  initialState: 0
+  alertDuration: 2
+  maxChaseDistance: 20
+  defaultHurtDuration: 0.3
+  logarTransicoes: 0
+--- !u!114 &6360046265921058457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60eebf8fd1e69d1488a8dfa7a6cf179d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Enemies.EnemyStatusEffects
+  mostrarNumerosDeSangramento: 1
+  corDoSangramento: {r: 0.85, g: 0.15, b: 0.2, a: 1}
+--- !u!114 &4695545914089126774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03db3837762a1e440b4c8896e33f276e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Audio.AudioDeCombate
+--- !u!114 &4727924443773620933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1290442817582334512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84ba4fe4047e0f3468dffc05509a987b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Runtime.Itens.DropAoAbater
+  tabela: {fileID: 11400000, guid: 6a8d57e5f1c34daeb81a8e0062bef7a1, type: 2}
+  prefabColetavel: {fileID: 0}
+  raioDeEspalhamento: 0.4

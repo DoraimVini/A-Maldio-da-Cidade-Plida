@@ -50,7 +50,6 @@ namespace FavelaAmarela.Editor
 
             // PlayerMovement injeta Rigidbody2D + BoxCollider2D via RequireComponent
             go.AddComponent<PlayerMovement>();
-            go.AddComponent<AnomalyPowerBridge>();
 
             // Configurar Rigidbody2D (já existe via RequireComponent)
             var rb = go.GetComponent<Rigidbody2D>();

@@ -9,6 +9,8 @@ timestamp: 2026-07-07T17:00:00Z
 
 # CercoZ4Cutscene
 
+> ⚠️ **Sem instância na cena atual (2026-07-30).** O Cerco da Zona 4 foi removido da Tumba de Alhazred junto com o resto do legado das Ruínas Pálidas — a dungeon virou um trecho único e fechado, sem travessia entre zonas. O script continua no projeto.
+
 **Namespace:** `FavelaAmarela.Runtime.GameLoop`
 **Tipo:** `public sealed class` (herda de `MonoBehaviour`)
 

@@ -372,5 +372,61 @@ namespace FavelaAmarela.Tests.EditMode
         public void Factory_FracaoNegativa_DeveLancarArgumentOutOfRange()
             => Assert.Throws<ArgumentOutOfRangeException>(
                 () => ResilienciaMental.ComThresholdFracional(100f, -0.1f));
+
+        // ════════════════════════════════════════════════════════════════════
+        // I. Restaurar (carregamento de save)
+        // ════════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void Restaurar_ValorNoMeio_DeveDefinirAtual()
+        {
+            _rm.Restaurar(42.5f);
+            Assert.AreEqual(42.5f, _rm.Atual, 1e-5f);
+        }
+
+        [Test]
+        public void Restaurar_AcimaDoMax_DeveClampearNoMax()
+        {
+            _rm.Restaurar(999f);
+            Assert.AreEqual(100f, _rm.Atual, 1e-5f);
+        }
+
+        [Test]
+        public void Restaurar_Negativo_DeveClampearEmZero()
+        {
+            _rm.Restaurar(-50f);
+            Assert.AreEqual(0f, _rm.Atual, 1e-5f);
+        }
+
+        [Test]
+        public void Restaurar_DeveDispararOnChanged()
+        {
+            ResilienciaChangedArgs? capturado = null;
+            _rm.OnChanged += args => capturado = args;
+            _rm.Restaurar(30f); // 100 → 30
+
+            Assert.IsNotNull(capturado);
+            Assert.AreEqual(30f, capturado!.Value.ValorAtual, 1e-5f);
+        }
+
+        [Test]
+        public void Restaurar_ParaValorEmPanico_DeveMarcarEntrouEmPanico()
+        {
+            ResilienciaChangedArgs? capturado = null;
+            _rm.OnChanged += args => capturado = args;
+            _rm.Restaurar(20f); // 100 → 20, cruza threshold (25) descendo
+
+            Assert.IsTrue(_rm.IsPanico);
+            Assert.IsTrue(capturado!.Value.EntrouEmPanico);
+        }
+
+        [Test]
+        public void Restaurar_ParaOMesmoValorAtual_NaoDeveDispararEvento()
+        {
+            int contagem = 0;
+            _rm.OnChanged += _ => contagem++;
+            _rm.Restaurar(100f); // já está em 100
+            Assert.AreEqual(0, contagem);
+        }
     }
 }

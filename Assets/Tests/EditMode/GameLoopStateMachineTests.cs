@@ -60,5 +60,35 @@ namespace FavelaAmarela.Tests.EditMode
             sm.TryTransition(GameState.Colapso);
             Assert.IsFalse(eventFired);
         }
+
+        [Test]
+        public void Gameplay_ToTransicaoDeFase_ShouldSucceed()
+        {
+            var sm = new GameLoopStateMachine(GameState.Gameplay);
+            bool success = sm.TryTransition(GameState.TransicaoDeFase);
+
+            Assert.IsTrue(success);
+            Assert.AreEqual(GameState.TransicaoDeFase, sm.CurrentState);
+        }
+
+        [Test]
+        public void TransicaoDeFase_ToMenu_ShouldSucceed()
+        {
+            var sm = new GameLoopStateMachine(GameState.TransicaoDeFase);
+            bool success = sm.TryTransition(GameState.Menu);
+
+            Assert.IsTrue(success);
+            Assert.AreEqual(GameState.Menu, sm.CurrentState);
+        }
+
+        [Test]
+        public void TransicaoDeFase_ToGameplay_ShouldBeRejected()
+        {
+            var sm = new GameLoopStateMachine(GameState.TransicaoDeFase);
+            bool success = sm.TryTransition(GameState.Gameplay);
+
+            Assert.IsFalse(success);
+            Assert.AreEqual(GameState.TransicaoDeFase, sm.CurrentState);
+        }
     }
 }

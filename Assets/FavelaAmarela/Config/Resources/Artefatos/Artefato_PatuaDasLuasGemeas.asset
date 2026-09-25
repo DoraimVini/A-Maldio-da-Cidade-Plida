@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe156a0836442a40b809c0997cbeb91, type: 3}
+  m_Name: Artefato_PatuaDasLuasGemeas
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ArtefatoDef
+  Id: patua_luas_gemeas
+  Nome: "Patu\xE1 das Luas G\xEAmeas"
+  Icone: {fileID: 21300000, guid: a8d68324bef74153a7e3da535205c471, type: 3}
+  Descricao: "Fios das vestes de Yhtill, tecidos sob duas luas que n\xE3o piscam.
+    A Can\xE7\xE3o de Cassilda continua nele, baixinho."
+  Item: {fileID: 11400000, guid: c8791bee981ab43468c3e891a6f5913d, type: 2}
+  Passivas:
+  - Stat: 9
+    Valor: 1.5
+  NomeDaHabilidade: "Can\xE7\xE3o de Cassilda"
+  TipoDeEfeito: 1
+  CustoRM: 0
+  Cooldown: 45
+  Duracao: 0
+  Raio: 0
+  Valor: 25

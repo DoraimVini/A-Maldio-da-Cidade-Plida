@@ -2,23 +2,18 @@
     "name": "FavelaAmarela.Tests.EditMode",
     "rootNamespace": "FavelaAmarela.Tests",
     "references": [
+        "FavelaAmarela.Core",
         "FavelaAmarela.Runtime",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": ["Editor"],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
+    "precompiledReferences": ["nunit.framework.dll"],
     "autoReferenced": false,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
-    ],
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"],
     "versionDefines": [],
     "noEngineReferences": false
 }

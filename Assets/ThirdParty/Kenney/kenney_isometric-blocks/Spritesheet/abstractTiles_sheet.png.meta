@@ -1,0 +1,975 @@
+fileFormatVersion: 2
+guid: 22cfb49635019f34db130e792d30c272
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5558275266991536363
+    second: abstractTiles_sheet_0
+  - first:
+      213: 6845873178009218068
+    second: abstractTiles_sheet_1
+  - first:
+      213: 4451386780167157014
+    second: abstractTiles_sheet_2
+  - first:
+      213: -8622142462048615024
+    second: abstractTiles_sheet_3
+  - first:
+      213: 7765896983470349205
+    second: abstractTiles_sheet_4
+  - first:
+      213: 2661794722030382238
+    second: abstractTiles_sheet_5
+  - first:
+      213: -6318973548516427762
+    second: abstractTiles_sheet_6
+  - first:
+      213: -1474903271599580365
+    second: abstractTiles_sheet_7
+  - first:
+      213: 5296053589347550972
+    second: abstractTiles_sheet_8
+  - first:
+      213: 227862584913819053
+    second: abstractTiles_sheet_9
+  - first:
+      213: -1086597864569749547
+    second: abstractTiles_sheet_10
+  - first:
+      213: 8665661635107731787
+    second: abstractTiles_sheet_11
+  - first:
+      213: -2283981000777104577
+    second: abstractTiles_sheet_12
+  - first:
+      213: -7931415255461196210
+    second: abstractTiles_sheet_13
+  - first:
+      213: -2394818727702359868
+    second: abstractTiles_sheet_14
+  - first:
+      213: 5705753608836857679
+    second: abstractTiles_sheet_15
+  - first:
+      213: -2291829382831751918
+    second: abstractTiles_sheet_16
+  - first:
+      213: 6709734864714594701
+    second: abstractTiles_sheet_17
+  - first:
+      213: 4897647672921479342
+    second: abstractTiles_sheet_18
+  - first:
+      213: 7279186699310251036
+    second: abstractTiles_sheet_19
+  - first:
+      213: -5930652455193773812
+    second: abstractTiles_sheet_20
+  - first:
+      213: 7809906794951437596
+    second: abstractTiles_sheet_21
+  - first:
+      213: 2493747537088506719
+    second: abstractTiles_sheet_22
+  - first:
+      213: 3970380430204601591
+    second: abstractTiles_sheet_23
+  - first:
+      213: 2198610734736801363
+    second: abstractTiles_sheet_24
+  - first:
+      213: 5927135651014327043
+    second: abstractTiles_sheet_25
+  - first:
+      213: -4311154312539907161
+    second: abstractTiles_sheet_26
+  - first:
+      213: -8141987971314226656
+    second: abstractTiles_sheet_27
+  - first:
+      213: 1788896356399395548
+    second: abstractTiles_sheet_28
+  - first:
+      213: 4576075714212621391
+    second: abstractTiles_sheet_29
+  - first:
+      213: 8698511858155008289
+    second: abstractTiles_sheet_30
+  - first:
+      213: -4493540797293189693
+    second: abstractTiles_sheet_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: abstractTiles_sheet_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 895
+        width: 112
+        height: 129
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be8bed408e5f22d40800000000000000
+      internalID: 5558275266991536363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 766
+        width: 112
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41c2d98626d610f50800000000000000
+      internalID: 6845873178009218068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_2
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 895
+        width: 113
+        height: 129
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 615bbbd21b086cd30800000000000000
+      internalID: 4451386780167157014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_3
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 766
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 095c7c2ec1ff75880800000000000000
+      internalID: -8622142462048615024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_4
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 895
+        width: 113
+        height: 129
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59b1706392206cb60800000000000000
+      internalID: 7765896983470349205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_5
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 766
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9c61a7623890f420800000000000000
+      internalID: 2661794722030382238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_6
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 895
+        width: 113
+        height: 129
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e08b697790f7e48a0800000000000000
+      internalID: -6318973548516427762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_7
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 766
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33bde32f947188be0800000000000000
+      internalID: -1474903271599580365
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_8
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 895
+        width: 113
+        height: 129
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf64e780eac5f7940800000000000000
+      internalID: 5296053589347550972
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_9
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 766
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da5f36f40d7892300800000000000000
+      internalID: 227862584913819053
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 637
+        width: 112
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5df3f9ccff0abe0f0800000000000000
+      internalID: -1086597864569749547
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_11
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 508
+        width: 112
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b49b350385d924870800000000000000
+      internalID: 8665661635107731787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_12
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 637
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3380fe716bad40e0800000000000000
+      internalID: -2283981000777104577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_13
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 508
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4e0f1cf8d3fde190800000000000000
+      internalID: -7931415255461196210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_14
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 637
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c019d13e05e3ced0800000000000000
+      internalID: -2394818727702359868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_15
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 508
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4fbf964da8ee2f40800000000000000
+      internalID: 5705753608836857679
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_16
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 637
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21db286a159c130e0800000000000000
+      internalID: -2291829382831751918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_17
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 508
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d89fd5c4f44cd1d50800000000000000
+      internalID: 6709734864714594701
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_18
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 637
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea8d0831c90f7f340800000000000000
+      internalID: 4897647672921479342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_19
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 508
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1cb22a7cbdd40560800000000000000
+      internalID: 7279186699310251036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 379
+        width: 112
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0970e1930712bda0800000000000000
+      internalID: -5930652455193773812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_21
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 250
+        width: 112
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1d6df1f9dc526c60800000000000000
+      internalID: 7809906794951437596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_22
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 379
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5b6aab2c229b9220800000000000000
+      internalID: 2493747537088506719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_23
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 250
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f4028d17ff991730800000000000000
+      internalID: 3970380430204601591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_24
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 379
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35ef85380d8038e10800000000000000
+      internalID: 2198610734736801363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_25
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 250
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30b3346a87a614250800000000000000
+      internalID: 5927135651014327043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_26
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 379
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ab5a258ef3bb24c0800000000000000
+      internalID: -4311154312539907161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_27
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 250
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02aef440419d10f80800000000000000
+      internalID: -8141987971314226656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_28
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 121
+        width: 112
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd23d2712cf63d810800000000000000
+      internalID: 1788896356399395548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_29
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 121
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4c6fe2fd9c718f30800000000000000
+      internalID: 4576075714212621391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_30
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 121
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1213ad3c27257b870800000000000000
+      internalID: 8698511858155008289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: abstractTiles_sheet_31
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 121
+        width: 113
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c52d91e37cb3a1c0800000000000000
+      internalID: -4493540797293189693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      abstractTiles_sheet_0: 5558275266991536363
+      abstractTiles_sheet_1: 6845873178009218068
+      abstractTiles_sheet_10: -1086597864569749547
+      abstractTiles_sheet_11: 8665661635107731787
+      abstractTiles_sheet_12: -2283981000777104577
+      abstractTiles_sheet_13: -7931415255461196210
+      abstractTiles_sheet_14: -2394818727702359868
+      abstractTiles_sheet_15: 5705753608836857679
+      abstractTiles_sheet_16: -2291829382831751918
+      abstractTiles_sheet_17: 6709734864714594701
+      abstractTiles_sheet_18: 4897647672921479342
+      abstractTiles_sheet_19: 7279186699310251036
+      abstractTiles_sheet_2: 4451386780167157014
+      abstractTiles_sheet_20: -5930652455193773812
+      abstractTiles_sheet_21: 7809906794951437596
+      abstractTiles_sheet_22: 2493747537088506719
+      abstractTiles_sheet_23: 3970380430204601591
+      abstractTiles_sheet_24: 2198610734736801363
+      abstractTiles_sheet_25: 5927135651014327043
+      abstractTiles_sheet_26: -4311154312539907161
+      abstractTiles_sheet_27: -8141987971314226656
+      abstractTiles_sheet_28: 1788896356399395548
+      abstractTiles_sheet_29: 4576075714212621391
+      abstractTiles_sheet_3: -8622142462048615024
+      abstractTiles_sheet_30: 8698511858155008289
+      abstractTiles_sheet_31: -4493540797293189693
+      abstractTiles_sheet_4: 7765896983470349205
+      abstractTiles_sheet_5: 2661794722030382238
+      abstractTiles_sheet_6: -6318973548516427762
+      abstractTiles_sheet_7: -1474903271599580365
+      abstractTiles_sheet_8: 5296053589347550972
+      abstractTiles_sheet_9: 227862584913819053
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

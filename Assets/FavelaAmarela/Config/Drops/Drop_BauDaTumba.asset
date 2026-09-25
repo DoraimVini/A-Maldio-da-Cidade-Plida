@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bb33166f8a964d4ba14254b2ecbb5d1, type: 3}
+  m_Name: Drop_BauDaTumba
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.TabelaDeDrop
+  entradas:
+  - Item: {fileID: 11400000, guid: b48855e3bf450c5469431b269fdee337, type: 2}
+    Grau: 0
+    Garantido: 0
+    Chance: 1
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: 58baf661cb6619c47bd037c5960a85fc, type: 2}
+    Grau: 0
+    Garantido: 0
+    Chance: 1
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  - Item: {fileID: 11400000, guid: 7e4ebe4f79b29604eb48aef7a109f9fd, type: 2}
+    Grau: 0
+    Garantido: 0
+    Chance: 1
+    QuantidadeMin: 1
+    QuantidadeMax: 1
+    NivelMinimo: 1
+  tetoDeItens: 1

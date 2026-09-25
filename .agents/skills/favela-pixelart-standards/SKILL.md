@@ -10,7 +10,7 @@ description: Enforces the asset import settings for all Pixel Art in Favela Amar
 Every `Texture2D` or Sprite imported into the project MUST adhere to the following strict settings to prevent blurring and artifacts:
 
 1. **Pixels Per Unit (PPU)**:
-   - Must be exactly `16`. (Adjust only if explicitly requested for specific UI/large assets).
+   - Must be exactly `32`. (Adjust only if explicitly requested).
 2. **Filter Mode**:
    - Must be set to `Point (no filter)`. Never use Bilinear or Trilinear for pixel art.
 3. **Compression**:

@@ -20,7 +20,7 @@ timestamp: 2026-07-07T11:00:00Z
 | Full Heal | **Estabilizar Completamente** | `EstabilizarCompletamente()` |
 | Death / Game Over | **Colapso** | `IsColapso`, `ForcarColapso()` |
 | Low HP State | **Pânico** | `IsPanico` |
-| Dash | **Salto Dimensional** | `DimensionalLeap.cs` |
+| Dash | **Esquiva** | `Esquiva.cs` / `EsquivaBridge.cs` |
 | Dodge | **Esquiva** | `Esquiva.cs` |
 | Enemy | **Cultista Amarelo** | `CultistaFSM.cs` |
 | Patrol | **Errante** | `CultistaState.Errante` |

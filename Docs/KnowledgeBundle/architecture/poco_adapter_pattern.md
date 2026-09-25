@@ -28,6 +28,12 @@ Os `MonoBehaviour` em `FavelaAmarela.Runtime.*` e nas pastas `Player/`, `Enemies
 | `ResilienciaMental` | `PlayerMovement` / `PlayerStealthState` / `ResilienciaBar` |
 | `SoundBroadcastService` | (wired via `GameManager.Bind()`) |
 | `GameLoopStateMachine` | `GameManager` |
+| `Vitalidade` / `FichaDeAtributos` | `VitalidadeBridge` (+ `FichaAtributosConfig`) |
+| `AbdulFSM` | `AbdulAlhazredAI` |
+| `SeletorDeInteracao` | `DetectorDeInteracao` |
+| `NavegadorDeOpcoes` | `PainelDeEscolha` |
+| `SeguidorDeAlvo` | `YugNethAI` |
+| `PlayerStateMachine` | `PlayerMovement` (injeta nos bridges) |
 
 ## Restrições no Core
 

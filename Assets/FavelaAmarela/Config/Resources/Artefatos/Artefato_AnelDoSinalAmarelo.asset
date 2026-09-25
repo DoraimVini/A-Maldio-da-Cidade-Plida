@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe156a0836442a40b809c0997cbeb91, type: 3}
+  m_Name: Artefato_AnelDoSinalAmarelo
+  m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.ArtefatoDef
+  Id: anel_sinal_amarelo
+  Nome: Anel do Sinal Amarelo
+  Icone: {fileID: 0}
+  Descricao: "Gravação sacra arrancada do Byakhee. O Sinal encara de volta, e as
+    sentinelas desviam os olhos."
+  Item: {fileID: 11400000, guid: 748bf24d78b8471f812df3438e8c4211, type: 2}
+  Passivas:
+  - Stat: 6
+    Valor: 0.3
+  - Stat: 1
+    Valor: 20
+  NomeDaHabilidade: Resguardo do Sinal
+  TipoDeEfeito: 2
+  CustoRM: 8
+  Cooldown: 30
+  Duracao: 8
+  Raio: 0
+  Valor: 0

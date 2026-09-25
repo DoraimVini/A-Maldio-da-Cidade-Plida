@@ -5,6 +5,7 @@ namespace FavelaAmarela.Core.Enemies
         Errante,
         Alerta,
         Caca,
+        Atacar,
         Atordoado
     }
 }

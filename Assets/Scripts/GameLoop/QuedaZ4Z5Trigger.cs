@@ -63,6 +63,9 @@ namespace FavelaAmarela.Runtime.GameLoop
             playerMovement.enabled = false;
             rb.linearVelocity = Vector2.zero;
 
+            // Preso na cutscene: imune a morte instantânea (Coisa etc.) — só tensão, não dano.
+            if (GameManager.Instance != null) GameManager.Instance.DefinirInvulneravel(true);
+
             if (cerco != null)
             {
                 yield return StartCoroutine(cerco.Tocar(rb.position));
@@ -76,11 +79,23 @@ namespace FavelaAmarela.Runtime.GameLoop
 
             rb.position = destino.position;
 
+            // Chegou na Zona 5 (subterrâneo fechado): sem tempestade. Zera a faixa
+            // explicitamente — o teleporte adormece o Rigidbody e o TempestadeTrigger_Z5_Nula
+            // não dispara OnTriggerEnter de forma confiável nesse caso.
+            GameManager.Instance?.TempestadeAmbiente?.DefinirFaixa(0f, 0f);
+
+            // Limpa os atores do cerco (Cultistas + Espectros) — eles eram set-piece da
+            // Zona 4; sem isso o Espectro persegue e encalha na barreira de anomalia.
+            if (cerco != null) cerco.LimparAtores();
+
             yield return new WaitForSeconds(blackHoldDuration);
 
             if (fader != null) yield return fader.FadeTo(0f, fadeInDuration);
 
             playerMovement.enabled = true;
+
+            // Fim da cutscene: volta a ser vulnerável (já teleportado pra Z5, longe da Coisa).
+            if (GameManager.Instance != null) GameManager.Instance.DefinirInvulneravel(false);
         }
     }
 }
