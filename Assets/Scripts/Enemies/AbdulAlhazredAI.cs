@@ -59,14 +59,27 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Rótulo do prompt de interação enquanto Abdul dorme em Transe.")]
         [SerializeField] private string rotuloDeInteracao = "Falar com o vulto";
 
-        [Tooltip("Falas ditas em sequência antes da luta começar. A última encerra e desperta Abdul.")]
+        /// <summary>
+        /// A conversa que termina em luta. <b>A luta é obrigatória</b> (decisão do Vini,
+        /// 2026-09-28): a escolha "Concordar — poupar Abdul" saiu, porque deixava o jogador sem o
+        /// Necronomicon, e o Rei em Amarelo não se sela sem ele. A conversa agora acaba com o
+        /// Damião dizendo a coisa errada — e o Abdul desperta ofendido.
+        /// </summary>
+        [Tooltip("Falas ditas em sequência antes da luta. A última é a reação do Abdul; o " +
+                 "aperto seguinte a ela desperta a luta.")]
         [TextArea(2, 4)]
-        [SerializeField] private string[] falasAntesDaLuta =
+        [SerializeField] private string[] falasAntesDaLuta = FalasPadrao;
+
+        /// <summary>O texto padrão da conversa — também o que a ferramenta grava no prefab.</summary>
+        public static readonly string[] FalasPadrao =
         {
             "O vulto não se move. A voz vem de dentro da sua cabeça, seca como areia.",
             "\"Vieste até a minha cripta atrás do livro. Todos vêm.\"",
             "\"Eu o escrevi acordado. Tu não sobreviverias a uma só página.\"",
-            "A poeira ao redor começa a subir. O Necronomicon range sob o braço dele.",
+            "Damião dá de ombros. \"Um livro que ninguém aguenta ler é só peso morto debaixo do " +
+            "braço de um velho.\"",
+            "O silêncio racha. \"Velho?\" A poeira sobe em redemoinho. \"Eu vi a Cidade Pálida " +
+            "antes de o teu sangue ter nome. Vais ler a primeira página agora.\"",
         };
 
         [Tooltip("Caixa de texto usada para as falas (reaproveita a UI de dica por ora).")]
@@ -74,27 +87,6 @@ namespace FavelaAmarela.Runtime.Enemies
 
         [Tooltip("Segundos que cada fala fica na tela antes de liberar a próxima.")]
         [SerializeField] private float duracaoDaFala = 4f;
-
-        [Header("Escolha ao fim da conversa")]
-        [Tooltip("Painel que apresenta as duas opções (Lutar / Concordar) após a última fala.")]
-        [SerializeField] private PainelDeEscolha painelDeEscolha;
-
-        /// <summary>
-        /// O painel de escolha a usar: o do Inspector, ou a <b>instância global do HUD</b>.
-        ///
-        /// <para><b>Por que existe (2026-09-02).</b> O painel vivia em duas cenas das seis, e
-        /// quando falta a ramificação é pulada <b>em silêncio</b> — a conversa acontece pela
-        /// metade e ninguém reclama. Resolve no momento do uso: a <c>Instancia</c> só existe
-        /// depois do <c>OnEnable</c> do HUD.</para>
-        /// </summary>
-        private PainelDeEscolha EscolhaEmUso =>
-            painelDeEscolha != null ? painelDeEscolha : PainelDeEscolha.Instancia;
-
-        [Tooltip("Texto da opção que inicia a luta.")]
-        [SerializeField] private string textoOpcaoLutar = "Lutar contra ele";
-
-        [Tooltip("Texto da opção que aceita a trégua e liberta Yug-Neth.")]
-        [SerializeField] private string textoOpcaoConcordar = "Concordar — poupar Abdul";
 
         [Header("Yug-Neth acorrentado")]
         [Tooltip("Instância de Yug-Neth já presente na cena (cativo, vagando perto de Abdul). Não é um prefab — é a referência direta ao GameObject da arena. [CENA]")]
@@ -104,9 +96,6 @@ namespace FavelaAmarela.Runtime.Enemies
         [Tooltip("Tranca as saídas da arena durante a luta — nenhum chefe pode ser abandonado " +
                  "antes do desfecho. Opcional: sem ela, a luta funciona mas dá para fugir. [CENA]")]
         [SerializeField] private TrancaDeArena trancaDaArena;
-
-        private const int OpcaoLutar = 0;
-        private const int OpcaoConcordar = 1;
 
         private int _falaAtual;
         private GameObject _jogadorNaConversa;
@@ -118,16 +107,6 @@ namespace FavelaAmarela.Runtime.Enemies
         /// </summary>
         private Transform _alvoDasConjuracoes;
         private bool _yugNethJaLibertado;
-
-        /// <summary>
-        /// <summary>
-        /// True quando o jogador escolheu "Concordar" — Abdul fica inerte, sem luta e sem
-        /// Necronomicon, <b>enquanto não for atacado</b>. Se o jogador o golpear depois,
-        /// isso é traição da trégua: vira <c>false</c> e a luta de verdade começa (ver
-        /// <see cref="ReceberGolpe"/>) — a paz não é permanente, só dura até o jogador
-        /// decidir quebrá-la.
-        /// </summary>
-        private bool _poupado;
 
         [Header("Ritmo da luta")]
         [Tooltip("Fração de vida que dispara a Fase 2 (escudo permanente).")]
@@ -237,13 +216,12 @@ namespace FavelaAmarela.Runtime.Enemies
 
         /// <inheritdoc />
         /// <remarks>
-        /// Os <b>dois</b> motivos de recusa dele, na mesma ordem em que <c>ReceberGolpe</c> os
-        /// aplica: a trégua (<c>_poupado</c> — o golpe que trai desperta a luta e não fere) e o
-        /// <b>Escudo Mágico</b>, que é a regra central da Fase 1: fora da janela de
-        /// vulnerabilidade, nada entra, e quebrar Pedra de Poder é o único jeito de abri-la.
+        /// O motivo de recusa dele é o <b>Escudo Mágico</b>, a regra central da Fase 1: fora da
+        /// janela de vulnerabilidade, nada entra, e quebrar Pedra de Poder é o único jeito de
+        /// abri-la. (A trégua, que era o outro motivo, saiu em 2026-09-28.)
         /// </remarks>
         public bool PodeSerFerido =>
-            !_poupado && _fsm != null && _fsm.PodeReceberDano && !EstaAbatido;
+            _fsm != null && _fsm.PodeReceberDano && !EstaAbatido;
 
         private void Awake()
         {
@@ -391,11 +369,10 @@ namespace FavelaAmarela.Runtime.Enemies
         public string RotuloDeInteracao => rotuloDeInteracao;
 
         /// <summary>
-        /// Só é interagível enquanto dorme em Transe <b>e</b> a conversa ainda não foi
-        /// resolvida. Depois de desperto (luta) ou poupado (trégua), o prompt some — não
-        /// se conversa de novo no meio de uma luta nem depois de já ter decidido.
+        /// Só é interagível enquanto dorme em Transe. Desperto, o prompt some — não se conversa
+        /// no meio de uma luta.
         /// </summary>
-        public bool PodeInteragir => !_poupado && _fsm != null && _fsm.CurrentState == AbdulState.Transe;
+        public bool PodeInteragir => _fsm != null && _fsm.CurrentState == AbdulState.Transe;
 
         /// <summary>Prioridade máxima: é o clímax da dungeon, ganha de qualquer coisa ao lado.</summary>
         public int PrioridadeDeInteracao => 100;
@@ -404,10 +381,8 @@ namespace FavelaAmarela.Runtime.Enemies
         public Vector2 PosicaoDeInteracao => transform.position;
 
         /// <summary>
-        /// Avança a conversa uma fala por aperto. Quando a última fala é dita, apresenta
-        /// a escolha — <b>lutar</b> (ganha o Necronomicon e liberta Yug-Neth) ou
-        /// <b>concordar</b> (poupa Abdul e liberta só Yug-Neth). É o jogador quem decide,
-        /// não a conversa sozinha.
+        /// Avança a conversa uma fala por aperto. O aperto depois da última fala desperta a
+        /// luta — ela é obrigatória desde 2026-09-28 (ver <see cref="FalasPadrao"/>).
         /// </summary>
         public void Interagir(GameObject quemInterage)
         {
@@ -416,10 +391,10 @@ namespace FavelaAmarela.Runtime.Enemies
             _jogadorNaConversa = quemInterage;
             if (quemInterage != null) _alvoDasConjuracoes = quemInterage.transform;
 
-            // Sem falas configuradas: pula direto para a escolha.
-            if (falasAntesDaLuta == null || falasAntesDaLuta.Length == 0)
+            // Sem falas, ou todas já ditas: a luta começa.
+            if (falasAntesDaLuta == null || _falaAtual >= falasAntesDaLuta.Length)
             {
-                ApresentarEscolha();
+                IniciarLuta();
                 return;
             }
 
@@ -430,54 +405,13 @@ namespace FavelaAmarela.Runtime.Enemies
                                  "antes da luta não aparecerão.", this);
 
             _falaAtual++;
-
-            if (_falaAtual >= falasAntesDaLuta.Length)
-                ApresentarEscolha();
-        }
-
-        /// <summary>
-        /// Abre a escolha ramificada. Sem painel atribuído, cai no comportamento antigo
-        /// (inicia a luta direto) para nunca travar o jogo por peça de UI faltando.
-        /// </summary>
-        private void ApresentarEscolha()
-        {
-            if (EscolhaEmUso == null)
-            {
-                Debug.LogWarning("[AbdulAlhazredAI] Painel de Escolha não atribuído — " +
-                                 "iniciando a luta direto (sem opção de trégua).", this);
-                IniciarLuta();
-                return;
-            }
-
-            var opcoes = new[]
-            {
-                new OpcaoDeDialogo(textoOpcaoLutar, OpcaoLutar),
-                new OpcaoDeDialogo(textoOpcaoConcordar, OpcaoConcordar),
-            };
-            EscolhaEmUso.Mostrar(opcoes, ResolverEscolha);
-        }
-
-        private void ResolverEscolha(int idDaOpcao)
-        {
-            if (idDaOpcao == OpcaoConcordar)
-            {
-                _poupado = true;
-                GerenciadorDeSave.DefinirValor(ChavesDeSave.AbdulResolvido,
-                                               ChavesDeSave.ValorAbdulPoupado);
-                LibertarYugNeth();
-            }
-            else
-            {
-                IniciarLuta();
-            }
         }
 
         /// <summary>
         /// Liberta Yug-Neth: chama <see cref="YugNethAI.Bind"/> na instância que já existe
         /// na cena (cativa, vagando perto de Abdul) para ele passar a seguir quem
-        /// conversou. Chamado tanto pela trégua (aqui) quanto pela derrota em combate
-        /// (<see cref="HandleDerrotado"/>) — Yug-Neth é libertado nos dois caminhos; só o
-        /// Necronomicon é exclusivo da luta. Idempotente.
+        /// conversou. Chamado na derrota de Abdul (<see cref="HandleDerrotado"/>) e na
+        /// restauração de save. Idempotente.
         /// </summary>
         private void LibertarYugNeth()
         {
@@ -523,18 +457,6 @@ namespace FavelaAmarela.Runtime.Enemies
         /// <inheritdoc />
         public void ReceberGolpe(ArmaResult resultado)
         {
-            // Traição da trégua: atacar Abdul depois de "Concordar" reabre a luta de
-            // verdade (decisão do Vini, 2026-07-30) — ele ainda pode ser derrotado e
-            // dropar o Necronomicon depois. O golpe que trai não causa dano: ele só
-            // desperta a luta (mesma regra de sempre — o escudo sobe junto com IniciarLuta
-            // e só cai ao quebrar uma Pedra de Poder, igual ao caminho normal da luta).
-            if (_poupado)
-            {
-                _poupado = false;
-                IniciarLuta();
-                return;
-            }
-
             // O escudo é a regra central: fora da janela de vulnerabilidade, nada entra.
             if (!_fsm.PodeReceberDano)
             {
@@ -740,10 +662,12 @@ namespace FavelaAmarela.Runtime.Enemies
         ///
         /// <para><b>Não passa pela <c>AbdulFSM</c> de propósito.</b> A FSM não tem (nem
         /// precisa ganhar) um jeito de pular direto para um estado terminal. No caminho
-        /// "poupado" ela fica em <c>Transe</c>, que é justamente o correto: <c>PodeInteragir</c>
-        /// já checa <c>!_poupado</c>, e a traição da trégua continua funcionando sem nenhuma
-        /// mudança, porque <c>IniciarLuta()</c> só exige <c>CurrentState == Transe</c>. No
-        /// caminho "derrotado" o objeto some, e ninguém mais consulta a FSM dele.</para>
+        /// "derrotado" o objeto some, e ninguém mais consulta a FSM dele.</para>
+        ///
+        /// <para><b>Saves antigos com "poupado" (antes de 2026-09-28).</b> A trégua saiu do
+        /// jogo; quem a escolheu ficaria sem o Necronomicon e sem como selar o Rei. Esses
+        /// saves encontram o Abdul de novo em <c>Transe</c>, com a conversa pela frente e a
+        /// luta no fim dela. O Yug-Neth continua livre.</para>
         /// </summary>
         /// <param name="jogador">Damião — quem Yug-Neth passa a seguir ao ser restaurado.</param>
         public void AplicarEstadoSalvo(GameObject jogador)
@@ -751,11 +675,7 @@ namespace FavelaAmarela.Runtime.Enemies
             string resolvido = GerenciadorDeSave.ObterValor(ChavesDeSave.AbdulResolvido);
             if (resolvido == null) return; // nunca resolvido: cena começa do zero
 
-            if (resolvido == ChavesDeSave.ValorAbdulPoupado)
-            {
-                _poupado = true;
-            }
-            else if (resolvido == ChavesDeSave.ValorAbdulDerrotado)
+            if (resolvido == ChavesDeSave.ValorAbdulDerrotado)
             {
                 // O tomo é spawn de runtime: se o jogador saiu sem pegá-lo, ele precisa
                 // renascer, senão a recompensa da luta se perde para sempre.

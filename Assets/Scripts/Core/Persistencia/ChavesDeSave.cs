@@ -33,7 +33,11 @@ namespace FavelaAmarela.Core.Persistencia
         /// <summary>Valor de <see cref="AbdulResolvido"/> quando Abdul foi vencido em combate.</summary>
         public const string ValorAbdulDerrotado = "derrotado";
 
-        /// <summary>Valor de <see cref="AbdulResolvido"/> quando Abdul foi poupado na conversa.</summary>
+        /// <summary>
+        /// Valor de <see cref="AbdulResolvido"/> quando Abdul era poupado na conversa. <b>Não é
+        /// mais gravado</b> desde 2026-09-28 — a trégua saiu e a luta é obrigatória. Fica para
+        /// reconhecer saves antigos, que voltam a encontrar o Abdul em Transe.
+        /// </summary>
         public const string ValorAbdulPoupado = "poupado";
 
         /// <summary>

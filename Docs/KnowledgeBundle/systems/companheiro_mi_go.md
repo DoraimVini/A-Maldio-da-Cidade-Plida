@@ -21,19 +21,20 @@ combatível". Ele segue não sendo combatível, mas agora é central à progress
 
 ## A conversa com Abdul
 
-Abdul começa a interação (botão E, "Falar com o vulto") enquanto dorme em Transe. Depois
-das falas, uma **escolha ramificada** aparece:
+Abdul começa a interação (botão E, "Falar com o vulto") enquanto dorme em Transe. **Desde
+2026-09-28 a conversa termina sempre em luta** (decisão do Vini): o Damião responde com
+desprezo — *"Um livro que ninguém aguenta ler é só peso morto debaixo do braço de um velho"* —,
+o Abdul se ofende, e o aperto seguinte desperta a luta. Derrotado, ele larga o **Necronomicon**
+e liberta Yug-Neth.
 
-| Opção | Resultado |
-|---|---|
-| **Lutar** | A luta acontece normalmente. Ao derrotá-lo: dropa o **Necronomicon** (item a coletar depois) *e* liberta Yug-Neth. |
-| **Concordar** | Abdul é poupado — sem luta, sem Necronomicon — mas Yug-Neth é libertado do mesmo jeito. |
+> **Por que a trégua saiu.** A escolha "Concordar — poupar Abdul" libertava o Yug-Neth sem
+> entregar o Necronomicon, e o Rei em Amarelo exige o Necronomicon para ser selado: a escolha
+> pacífica levava a um final impossível. Saves antigos com a trégua reencontram o Abdul em
+> Transe (o Yug-Neth continua livre). Guardas: `ALutaDoAbdulEhObrigatoriaTests`,
+> `NinguemPoupaOAbdulTests`.
 
-**Yug-Neth é obrigatório nos dois caminhos.** Só o Necronomicon é exclusivo da luta. Ambos
-os caminhos só existem através desta conversa com Abdul — **não há gatilho separado nas
-correntes de Yug-Neth** (decisão explícita do Vini: simplifica o design de duas entradas
-do documento de lore para uma só). Depois de resolvida a conversa, Abdul deixa de ser
-interagível (`PodeInteragir` vira `false` permanentemente).
+Não há gatilho separado nas correntes de Yug-Neth (decisão explícita do Vini). Desperto, o
+Abdul deixa de ser interagível.
 
 ## O companheiro
 

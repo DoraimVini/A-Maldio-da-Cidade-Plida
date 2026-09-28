@@ -258,12 +258,12 @@ MonoBehaviour:
   - "O vulto n\xE3o se move. A voz vem de dentro da sua cabe\xE7a, seca como areia."
   - "\"Vieste at\xE9 a minha cripta atr\xE1s do livro. Todos v\xEAm.\""
   - "\"Eu o escrevi acordado. Tu n\xE3o sobreviverias a uma s\xF3 p\xE1gina.\""
-  - "A poeira ao redor come\xE7a a subir. O Necronomicon range sob o bra\xE7o dele."
+  - "Dami\xE3o d\xE1 de ombros. \"Um livro que ningu\xE9m aguenta ler \xE9 s\xF3
+    peso morto debaixo do bra\xE7o de um velho.\""
+  - "O sil\xEAncio racha. \"Velho?\" A poeira sobe em redemoinho. \"Eu vi a Cidade
+    P\xE1lida antes de o teu sangue ter nome. Vais ler a primeira p\xE1gina agora.\""
   caixaDeDialogo: {fileID: 0}
   duracaoDaFala: 4
-  painelDeEscolha: {fileID: 0}
-  textoOpcaoLutar: Lutar contra ele
-  textoOpcaoConcordar: "Concordar \u2014 poupar Abdul"
   yugNethNaArena: {fileID: 0}
   trancaDaArena: {fileID: 0}
   fracaoParaFase2: 0.35
