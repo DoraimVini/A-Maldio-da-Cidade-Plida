@@ -7,8 +7,8 @@ tags: [boss, rei-em-amarelo, combate, castelo, final]
 
 # Boss Rei em Amarelo
 
-> **Visão completa e atualizada (2026-09-28): [dossie_luta_do_rei.md](dossie_luta_do_rei.md).** Partes deste documento
-> estão desatualizadas — o dossiê lista quais (§13).
+> **Esta luta vai ser substituída** pelo Rito do Olhar — plano em [dossie_luta_do_rei.md](dossie_luta_do_rei.md) (2026-09-28).
+> O retrato completo da versão atual está no commit `9dc607d4` daquele arquivo.
 
 > **Status:** Core e Runtime implementados em 2026-08-11. **Falta prefab, arte, o Trono de
 > Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos.** Item 12 da lista
