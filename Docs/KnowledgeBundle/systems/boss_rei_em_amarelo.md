@@ -7,6 +7,9 @@ tags: [boss, rei-em-amarelo, combate, castelo, final]
 
 # Boss Rei em Amarelo
 
+> **Visão completa e atualizada (2026-09-28): [dossie_luta_do_rei.md](dossie_luta_do_rei.md).** Partes deste documento
+> estão desatualizadas — o dossiê lista quais (§13).
+
 > **Status:** Core e Runtime implementados em 2026-08-11. **Falta prefab, arte, o Trono de
 > Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos.** Item 12 da lista
 > do edital. Design em

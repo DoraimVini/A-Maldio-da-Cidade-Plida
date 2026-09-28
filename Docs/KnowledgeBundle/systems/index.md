@@ -33,6 +33,7 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Áudio](audio.md) — **[IMPLEMENTADO, sem clipes]** Mixer com pool, banco autorável e síntese de andaime. Torna audível o ruído que Damião emite — o pilar que era invisível
 - [Boss Byakhee](boss_byakhee.md) — **[CORE+RUNTIME]** O cadeado dos Portões: imune no ar, vulnerável só no pouso; fecha a Fase 1
 - [Boss Rei em Amarelo](boss_rei_em_amarelo.md) — **[CORE+RUNTIME]** O confronto final: sem barra de vida, ritual de relíquias + selamento por reação (Máscara Pálida). Ver também o Carcosa Debugger e a Arena de Testes
+- [Dossiê — A luta contra o Rei em Amarelo](dossie_luta_do_rei.md) — **[REDESENHO]** Tudo o que cerca o confronto final em 2026-09-28: caminho até o Trono, fases, números, falas, testes, arte, histórico, veredito do playtest ("muito repetitiva") e restrições para refazer a luta
 - [Persistência](persistencia.md) — O ciclo do save, o padrão Observer do `IPersistente`, e o bug em que o jogo gravava mas nunca lia de volta
 - [HUD](hud.md) — As 6 views, o `HUDController` como injetor, e `BuildHUDCompleto` como ponto único de montagem — nenhuma cena tinha HUD completo antes de 2026-08-13
 - [Luta contra Abdul Alhazred](boss_abdul.md) — Boss em fases: Escudo Mágico, Pedras de Poder, Cones de Gelo e a janela de exaustão
