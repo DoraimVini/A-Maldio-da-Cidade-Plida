@@ -32,8 +32,8 @@ Aqui estão as **regras de negócio** — o que deve acontecer e as fórmulas ma
 - [Análise do Inventário](inventario_analise.md) — **[AUDITORIA 2026-08-14]** O que está de fato ligado, os 7 atributos que não fazem nada, o bug que apaga a ficha ao trocar equipamento, e a ordem de correção sugerida
 - [Áudio](audio.md) — **[IMPLEMENTADO, sem clipes]** Mixer com pool, banco autorável e síntese de andaime. Torna audível o ruído que Damião emite — o pilar que era invisível
 - [Boss Byakhee](boss_byakhee.md) — **[CORE+RUNTIME]** O cadeado dos Portões: imune no ar, vulnerável só no pouso; fecha a Fase 1
-- [Boss Rei em Amarelo](boss_rei_em_amarelo.md) — **[CORE+RUNTIME]** O confronto final: sem barra de vida, ritual de relíquias + selamento por reação (Máscara Pálida). Ver também o Carcosa Debugger e a Arena de Testes
-- [O Rito do Olhar — plano da luta contra o Rei](dossie_luta_do_rei.md) — **[PLANO]** Redesenho aprovado em direção (2026-09-28): o Rei olha, ser visto drena a mente, o Altar avança o selo, os Nobres são a sombra; 5 fases, números, geometria, arquitetura, testes e etapas
+- [Boss Rei em Amarelo](boss_rei_em_amarelo.md) — **[CORE+RUNTIME+CENA]** O Rito do Olhar (2026-09-28): o Rei olha; ser visto drena a mente, ser visto no Altar avança o selo, os Nobres são a sombra. Cinco fases, relíquias como modificadores, sala montada por ferramenta e guardada por geometria
+- [O Rito do Olhar — plano da luta contra o Rei](dossie_luta_do_rei.md) — **[PLANO, IMPLEMENTADO]** Com a tabela do que divergiu na implementação. Redesenho aprovado em direção (2026-09-28): o Rei olha, ser visto drena a mente, o Altar avança o selo, os Nobres são a sombra; 5 fases, números, geometria, arquitetura, testes e etapas
 - [Persistência](persistencia.md) — O ciclo do save, o padrão Observer do `IPersistente`, e o bug em que o jogo gravava mas nunca lia de volta
 - [HUD](hud.md) — As 6 views, o `HUDController` como injetor, e `BuildHUDCompleto` como ponto único de montagem — nenhuma cena tinha HUD completo antes de 2026-08-13
 - [Luta contra Abdul Alhazred](boss_abdul.md) — Boss em fases: Escudo Mágico, Pedras de Poder, Cones de Gelo e a janela de exaustão

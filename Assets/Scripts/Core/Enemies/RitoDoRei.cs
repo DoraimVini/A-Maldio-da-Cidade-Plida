@@ -2,6 +2,22 @@ using System;
 
 namespace FavelaAmarela.Core.Enemies
 {
+    /// <summary>
+    /// Os ids das três relíquias que pesam no Rito do Olhar — um lugar só, para o Rei, o
+    /// montador da cena e os testes não soletrarem "patua_luas_gemeas" cada um à sua maneira.
+    /// </summary>
+    public static class RitoDoRei
+    {
+        /// <summary>O Necronomicon: as palavras do selo (selo mais rápido).</summary>
+        public const string Necronomicon = "necronomicon";
+
+        /// <summary>O Patuá das Luas Gêmeas: ancora no escuro (Ancoragem mais forte).</summary>
+        public const string Patua = "patua_luas_gemeas";
+
+        /// <summary>O Anel do Sinal Amarelo: filtra o olhar (dreno menor).</summary>
+        public const string Anel = "anel_sinal_amarelo";
+    }
+
     /// <summary>As fases do Rito do Olhar, na ordem em que acontecem.</summary>
     public enum FaseDoRito
     {

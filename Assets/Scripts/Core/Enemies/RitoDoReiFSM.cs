@@ -115,6 +115,33 @@ namespace FavelaAmarela.Core.Enemies
             OnColapso?.Invoke();
         }
 
+        /// <summary>
+        /// Leva o selo direto ao marco de uma fase, passando pelas transições do caminho (cada
+        /// uma dispara <see cref="OnFaseMudou"/>, como no jogo). Só avança; pedir uma fase já
+        /// passada não faz nada.
+        ///
+        /// <para>Existe para o Carcosa Debugger ("pular para a fase N") e para o teste de ponta a
+        /// ponta, que não podem gastar três minutos para chegar ao Verbo.</para>
+        /// </summary>
+        public void PularPara(FaseDoRito fase)
+        {
+            if (Fase == FaseDoRito.Aguardando || Encerrado) return;
+
+            float marco = fase switch
+            {
+                FaseDoRito.Mascara => _p.MarcoMascara,
+                FaseDoRito.Peca => _p.MarcoPeca,
+                FaseDoRito.Verbo => _p.MarcoVerbo,
+                FaseDoRito.Queda => _p.MarcoQueda,
+                FaseDoRito.Selado => 100f,
+                _ => Selo,
+            };
+            if (marco <= Selo) return;
+
+            Selo = marco;
+            AvaliarMarcos();
+        }
+
         /// <summary>Se o Rei vê o Damião, dada a leitura do mundo.</summary>
         public bool Ve(LeituraDoRito leitura)
         {

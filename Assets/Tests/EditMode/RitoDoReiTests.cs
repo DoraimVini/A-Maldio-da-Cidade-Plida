@@ -292,5 +292,37 @@ namespace FavelaAmarela.Tests.EditMode
             for (int i = 0; i < 10; i++) verbo.Avancar(new ParametrosDoVerbo().Intervalo, false);
             Assert.AreEqual(2, verbo.Desfeitas, "De 3 coberturas, o Verbo desfaz 2 e a última resiste.");
         }
+
+        // ── Depuração ─────────────────────────────────────────────────────────
+
+        [Test]
+        public void PularPara_PassaPorCadaFaseDoCaminho_ESoAvanca()
+        {
+            var rito = Novo();
+            var fases = new List<FaseDoRito>();
+            rito.OnFaseMudou += (_, nova) => fases.Add(nova);
+
+            rito.PularPara(FaseDoRito.Verbo);
+            CollectionAssert.AreEqual(new[] { FaseDoRito.Mascara, FaseDoRito.Peca, FaseDoRito.Verbo }, fases,
+                "Pular não pode esconder transições: a cena reage a cada uma (animação, fala, fragmentos).");
+
+            rito.PularPara(FaseDoRito.Mascara);
+            Assert.AreEqual(FaseDoRito.Verbo, rito.Fase, "Pedir uma fase já passada não volta o rito.");
+        }
+
+        [Test]
+        public void PularPara_Selado_DisparaOSelamento_EAntesDeIniciarNaoFazNada()
+        {
+            var parado = new RitoDoReiFSM(new ParametrosDoRito(), Nenhum, 5, 3);
+            parado.PularPara(FaseDoRito.Queda);
+            Assert.AreEqual(FaseDoRito.Aguardando, parado.Fase);
+
+            var rito = Novo();
+            bool selou = false;
+            rito.OnSelado += () => selou = true;
+            rito.PularPara(FaseDoRito.Selado);
+            Assert.IsTrue(selou);
+            Assert.IsTrue(rito.Encerrado);
+        }
     }
 }

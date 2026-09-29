@@ -4,6 +4,59 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-28 — O Rito do Olhar: a luta do Rei refeita; o Abdul obrigatório
+
+O Vini, depois de jogar a luta dos escudos: *"porra quantas vezes essa porra dessa luta do rei se
+repete?"*. Dossiê → redesenho → plano (recusou um botão de "fitar": *"vai criar um botão só para
+essa luta?"* — a resposta tinha de ser de level design) → implementação inteira hoje.
+
+**Abdul obrigatório** (`fdb5e6f2`). A trégua libertava o Yug-Neth sem entregar o Necronomicon.
+Agora a conversa termina com o Damião ofendendo o Abdul ("Velho?") e o aperto seguinte desperta
+a luta; saves "poupado" são ignorados. `ALutaDoAbdulEhObrigatoriaTests`, `NinguemPoupaOAbdulTests`.
+
+**Core** (`877aacdc`). `RitoDoReiFSM` + `ExposicaoAoRei`, `OlharDoRei`, `FragmentosDaPeca`,
+`VerboDoRei`. Os números do plano **colapsavam** o jogador simulado na Fase 4; calibrados por
+busca espelhando a FSM: marcos 20/40/65/90, Verbo 8 s/8 RM, último Nobre resiste. Resultado:
+~3 min com as três relíquias, ~4 min 20 s sem o Patuá, ~7 min 20 s sem nenhuma (vence).
+
+**Runtime e sala** (este commit):
+- `LinhaDeVisao` (Core): segmento contra a pegada, Liang–Barsky — no lugar do `Linecast` do
+  plano, para o guarda de cena fazer a mesma conta do jogo sem rodar física.
+- `ReiEmAmareloAI` reescrito: o olho é o **colisor dos pés** (0,1 ; 66,7), não o pivô (3,9 un à
+  direita, 4,3 abaixo da figura). Começa quando o Damião entra na elipse 12 × 6 do Altar; lê as
+  relíquias equipadas na entrada; aplica o dreno por `ResilienciaBridge.SofrerDrenoContinuo`
+  (novo, **sem mitigação** — a fatia por quadro seria esmagada pela Defesa Anômala).
+- `CoberturaDoTrono`, `AltarDeSelamento`, `PontoFocalDeReliquia` (vira altar de fragmento, sem
+  `IInteragivel`), `SinaisDoOlhar` (fio + farol por `LineRenderer`), `TelaDoRito` (barra do
+  selo com marcos + vinheta gerada), `ConfiguracaoDoRito` (números no Inspector).
+- `IsometricCameraController.DeslocamentoDeEnquadramento`: o rito sobe a vista 2,2 un. **Medido
+  em Play:** sem isso, com o Damião no Altar, os pés do Rei ficavam fora do quadro.
+- `Tools/FavelaAmarela/Trono: montar o Rito do Olhar`: Altar, 5 Nobres (escala 2, dither), altares
+  de fragmento reposicionados, um Eco da Queda (1,5 s), prefab do Rei sem espólio (D3), overrides
+  órfãos removidos. Layout saído de **busca** contra as 6 regras do plano.
+- Carcosa Debugger: iniciar o rito, pular para a fase N, estado ao vivo.
+- **Saiu:** `ReiEmAmareloFSM`/`State`, `EscudoDeReliquia`, `AbrigosDoTrono`, `ConfrontoDoRei` e
+  seus testes, `OAltarResponde`.
+
+**Correção minha:** escrevi que o shader de dither "não tinha material no projeto" e usei alpha
+liso nos Nobres. O `OcclusionDither.mat` existe (usado pela dissolução do Colapso na Tumba) e o
+shader compila e é suportado sob a URP (conferido no Editor). O que faltava era ligação: o
+`OcclusaoDitherFade` não estava em cena nenhuma. Os Nobres usam o dither agora.
+
+**Guardas:** `LinhaDeVisaoTests` (7), `OTronoDoOlharTests` (7, cena), `ORitoDoOlharTests`
+(PlayMode, 2), `RitoDoReiTests` +2 (`PularPara`). Atualizados: altares (o feixe também serve o
+Altar de Selamento; sem `spriteAtivo`), animação (um clipe por fase), `ArmaAlcancavelTests` (as 3
+T3 declaradas sem fonte — o Rei não larga mais nada; `Drop_ReiEmAmarelo` guardado), Ecos do
+Castelo (3), linha de base de ligação (isenção órfã). `AArenaDosPortoesNaTelaTests` herdava o
+**save real** (Portões abertos na partida do Vini) — agora limpa o registro.
+
+**EditMode: 1177 testes, 1154 passam, 0 reprovam, 23 pulados. PlayMode: 79/79.**
+
+**Aberto:** o Vini jogar (os números são de simulação); falas e som finais; a caixa de fala do HUD
+cobre metade da tela durante a luta. **Achado, não corrigido:** o grito do Byakhee, a
+`PressaoPsiquicaZone` e o `EcoDeCarcosa` drenam por `SofrerTrauma` a cada quadro — com Defesa
+Anômala equipada a fatia é esmagada pela mitigação. Inerte no VS (nada jogável rola o atributo).
+
 ## 2026-09-10 — O Rei grande é intenção: a cena do Castelo do Vini entra, os guardas medem a decisão
 
 O Vini: *"Faça todos os commits e o push. Eu quis o Rei com uma escala maior, mesmo."* A

@@ -1,7 +1,6 @@
 using System.Linq;
 using FavelaAmarela.Core.Enemies;
 using FavelaAmarela.Runtime.Enemies;
-using FavelaAmarela.Runtime.Itens;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -64,8 +63,10 @@ namespace FavelaAmarela.Tests.EditMode
             var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
             Assert.NotNull(rei, "Nenhum ReiEmAmareloAI na cena do Castelo.");
 
-            Assert.IsTrue(TemChao(Chao(), rei.transform.position),
-                $"O Rei está em {(Vector2)rei.transform.position}, onde não há chão pintado.");
+            // Os pés de verdade, não o pivô: o pivô do quadro fica 3,9 un à direita e 4,3 un
+            // abaixo da figura desenhada (ver ReiEmAmareloAI.OrigemDoOlhar).
+            Assert.IsTrue(TemChao(Chao(), rei.OrigemDoOlhar),
+                $"Os pés do Rei estão em {rei.OrigemDoOlhar}, onde não há chão pintado.");
         }
 
         /// <summary>
@@ -146,119 +147,6 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.Less(sprite.bounds.size.y, AlturaDaTela * 2f,
                 $"O Rei tem {sprite.bounds.size.y:F2} un de altura — mais de duas telas de " +
                 $"{AlturaDaTela}. A escala escolhida pelo Vini dá ~15,2; isto é outra coisa.");
-        }
-
-        // ── Os abrigos ───────────────────────────────────────────────────────
-
-        private static EscudoDeReliquia[] Abrigos()
-        {
-            var escudos = Object.FindObjectsByType<EscudoDeReliquia>();
-            Assert.IsNotEmpty(escudos,
-                "Nenhum EscudoDeReliquia na cena. Rode " +
-                "Tools/FavelaAmarela/Trono: montar os abrigos das relíquias.");
-            return escudos;
-        }
-
-        /// <summary>
-        /// Cada relíquia que o rito exige tem um abrigo. Uma sem escudo seria um ciclo sem
-        /// resposta possível — morte certa, do jeito que o Vini relatou na mecânica antiga.
-        /// </summary>
-        [Test]
-        public void CadaReliquiaExigida_TemOSeuAbrigo()
-        {
-            Abrir();
-            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
-            var abrigos = Abrigos();
-
-            foreach (var id in rei.ReliquiasExigidas)
-                Assert.IsTrue(abrigos.Any(e => e.ArtefatoId == id),
-                    $"O rito exige '{id}' e nenhum ponto focal ergue o abrigo dessa relíquia.");
-        }
-
-        /// <summary>
-        /// <b>Todo o abrigo tem de estar sobre chão pintado.</b> Um escudo que transborda a
-        /// borda do losango convida o jogador a ficar de pé no vazio — e a cúpula desenhada diz
-        /// que ali é seguro.
-        /// </summary>
-        [Test]
-        public void TodoOAbrigo_FicaSobreOChao()
-        {
-            Abrir();
-            var chao = Chao();
-
-            foreach (var escudo in Abrigos())
-            {
-                Vector2 centro = escudo.transform.position;
-
-                for (int i = 0; i < 16; i++)
-                {
-                    float t = i / 16f * Mathf.PI * 2f;
-                    var p = centro + new Vector2(escudo.SemiEixoX * Mathf.Cos(t),
-                                                 escudo.SemiEixoY * Mathf.Sin(t));
-
-                    Assert.IsTrue(TemChao(chao, p),
-                        $"O abrigo de '{escudo.ArtefatoId}' em {centro} chega a {p}, onde não " +
-                        "há chão. O jogador seria mandado ficar de pé sobre o vazio.");
-                }
-            }
-        }
-
-        /// <summary>
-        /// <b>A travessia mais longa tem de caber na calmaria.</b> O escudo acende no começo de
-        /// <c>Selando</c>, então a calmaria inteira é o tempo de corrida; se um altar for
-        /// afastado, este teste falha em vez de o jogador descobrir sozinho que não dava para
-        /// chegar. Mede <b>andando</b> (4,5 u/s), não correndo — a luta não pode exigir correr.
-        /// </summary>
-        [Test]
-        public void ATravessiaMaisLonga_CabeNaCalmaria()
-        {
-            Abrir();
-            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
-            var abrigos = Abrigos();
-
-            float calmaria = new SerializedObject(rei)
-                .FindProperty("intervaloEntreCiclos").floatValue;
-
-            float pior = 0f;
-            string trajeto = "";
-
-            foreach (var origem in abrigos)
-            foreach (var destino in abrigos)
-            {
-                if (origem == destino) continue;
-
-                float t = AbrigoDeReliquia.SegundosParaAlcancar(
-                    origem.transform.position, destino.transform.position,
-                    VelocidadeAndando, destino.SemiEixoX, destino.SemiEixoY);
-
-                if (t <= pior) continue;
-
-                pior = t;
-                trajeto = $"{origem.ArtefatoId} -> {destino.ArtefatoId}";
-            }
-
-            Assert.Less(pior, calmaria,
-                $"A travessia mais longa ({trajeto}) leva {pior:F2} s andando e a calmaria " +
-                $"entre ciclos é de {calmaria:F2} s. O jogador não teria como chegar ao abrigo " +
-                "antes do desvelo.");
-        }
-
-        /// <summary>
-        /// Com três relíquias e três ciclos, cada artefato abriga exatamente uma vez — que é o
-        /// que <i>"cada artefato gera um escudo por vez"</i> quer dizer.
-        /// </summary>
-        [Test]
-        public void OsCiclos_SaoUmPorReliquia()
-        {
-            Abrir();
-            var rei = Object.FindAnyObjectByType<ReiEmAmareloAI>();
-
-            int ciclos = new SerializedObject(rei).FindProperty("ciclosDeSelamento").intValue;
-
-            Assert.AreEqual(rei.ReliquiasExigidas.Count, ciclos,
-                $"O rito exige {rei.ReliquiasExigidas.Count} relíquia(s) e roda {ciclos} " +
-                "ciclo(s). Com números diferentes, alguma relíquia abriga duas vezes e outra " +
-                "nenhuma — o revezamento deixa de ler como 'um escudo por artefato'.");
         }
     }
 }

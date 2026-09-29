@@ -86,6 +86,23 @@ namespace FavelaAmarela.Runtime.Combat
         }
 
         /// <summary>
+        /// Drena Resiliência <b>sem mitigação</b> — para desgaste contínuo, cobrado em fatias por
+        /// quadro. Respeita <see cref="IgnorarTrauma"/>, como todo dano à mente.
+        ///
+        /// <para><b>Por que não <see cref="SofrerTrauma"/>.</b> A <c>MitigacaoDeDano</c> subtrai a
+        /// defesa de <b>cada golpe</b> e guarda um piso proporcional. Aplicada a 6 RM/s em fatias de
+        /// 0,1, qualquer Defesa Anômala esmaga a fatia até o piso — e o dreno do olhar do Rei, que é
+        /// a regra da luta, viraria outro número conforme o equipamento, sem ninguém ter decidido
+        /// isso. Desgaste contínuo não é golpe; a relíquia que filtra o olhar (o Anel) é quem mexe
+        /// nele, e de propósito.</para>
+        /// </summary>
+        public void SofrerDrenoContinuo(float quantidade)
+        {
+            if (IgnorarTrauma || quantidade <= 0f) return;
+            _resiliencia?.SofrerTrauma(quantidade);
+        }
+
+        /// <summary>
         /// Defesa anômala agregada do equipamento — a contraparte mental da
         /// <c>DefesaFisica</c> que a <c>VitalidadeBridge</c> já consulta.
         ///

@@ -34,6 +34,7 @@ namespace FavelaAmarela.Tests.EditMode
         private const string PastaDeCenas = "Assets/Scenes";
         private const string PontoFocal = "PontoFocalDeReliquia";
         private const string Feixe = "AnimadorDeAltarDeReliquia";
+        private const string AltarDeSelamento = "AltarDeSelamento";
 
         /// <summary>Um objeto do YAML: tipo, id, e o corpo cru.</summary>
         private sealed class Bloco
@@ -100,7 +101,10 @@ namespace FavelaAmarela.Tests.EditMode
                 {
                     achados++;
 
-                    foreach (var campo in new[] { "spriteInativo", "spriteAtivo" })
+                    // Só o inativo: desde o Rito do Olhar (2026-09-28) o altar aceso é o FEIXE
+                    // (conferido abaixo, em OFeixeEstaNoMesmoObjetoDoPontoFocal) — o sprite
+                    // 'spriteAtivo' era o desfecho mínimo da luta antiga e saiu com ela.
+                    foreach (var campo in new[] { "spriteInativo" })
                     {
                         var m = Regex.Match(b.Corpo,
                             $@"(?m)^  {campo}: \{{fileID: (-?\d+)");
@@ -120,8 +124,8 @@ namespace FavelaAmarela.Tests.EditMode
                 "medindo o projeto — conserte a varredura antes de confiar no verde.");
 
             Assert.IsEmpty(falhas,
-                "Ponto focal que não muda de cara ao acender — o jogador aperta E, a relíquia " +
-                "é aceita, e a tela fica igual. É indistinguível de um altar quebrado:" +
+                "Altar de fragmento sem a pedra apagada — ao sair o fragmento, o altar fica no " +
+                "último quadro do feixe, e parece que ainda arde:" +
                 System.Environment.NewLine + string.Join(System.Environment.NewLine, falhas));
         }
 
@@ -133,8 +137,10 @@ namespace FavelaAmarela.Tests.EditMode
 
             foreach (var (cena, blocos) in Cenas())
             {
+                // Donos legítimos do feixe: quem o procura por GetComponent — o altar de
+                // fragmento e, desde o Rito do Olhar, o Altar de Selamento.
                 var donosDePontoFocal = new HashSet<string>(blocos
-                    .Where(b => b.Classe == PontoFocal && b.GameObject != null)
+                    .Where(b => (b.Classe == PontoFocal || b.Classe == AltarDeSelamento) && b.GameObject != null)
                     .Select(b => b.GameObject));
 
                 foreach (var b in blocos.Where(x => x.Classe == Feixe))

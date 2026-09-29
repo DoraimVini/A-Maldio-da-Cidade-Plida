@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using FavelaAmarela.Core.Enemies;
 using UnityEngine;
 using FavelaAmarela.Core.Loot;
 using FavelaAmarela.Core.Artefatos;
@@ -666,8 +667,19 @@ namespace FavelaAmarela.EditorTools
                 var rei = FindAnyObjectByType<ReiEmAmareloAI>();
                 using (new EditorGUI.DisabledScope(rei == null))
                 {
-                    if (GUILayout.Button("Rei: iniciar ritual (libera os pontos focais)"))
+                    if (GUILayout.Button("Rei: iniciar o Rito do Olhar"))
                         rei.IniciarRitual();
+
+                    // Pular de fase: o rito inteiro leva ~3 min, e conferir o Verbo não pode
+                    // custar dois deles. Passa por cada transição do caminho, como no jogo.
+                    using (new EditorGUI.DisabledScope(rei == null || rei.Rito == null || rei.Rito.Encerrado))
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField("Pular para:", GUILayout.Width(70));
+                        foreach (var fase in new[] { FaseDoRito.Mascara, FaseDoRito.Peca, FaseDoRito.Verbo, FaseDoRito.Queda, FaseDoRito.Selado })
+                            if (GUILayout.Button(fase.ToString()))
+                                rei.Rito.PularPara(fase);
+                    }
                 }
             }
 
@@ -808,10 +820,12 @@ namespace FavelaAmarela.EditorTools
             var rei = FindAnyObjectByType<ReiEmAmareloAI>();
             if (rei != null)
             {
-                EditorGUILayout.LabelField("Rei em Amarelo",
-                    $"Estado: {rei.Fsm.CurrentState}  |  " +
-                    $"Relíquias: {rei.Fsm.ReliquiasAtivas}/{rei.Fsm.TotalDeReliquiasExigidas}  |  " +
-                    $"Ciclos: {rei.Fsm.CiclosSobrevividos}/{rei.Fsm.TotalDeCiclos}");
+                var rito = rei.Rito;
+                EditorGUILayout.LabelField("Rei em Amarelo", rito == null
+                    ? "Aguardando o Damião entrar no Trono."
+                    : $"Fase: {rito.Fase}  |  Selo: {rito.Selo:0.0}  |  " +
+                      $"Vê o Damião: {rei.VendoODamiao}  |  No Altar: {rei.UltimaLeitura.NoAltar}  |  " +
+                      $"Nobres desfeitos: {rito.Verbo.Desfeitas}");
             }
 
             if (byakhee == null && rei == null)

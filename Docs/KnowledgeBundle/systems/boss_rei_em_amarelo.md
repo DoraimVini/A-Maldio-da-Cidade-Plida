@@ -1,213 +1,158 @@
 ---
 type: Game System
-title: Boss Rei em Amarelo — O Rito no Trono de Aldebaran
-description: O confronto final. Sem barra de vida — duas metades, ritual de relíquias sem pressão e selamento em ciclos de reação pura, onde errar mata na hora.
-tags: [boss, rei-em-amarelo, combate, castelo, final]
+title: Boss Rei em Amarelo — O Rito do Olhar, no Trono de Aldebaran
+description: O confronto final, desde 2026-09-28. O Rei não ataca nem morre; ele olha. Ser visto drena a Resiliência Mental, ser visto dentro do Altar de Selamento avança o selo, e atrás dos Nobres Fossilizados a mente se ancora. Cinco fases, cada uma muda a sala.
+tags: [boss, rei-em-amarelo, combate, castelo, final, rito-do-olhar]
 ---
 
-# Boss Rei em Amarelo
+# Boss Rei em Amarelo — O Rito do Olhar
 
-> **Esta luta vai ser substituída** pelo Rito do Olhar — plano em [dossie_luta_do_rei.md](dossie_luta_do_rei.md) (2026-09-28).
-> O retrato completo da versão atual está no commit `9dc607d4` daquele arquivo.
+> **Status (2026-09-28):** implementado de ponta a ponta — Core, Runtime, sala montada na Z5,
+> guardas de geometria e testes PlayMode verdes. **Calibrado por simulação, ainda não jogado:**
+> a calibração fina é ao vivo, com o Vini. Plano de origem, com o raciocínio de cada decisão:
+> [dossie_luta_do_rei.md](dossie_luta_do_rei.md).
 
-> **Status:** Core e Runtime implementados em 2026-08-11. **Falta prefab, arte, o Trono de
-> Aldebaran em cena de verdade, e uma fonte jogável para a Coroa de Ossos.** Item 12 da lista
-> do edital. Design em
-> [level_design_castelo_carcosa.md](level_design_castelo_carcosa.md) §Z5.
+Substitui a luta dos escudos + Confronto, reprovada no playtest de 2026-09-10 (*"Eu detestei a
+luta contra o Rei, está muito repetitiva"*). O retrato completo da luta antiga está no commit
+`9dc607d4` de `dossie_luta_do_rei.md`; o resumo está em [Histórico](#histórico).
 
-## Não é uma luta — é um rito que se sobrevive
+## A regra
 
-> **Sem `EnemyBase`** — de propósito, como o Abdul. Até 2026-09-10 também sem `Vitalidade`
-> nem `IDanificavel`: o rito era só sobrevivido. **Isso mudou com a quarta fase** (abaixo).
-> `ReiEmAmareloAI` implementa `IDanificavel` direto, porque já é a única `IFonteDeEspolio`
-> do objeto e o `DropAoAbater` resolve a fonte por `GetComponent` — uma segunda faria o
-> espólio cair duas vezes ou nenhuma. O par de referência não é `CultistaAI`, é mais perto de
-> `ColapsoTrigger`/`CoisaDoCemiterioAI`: algo que mata instantaneamente, e cuja "vitória" é um
-> evento, não uma barra chegando a zero.
+| Situação do Damião | Selo | Resiliência Mental |
+|---|---|---|
+| Visto **e** dentro do Altar de Selamento | **avança** | **drena** |
+| Visto fora do Altar | parado | **drena** |
+| Na sombra de um Nobre (não visto) | parado | **se ancora** |
 
-Três metades — a terceira chegou em 2026-09-10:
+Não existe estado seguro que avance o selo: para vencer é preciso ser visto. O laço é de
+**posição** — sair da sombra, pagar no Altar, voltar antes de a mente quebrar — com os
+controles que o jogador já tem. **Nenhum botão novo** (decisão do Vini: *"vai criar um botão só
+para essa luta?"*).
 
-1. **Ritual das relíquias** — sem pressão, sem relógio. O jogador ativa cada relíquia exigida
-   num `PontoFocalDeReliquia` da arena (interação deliberada, botão E).
-2. **Selamento** — o Rei se desvela em ciclos. Cada um é um teste de **posição**: estar dentro
-   do escudo que uma relíquia ergueu sobrevive o ciclo; estar fora, `Colapso` instantâneo.
-3. **Confronto** — sobrevividos os ciclos, a Máscara cai. O ritmo continua (escudo, calmaria,
-   desvelo), mas **entre os desvelos o Rei sangra**. Damião sai do abrigo, corre até ele, fere,
-   e volta antes do próximo desvelo. Vitalidade em zero sela o Rei.
+- **Vitória:** selo em 100 → `OnVitoria` → `SequenciaDeSelamento` (o jogo volta ao Menu).
+- **Derrota:** Resiliência em zero → o Colapso de sempre; o rito só se encerra.
+- **"Visto"** = o segmento do **olho do Rei** até os **pés do Damião** não atravessa a pegada de
+  nenhum Nobre de pé (`LinhaDeVisao.Cruza`, Liang–Barsky, sem alocação). Não depende de
+  `LookDirection` — foi ela que matou a mecânica "dê as costas".
+- **O olho** é o centro do colisor do corpo do Rei, **(0,1 ; 66,7)** — os pés da figura
+  desenhada. Não o `transform.position`: o pivô do quadro de 88 × 129 px fica 3,9 un à direita
+  e 4,3 un abaixo da figura, com a escala 3,7 que o Vini escolheu.
 
-## O ritual das relíquias
+## As cinco fases (números do Core, calibrados por simulação)
 
-`PontoFocalDeReliquia` implementa `IInteragivel` (mesmo contrato do `BauDaTumba`). Ao
-interagir, checa `ArtefatosBridge.Inventario.Contem(artefatoId)` — só ativa se o jogador
-**já tiver a relíquia equipada**. O ponto nunca entrega nada, só confirma.
+| | Chegada | Máscara | Peça | Verbo | Queda |
+|---|---|---|---|---|---|
+| Selo | 0 → 20 | 20 → 40 | 40 → 65 | 65 → 90 | 90 → 100 sozinho, em 30 s |
+| Dreno visto (RM/s) | 6 | 7 (× 3 com a Máscara aberta) | 8 | 8 | — |
+| O que muda | só Rei, Altar e Nobres | o olhar vira **farol**: cone de 70° varrendo ± 60° em 8 s; fora dele não se é visto. A cada 3 varreduras a **Máscara abre** 2 s (cone dobra, dreno × 3), com som 0,5 s antes | um **fragmento da Peça** arde num altar de relíquia; 1,5 s visto em cima dele o lê: **+8 selo, −15 RM** de uma vez; reaparece no altar seguinte 10 s depois | o **Verbo** pulsa a cada 8 s: quem está visto perde 8 RM, e **um Nobre se desfaz** — do mais perto do Altar ao mais longe; o último resiste | o Rei se curva e se apaga; não há olhar nem Ancoragem; o **Eco da Queda** pune quem fica parado 1,5 s (3 RM/s nas costas) |
+| Animação | `idle` | `selar` | `dano` | `desvelo` | `queda` + alpha a zero em 3 s |
 
-Todas as relíquias ativas dispara `Selando` automaticamente (`ReiEmAmareloFSM.AtivarReliquia`).
+Base: selo **1,0/s** no Altar, Ancoragem **3 RM/s** na sombra.
 
-## A lista de relíquias exigidas é dado, não constante
+**Relíquias são modificadores, não chaves** — lidas do que está **equipado** ao entrar no Trono:
+Necronomicon × 1,3 no selo, Patuá × 2 na Ancoragem, Anel × 0,8 no dreno. Sem elas o rito
+continua vencível, só mais longo; o Rei diz na chegada quais faltam. Isso fecha o caso do Abdul
+(que deixou de poder ser poupado — [companheiro_mi_go.md](companheiro_mi_go.md)).
 
-O design pede 4 (Anel do Sinal Amarelo, Coroa de Ossos, Patuá das Luas Gêmeas, Necronomicon),
-mas **a Coroa de Ossos não tem fonte jogável** — seria drop do Nagaraja, no Templo da Serpente,
-que não tem cena. `ReiEmAmareloFSM` recebe a lista de ids exigidos no construtor (como
-`TabelaDeDrop` recebe entradas), em vez de hardcodar os 4. `ReiEmAmareloAI` hoje exige só 3
-(`necronomicon`, `patua_luas_gemeas`, `anel_sinal_amarelo`) — trocar para os 4 reais é uma
-alteração de um array serializado no Inspector, não de código, assim que a Coroa tiver fonte.
+**A simulação** (`ORitoCabeNoTempoTests`, jogador disciplinado contra a FSM real): ~3 min com
+as três relíquias, ~4 min 20 s sem o Patuá, ~7 min 20 s sem nenhuma — e ainda sela. Os números
+do plano original (marcos 15/35/60/90, Verbo a cada 6 s custando 10) **colapsavam** o jogador na
+Fase 4; a calibração está no `ParametrosDoRito`.
 
-## A Mecânica do Abrigo (desde 2026-09-10)
+Todos os números moram também no prefab do Rei (`ConfiguracaoDoRito`, calibráveis sem
+recompilar). A simulação usa os padrões do Core — calibração que ficar deve voltar para lá.
 
-> **Substituiu a Máscara Pálida**, que era dar as costas ao Rei. Pedido do Vini:
-> *"cada artefato gera um escudo por vez e você tem que se proteger dentro"*.
+## A sala (Z5 do `Castelo_Carcosa`)
 
-**Cada relíquia ativada ergue um abrigo no ponto focal dela**, e a cada ciclo **uma** delas
-acende — na ordem em que foram ativadas (`ReiEmAmareloFSM.ReliquiaDoCiclo`). Três relíquias,
-três ciclos: cada artefato abriga exatamente uma vez. Mais ciclos do que relíquias dá a volta
-na lista, em vez de deixar um ciclo sem resposta possível.
+Losango de 30 × 16 un centrado em (0 ; 62). Montada por `Tools/FavelaAmarela/Trono: montar o
+Rito do Olhar` (idempotente). O layout saiu de uma **busca** contra as seis regras do plano, não
+de mão:
 
-**O escudo acende no começo da calmaria, não no desvelo** (`OnEscudoAceso` dispara na entrada
-de `Selando`). É a decisão que faz a mecânica funcionar: os 6 s de calmaria são o tempo de
-travessia. Medido na cena do Trono, a corrida mais longa entre dois altares é **20 un — 4,44 s
-andando** (4,5 u/s), e cabe. Guardado por
-`OTronoCabeNaSalaTests.ATravessiaMaisLonga_CabeNaCalmaria`.
-
-Ao se desvelar (`Desvelado`), valem os mesmos **1,5 s** — único número que o design doc
-realmente especifica — mas agora a pergunta é *"está dentro?"*. **Estar dentro salva assim que
-acontece**, não precisa se manter até o fim da janela: quem chegou correndo e pisou no abrigo
-no último instante sobrevive.
-
-### A quarta fase: o Confronto (desde 2026-09-10)
-
-> Pedido do Vini: *"depois dos três escudos, abre-se uma fase de combate contra ele"*.
-
-**Por que o mesmo ritmo, e não um chefe de espada.** O Rei tem cinco clipes — idle, selar,
-desvelo, dano, queda — e **nenhum de ataque**. Um confronto em que ele avança e golpeia
-precisaria de arte que não existe. O desvelo já é o ataque dele e o abrigo já é a resposta; a
-fase nova só dá ao jogador o que faltava: **encostar nele**. As três primeiras fases ensinam o
-relógio; a quarta cobra.
-
-| regra | onde vive |
+| Peça | Onde |
 |---|---|
-| Sobreviver os ciclos abre o Confronto, **não** sela | `ReiEmAmareloFSM.SobreviverCiclo` → `EmConfronto`, `OnComecouOConfronto` |
-| O Rei só sangra no Confronto, e só na **calmaria** — desvelado é imune | `ReiEmAmareloFSM.PodeReceberDano` |
-| Os escudos continuam se revezando, dando a volta na lista | `ReliquiaDoCiclo` com `%` |
-| Perder o desvelo no Confronto ainda colapsa | inalterado — é o risco da fase |
-| Vitalidade em zero → `Abater()` → `Selado` → `OnSelado` (vitória + espólio) | `ReiEmAmareloAI.ReceberGolpe` |
-| A calmaria do Confronto é **5 s**, a do selamento 6 | `intervaloNoConfronto` no prefab |
+| Rei | não se move — a figura já está de pé no fundo (decisão D1 cumprida sem mexer) |
+| Altar de Selamento | (0 ; 62), elipse 4 × 2 com círculo no chão; a pedra fica na borda do fundo, para o Damião ficar na frente dela |
+| 5 Nobres Fossilizados (escala 2, pegada 2,4 × 2,0) | (−4,5 ; 62), (4,5 ; 62), (−8,5 ; 63), (8,5 ; 63), (−5 ; 58,5) |
+| Altares de fragmento | Necronomicon (−5,5 ; 66) e Patuá (5,5 ; 66), ao lado do Rei; Anel (0 ; 57,3), perto da entrada |
+| Eco da Queda | inativo até a Fase 5 |
 
-**A ficha: `Ficha_Rei` — Vitalidade 1000, Defesa 12, Resistência Anômala 30, Ataque 0.** Ataque
-zero é afirmação, não omissão: o Rei não golpeia, e `OConfrontoDoReiTests` recusa ficha com
-Ataque > 0 como promessa de um moveset sem arte.
+29 % do chão fica na sombra com todos de pé; a sombra mais perto está a ~4 un do centro do
+Altar, a mais longe (a que resiste) a ~8,5.
 
-**Os números saem da mesma régua do Byakhee**, e o teste os amarra:
+## O que o jogador vê
 
-| | |
-|---|---|
-| nível ao chegar no Trono | **4** (675 de Exposição, somada das cenas: 11 Cultistas, Abdul, Byakhee) |
-| Alfanje do baú @ nível 2 (o piso) | 63 brutos → 51 após Defesa → **20 golpes → 7 ciclos** a 3 golpes/ciclo |
-| Alfanje T2 @ nível 4 (o teto) | 128 brutos → 116 → **8,6 golpes → 3 ciclos** |
-| ida e volta do abrigo mais próximo, correndo | 2,4 s (Anel) · 2,56 s (Necronomicon, Patuá) |
-| golpes máximos por ciclo a 5 s de calmaria | **5** de qualquer abrigo |
-
-**Por que 5 s e não 6.** A 6 s a calmaria comportava 7–8 golpes depois de ir e voltar, e a
-T2 precisa de 8,6: um jogador perfeito matava o Rei **num ciclo só** depois da Máscara cair.
-Subir a Vitalidade puniria quem chega com a arma do baú (já são 20 golpes). A calmaria mais
-curta limita os golpes por ciclo para todo mundo — a T2 passa a precisar de dois ciclos no
-mínimo — e escala a luta: as três fases a 6 s, a quarta a 5.
-
-**A barra é a `BarraDeVidaFlutuante` do Yug-Neth**, ligada no `OnComecouOConfronto`. Some
-cheia e reaparece a cada golpe — para um chefe isso funciona melhor do que parece: aparece
-exatamente quando o jogador o feriu, e some enquanto ele corre de volta ao abrigo.
-
-## A geometria: `Core.Enemies.AbrigoDeReliquia`
-
-O abrigo é uma **elipse de 2 × 1 un**, não um círculo — a vista do jogo é 20 × 11,25 unidades e
-espaço de jogo redondo num quadro largo lê torto (a mesma lição da arena da Byakhee e da zona
-morta da câmera). A meia-largura testada é a meia-largura **desenhada** da cúpula: o
-`Escudo_Magico` tem 51 px de bolha opaca em 64 de largura, a PPU 32, e à escala 2,5 isso dá
-exatamente 4,0 un. **A zona testada nunca pode ser menor que a bolha desenhada** — *"eu estava
-dentro e morri"* é o pior desfecho possível numa mecânica de abrigo.
-
-### Por que a mecânica antiga foi trocada
-
-O Vini jogou e relatou: *"Não tem como evitar o ataque do Rei, nem de costas."* Estava certo. O
-`DetectorDeCostas` lia `PlayerMovement.LookDirection`, e essa propriedade **só é atualizada
-enquanto o jogador anda**:
-
-```csharp
-if (isMoving)
-{
-    LookDirection = direcaoNoMundo;
-}
-```
-
-Quem parava para ler a caixa de aviso — que dizia, ela mesma, *"dá-lhe as costas quando ele se
-desvelar"* — ficava com o olhar preso no Rei e morria sem resposta possível. Somando ao problema
-já registrado de que o único telégrafo era visual numa luta cuja resposta certa é não olhar, a
-mecânica tinha três caminhos para ser injusta. Posição não tem esse buraco: parado ou andando,
-estar dentro é estar dentro.
-
-O `DetectorDeCostas` **continua no projeto** (POCO, 7 testes) — não custa nada e pode servir a
-outra coisa —, mas não governa mais o rito.
-
-Sobreviver todos os ciclos de desvelar (3 — **um por relíquia**, com 6 s de calmaria entre
-eles) sela o Rei — vitória. Falhar um único ciclo é derrota instantânea, via
-`GameManager.Instance.Resiliencia.ForcarColapso()` (mesmo mecanismo do `ColapsoTrigger`).
-
-## Por que ciclos e intervalo não foram calibrados por simulação (diferente do Byakhee)
-
-O Byakhee é uma corrida de DPS — dá para simular um "jogo perfeito" e tirar números reais de
-RM gasta. O selamento do Rei é mecânica de **reação pura**: não existe "jogo perfeito"
-significativo para um teste de reflexo de 1,5 s, só existe "o jogador reagiu ou não". Os
-defaults (3 ciclos, 6 s de intervalo) não estão no design doc — são ponto de partida para
-calibrar **ao vivo**, na `Cena_ArenaDeTestes`, e não por simulação externa.
+- **O fio do olhar:** linha amarela dos pés do Rei até o Damião, só enquanto ele é visto.
+- **O farol** da Máscara: triângulo translúcido no chão (um `LineRenderer` com a largura indo de
+  zero ao máximo), mais forte com a Máscara aberta.
+- **O Altar:** o feixe da pedra acende e o círculo clareia enquanto o selo avança.
+- **A barra do selo** no topo, com os marcos das fases, e a **vinheta amarela** que cresce com o
+  tempo visto (`TelaDoRito`, montada em código — nenhum asset novo).
+- **A câmera sobe 2,2 un** durante o rito (`IsometricCameraController.DeslocamentoDeEnquadramento`):
+  com o Damião no Altar, a vista do Castelo (8,4 un de altura) deixava os pés do Rei fora do
+  quadro — o olhar que decide a luta vinha de fora da tela.
+- **Silhueta atrás dos Nobres:** `OcclusaoDitherFade` + `OcclusionDither.mat` (skill de
+  isometria, regra 6). Esconder-se é ficar do lado da entrada, que o Y-sort já desenha por cima;
+  o dither serve a quem passa por trás da estátua.
+- **Falas provisórias** (texto final é do Vini) em `ReiEmAmareloAI.Falas`, curtas na tela porque
+  a caixa de fala do HUD cobre a metade de baixo da vista.
 
 ## Arquitetura
 
-| Peça | Camada |
-|---|---|
-| `ReiEmAmareloFSM`, `ReiEmAmareloState` | Core (POCO, 13 testes) |
-| `AbrigoDeReliquia` | Core (POCO, geometria pura, 10 testes) |
-| `DetectorDeCostas` | Core (POCO, 7 testes) — **aposentado do rito** desde 2026-09-10 |
-| `ReiEmAmareloAI` | Runtime — sem `EnemyBase`/`Vitalidade`; liga o `Tick`, acende um abrigo por ciclo, aplica Colapso, expõe vitória |
-| `PontoFocalDeReliquia` | Runtime — `IInteragivel`, checa posse real da relíquia antes de ativar |
-| `EscudoDeReliquia` | Runtime — no ponto focal: acende, apaga, responde "está dentro?" |
-| `Ficha_Rei` | asset — Vitalidade 1000, Defesa 12, Res. Anômala 30, Ataque 0 |
-| `Tools/FavelaAmarela/Trono: dar carne ao Rei` | grava ficha e barra no prefab |
-| `OConfrontoDoReiTests` | 7 testes: geometria, duração da luta, nível de chegada |
+| Camada | Peça | Papel |
+|---|---|---|
+| Core | `RitoDoReiFSM` | fases, selo, eventos (`OnFaseMudou`, `OnSelado`, `OnColapso`); `PularPara` para depuração |
+| Core | `ExposicaoAoRei`, `ModificadoresDoRito`, `ParametrosDoRito`, `RitoDoRei` (ids) | a tabela da regra e os números |
+| Core | `OlharDoRei`, `FragmentosDaPeca`, `VerboDoRei` | as mecânicas das fases 2, 3 e 4 |
+| Core | `LinhaDeVisao`, `CaixaDeCobertura` | o segmento contra a pegada |
+| Runtime | `ReiEmAmareloAI` | mede o mundo por quadro, entrega ao Core, aplica na mente, traduz eventos em cena |
+| Runtime | `CoberturaDoTrono`, `AltarDeSelamento`, `PontoFocalDeReliquia` | Nobre, Altar, altar de fragmento |
+| Runtime | `SinaisDoOlhar`, `TelaDoRito`, `ConfiguracaoDoRito` | fio + farol, barra + vinheta, números no Inspector |
+| Runtime | `ResilienciaBridge.SofrerDrenoContinuo` | dreno por quadro **sem mitigação** — a `MitigacaoDeDano` por fatia esmagaria o olhar conforme o equipamento |
+| Editor | `MontarORitoDoOlhar` | monta a sala e limpa o prefab do Rei |
+| Editor | `CarcosaDebuggerWindow` | iniciar o rito, **pular para a fase N**, estado ao vivo |
 
-## Infraestrutura de teste (2026-08-11)
+O Rei **perdeu** `IDanificavel`, `Vitalidade`, hurtbox, barra de vida, `IFonteDeEspolio`,
+`DropAoAbater` e `ExposicaoAoAbater` (decisão D3: selá-lo termina o jogo; o espólio caía na
+tela do desfecho). As três armas T3 ficaram **sem fonte, declaradas** em
+`ArmaAlcancavelTests.SemFonteAinda`; o `Drop_ReiEmAmarelo` fica guardado.
 
-Sem a Coroa de Ossos jogável, não havia como testar o rito de ponta a ponta dentro do fluxo
-real do jogo. Duas ferramentas resolvem isso **sem fabricar uma fonte de drop que não
-existe**:
+## Testes
 
-- **`CarcosaDebuggerWindow`** (`Tools/FavelaAmarela/Carcosa Debugger`, primeira `EditorWindow`
-  do projeto, Play-Mode-only): concede os 4 artefatos (inclui a Coroa), concede+equipa as 3
-  armas da Tumba, invoca Byakhee e Rei em Amarelo sob demanda (o corpo é montado em runtime —
-  nenhum dos dois tem prefab ainda), e mostra o estado ao vivo da FSM de qualquer um dos dois
-  chefes presentes na cena.
-- **`Cena_ArenaDeTestes`** (`Tools/FavelaAmarela/Montar Arena de Testes`): chão neutro,
-  `GameManager`, Damião, câmera isométrica e HUD completo. Cena de dev, **deliberadamente fora
-  do Build Settings** — nunca vai para um build de jogador.
-
-## Prefab e sprite emprestado (2026-08-12)
-
-`ReiEmAmarelo.prefab` existe (`Tools/FavelaAmarela/Montar Prefab do Rei em Amarelo`), com
-`ReiEmAmarelo_Placeholder.png` — um frame isolado (recorte por canal alfa, sem redesenho) do
-spritesheet "Necromancer" já presente na Inbox desde a rodada anterior. Não é a arte final
-(cores erradas, sem a Máscara Pálida), mas é o mesmo arquétipo visual — figura encapuzada e
-sinistra com cajado — e tira o Rei do quadrado colorido. O `CarcosaDebuggerWindow` agora
-instancia este prefab ao invocar o Rei, com o corpo construído em runtime como fallback só se
-o prefab for removido.
+- `RitoDoReiTests` (21) e `ORitoCabeNoTempoTests` (4) — o Core e a simulação.
+- `LinhaDeVisaoTests` (7) — o segmento contra a caixa, quinas e paralelas.
+- `OTronoDoOlharTests` (7, cena) — as seis regras de geometria do plano, com a mesma conta do
+  jogo: Altar visto, sombra a ≤ 11 un, sombra que cabe o Damião, fragmentos vistos, ordem do
+  Verbo, entrada livre — e a ligação do Rei.
+- `OTronoCabeNaSalaTests` — pés do Rei no chão (pelo olho, não pelo pivô), corpo na sala, escala.
+- `ORitoDoOlharTests` (PlayMode, cena real) — linha de visão segue os Nobres, mente paga e se
+  ancora, Nobre desfeito expõe; e as cinco fases até o selamento (farol, fragmento, Verbo, Eco,
+  `OnVitoria`).
 
 ## Pendente
-- **Arte final** — cores certas (amarelo/pálido), a Máscara Pálida.
-- **O Trono de Aldebaran em cena de verdade** — o Castelo (item 11) ainda não existe.
-- **Fonte jogável para a Coroa de Ossos** — depende do Templo da Serpente/Nagaraja terem cena.
-- Trocar a lista de relíquias exigidas de `ReiEmAmareloAI` de 3 para as 4 reais assim que a
-  Coroa tiver fonte.
-- Calibrar ciclos/intervalo do selamento na Arena de Testes com playtest real.
+
+- **O Vini jogar.** A regra central (Fase 1) é a que decide se o resto vale; os números são de
+  simulação.
+- Falas finais e som próprio (a Canção de Cassilda, a voz do Verbo) — hoje o rito usa
+  `EntrouEmPanico` e `ItemRecolhido`.
+- O Eco aparece "nas costas" pela `LookDirection` — cosmético; a regra dele é imobilidade.
+- A caixa de fala do HUD cobre metade da tela; as falas do rito ficam 3,5–4,5 s por isso.
+
+## Histórico
+
+- **2026-08-11 → 2026-09-10:** ritual de relíquias (botão E nos pontos focais) + selamento em
+  ciclos de reação: estar de costas (`DetectorDeCostas`), depois dentro de um escudo
+  (`EscudoDeReliquia`, elipse `AbrigoDeReliquia` — hoje reaproveitada pelo Altar). Em 10/09
+  ganhou o Confronto (o Rei sangrava entre desvelos). Reprovada por ser um laço só, repetido de
+  5 a 8 vezes. Código, ferramentas (`AbrigosDoTrono`, `ConfrontoDoRei`) e testes
+  (`ReiEmAmareloFSMTests`, `OConfrontoDoReiTests`, `OAltarResponde`) removidos em 2026-09-28.
+- **Arte:** Sucart (*Moonstone Keeper*), 5 clipes sem ataque — crédito obrigatório, já na tela de
+  Créditos (`AnimacaoDoReiEmAmareloTests` guarda a licença).
+- **A Coroa de Ossos** não pesa no rito; continua sem fonte jogável (Templo fora do VS).
 
 ## Relacionados
-- [Boss Byakhee](boss_byakhee.md) — o outro chefe do VS; contraste DPS-simulável vs. reação pura
-- [Artefatos](artefatos.md) — os 4 slots e a regra "só vale o que está equipado"
-- [Interação com o Mundo (botão E)](interacao.md) — o contrato `IInteragivel` que `PontoFocalDeReliquia` implementa
-- [Resiliência Mental](resiliencia_mental.md) — o recurso que o Colapso zera
+- [O Rito do Olhar — plano](dossie_luta_do_rei.md) — o raciocínio, as decisões D1–D3, os riscos
+- [Level design do Castelo](level_design_castelo_carcosa.md) — a Z5 original
+- [Artefatos](artefatos.md) — "só vale o que está equipado"
+- [Resiliência Mental](resiliencia_mental.md) — a barra que decide a luta
+- [Renderização isométrica](renderizacao_isometrica.md) — o dither de oclusão
+- [Companheiro Mi-Go](companheiro_mi_go.md) — o Abdul obrigatório

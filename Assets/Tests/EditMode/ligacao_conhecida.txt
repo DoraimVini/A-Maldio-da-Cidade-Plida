@@ -36,7 +36,6 @@ divida metodo PlayerMovement.MascararOdor | A Coisa do Cemitério caça por FARO
 
 # ── EVENTOS ──────────────────────────────────────────────────────────────────
 
-ok evento ReiEmAmareloFSM.OnColapso | O Colapso já é aplicado por HandleEstadoMudou na transição de estado (ReiEmAmareloAI:232). O evento é o mesmo fato por outro canal.
 
 divida evento ByakheeFSM.OnLevantouVoo | Sem som nem aviso quando o chefe alça voo.
 divida evento ByakheeFSM.OnPousou | Sem som nem aviso no pouso — que é a abertura da fase 3, a janela de ataque.

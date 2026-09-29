@@ -302,9 +302,12 @@ namespace FavelaAmarela.Tests.EditMode
                                "Mental sem aparecer na tela");
             }
 
-            Assert.AreEqual(2, encontrados,
-                $"Esperava 2 EcoDeCarcosa no Castelo e achei {encontrados}. Ou a Biblioteca " +
-                "perdeu um, ou o componente foi renomeado e este guarda parou de guardar.");
+            // Dois na Biblioteca (Z3) e, desde o Rito do Olhar (2026-09-28), o Eco da Queda no
+            // Trono (Z5), que o Rei liga na Fase 5.
+            Assert.AreEqual(3, encontrados,
+                $"Esperava 3 EcoDeCarcosa no Castelo (2 na Biblioteca, 1 no Trono) e achei " +
+                $"{encontrados}. Ou algum sumiu, ou o componente foi renomeado e este guarda " +
+                "parou de guardar.");
 
             Assert.IsEmpty(falhas,
                 string.Join("\n  ", falhas) +

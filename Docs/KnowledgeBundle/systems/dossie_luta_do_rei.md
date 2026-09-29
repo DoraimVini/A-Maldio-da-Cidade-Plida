@@ -7,7 +7,21 @@ tags: [boss, rei-em-amarelo, castelo, final, plano, redesenho]
 
 # Plano de implementação — O Rito do Olhar
 
-> **Estado:** plano, sem código. Substitui a luta reprovada no playtest de 2026-09-10
+> **Estado (2026-09-28, fim do dia): IMPLEMENTADO.** O estado atual, com os números que
+> valem, está em [boss_rei_em_amarelo.md](boss_rei_em_amarelo.md). Este plano fica como registro
+> do raciocínio. **Onde a implementação divergiu dele:**
+>
+> | Plano | Implementado | Por quê |
+> |---|---|---|
+> | Marcos 15/35/60/90; Verbo a cada 6 s, −10 RM; dreno 6→9 | Marcos **20/40/65/90**; Verbo a cada **8 s, −8 RM**; dreno 6/7/8/8; o último Nobre resiste | com os números do plano o jogador simulado **colapsava na Fase 4** (`ORitoCabeNoTempoTests`) |
+> | Mover o Rei para ~(0 ; 68) (D1) | O Rei **não se move** | os pés da figura já estão em (0,1 ; 66,7); o "(4 ; 61,7)" era o pivô do quadro. Em 68 os pés sairiam do chão |
+> | `Physics2D.Linecast` com camada de cobertura | `LinhaDeVisao` (segmento contra a pegada, geometria pura) | mesma resposta em PlayMode, EditMode e no guarda que lê a cena parada; sem camada nova na TagManager |
+> | Três Ecos na Fase 5 | **Um** Eco | os três se manifestariam no mesmo lugar (nas costas do Damião): o triplo do dreno, nenhuma leitura nova |
+> | Barra do selo da família `BarraAnimada`; vinheta pelo `TempestadeVisualOverlay` | `TelaDoRito`, montada em código | o overlay da tempestade pinta a tela inteira; a vinheta precisa do centro limpo |
+> | O Anel fica em (0 ; 59,8) ou vai para (0 ; 57) | Necronomicon e Patuá **ao lado do Rei** (±5,5 ; 66), Anel em (0 ; 57,3) | saiu da busca de layout contra as regras do §6.2 — nas posições antigas os Nobres cobriam os fragmentos |
+> | — | A câmera **sobe 2,2 un** durante o rito | a vista do Castelo tem 8,4 un de altura; com o Damião no Altar os pés do Rei ficavam fora do quadro |
+>
+> **Plano original, preservado abaixo:** substitui a luta reprovada no playtest de 2026-09-10
 > (*"Eu detestei a luta contra o Rei, está muito repetitiva"*). A fotografia completa da luta
 > antiga — números, testes, histórico — está no commit `9dc607d4` deste mesmo arquivo; o que
 > importa dela está resumido no §12.

@@ -75,6 +75,12 @@ namespace FavelaAmarela.Tests.PlayMode
             // sem ele o GameLoopBootstrap loga um Error na carga e o runner reprova o teste
             // por "unhandled log message" — sem relação com o que se mede aqui.
             FavelaAmarela.Runtime.UI.HUDController.GarantirInstancia();
+
+            // O save real do jogador vem junto (o GerenciadorDeSave lê o disco no Awake): com os
+            // Portões abertos numa partida de verdade, a arena nasce resolvida e a passagem
+            // acesa — e este teste media a partida do Vini, não a cena. Reprovou assim em
+            // 2026-09-28, sem nenhuma mudança na cena.
+            FavelaAmarela.Runtime.Persistencia.GerenciadorDeSave.Instancia?.LimparRegistro();
             yield return SceneManager.LoadSceneAsync(Cena, LoadSceneMode.Single);
             yield return null;
 

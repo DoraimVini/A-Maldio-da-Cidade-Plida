@@ -30,7 +30,10 @@ namespace FavelaAmarela.Tests.EditMode
         /// sem razão, não.
         /// </summary>
         /// <remarks>
-        /// <b>Vazia desde 2026-09-01, e isso é a notícia.</b> As três armas T3 (Alfanje do Rei,
+        /// <b>2026-09-28: as três T3 voltaram para cá</b>, com o Rito do Olhar — o Rei deixou de
+        /// largar espólio (decisão D3). O histórico abaixo fica como estava.
+        ///
+        /// <para><b>Vazia de 2026-09-01 a 2026-09-28.</b></para> As três armas T3 (Alfanje do Rei,
         /// Maça do Sinal Amarelo, Estilete da Máscara Pálida) ficaram aqui declaradas como
         /// inalcançáveis com uma razão real: <i>"o Rei em Amarelo é SELADO por rito, não abatido
         /// — ele não dispara OnAbatido, então não larga espólio pelo caminho normal"</i>.
@@ -47,6 +50,22 @@ namespace FavelaAmarela.Tests.EditMode
         /// </remarks>
         private static readonly (string Id, string Porque)[] SemFonteAinda =
         {
+            // 2026-09-28, Rito do Olhar (decisão D3 do plano): o Rei é selado e o jogo volta ao
+            // Menu 5 s depois. O espólio caía na tela do desfecho, onde ninguém podia usá-lo —
+            // era fonte no papel. O Drop_ReiEmAmarelo fica no projeto para quando houver um
+            // "depois do Rei" (ver TabelasSemConsumidor).
+            ("Item_Arma_AlfanjeDoRei", "o Rei não larga espólio desde o Rito do Olhar (D3)"),
+            ("Item_Arma_MacaDoSinalAmarelo", "o Rei não larga espólio desde o Rito do Olhar (D3)"),
+            ("Item_Arma_EstileteDaMascaraPalida", "o Rei não larga espólio desde o Rito do Olhar (D3)"),
+        };
+
+        /// <summary>
+        /// Tabelas guardadas que nada consulta, e por quê. Não contam como fonte: tabela que
+        /// ninguém rola não entrega arma a ninguém.
+        /// </summary>
+        private static readonly (string Nome, string Porque)[] TabelasSemConsumidor =
+        {
+            ("Drop_ReiEmAmarelo", "o Rei perdeu o DropAoAbater no Rito do Olhar (D3); guardada para uso futuro"),
         };
 
         private static ItemDef[] ArmasAutoradas() =>
@@ -65,7 +84,8 @@ namespace FavelaAmarela.Tests.EditMode
             foreach (var tabela in AssetDatabase.FindAssets("t:TabelaDeDrop")
                          .Select(AssetDatabase.GUIDToAssetPath)
                          .Select(AssetDatabase.LoadAssetAtPath<TabelaDeDrop>)
-                         .Where(t => t != null))
+                         .Where(t => t != null)
+                         .Where(t => TabelasSemConsumidor.All(x => x.Nome != t.name)))
             {
                 foreach (var c in tabela.ProjetarCandidatos())
                     ids.Add(c.ItemDefId);
@@ -143,70 +163,21 @@ namespace FavelaAmarela.Tests.EditMode
         }
 
         /// <summary>
-        /// O <b>último degrau</b> tem de cair no desfecho. Antes de 2026-09-01 o Rei em Amarelo
-        /// era o único confronto do Vertical Slice que largava <b>zero</b> equipamento — ele não
-        /// é <c>EnemyBase</c> nem <c>IDanificavel</c> (não tem barra de vida, por design), e
-        /// ficava de fora do espólio por construção.
+        /// <b>O Rei não larga espólio</b> (decisão D3 do Rito do Olhar, 2026-09-28): selá-lo
+        /// termina o jogo, e o que caísse ali ficaria na tela do desfecho. Guarda contra alguém
+        /// religar o <c>DropAoAbater</c> por reflexo — o Rei nem implementa mais
+        /// <c>IFonteDeEspolio</c>, e o componente reclamaria em todo Awake.
         /// </summary>
         [Test]
-        public void OUltimoDegrau_CaiAoSelarORei()
-        {
-            var rei = AssetDatabase.LoadAssetAtPath<TabelaDeDrop>(
-                "Assets/FavelaAmarela/Config/Drops/Drop_ReiEmAmarelo.asset");
-
-            Assert.IsNotNull(rei, "Drop_ReiEmAmarelo não existe — o desfecho voltou a não " +
-                                  "largar nada.");
-
-            var candidatos = rei.ProjetarCandidatos();
-            var ids = candidatos.Select(x => x.ItemDefId).ToHashSet();
-
-            var t3 = new[]
-            {
-                "Item_Arma_AlfanjeDoRei",
-                "Item_Arma_MacaDoSinalAmarelo",
-                "Item_Arma_EstileteDaMascaraPalida",
-            };
-
-            var faltando = t3.Where(i => !ids.Contains(i)).ToList();
-
-            Assert.IsEmpty(faltando,
-                "O Rei deixou de largar T3: " + string.Join(", ", faltando));
-
-            // GARANTIDO, e não sorteado. O Rei é selado UMA vez e a cena acaba: sorteio só é
-            // justo quando se repete, porque só aí o azar tem como ser corrigido jogando.
-            var sorteadas = candidatos
-                .Where(x => t3.Contains(x.ItemDefId) && !x.Garantido)
-                .Select(x => x.ItemDefId)
-                .ToList();
-
-            Assert.IsEmpty(sorteadas,
-                "Arma(s) T3 dependendo de sorte no Rei: " + string.Join(", ", sorteadas) +
-                Environment.NewLine + "O rito acontece uma vez só — quem tiver azar fica sem, " +
-                "e não existe segunda tentativa para corrigir.");
-        }
-
-        /// <summary>
-        /// E a tabela precisa estar <b>ligada</b> ao prefab. Criar tabela não é ligar tabela —
-        /// o <c>Drop_Abdul</c> passou um mês inteiro apontando para nada.
-        /// </summary>
-        [Test]
-        public void OReiTemODropAoAbaterLigado()
+        public void ORei_NaoLargaEspolio()
         {
             const string caminho = "Assets/FavelaAmarela/Art/Enemies/ReiEmAmarelo.prefab";
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(caminho);
 
             Assert.IsNotNull(prefab, $"Prefab ausente: {caminho}");
-
-            var drop = prefab.GetComponentInChildren<FavelaAmarela.Runtime.Itens.DropAoAbater>(true);
-
-            Assert.IsNotNull(drop,
-                "O prefab do Rei não tem DropAoAbater: a tabela existe e nada a consulta.");
-
-            var so = new UnityEditor.SerializedObject(drop);
-            var tabela = so.FindProperty("tabela");
-
-            Assert.IsNotNull(tabela?.objectReferenceValue,
-                "O DropAoAbater do Rei está sem tabela — o componente existe e não entrega nada.");
+            Assert.IsNull(prefab.GetComponentInChildren<FavelaAmarela.Runtime.Itens.DropAoAbater>(true),
+                "O prefab do Rei voltou a ter DropAoAbater. O Rei é selado e o jogo termina — " +
+                "se isso mudou, mude também a decisão D3 no plano do Rito do Olhar.");
         }
     }
 }

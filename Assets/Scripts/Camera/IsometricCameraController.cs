@@ -298,7 +298,7 @@ namespace FavelaAmarela.CameraSystem
             float meiaAltura = cam != null ? cam.orthographicSize : 0f;
             float meiaLargura = cam != null ? meiaAltura * cam.aspect : 0f;
 
-            Vector2 alvo = (Vector2)target.position + _antecipacaoAtual;
+            Vector2 alvo = (Vector2)target.position + _antecipacaoAtual + DeslocamentoDeEnquadramento;
 
             // ── zona morta: passo curto não arrasta a câmera ──
             alvo = EnquadramentoDaCamera.AlvoComZonaMorta(
@@ -441,6 +441,18 @@ namespace FavelaAmarela.CameraSystem
 
             if (cam != null) cam.orthographicSize = orthographicSize;
         }
+
+        /// <summary>
+        /// Desloca o ponto que a câmera segue, em unidades de mundo, sem trocar o alvo. Quem
+        /// liga desliga (volta a <c>Vector2.zero</c>); a suavização é a mesma do seguimento.
+        ///
+        /// <para><b>Por que existe (2026-09-28):</b> no Trono o Rei fica ao fundo, e com o Damião
+        /// no centro da vista os pés dele ficam fora do quadro — o olhar que decide a luta vinha
+        /// de fora da tela. O Rito do Olhar desloca a vista para cima enquanto corre, e o Damião
+        /// desce para o terço de baixo. Não é zoom: o <c>orthographicSize</c> continua o da
+        /// <c>PixelPerfectCamera</c>.</para>
+        /// </summary>
+        public Vector2 DeslocamentoDeEnquadramento { get; set; }
 
         /// <summary>
         /// Sets a new target for the camera to follow.

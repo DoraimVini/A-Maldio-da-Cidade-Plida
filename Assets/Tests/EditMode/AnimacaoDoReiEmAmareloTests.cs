@@ -125,9 +125,14 @@ namespace FavelaAmarela.Tests.EditMode
             Assert.IsTrue(codigo.Contains("animator.Play("),
                 "ReiEmAmareloAI não chama animator.Play.");
 
-            Assert.IsTrue(codigo.Contains("OnReliquiaAtivada"),
-                "O AI não assina OnReliquiaAtivada — o Rei não daria retorno visual nenhum ao " +
-                "travar uma relíquia, e o jogador não saberia que a ação surtiu efeito.");
+            // Desde o Rito do Olhar (2026-09-28): um clipe por transição de fase (plano, §7.4).
+            // A troca de fase é o único retorno visual de que o selo passou um marco — sem ela a
+            // luta muda de regra sem o Rei mexer um dedo.
+            Assert.IsTrue(codigo.Contains("OnFaseMudou"),
+                "O AI não assina OnFaseMudou — o Rei não reagiria às fases do rito.");
+            foreach (var clipe in new[] { "Anim.Selar", "Anim.Dano", "Anim.Desvelo", "Anim.Queda" })
+                Assert.IsTrue(codigo.Contains(clipe),
+                    $"O AI não toca {clipe} — alguma transição do rito ficaria sem animação.");
         }
 
         /// <summary>
