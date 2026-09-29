@@ -47,7 +47,7 @@ namespace FavelaAmarela.EditorTools
         /// </summary>
         private static readonly HashSet<string> Paineis = new HashSet<string>
         {
-            "PainelDeFicha", "PainelDeInventario", "PainelDeEscolha", "Painel_Escolha",
+            "Detalhe", "PainelDeInventario", "PainelDeEscolha", "Painel_Escolha",
             "Janela", "Painel", "Tela_Pause", "Tela_Colapso", "CaixaDeDialogo",
 
             // Painéis do menu principal, acrescentados em 2026-08-22. Eles CARREGAVAM a

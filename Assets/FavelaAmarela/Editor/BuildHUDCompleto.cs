@@ -89,14 +89,9 @@ namespace FavelaAmarela.EditorTools
             // que já se auto-ligam no HUDController — ver MontarBarraDeItens.MontarNaCenaAberta.
             // Idempotentes, então chamar de novo numa cena que já as tem não duplica nada.
             MontarBarraDeItens.MontarNaCenaAberta();
+            // O painel já nasce com a coluna de detalhe (PainelDoItem), que substituiu a antiga
+            // PainelDeFicha em 2026-09-28 — não há mais segunda peça para remontar depois.
             MontarPainelDeInventario.MontarNaCenaAberta();
-
-            // DEPOIS do inventário, e não antes: o PainelDeFicha vive dentro da 'Janela', que é
-            // filha do PainelDeInventario — e MontarNaCenaAberta DESTRÓI o PainelDeInventario
-            // inteiro para refazer. Sem esta linha, rodar este montador apagava a ficha das
-            // cenas que já a tinham, calado. Foi o que aconteceu em 2026-08-20; quem pegou foi
-            // o PainelDeFichaNoMundoTests, não o log.
-            BuildPainelDeFicha.Montar();
 
             // A caixa de dialogo tambem vive neste canvas e tambem estava dimensionada para
             // 640x360. Encadear aqui evita o que aconteceu em 2026-08-20: rodar o HUD, achar

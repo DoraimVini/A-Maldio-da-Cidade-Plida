@@ -83,6 +83,32 @@ namespace FavelaAmarela.Tests.EditMode
             return a;
         }
 
+        // ── Só o que se veste rola ───────────────────────────────────────────
+
+        /// <summary>
+        /// Consumível não rola grau nem afixo (2026-09-28). A legalidade do afixo é por slot, e
+        /// os sem restrição aceitavam o slot "Nenhum" do consumível — a tela nova do inventário
+        /// mostrou uma "Afiado Erva de Ancoragem".
+        /// </summary>
+        [Test]
+        public void Consumivel_NaoRolaAfixo_NemGrau()
+        {
+            var erva = Base(EquipmentSlot.Nenhum);
+            erva.Tipo = ItemType.Consumivel;
+
+            var item = new GeradorDeItem().Gerar(
+                erva, GrauDeImpregnacao.Impregnado, 3,
+                new[]
+                {
+                    Afixo("p", TipoDeAfixo.Prefixo, StatType.ChanceCritica, 2f, 6f),
+                    Afixo("s", TipoDeAfixo.Sufixo, StatType.DefesaFisica, 2f, 2f),
+                },
+                new FonteFake(0.5f));
+
+            Assert.IsEmpty(item.Afixos, "Uma erva não carrega Chance Crítica.");
+            Assert.AreEqual(GrauDeImpregnacao.Inerte, item.Grau);
+        }
+
         // ── Grau decide quantos afixos ────────────────────────────────────────
 
         [Test]

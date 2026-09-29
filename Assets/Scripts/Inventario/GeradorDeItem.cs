@@ -46,6 +46,17 @@ namespace FavelaAmarela.Inventario
                 NivelDoItem = nivelDoItem < 1 ? 1 : nivelDoItem,
             };
 
+            // SÓ O QUE SE VESTE rola grau e afixo (2026-09-28). A legalidade do afixo é por slot,
+            // e consumível tem slot "Nenhum" — que os afixos sem restrição aceitavam: a tela nova
+            // do inventário mostrou uma "Afiado Erva de Ancoragem" (+Chance Crítica numa erva).
+            // O bônus nunca valia (só o corpo conta), mas o nome mentia e a pilha deixava de
+            // empilhar com a erva comum.
+            if (!DescricaoDeItem.SeVeste(baseDoItem))
+            {
+                item.Grau = GrauDeImpregnacao.Inerte;
+                return item;
+            }
+
             if (!RegrasDeGrau.PodeSerGerado(grau)) return item;
             if (pool == null || pool.Count == 0 || fonte == null) return item;
 

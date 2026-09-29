@@ -4,6 +4,48 @@ title: Log de Atualizações do Knowledge Bundle
 description: Histórico cronológico de mudanças na base de conhecimento
 ---
 
+## 2026-09-28 — Inventário, plano B: a tela descreve o item; e três defeitos de item que ela expôs
+
+O Vini: *"Quando você acabar com essa parte, ataque o inventário."* Capturado em Play antes: a
+ficha de atributos pendurada fora da borda direita da janela (âncora x = 1), uma palavra por
+linha, por cima das linhas do Corpo e da dica de fechar; escolher um item não dizia nada sobre ele.
+
+**A tela** (`MontarPainelDeInventario.MontarNoHud`, dentro do `HUD_Gameplay.prefab`):
+- Mochila em `GridLayoutGroup` 4 × 3, Corpo em `VerticalLayoutGroup`, e a coluna nova
+  **Detalhe** (`PainelDoItem`): nome na cor do grau, tipo/mãos/nível/grau, descrição, dano,
+  crítico, precisão, afixos somados, e **"No lugar de …"** com ganho em verde e perda em vermelho.
+  Sem escolha, o Damião (Vitalidade, Defesa, bônus dos itens). Texto composto por
+  `DescricaoDeItem` (sem Unity, testado).
+- **Recusas com motivo** (`RecusaAoEquipar`, `RecusaAoDesequipar`), na coluna de detalhe — não
+  mais na caixa de fala, que pode ficar por baixo da janela. O descarte também pergunta ali.
+- **Conserto:** `Desequipar` com a mochila cheia destruía o item (tirava do corpo, não cabia,
+  "dropado no chão" com um TODO). Agora recusa.
+- A `PainelDeFicha` saiu da tela do jogador (e `BuildPainelDeFicha`, e o guarda já ignorado);
+  o diagnóstico "SEM EFEITO PASSIVO" foi para o Carcosa Debugger. Atributo sem consumidor aparece
+  ao jogador como "(adormecido)".
+- Padding do Detalhe medido na captura: com 32 px o título e a dica entravam debaixo dos cantos
+  ornados; 44/58.
+
+**Os três defeitos que a tela expôs:**
+1. **Afixos percentuais 100× fracos.** Chance Crítica, Dano Crítico, Precisão e Dano Físico são
+   percentuais desde 28/08 (a `MaoFisicaBridge` divide por 100); Afiado, Certeiro, da Fúria e do
+   Augúrio foram autorados em fração em 01/09. Assets × 100 (pelo Editor); save antigo corrigido na
+   carga (`NomesDeAtributo.CorrigirPercentualAntigo`, em `ItemSlotData.ParaInstancia`). O Capuz
+   do Vini passou de "+0,03" para "+2,9% Chance Crítica".
+2. **Consumível rolava afixo** ("Afiado Erva de Ancoragem"): a legalidade é por slot e o slot
+   "Nenhum" passava. `GeradorDeItem` só dá grau e afixo a quem se veste; o save limpa os antigos.
+3. **`afixo_do_peregrino_firme` era prefixo** — o nome saía "do Peregrino Firme Alfanje…". Virou
+   sufixo; guarda `RotuloComPreposicao_ESufixo`.
+
+`NomesDeAtributo.Linha` escreve "+3% Chance Crítica"; `ItemInstance.LinhasDeAfixo` passa por ela.
+
+**Guardas:** `DescricaoDeItemTests` (12), `RecusasDoInventarioTests` (5),
+`GeradorDeItemTests.Consumivel_NaoRolaAfixo_NemGrau`, `ATelaDoInventarioTests` (PlayMode, 3).
+Atualizados: `AtributosConsumidosTests` (fonte única em `NomesDeAtributo.SemEfeito`),
+`BootstrapDeCenaTests` (bind do `PainelDoItem`).
+
+**EditMode: 1189 testes, 1172 passam, 0 reprovam, 17 pulados. PlayMode: 82/82.**
+
 ## 2026-09-28 — O Rito do Olhar: a luta do Rei refeita; o Abdul obrigatório
 
 O Vini, depois de jogar a luta dos escudos: *"porra quantas vezes essa porra dessa luta do rei se

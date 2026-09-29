@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: afixo_do_peregrino_firme
   m_EditorClassIdentifier: FavelaAmarela.Runtime::FavelaAmarela.Inventario.AfixoDef
   Id: afixo_do_peregrino_firme
-  Tipo: 0
+  Tipo: 1
   Rotulo: do Peregrino Firme
   Stat: 0
   ValorMin: 14

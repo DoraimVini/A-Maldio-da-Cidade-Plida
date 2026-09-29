@@ -283,23 +283,25 @@ namespace FavelaAmarela.Tests.EditMode
         ///
         /// <para>Depois que a HUD virou persistente, ligar por Inspector deixou de ser possível
         /// <b>por construção</b>: o Damião troca a cada cena e a HUD não.</para>
+        ///
+        /// <para><b>2026-09-28:</b> a ficha virou o resumo do Damião na coluna de detalhe
+        /// (<c>PainelDoItem</c>); o caminho do bind é o mesmo, pelo mesmo motivo.</para>
         /// </summary>
         [Test]
         public void OBootstrap_LigaAFichaDoInventario()
         {
             string fonte = File.ReadAllText("Assets/Scripts/GameLoop/GameLoopBootstrap.cs");
 
-            StringAssert.Contains("PainelDeFicha", fonte,
-                "O GameLoopBootstrap parou de procurar o PainelDeFicha. Como ele vive num " +
-                "prefab-asset, NÃO existe outro caminho: a ficha volta a abrir vazia.");
+            StringAssert.Contains("FindAnyObjectByType<FavelaAmarela.Runtime.UI.PainelDoItem>", fonte,
+                "O GameLoopBootstrap parou de procurar o PainelDoItem. Como ele vive num " +
+                "prefab-asset, NÃO existe outro caminho: o resumo do Damião volta a abrir vazio.");
 
-            StringAssert.Contains("ficha.Bind(_vitalidadeDamiao)", fonte,
-                "O bind da ficha sumiu. Sem ele o painel abre com 'Ficha indisponível' e o " +
-                "efeito de todo item equipado volta a ser invisível — que é justamente o " +
-                "problema que essa tela existe para expor.");
+            StringAssert.Contains("detalhe.Bind(_vitalidadeDamiao)", fonte,
+                "O bind do resumo do Damião sumiu. Sem ele a coluna de detalhe abre sem a " +
+                "Vitalidade e a Defesa — o efeito dos itens vestidos fica invisível.");
 
             StringAssert.Contains("FindObjectsInactive.Include", fonte,
-                "A busca do PainelDeFicha precisa incluir inativos: ele fica desligado " +
+                "A busca do PainelDoItem precisa incluir inativos: ele fica desligado " +
                 "enquanto a mochila está fechada, que é a maior parte do tempo. Sem isso o " +
                 "bind acha null e falha em silêncio.");
         }

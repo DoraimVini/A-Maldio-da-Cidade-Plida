@@ -40,7 +40,9 @@ namespace FavelaAmarela.EditorTools
             Etapa("Sistemas novos (artefatos, áudio, save, drop)", LigarSistemasNovos.Executar, ref ok, ref falhas);
             Etapa("Telas de fluxo (pause, colapso)", MontarTelasDeFluxo.Executar, ref ok, ref falhas);
             Etapa("Refúgios de Luz (+ pontos de renascimento)", MontarRefugiosDeLuz.Executar, ref ok, ref falhas);
-            Etapa("Painel de inventário (Tab)", MontarPainelDeInventario.Executar, ref ok, ref falhas);
+            // O inventário mora no HUD_Gameplay.prefab desde 2026-08-22; a etapa antiga abria
+            // três cenas que já não o têm.
+            Etapa("Painel de inventário (Tab)", MontarPainelDeInventario.MontarNoHud, ref ok, ref falhas);
             Etapa("Povoar o Deserto de Hali", PovoarODeserto.Executar, ref ok, ref falhas);
 
             AssetDatabase.SaveAssets();

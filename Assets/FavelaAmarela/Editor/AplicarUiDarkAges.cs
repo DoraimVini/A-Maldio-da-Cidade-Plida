@@ -80,11 +80,10 @@ namespace FavelaAmarela.EditorTools
 
         private static readonly Regra[] RegrasDoHud =
         {
-            new Regra("/PainelDeInventario/Janela/PainelDeFicha", "painel_ornado",
-                "a ficha não tinha sprite NENHUM. Quase virou pergaminho — a ficha é leitura, e " +
-                "material diferente separaria as duas metades da janela sem legenda —, mas o " +
-                "texto dela é dourado-pálido (luminância 0,89) e o pergaminho é creme: seria " +
-                "bonito e ilegível. Trocar a cor do texto é decisão de design, não conserto"),
+            new Regra("/PainelDeInventario/Janela/Detalhe", "painel_ornado",
+                "a coluna do item escolhido (antes, a ficha — que não tinha sprite NENHUM). " +
+                "Painel ornado e não pergaminho: o texto é dourado-pálido (luminância 0,89) e o " +
+                "pergaminho é creme — seria bonito e ilegível"),
 
             new Regra("/CaixaDeDialogo", "painel_ornado",
                 "a caixa onde TODA conversa do jogo acontece estava no retângulo branco padrão " +

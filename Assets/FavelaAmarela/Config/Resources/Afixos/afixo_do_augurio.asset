@@ -16,8 +16,8 @@ MonoBehaviour:
   Tipo: 1
   Rotulo: "do Aug\xFArio"
   Stat: 16
-  ValorMin: 0.1
-  ValorMax: 0.35
+  ValorMin: 10
+  ValorMax: 35
   EscalaComONivelDoItem: 0
   NivelMinimoDoItem: 3
   Peso: 0.7

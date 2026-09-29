@@ -69,7 +69,21 @@ namespace FavelaAmarela.Inventario
 
             if (afixos != null)
                 foreach (var a in afixos)
-                    if (a != null) item.Afixos.Add(new AfixoRolado(a.AfixoId, a.Stat, a.Valor));
+                    // A correção dos percentuais gravados em fração (2026-09-28) mora aqui,
+                    // na única porta do save para o jogo: mochila e corpo passam os dois por ela.
+                    if (a != null)
+                        item.Afixos.Add(new AfixoRolado(a.AfixoId, a.Stat,
+                            NomesDeAtributo.CorrigirPercentualAntigo(a.Stat, a.Valor)));
+
+            // Consumível, achado e Artefato não rolam afixo desde 2026-09-28 (GeradorDeItem);
+            // os que rolaram antes voltam comuns — e voltam a empilhar com os iguais.
+            // Sem catálogo (teste de save puro) não há como saber o tipo; o item fica como veio.
+            var def = ItemDatabase.Instance != null ? item.Def : null;
+            if (def != null && !DescricaoDeItem.SeVeste(def))
+            {
+                item.Afixos.Clear();
+                item.Grau = GrauDeImpregnacao.Inerte;
+            }
 
             return item;
         }

@@ -8,140 +8,261 @@ using FavelaAmarela.Runtime.UI;
 namespace FavelaAmarela.EditorTools
 {
     /// <summary>
-    /// Ferramenta de Editor. Monta a <b>tela de inventário</b> — mochila em grade + slots do
-    /// corpo em coluna — e a liga ao <see cref="PainelDeInventario"/>.
+    /// Ferramenta de Editor. Monta a <b>tela de inventário</b> em três colunas — Mochila em
+    /// grade, Corpo em lista, e o <see cref="PainelDoItem"/> (o item escolhido, ou o Damião) — e
+    /// a liga ao <see cref="PainelDeInventario"/>.
     ///
-    /// <para>Até 2026-08-11 o jogo só tinha a barra de 8 posições; os slots de equipamento
-    /// não tinham interface nenhuma. Esta tela abre com <b>Tab</b> ou <b>I</b>.</para>
+    /// <para><b>O plano B do inventário (2026-09-28).</b> A versão anterior posicionava cada casa
+    /// por âncora calculada à mão e pendurava a ficha de atributos fora da borda direita da
+    /// janela (âncora x = 1): ela quebrava linha a cada palavra, cobria as linhas do Corpo e a
+    /// dica de fechar. Agora a grade é um <c>GridLayoutGroup</c>, o Corpo um
+    /// <c>VerticalLayoutGroup</c>, e o texto do detalhe se empilha sozinho — mudar um tamanho
+    /// deixou de exigir refazer contas de âncora.</para>
     ///
-    /// <para>Idempotente: refaz do zero a cada execução, para ajuste de layout valer sem
-    /// sobrar slot velho.</para>
+    /// <para><b>Onde roda.</b> O HUD é o <c>Resources/HUD_Gameplay.prefab</c>, persistente
+    /// desde 2026-08-22; <see cref="MontarNoHud"/> reconstrói só o interior do painel dentro
+    /// dele, preservando a raiz (que o <c>HUDController</c> referencia) e as artes de moldura.
+    /// <see cref="MontarNaCenaAberta"/> continua servindo ao <c>BuildHUDCompleto</c>.</para>
+    ///
+    /// <para>Idempotente: refaz a <c>Janela</c> do zero a cada execução. Os caminhos
+    /// <c>Janela/Mochila/Slot_N</c> e <c>Janela/Corpo/Corpo_N</c> são os que as regras do
+    /// <c>AplicarUiDarkAges</c> esperam — não os renomeie sem elas.</para>
     /// </summary>
     public static class MontarPainelDeInventario
     {
-        private static readonly string[] Cenas =
-        {
-            "Assets/Scenes/Deserto_Hali.unity",
-            "Assets/Scenes/Tumba_De_Alhazred.unity",
-            "Assets/Scenes/Santuario_Yhtill.unity",
-        };
+        private const string Hud = "Assets/FavelaAmarela/Resources/HUD_Gameplay.prefab";
 
         private const int SlotsDaMochila = MainInventory.DefaultCapacidadeSurvivalHorror; // 12
-        private const int SlotsDoCorpo = 7;                                               // anatomia (com Mão Secundária)
+        private const int SlotsDoCorpo = 7;                                               // com a Mão Secundária
         private const int ColunasDaMochila = 4;
 
-        /// <summary>
-        /// Proporção largura/altura de um slot de CORPO, medida na cena: 600 × 81 px num canvas
-        /// de 1920 × 1080 (área de corpo 614 × 778, sete linhas). É o que converte "quero uma
-        /// miniatura quadrada" em âncoras, que são relativas ao slot e portanto anisotrópicas.
-        /// </summary>
-        private const float ProporcaoDaLinhaDeCorpo = 7.37f;
+        private const float LadoDaCasa = 150f;
+        private const float EspacoEntreCasas = 16f;
+        private const float AlturaDaLinhaDoCorpo = 90f;
 
-        [MenuItem("Tools/FavelaAmarela/Montar painel de inventário (Tab)")]
-        public static void Executar()
+        private static readonly Color CorDoTitulo = new Color(0.92f, 0.86f, 0.55f, 0.95f);
+        private static readonly Color CorDoRotulo = new Color(0.85f, 0.80f, 0.60f, 0.75f);
+        private static readonly Color CorDoTexto = new Color(0.93f, 0.89f, 0.78f, 1f);
+        private static readonly Color CorFraca = new Color(0.72f, 0.66f, 0.52f, 0.9f);
+        private static readonly Color CorDoAviso = new Color(0.98f, 0.62f, 0.38f, 1f);
+
+        [MenuItem("Tools/FavelaAmarela/Inventário: montar a tela no HUD")]
+        public static void MontarNoHud()
         {
-            var cenaAtiva = EditorSceneManager.GetActiveScene();
-            if (cenaAtiva.isDirty && !string.IsNullOrEmpty(cenaAtiva.path))
-                EditorSceneManager.SaveScene(cenaAtiva);
-
-            string cenaOriginal = cenaAtiva.path;
-            int feitas = 0;
-
-            foreach (var caminho in Cenas)
+            var raiz = PrefabUtility.LoadPrefabContents(Hud);
+            try
             {
-                if (!System.IO.File.Exists(caminho)) continue;
-
-                var cena = EditorSceneManager.OpenScene(caminho, OpenSceneMode.Single);
-                if (MontarNaCenaAberta())
+                var comp = raiz.GetComponentInChildren<PainelDeInventario>(true);
+                if (comp == null)
                 {
-                    EditorSceneManager.MarkSceneDirty(cena);
-                    EditorSceneManager.SaveScene(cena);
-                    feitas++;
-                    Debug.Log($"[PainelDeInventario] Montado em '{cena.name}'.");
+                    Debug.LogError("[PainelDeInventario] O HUD_Gameplay.prefab não tem PainelDeInventario.");
+                    return;
                 }
+
+                MontarLayout(comp);
+                PrefabUtility.SaveAsPrefabAsset(raiz, Hud);
+                Debug.Log("[PainelDeInventario] Tela montada no HUD_Gameplay.prefab (Mochila, Corpo, Detalhe).");
             }
-
-            if (!string.IsNullOrEmpty(cenaOriginal))
-                EditorSceneManager.OpenScene(cenaOriginal, OpenSceneMode.Single);
-
-            Debug.Log($"[PainelDeInventario] Pronto — {feitas} cena(s). Abre com Tab ou I.");
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(raiz);
+            }
         }
 
         /// <summary>
-        /// Monta o painel na <b>cena já aberta</b>. Público pelo mesmo motivo da
-        /// <c>MontarBarraDeItens.MontarNaCenaAberta</c>: cenas montadas por outras ferramentas
-        /// precisam de HUD completo, não de metade dele.
+        /// Monta o painel na <b>cena já aberta</b> (usado pelo <c>BuildHUDCompleto</c>). Cria a
+        /// raiz se faltar.
         /// </summary>
         public static bool MontarNaCenaAberta()
         {
-            var canvas = Object.FindAnyObjectByType<Canvas>(FindObjectsInactive.Include);
-            if (canvas == null)
+            var comp = Object.FindAnyObjectByType<PainelDeInventario>(FindObjectsInactive.Include);
+            if (comp == null)
             {
-                Debug.LogWarning("[PainelDeInventario] Sem Canvas nesta cena — pulada.");
-                return false;
+                var canvas = Object.FindAnyObjectByType<Canvas>(FindObjectsInactive.Include);
+                if (canvas == null)
+                {
+                    Debug.LogWarning("[PainelDeInventario] Sem Canvas nesta cena — pulada.");
+                    return false;
+                }
+
+                // RectTransform EXPLÍCITO: um `new GameObject(nome)` nasce com Transform comum, e
+                // uma Janela esticada 0..1 dentro dele resolvia para 0×0 — o inventário não
+                // aparecia e TAB parecia "só um pause" (bug de 2026-08).
+                var go = new GameObject("PainelDeInventario", typeof(RectTransform));
+                go.transform.SetParent(canvas.transform, false);
+                Esticar(go.GetComponent<RectTransform>());
+                comp = go.AddComponent<PainelDeInventario>();
             }
 
-            var antigo = GameObject.Find("PainelDeInventario");
-            if (antigo != null) Object.DestroyImmediate(antigo);
-
-            // Raiz do controlador: fica SEMPRE ativa, senão o Update que lê a tecla não roda.
-            // Quem liga/desliga é o filho "Janela".
-            //
-            // RectTransform EXPLÍCITO, e esta linha é o conserto de um bug que custou caro: um
-            // `new GameObject(nome)` nasce com Transform comum, e um RectTransform filho de
-            // Transform comum não tem retângulo de pai onde ancorar — com âncoras 0..1 a Janela
-            // resolvia para 0×0 e o inventário simplesmente não aparecia. Apertar TAB parecia
-            // "só um pause". Os outros montadores de UI escapam por acidente: eles criam a raiz
-            // com `Image`, que exige RectTransform e faz a Unity adicioná-lo. Este era o único
-            // sem Graphic, e por isso o único quebrado.
-            var raiz = new GameObject("PainelDeInventario", typeof(RectTransform));
-            raiz.transform.SetParent(canvas.transform, false);
-
-            var rtRaiz = raiz.GetComponent<RectTransform>();
-            rtRaiz.anchorMin = Vector2.zero;
-            rtRaiz.anchorMax = Vector2.one;
-            rtRaiz.offsetMin = Vector2.zero;
-            rtRaiz.offsetMax = Vector2.zero;
-            var comp = raiz.AddComponent<PainelDeInventario>();
-
-            var janela = MontarJanela(raiz.transform);
-
-            var mochila = new SlotRefs[SlotsDaMochila];
-            var corpo = new SlotRefs[SlotsDoCorpo];
-
-            var areaMochila = MontarArea(janela.transform, "Mochila", "MOCHILA",
-                xMin: 0.06f, xMax: 0.56f);
-            for (int i = 0; i < SlotsDaMochila; i++)
-                mochila[i] = MontarSlot(areaMochila, $"Slot_{i}", i, ColunasDaMochila, SlotsDaMochila, comRotulo: false);
-
-            var areaCorpo = MontarArea(janela.transform, "Corpo", "CORPO",
-                xMin: 0.62f, xMax: 0.94f);
-            for (int i = 0; i < SlotsDoCorpo; i++)
-                corpo[i] = MontarSlot(areaCorpo, $"Corpo_{i}", i, 1, SlotsDoCorpo, comRotulo: true);
-
-            Ligar(comp, janela, mochila, corpo);
+            MontarLayout(comp);
+            EditorSceneManager.MarkSceneDirty(comp.gameObject.scene);
             return true;
         }
 
-        /// <summary>
-        /// Carrega uma moldura fatiada da folha do Dark Ages UI.
-        ///
-        /// <para>Devolve <c>null</c> — e avisa — se a fatia não existir, em vez de estourar: a
-        /// folha precisa ter passado por
-        /// <c>Tools/FavelaAmarela/Fatiar molduras de slot (Dark Ages UI)</c> antes. O painel cai
-        /// no sprite embutido e continua utilizável, só sem a arte.</para>
-        /// </summary>
-        private static Sprite MolduraDeSlot(string nome)
+        /// <summary>Refaz a Janela inteira sob <paramref name="comp"/> e liga tudo.</summary>
+        public static void MontarLayout(PainelDeInventario comp)
         {
-            const string folha = "Assets/ThirdParty/DarkAgesUI/DarkAgesUi_v1.0/32x32-Tilesheet.png";
+            var modeloCasa = CopiarBotao(comp.transform, "Janela/Mochila/Slot_0");
+            var modeloCorpo = CopiarBotao(comp.transform, "Janela/Corpo/Corpo_0");
 
-            foreach (var asset in AssetDatabase.LoadAllAssetsAtPath(folha))
-                if (asset is Sprite sprite && sprite.name == nome) return sprite;
+            var antiga = comp.transform.Find("Janela");
+            if (antiga != null) Object.DestroyImmediate(antiga.gameObject);
 
-            Debug.LogWarning($"[PainelDeInventario] Moldura '{nome}' não está fatiada na folha. " +
-                             "Rode 'Tools/FavelaAmarela/Fatiar molduras de slot (Dark Ages UI)'.");
-            return null;
+            var janela = Novo("Janela", comp.transform, typeof(Image));
+            Esticar(janela);
+            PaletaDaInterface.AplicarPainel(janela.GetComponent<Image>());
+
+            Texto(janela, "Titulo", "INVENTÁRIO", 64, CorDoTitulo, TextAnchor.MiddleLeft,
+                new Vector2(0.05f, 0.885f), new Vector2(0.6f, 0.955f));
+            Texto(janela, "Dica", "Tab / I para fechar", 32, CorFraca, TextAnchor.MiddleRight,
+                new Vector2(0.05f, 0.035f), new Vector2(0.95f, 0.085f));
+
+            Texto(janela, "Rotulo_Mochila", "MOCHILA", 40, CorDoRotulo, TextAnchor.LowerLeft,
+                new Vector2(0.05f, 0.80f), new Vector2(0.40f, 0.85f));
+            var mochila = MontarMochila(janela, modeloCasa);
+
+            Texto(janela, "Rotulo_Corpo", "CORPO", 40, CorDoRotulo, TextAnchor.LowerLeft,
+                new Vector2(0.42f, 0.80f), new Vector2(0.66f, 0.85f));
+            var corpo = MontarCorpo(janela, modeloCorpo);
+
+            var detalhe = MontarDetalhe(janela);
+
+            janela.gameObject.SetActive(false);
+            Ligar(comp, janela.gameObject, mochila, corpo, detalhe);
         }
+
+        // ── Mochila ──────────────────────────────────────────────────────────
+
+        private static SlotRefs[] MontarMochila(RectTransform janela, ModeloDeBotao? modelo)
+        {
+            var area = Novo("Mochila", janela, typeof(GridLayoutGroup));
+            Ancorar(area, new Vector2(0.05f, 0.14f), new Vector2(0.40f, 0.80f));
+
+            var grade = area.GetComponent<GridLayoutGroup>();
+            grade.cellSize = new Vector2(LadoDaCasa, LadoDaCasa);
+            grade.spacing = new Vector2(EspacoEntreCasas, EspacoEntreCasas);
+            grade.startCorner = GridLayoutGroup.Corner.UpperLeft;
+            grade.startAxis = GridLayoutGroup.Axis.Horizontal;
+            grade.childAlignment = TextAnchor.UpperLeft;
+            grade.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grade.constraintCount = ColunasDaMochila;
+
+            var casas = new SlotRefs[SlotsDaMochila];
+            for (int i = 0; i < SlotsDaMochila; i++)
+            {
+                var casa = Casa(area, $"Slot_{i}", MolduraDeSlot("slot_vazio"), modelo);
+
+                var icone = Novo("Icone", casa, typeof(Image));
+                Ancorar(icone, new Vector2(0.16f, 0.16f), new Vector2(0.84f, 0.84f));
+                casas[i] = Refs(casa, icone.GetComponent<Image>());
+                casas[i].Quantidade = Texto(casa, "Quantidade", "", 33, CorDoTexto, TextAnchor.LowerRight,
+                    new Vector2(0.45f, 0.04f), new Vector2(0.92f, 0.4f));
+            }
+            return casas;
+        }
+
+        // ── Corpo ────────────────────────────────────────────────────────────
+
+        private static SlotRefs[] MontarCorpo(RectTransform janela, ModeloDeBotao? modelo)
+        {
+            var area = Novo("Corpo", janela, typeof(VerticalLayoutGroup));
+            Ancorar(area, new Vector2(0.42f, 0.14f), new Vector2(0.66f, 0.80f));
+
+            var lista = area.GetComponent<VerticalLayoutGroup>();
+            lista.spacing = 10f;
+            lista.childAlignment = TextAnchor.UpperLeft;
+            lista.childControlWidth = true;
+            lista.childControlHeight = true;
+            lista.childForceExpandWidth = true;
+            lista.childForceExpandHeight = false;
+
+            var linhas = new SlotRefs[SlotsDoCorpo];
+            for (int i = 0; i < SlotsDoCorpo; i++)
+            {
+                var linha = Casa(area, $"Corpo_{i}", PaletaDaInterface.Slot, modelo);
+                var le = linha.gameObject.AddComponent<LayoutElement>();
+                le.preferredHeight = AlturaDaLinhaDoCorpo;
+                le.minHeight = AlturaDaLinhaDoCorpo;
+
+                // Miniatura QUADRADA na ponta esquerda (70 × 70 numa linha de 90): o ícone
+                // esticado na linha inteira foi o "distorce o desenho dos itens" de 2026-09.
+                var icone = Novo("Icone", linha, typeof(Image));
+                icone.anchorMin = new Vector2(0f, 0f);
+                icone.anchorMax = new Vector2(0f, 1f);
+                icone.offsetMin = new Vector2(12f, 10f);
+                icone.offsetMax = new Vector2(82f, -10f);
+
+                linhas[i] = Refs(linha, icone.GetComponent<Image>());
+                linhas[i].Quantidade = Texto(linha, "Quantidade", "", 24, CorDoTexto, TextAnchor.LowerRight,
+                    new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(12f, 8f), new Vector2(82f, -8f));
+
+                var rotulo = Texto(linha, "Rotulo", "", 26, CorDoRotulo, TextAnchor.MiddleLeft,
+                    Vector2.zero, Vector2.one, new Vector2(96f, 8f), new Vector2(-14f, -8f));
+                rotulo.resizeTextForBestFit = true;
+                rotulo.resizeTextMinSize = 16;
+                rotulo.resizeTextMaxSize = 26;
+                linhas[i].Rotulo = rotulo;
+            }
+            return linhas;
+        }
+
+        // ── Detalhe ──────────────────────────────────────────────────────────
+
+        private static PainelDoItem MontarDetalhe(RectTransform janela)
+        {
+            var painel = Novo("Detalhe", janela, typeof(Image), typeof(VerticalLayoutGroup));
+            Ancorar(painel, new Vector2(0.68f, 0.11f), new Vector2(0.95f, 0.85f));
+            PaletaDaInterface.AplicarPainel(painel.GetComponent<Image>());
+            painel.GetComponent<Image>().raycastTarget = false;
+
+            // Padding medido na tela, não na borda 9-slice: com 32 px o título entrava debaixo
+            // do canto ornado e a dica do rodapé também (captura de 2026-09-28). Os cantos do
+            // painel_ornado ocupam ~52 px a 1920 × 1080; a trama lateral, ~22.
+            var vl = painel.GetComponent<VerticalLayoutGroup>();
+            vl.padding = new RectOffset(44, 44, 58, 56);
+            vl.spacing = 12f;
+            vl.childAlignment = TextAnchor.UpperLeft;
+            vl.childControlWidth = true;
+            vl.childControlHeight = true;
+            vl.childForceExpandWidth = true;
+            vl.childForceExpandHeight = false;
+
+            var titulo = Linha(painel, "Titulo", 40, CorDoTexto);
+            var subtitulo = Linha(painel, "Subtitulo", 24, CorFraca);
+            var descricao = Linha(painel, "Descricao", 24, CorFraca);
+            var atributos = Linha(painel, "Atributos", 28, CorDoTexto);
+            var comparacao = Linha(painel, "Comparacao", 26, CorDoTexto);
+
+            var espaco = Novo("Espaco", painel);
+            espaco.gameObject.AddComponent<LayoutElement>().flexibleHeight = 1f;
+
+            var aviso = Linha(painel, "Aviso", 26, CorDoAviso);
+            var dica = Linha(painel, "DicaDoItem", 22, CorFraca);
+
+            var comp = painel.gameObject.AddComponent<PainelDoItem>();
+            var so = new SerializedObject(comp);
+            so.FindProperty("titulo").objectReferenceValue = titulo;
+            so.FindProperty("subtitulo").objectReferenceValue = subtitulo;
+            so.FindProperty("descricao").objectReferenceValue = descricao;
+            so.FindProperty("atributos").objectReferenceValue = atributos;
+            so.FindProperty("comparacao").objectReferenceValue = comparacao;
+            so.FindProperty("aviso").objectReferenceValue = aviso;
+            so.FindProperty("dica").objectReferenceValue = dica;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return comp;
+        }
+
+        private static Text Linha(RectTransform pai, string nome, int tamanho, Color cor)
+        {
+            var t = Texto(pai, nome, "", tamanho, cor, TextAnchor.UpperLeft, Vector2.zero, Vector2.one);
+            t.horizontalOverflow = HorizontalWrapMode.Wrap;
+            t.verticalOverflow = VerticalWrapMode.Overflow;
+            t.supportRichText = true;
+            t.lineSpacing = 1.05f;
+            return t;
+        }
+
+        // ── Casas ────────────────────────────────────────────────────────────
 
         private struct SlotRefs
         {
@@ -150,206 +271,101 @@ namespace FavelaAmarela.EditorTools
             public Image Icone;
             public Text Quantidade;
             public Text Rotulo;
+            public Button Botao;
         }
 
-        private static GameObject MontarJanela(Transform pai)
+        private static RectTransform Casa(RectTransform pai, string nome, Sprite moldura, ModeloDeBotao? modelo)
         {
-            var janela = new GameObject("Janela", typeof(Image));
-            janela.transform.SetParent(pai, false);
+            var casa = Novo(nome, pai, typeof(CanvasGroup), typeof(Image), typeof(Button));
+            var img = casa.GetComponent<Image>();
+            img.sprite = moldura;
+            img.type = Image.Type.Sliced;
+            img.color = Color.white;   // a arte tem cor própria; tingir escureceria o ouro
 
-            var rt = janela.GetComponent<RectTransform>();
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-
-            // Véu escuro sobre o mundo: a tela pausa o jogo, e o escurecido comunica isso.
-            var fundo = janela.GetComponent<Image>();
-            fundo.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-            fundo.type = Image.Type.Sliced;
-            fundo.color = new Color(0.02f, 0.02f, 0.015f, 0.88f);
-
-            MontarTexto(janela.transform, "Titulo", "INVENTÁRIO",
-                new Vector2(0.06f, 0.88f), new Vector2(0.94f, 0.96f), 60, TextAnchor.MiddleLeft,
-                new Color(0.92f, 0.86f, 0.55f, 0.9f));
-
-            MontarTexto(janela.transform, "Dica", "Tab / I para fechar",
-                new Vector2(0.06f, 0.03f), new Vector2(0.94f, 0.09f), 36, TextAnchor.MiddleRight,
-                new Color(0.85f, 0.82f, 0.65f, 0.45f));
-
-            janela.SetActive(false);
-            return janela;
-        }
-
-        private static Transform MontarArea(Transform pai, string nome, string titulo, float xMin, float xMax)
-        {
-            var area = new GameObject(nome);
-            area.transform.SetParent(pai, false);
-
-            var rt = area.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(xMin, 0.12f);
-            rt.anchorMax = new Vector2(xMax, 0.84f);
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-
-            MontarTexto(area.transform, "Rotulo", titulo,
-                new Vector2(0f, 0.93f), new Vector2(1f, 1f), 39, TextAnchor.MiddleLeft,
-                new Color(0.85f, 0.80f, 0.60f, 0.7f));
-
-            return area.transform;
-        }
-
-        private static SlotRefs MontarSlot(Transform pai, string nome, int indice, int colunas,
-            int total, bool comRotulo)
-        {
-            int linhas = Mathf.CeilToInt(total / (float)colunas);
-            int coluna = indice % colunas;
-            int linha = indice / colunas;
-
-            var go = new GameObject(nome, typeof(CanvasGroup), typeof(Image));
-            go.transform.SetParent(pai, false);
-
-            const float folga = 0.012f;
-            float larguraCel = 1f / colunas;
-            float alturaCel = 0.9f / linhas;
-
-            var rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(coluna * larguraCel + folga,
-                                       0.9f - (linha + 1) * alturaCel + folga);
-            rt.anchorMax = new Vector2((coluna + 1) * larguraCel - folga,
-                                       0.9f - linha * alturaCel - folga);
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-
-            var moldura = go.GetComponent<Image>();
-
-            // Arte do Dark Ages UI em vez do sprite embutido tingido a 16% de alpha, que era o
-            // que fazia a grade parecer "caixas chapadas". Quem troca entre vazio e cheio em
-            // runtime é o PainelDeInventario; aqui só entra o estado inicial.
-            var vazia = MolduraDeSlot("slot_vazio");
-            moldura.sprite = vazia != null
-                ? vazia
-                : AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
-
-            moldura.type = Image.Type.Sliced;
-            moldura.color = Color.white;   // arte com cor própria; tingir escureceria o ouro
-            moldura.raycastTarget = false;
-
-            var refs = new SlotRefs
+            var botao = casa.GetComponent<Button>();
+            botao.targetGraphic = img;
+            if (modelo.HasValue)
             {
-                Grupo = go.GetComponent<CanvasGroup>(),
-                Moldura = moldura,
-            };
-
-            var goIcone = new GameObject("Icone", typeof(Image));
-            goIcone.transform.SetParent(go.transform, false);
-            var rtIcone = goIcone.GetComponent<RectTransform>();
-
-            if (comRotulo)
-            {
-                // Slot de CORPO. Ele é uma linha de lista, não um quadrado: 600 × 81 px, ou
-                // 7,37 : 1. Isso está certo para uma linha -- o errado era o ícone preencher a
-                // linha inteira. Uma peça de armadura de 32 × 32 acabava esticada 12,7× na
-                // horizontal contra 1,7× na vertical, e foi isso que o Vini viu como
-                // "distorce o desenho dos itens".
-                //
-                // Agora o ícone é miniatura QUADRADA na ponta esquerda: 0,8 da altura da linha
-                // em cima e embaixo, e a mesma medida em largura, convertida pela proporção da
-                // linha. O rótulo ocupa o resto.
-                const float alturaDaMiniatura = 0.8f;
-                float larguraDaMiniatura = alturaDaMiniatura / ProporcaoDaLinhaDeCorpo;
-
-                rtIcone.anchorMin = new Vector2(0.02f, (1f - alturaDaMiniatura) / 2f);
-                rtIcone.anchorMax = new Vector2(0.02f + larguraDaMiniatura,
-                                                1f - (1f - alturaDaMiniatura) / 2f);
+                botao.transition = modelo.Value.Transicao;
+                botao.spriteState = modelo.Value.Sprites;
+                botao.colors = modelo.Value.Cores;
             }
             else
             {
-                // Slot de MOCHILA: 217 × 215 px, praticamente quadrado. Aqui a proporção do
-                // slot nunca foi o problema.
-                rtIcone.anchorMin = new Vector2(0.16f, 0.16f);
-                rtIcone.anchorMax = new Vector2(0.84f, 0.84f);
+                // Sem modelo: troca de arte sob o cursor, que é o que o guarda
+                // OsBotoesTrocamDeArteSobOCursor exige (tint escureceria a moldura).
+                botao.transition = Selectable.Transition.SpriteSwap;
+                botao.spriteState = new SpriteState { highlightedSprite = MolduraDeSlot("slot_cheio") };
             }
-
-            rtIcone.offsetMin = Vector2.zero;
-            rtIcone.offsetMax = Vector2.zero;
-            refs.Icone = goIcone.GetComponent<Image>();
-            refs.Icone.raycastTarget = false;
-            refs.Icone.enabled = false;
-
-            // Sem isto o ícone deforma para encher o retângulo, mesmo num slot quadrado: a arte
-            // não é toda quadrada (a Água da Cacimba tem 11 × 31, a Raiz de Yhtill 51 × 35).
-            // A barra de ações já fazia isso desde sempre; o painel é que tinha ficado de fora.
-            refs.Icone.preserveAspect = true;
-
-            refs.Quantidade = MontarTexto(go.transform, "Quantidade", "",
-                new Vector2(0.45f, 0.02f), new Vector2(0.96f, 0.4f), 33, TextAnchor.LowerRight,
-                new Color(0.95f, 0.92f, 0.75f, 0.9f));
-
-            if (comRotulo)
-            {
-                // Ao lado da miniatura, não por cima dela. Antes o rótulo cobria o terço
-                // superior do slot inteiro -- inclusive o ícone.
-                const float alturaDaMiniatura = 0.8f;
-                float larguraDaMiniatura = alturaDaMiniatura / ProporcaoDaLinhaDeCorpo;
-
-                refs.Rotulo = MontarTexto(go.transform, "Rotulo", "",
-                    new Vector2(0.04f + larguraDaMiniatura, 0.1f), new Vector2(0.97f, 0.9f),
-                    30, TextAnchor.MiddleLeft,
-                    new Color(0.85f, 0.82f, 0.62f, 0.75f));
-            }
-
-            return refs;
+            return casa;
         }
 
-        private static Text MontarTexto(Transform pai, string nome, string conteudo,
-            Vector2 ancoraMin, Vector2 ancoraMax, int tamanho, TextAnchor alinhamento, Color cor)
+        private static SlotRefs Refs(RectTransform casa, Image icone)
         {
-            var go = new GameObject(nome, typeof(Text));
-            go.transform.SetParent(pai, false);
-
-            var rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = ancoraMin;
-            rt.anchorMax = ancoraMax;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-
-            var texto = go.GetComponent<Text>();
-            texto.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            texto.text = conteudo;
-            texto.fontSize = tamanho;
-            texto.alignment = alinhamento;
-            texto.color = cor;
-            texto.raycastTarget = false;
-
-            return texto;
+            icone.raycastTarget = false;
+            icone.preserveAspect = true;   // a arte não é toda quadrada (Água da Cacimba: 11 × 31)
+            icone.enabled = false;
+            return new SlotRefs
+            {
+                Grupo = casa.GetComponent<CanvasGroup>(),
+                Moldura = casa.GetComponent<Image>(),
+                Icone = icone,
+                Botao = casa.GetComponent<Button>(),
+            };
         }
+
+        /// <summary>A configuração de um botão de casa, copiada antes de a Janela ser refeita.</summary>
+        private struct ModeloDeBotao
+        {
+            public Selectable.Transition Transicao;
+            public SpriteState Sprites;
+            public ColorBlock Cores;
+        }
+
+        /// <summary>
+        /// Guarda a configuração do botão de uma casa antiga (transição e sprites de realce), para
+        /// a casa nova herdar o que o <c>AplicarUiDarkAges</c> já aplicou.
+        /// </summary>
+        private static ModeloDeBotao? CopiarBotao(Transform raiz, string caminho)
+        {
+            var t = raiz.Find(caminho);
+            var b = t != null ? t.GetComponent<Button>() : null;
+            if (b == null) return null;
+            return new ModeloDeBotao { Transicao = b.transition, Sprites = b.spriteState, Cores = b.colors };
+        }
+
+        // ── Ligação ──────────────────────────────────────────────────────────
 
         private static void Ligar(PainelDeInventario comp, GameObject janela,
-            SlotRefs[] mochila, SlotRefs[] corpo)
+            SlotRefs[] mochila, SlotRefs[] corpo, PainelDoItem detalhe)
         {
             var so = new SerializedObject(comp);
             so.FindProperty("raizDoPainel").objectReferenceValue = janela;
+            so.FindProperty("detalhe").objectReferenceValue = detalhe;
 
-            so.FindProperty("molduraVazia").objectReferenceValue = MolduraDeSlot("slot_vazio");
-            so.FindProperty("molduraCheia").objectReferenceValue = MolduraDeSlot("slot_cheio");
-
-            // 1, e não o 0,25 antigo: com duas molduras distintas quem comunica o estado é a
-            // arte. Manter o desbotamento apagaria a própria moldura da casa vazia — que é
-            // justamente a que precisa ser vista para a grade fazer sentido.
+            // As artes de moldura ficam as que já estão (o AplicarUiDarkAges as escolheu); só
+            // preenche o que estiver vazio.
+            Preencher(so, "molduraVazia", MolduraDeSlot("slot_vazio"));
+            Preencher(so, "molduraCheia", MolduraDeSlot("slot_cheio"));
+            Preencher(so, "molduraCorpoVazia", PaletaDaInterface.Slot);
+            Preencher(so, "molduraCorpoCheia", PaletaDaInterface.Slot);
             so.FindProperty("opacidadeVazio").floatValue = 1f;
 
             PreencherArray(so.FindProperty("slotsDaMochila"), mochila);
             PreencherArray(so.FindProperty("slotsDoCorpo"), corpo);
-
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(comp);
+        }
+
+        private static void Preencher(SerializedObject so, string campo, Object valor)
+        {
+            var p = so.FindProperty(campo);
+            if (p != null && p.objectReferenceValue == null) p.objectReferenceValue = valor;
         }
 
         private static void PreencherArray(SerializedProperty arr, SlotRefs[] refs)
         {
             arr.arraySize = refs.Length;
-
             for (int i = 0; i < refs.Length; i++)
             {
                 var el = arr.GetArrayElementAtIndex(i);
@@ -358,7 +374,64 @@ namespace FavelaAmarela.EditorTools
                 el.FindPropertyRelative("icone").objectReferenceValue = refs[i].Icone;
                 el.FindPropertyRelative("quantidade").objectReferenceValue = refs[i].Quantidade;
                 el.FindPropertyRelative("rotulo").objectReferenceValue = refs[i].Rotulo;
+                el.FindPropertyRelative("botao").objectReferenceValue = refs[i].Botao;
             }
+        }
+
+        // ── Utilidades ───────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Moldura fatiada da folha do Dark Ages UI, ou <c>null</c> (e aviso) se a folha não
+        /// passou por <c>Tools/FavelaAmarela/Fatiar molduras de slot (Dark Ages UI)</c>.
+        /// </summary>
+        private static Sprite MolduraDeSlot(string nome)
+        {
+            const string folha = "Assets/ThirdParty/DarkAgesUI/DarkAgesUi_v1.0/32x32-Tilesheet.png";
+            foreach (var asset in AssetDatabase.LoadAllAssetsAtPath(folha))
+                if (asset is Sprite sprite && sprite.name == nome) return sprite;
+
+            Debug.LogWarning($"[PainelDeInventario] Moldura '{nome}' não está fatiada na folha. " +
+                             "Rode 'Tools/FavelaAmarela/Fatiar molduras de slot (Dark Ages UI)'.");
+            return null;
+        }
+
+        private static RectTransform Novo(string nome, Transform pai, params System.Type[] componentes)
+        {
+            var tipos = new System.Type[componentes.Length + 1];
+            tipos[0] = typeof(RectTransform);
+            componentes.CopyTo(tipos, 1);
+            var go = new GameObject(nome, tipos);
+            go.transform.SetParent(pai, false);
+            return go.GetComponent<RectTransform>();
+        }
+
+        private static void Esticar(RectTransform rt) => Ancorar(rt, Vector2.zero, Vector2.one);
+
+        private static void Ancorar(RectTransform rt, Vector2 min, Vector2 max)
+        {
+            rt.anchorMin = min;
+            rt.anchorMax = max;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
+        private static Text Texto(RectTransform pai, string nome, string conteudo, int tamanho, Color cor,
+            TextAnchor alinhamento, Vector2 min, Vector2 max, Vector2 offsetMin = default, Vector2 offsetMax = default)
+        {
+            var rt = Novo(nome, pai, typeof(Text));
+            rt.anchorMin = min;
+            rt.anchorMax = max;
+            rt.offsetMin = offsetMin;
+            rt.offsetMax = offsetMax;
+
+            var texto = rt.GetComponent<Text>();
+            texto.font = PaletaDaInterface.Fonte;
+            texto.text = conteudo;
+            texto.fontSize = tamanho;
+            texto.alignment = alinhamento;
+            texto.color = cor;
+            texto.raycastTarget = false;
+            return texto;
         }
     }
 }

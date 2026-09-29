@@ -830,6 +830,44 @@ namespace FavelaAmarela.EditorTools
 
             if (byakhee == null && rei == null)
                 EditorGUILayout.HelpBox("Nenhum chefe na cena ainda.", MessageType.None);
+
+            DesenharFichaDeDiagnostico();
+        }
+
+        /// <summary>
+        /// A ficha de Damião como <b>instrumento de diagnóstico</b>: cada bônus de item, e quais
+        /// não têm consumidor (<c>NomesDeAtributo.SemEfeito</c>).
+        ///
+        /// <para>Morava na tela do jogador (a <c>PainelDeFicha</c>) até 2026-09-28, pendurada fora
+        /// da janela do inventário e escrevendo "SEM EFEITO PASSIVO" para quem estava jogando. O
+        /// jogador ganhou o resumo do Damião no <c>PainelDoItem</c>; o diagnóstico ficou aqui.</para>
+        /// </summary>
+        private static void DesenharFichaDeDiagnostico()
+        {
+            var jogador = GameObject.FindGameObjectWithTag("Player");
+            var corpo = jogador != null
+                ? jogador.GetComponentInChildren<FavelaAmarela.Runtime.Combat.VitalidadeBridge>()
+                : null;
+            var passivas = GerenciadorEfeitosPassivos.Instance;
+            if (corpo == null && passivas == null) return;
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Ficha de Damião (diagnóstico)", EditorStyles.boldLabel);
+
+            var f = corpo != null ? corpo.Atributos : null;
+            if (f != null)
+                EditorGUILayout.LabelField("Ficha",
+                    $"Vitalidade {f.VitalidadeMax:0.##}  |  Defesa {f.Defesa:0.##}  |  " +
+                    $"Res. Anômala {f.ResistenciaAnomala:0.##}  |  Conjuração {f.Conjuracao:0.##}");
+
+            if (passivas == null) return;
+            foreach (StatType stat in System.Enum.GetValues(typeof(StatType)))
+            {
+                float bonus = passivas.GetBonus(stat);
+                if (Mathf.Approximately(bonus, 0f)) continue;
+                EditorGUILayout.LabelField(stat.ToString(),
+                    $"{bonus:0.##}{(NomesDeAtributo.NaoTemEfeito(stat) ? "   — SEM EFEITO PASSIVO" : "")}");
+            }
         }
     }
 }

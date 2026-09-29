@@ -54,7 +54,54 @@ namespace FavelaAmarela.Inventario
             return false;
         }
 
-        /// <summary>Nome diegético do atributo.</summary>
+        /// <summary>
+        /// Se o atributo é gravado em <b>percentual</b> (5 = 5%) — os quatro de combate a dado,
+        /// que a <c>MaoFisicaBridge</c> divide por 100 na hora do golpe (convenção de 2026-08-28,
+        /// escrita no próprio <see cref="StatType"/>).
+        /// </summary>
+        public static bool EhPercentual(StatType stat) =>
+            stat == StatType.ChanceCritica || stat == StatType.DanoCritico ||
+            stat == StatType.Precisao || stat == StatType.AumentoDeDanoFisico;
+
+        /// <summary>
+        /// Corrige um valor de afixo percentual gravado na convenção errada.
+        ///
+        /// <para><b>O defeito (achado em 2026-09-28):</b> os quatro afixos de combate
+        /// (Afiado, Certeiro, da Fúria, do Augúrio) foram autorados em 2026-09-01 como
+        /// <b>fração</b> (0,02 a 0,06) num atributo que o jogo lê em <b>percentual</b> — valiam
+        /// 100 vezes menos do que o autor quis, e o Capuz com "+0,03 Chance Crítica" dava 0,03%.
+        /// Os assets foram corrigidos; os exemplares já rolados estão <b>gravados no save</b>
+        /// (valor, não semente), e só este passo os conserta.</para>
+        ///
+        /// <para>A regra é segura porque as faixas corrigidas começam em 2%: nenhum afixo
+        /// percentual legítimo rola abaixo de 1.</para>
+        /// </summary>
+        public static float CorrigirPercentualAntigo(StatType stat, float valor) =>
+            EhPercentual(stat) && valor != 0f && System.Math.Abs(valor) < 1f ? valor * 100f : valor;
+
+        /// <summary>
+        /// A linha que o jogador lê para um modificador: <c>"+13 Vitalidade"</c>,
+        /// <c>"+3% Chance Crítica"</c>. Fonte única — o tooltip, a comparação e o resumo do
+        /// Damião escrevem por aqui.
+        /// </summary>
+        public static string Linha(StatType stat, float valor)
+        {
+            string sinal = valor >= 0f ? "+" : "−";
+            float absoluto = System.Math.Abs(valor);
+            string numero = absoluto.ToString("0.#", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+            return EhPercentual(stat) ? $"{sinal}{numero}% {De(stat)}" : $"{sinal}{numero} {De(stat)}";
+        }
+
+        /// <summary>Nome do grau de impregnação, como o jogador lê.</summary>
+        public static string De(FavelaAmarela.Core.Loot.GrauDeImpregnacao grau) => grau switch
+        {
+            FavelaAmarela.Core.Loot.GrauDeImpregnacao.Inerte => "Inerte",
+            FavelaAmarela.Core.Loot.GrauDeImpregnacao.Marcado => "Marcado",
+            FavelaAmarela.Core.Loot.GrauDeImpregnacao.Impregnado => "Impregnado",
+            FavelaAmarela.Core.Loot.GrauDeImpregnacao.Reliquia => "Relíquia",
+            _ => grau.ToString(),
+        };
+
         /// <summary>
         /// O nome que o jogador lê para cada slot do corpo. <c>MaoSecundaria</c> em texto cru na
         /// tela (2026-09-10) era o enum vazando — e a única pista de que o slot existia, porque o
@@ -72,6 +119,7 @@ namespace FavelaAmarela.Inventario
             _ => slot.ToString(),
         };
 
+        /// <summary>Nome diegético do atributo.</summary>
         public static string De(StatType stat) => stat switch
         {
             StatType.VitMaxima => "Vitalidade",

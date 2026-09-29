@@ -16,8 +16,8 @@ MonoBehaviour:
   Tipo: 1
   Rotulo: "da F\xFAria"
   Stat: 18
-  ValorMin: 0.08
-  ValorMax: 0.2
+  ValorMin: 8
+  ValorMax: 20
   EscalaComONivelDoItem: 0
   NivelMinimoDoItem: 2
   Peso: 0.8

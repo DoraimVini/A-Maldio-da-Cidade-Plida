@@ -139,8 +139,7 @@ namespace FavelaAmarela.Inventario
             {
                 if (a == null) continue;
 
-                string sinal = a.Valor >= 0f ? "+" : "";
-                linhas.Add($"{sinal}{a.Valor:0.##} {NomesDeAtributo.De(a.Stat)}");
+                linhas.Add(NomesDeAtributo.Linha(a.Stat, a.Valor));
             }
 
             return linhas;

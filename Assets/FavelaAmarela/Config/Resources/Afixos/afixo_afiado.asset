@@ -16,8 +16,8 @@ MonoBehaviour:
   Tipo: 0
   Rotulo: Afiado
   Stat: 15
-  ValorMin: 0.02
-  ValorMax: 0.06
+  ValorMin: 2
+  ValorMax: 6
   EscalaComONivelDoItem: 0
   NivelMinimoDoItem: 1
   Peso: 1

@@ -152,6 +152,32 @@ derivada** (`Item.Deserto.<id>.<índice>`), com os setores percorridos em ordem 
 > todas e o save perde o registro de tudo que o jogador já pegou ou matou. Verificado em
 > 2026-08-12. `ConsumiveisNoMundoTests` trava essa propriedade com regex.
 
+## A tela de inventário (plano B, 2026-09-28)
+
+Tab / I abre, pausa o mundo e toma o foco. Três colunas, montadas por
+`Tools/FavelaAmarela/Inventário: montar a tela no HUD` dentro do `HUD_Gameplay.prefab`:
+
+| Coluna | O que é |
+|---|---|
+| **Mochila** | 12 casas num `GridLayoutGroup` 4 × 3 (150 px, moldura `slot_vazio`/`slot_cheio`) |
+| **Corpo** | 7 linhas num `VerticalLayoutGroup`: miniatura quadrada + "Slot — Item" |
+| **Detalhe** (`PainelDoItem`) | O item escolhido: nome na cor do grau, "Arma · Uma Mão · Nível 3 · Marcado", descrição, dano/crítico/precisão, afixos somados por atributo, e **a troca contra o que está vestido** em verde e vermelho. Sem escolha: **o Damião** (Vitalidade, Defesa, bônus dos itens). |
+
+- **Clique para escolher, clique no destino:** mochila → mochila move; mochila → Corpo veste;
+  Corpo → mochila guarda. Delete duas vezes abandona.
+- **Recusas com motivo**, na própria coluna de detalhe (`RecusaAoEquipar`, `RecusaAoDesequipar`,
+  textos em `DescricaoDeItem.TextoDaRecusa`): consumível não se veste; escudo com arma de duas
+  mãos; duas mãos com a secundária ocupada e a mochila cheia; guardar com a mochila cheia.
+- **Guardar com a mochila cheia não perde mais o item.** Até 2026-09-28 o `Desequipar` tirava do
+  corpo, não conseguia guardar e o item sumia ("dropado no chão" — não havia chão).
+- **Atributo sem consumidor** aparece como "(adormecido)" — honesto sem jargão. O diagnóstico com
+  "SEM EFEITO PASSIVO" foi para o Carcosa Debugger; a `PainelDeFicha` saiu da tela do jogador.
+- **Percentuais com %:** `NomesDeAtributo.Linha` escreve "+3% Chance Crítica" — ver a correção
+  dos afixos percentuais em [loot_e_drop.md](loot_e_drop.md).
+
+Guardas: `DescricaoDeItemTests`, `RecusasDoInventarioTests` (EditMode), `ATelaDoInventarioTests`
+(PlayMode, HUD real).
+
 ## Regras que evitam bugs de progressão
 
 1. **Testes isolados (POCO):** O `BaseInventory` e o `MainInventory` são exaustivamente testados sem Unity (NUnit EditMode), cobrindo falhas de empilhamento e limites estritos.

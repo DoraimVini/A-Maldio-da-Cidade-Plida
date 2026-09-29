@@ -161,6 +161,20 @@ Resiliência como recurso.
 Pool ampliado de **8 para 15**, cobrindo os quatro eixos que o combate ganhou em 2026-08-28 e que
 nenhum afixo rolava.
 
+> ⚠️ **Correção de 2026-09-28: não eram fração.** Os quatro atributos de combate (Chance Crítica,
+> Dano Crítico, Precisão, Dano Físico) são gravados em **percentual** (5 = 5%) desde 2026-08-28 —
+> está escrito no próprio `StatType`, e a `MaoFisicaBridge` divide por 100 no golpe. Os afixos
+> Afiado, Certeiro, da Fúria e do Augúrio foram autorados como fração (0,02–0,06) e **valiam 100
+> vezes menos**. Assets corrigidos (2–6%, 3–8%, 8–20%, 10–35%); os exemplares já rolados são
+> corrigidos na carga do save (`NomesDeAtributo.CorrigirPercentualAntigo`); guarda
+> `DescricaoDeItemTests.TodoAfixoPercentual_RolaEmPercentual_NaoEmFracao`. Achado pela tela nova
+> do inventário, que mostrava "+0,03 Chance Crítica".
+>
+> **No mesmo dia:** só o que se veste rola grau e afixo (`GeradorDeItem`) — a legalidade por slot
+> deixava consumível ("slot Nenhum") rolar, e apareceu uma *Afiado Erva de Ancoragem*; e o
+> `afixo_do_peregrino_firme` passou a sufixo (como prefixo, o nome saía "do Peregrino Firme
+> Alfanje…"; guarda `RotuloComPreposicao_ESufixo`).
+
 ### Espaço para armas à distância e de fogo
 
 `BaseDeArma.Entrega` (`TipoDeEntrega`): `CorpoACorpo` — o único implementado —, `Projetil` e

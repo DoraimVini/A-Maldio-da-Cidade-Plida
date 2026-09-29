@@ -171,19 +171,72 @@ namespace FavelaAmarela.Inventario
         }
 
         /// <summary>
-        /// Desequipa o slot e tenta mover para a mochila.
+        /// Devolve o item do corpo à mochila. <b>Recusa com a mochila cheia</b> em vez de tirar
+        /// o item e perdê-lo — ver <see cref="RecusaAoDesequipar.MochilaCheia"/>.
         /// </summary>
         public bool Desequipar(int indiceEquip)
         {
+            if (PorQueNaoDesequipa(indiceEquip) != RecusaAoDesequipar.Nenhuma) return false;
+
             ItemInstance retirado = Equipment.Unequip(indiceEquip);
             if (retirado == null) return false;
 
             if (!Main.Add(retirado))
             {
-                Debug.LogWarning("Mochila cheia! Item dropado no chão.");
-                // TODO: instanciar loot no mundo
+                // Não devia acontecer (a checagem acima garante espaço); se acontecer, o item
+                // volta ao corpo em vez de sumir.
+                Equipment.Equip(retirado, indiceEquip);
+                Debug.LogError("[InventoryManager] A mochila recusou um item que a checagem " +
+                               "disse caber; ele voltou ao corpo.", this);
+                return false;
             }
             return true;
+        }
+
+        /// <summary>Por que o slot do corpo não pode voltar para a mochila agora.</summary>
+        public RecusaAoDesequipar PorQueNaoDesequipa(int indiceEquip)
+        {
+            var item = Equipment.GetSlot(indiceEquip);
+            if (item == null || item.Def == null) return RecusaAoDesequipar.CasaVazia;
+            return Main.CanAddAny(item) ? RecusaAoDesequipar.Nenhuma : RecusaAoDesequipar.MochilaCheia;
+        }
+
+        /// <summary>
+        /// Por que o item da mochila não pode ir para o corpo agora — as mesmas regras que o
+        /// <see cref="Equipar"/> e o <c>EquipmentInventory.CanAdd</c> aplicam, com nome.
+        /// </summary>
+        public RecusaAoEquipar PorQueNaoEquipa(int indiceMochila)
+        {
+            var item = Main.GetSlot(indiceMochila);
+            if (item == null || item.Def == null) return RecusaAoEquipar.CasaVazia;
+
+            var def = item.Def;
+            if (def.Tipo != ItemType.Arma && def.Tipo != ItemType.Armadura && def.Tipo != ItemType.Amuleto)
+                return RecusaAoEquipar.NaoSeVeste;
+
+            if (Equipment.IndiceDoSlot(def.SlotEquipamento) < 0) return RecusaAoEquipar.SemLugarNoCorpo;
+
+            if (def.SlotEquipamento == EquipmentSlot.MaoSecundaria && Equipment.ArmaDeDuasMaosEquipada)
+                return RecusaAoEquipar.MaosTomadasPorArmaDeDuasMaos;
+
+            // Duas mãos com a secundária ocupada: o Equipar guarda a secundária na mochila ANTES
+            // de tirar a arma dela — então precisa de uma casa livre além da casa da arma.
+            if (def.Tipo == ItemType.Arma && def.Empunhadura == Empunhadura.DuasMaos
+                && Equipment.MaoSecundariaOcupada && !CabeNaMochilaDepoisDeTirar(indiceMochila))
+                return RecusaAoEquipar.SemEspacoParaGuardarAMaoSecundaria;
+
+            return RecusaAoEquipar.Nenhuma;
+        }
+
+        /// <summary>
+        /// Se a Mão Secundária caberia na mochila. A ordem real do <see cref="Equipar"/> guarda
+        /// a secundária ANTES de tirar a arma da mochila, então a casa da arma não conta.
+        /// </summary>
+        private bool CabeNaMochilaDepoisDeTirar(int indiceMochila)
+        {
+            int indiceOffHand = Equipment.IndiceDoSlot(EquipmentSlot.MaoSecundaria);
+            var offHand = indiceOffHand >= 0 ? Equipment.GetSlot(indiceOffHand) : null;
+            return offHand == null || Main.CanAddAny(offHand);
         }
 
         /// <summary>

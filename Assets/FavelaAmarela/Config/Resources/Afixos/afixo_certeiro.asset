@@ -16,8 +16,8 @@ MonoBehaviour:
   Tipo: 0
   Rotulo: Certeiro
   Stat: 17
-  ValorMin: 0.03
-  ValorMax: 0.08
+  ValorMin: 3
+  ValorMax: 8
   EscalaComONivelDoItem: 0
   NivelMinimoDoItem: 1
   Peso: 1

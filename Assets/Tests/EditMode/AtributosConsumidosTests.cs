@@ -7,10 +7,14 @@ using NUnit.Framework;
 namespace FavelaAmarela.Tests.EditMode
 {
     /// <summary>
-    /// Guarda a tabela de "quais atributos fazem alguma coisa" do <c>PainelDeFicha</c> contra o
-    /// que o código de produção realmente consome.
+    /// Guarda a tabela de "quais atributos fazem alguma coisa" (<c>NomesDeAtributo.SemEfeito</c>)
+    /// contra o que o código de produção realmente consome.
     ///
-    /// <para><b>Por que existe:</b> o painel marca <c>SEM EFEITO</c> em bônus de
+    /// <para><b>Quem lê a tabela (2026-09-28):</b> o <c>PainelDoItem</c> marca "(adormecido)" na
+    /// tela do jogador, e o Carcosa Debugger marca "SEM EFEITO PASSIVO" na ficha de diagnóstico
+    /// (que foi a <c>PainelDeFicha</c> até esta data).</para>
+    ///
+    /// <para><b>Por que existe:</b> o painel marcava <c>SEM EFEITO</c> em bônus de
     /// <c>StatType</c> que nenhum sistema lê. Essa marca só vale se a lista estiver certa — e
     /// uma lista escrita à mão sobre 15 valores <b>já nasceu errada</b>: na primeira versão
     /// faltavam <c>RegenRM</c> e <c>DrenoRM</c>, que o <c>GerenciadorEfeitosPassivos.Update</c>
@@ -23,7 +27,7 @@ namespace FavelaAmarela.Tests.EditMode
     /// </summary>
     public sealed class AtributosConsumidosTests
     {
-        private const string Painel = "Assets/Scripts/UI/PainelDeFicha.cs";
+        private const string Painel = "Assets/Scripts/Inventario/NomesDeAtributo.cs (SemEfeito)";
 
         /// <summary>
         /// <c>StatType</c> que o código menciona, mas <b>não</b> como bônus passivo — logo, não
@@ -58,16 +62,16 @@ namespace FavelaAmarela.Tests.EditMode
             var mentemQueNaoFunciona = noCodigo.Except(naTabela).OrderBy(s => s).ToList();
 
             Assert.IsEmpty(mentemQueNaoFunciona,
-                "StatType consumido pelo código mas AUSENTE da tabela do PainelDeFicha. O painel " +
-                "vai marcar 'SEM EFEITO' num atributo que funciona:\n  " +
+                "StatType consumido pelo código mas listado como SEM EFEITO. O inventário vai " +
+                "chamar de 'adormecido' um atributo que funciona:\n  " +
                 string.Join("\n  ", mentemQueNaoFunciona) +
-                "\nAcrescente-os a AtributoConsomeBonus em " + Painel);
+                "\nTire-os da lista em " + Painel);
 
             Assert.IsEmpty(mentemQueFunciona,
-                "StatType marcado como consumido na tabela, mas nenhum código de produção o " +
-                "menciona. O painel vai deixar de avisar que o atributo é decorativo:\n  " +
+                "StatType fora da lista SEM EFEITO, mas nenhum código de produção o menciona. O " +
+                "inventário vai deixar de avisar que o atributo é decorativo:\n  " +
                 string.Join("\n  ", mentemQueFunciona) +
-                "\nRemova-os de AtributoConsomeBonus em " + Painel);
+                "\nAcrescente-os à lista em " + Painel);
         }
 
         // ── Apoio ────────────────────────────────────────────────────────────
@@ -146,7 +150,11 @@ namespace FavelaAmarela.Tests.EditMode
                 // para escrever o rótulo dele não é ler o bônus e aplicá-lo -- sem esta
                 // exclusão, a tabela de tradução faria os 4 atributos decorativos
                 // parecerem implementados.
-                if (nome == "ItemEnums.cs" || nome == "PainelDeFicha.cs" ||
+                //
+                // DescricaoDeItem.cs entrou em 2026-09-28, quando a PainelDeFicha saiu: ele
+                // DESCREVE itens (e cita VitMaxima/RMMaxima para chamar consumível de "Restaura" e
+                // "Ancora") — não aplica bônus nenhum.
+                if (nome == "ItemEnums.cs" || nome == "DescricaoDeItem.cs" ||
                     nome == "NomesDeAtributo.cs") continue;
 
                 string texto = File.ReadAllText(arquivo);

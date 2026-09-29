@@ -307,19 +307,18 @@ namespace FavelaAmarela.Runtime.GameLoop
             var cutscene = GetComponent<CutsceneController>();
             if (cutscene != null) cutscene.Bind(_vitalidadeDamiao, _menteDamiao);
 
-            // A ficha de Damião mora dentro do HUD_Gameplay.prefab, que é um asset em
-            // Resources -- um prefab-asset NÃO PODE referenciar objeto de cena, então o campo
-            // de Inspector dela era impossível de preencher e a tela nunca funcionou (o
-            // playtest de 2026-08-28 mostrou "Ficha indisponível: sem VitalidadeBridge
-            // ligada"). Inclui inativos: o painel fica desligado enquanto a mochila está
-            // fechada, que é a maior parte do tempo.
-            var ficha = FindAnyObjectByType<FavelaAmarela.Runtime.UI.PainelDeFicha>(
+            // O resumo do Damião (coluna de detalhe do inventário) mora dentro do
+            // HUD_Gameplay.prefab, que é um asset em Resources -- um prefab-asset NÃO PODE
+            // referenciar objeto de cena, então o corpo dele só chega por aqui. Era o mesmo
+            // caminho da antiga PainelDeFicha (2026-08-28), substituída em 2026-09-28. Inclui
+            // inativos: o painel fica desligado enquanto a mochila está fechada.
+            var detalhe = FindAnyObjectByType<FavelaAmarela.Runtime.UI.PainelDoItem>(
                 FindObjectsInactive.Include);
 
-            if (ficha != null) ficha.Bind(_vitalidadeDamiao);
+            if (detalhe != null) detalhe.Bind(_vitalidadeDamiao);
             else
-                Debug.LogWarning("[GameLoopBootstrap] Nenhum PainelDeFicha encontrado — a ficha " +
-                                 "do inventário vai abrir vazia.", this);
+                Debug.LogWarning("[GameLoopBootstrap] Nenhum PainelDoItem encontrado — o " +
+                                 "resumo do Damião no inventário vai abrir vazio.", this);
 
             // O PROMPT DE INTERAÇÃO, pelo mesmo motivo e pelo mesmo caminho da ficha acima.
             // Ele existia numa cena só das seis do build: nas outras cinco o jogador NUNCA via

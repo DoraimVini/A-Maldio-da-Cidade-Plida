@@ -85,6 +85,10 @@ namespace FavelaAmarela.Runtime.UI
         [Tooltip("Cor da moldura do slot selecionado.")]
         [SerializeField] private Color corSelecionado = new Color(1f, 0.86f, 0.45f, 1f);
 
+        [Header("Detalhe")]
+        [Tooltip("A coluna que descreve o item escolhido (ou o Damião, sem escolha). [ASSET]")]
+        [SerializeField] private PainelDoItem detalhe;
+
         [Header("Comportamento")]
         [Tooltip("Pausa o jogo enquanto o inventário estiver aberto.")]
         [SerializeField] private bool pausarAoAbrir = true;
@@ -168,9 +172,10 @@ namespace FavelaAmarela.Runtime.UI
         /// item que reaparece aos pés do jogador convida a usar o descarte como depósito. Some
         /// de verdade pede um passo a mais antes.</para>
         ///
-        /// <para>Dois toques em vez de um painel novo: a caixa de fala já existe, já é a voz do
-        /// jogo, e o segundo Delete é uma confirmação tão real quanto um botão "Sim" — com a
-        /// vantagem de não precisar de foco, de layout nem de mais uma peça para ligar errado.</para>
+        /// <para>Dois toques em vez de um painel novo: o segundo Delete é uma confirmação tão real
+        /// quanto um botão "Sim", sem precisar de foco nem de mais uma peça para ligar errado. A
+        /// pergunta aparece na coluna de detalhe (desde 2026-09-28; antes ia para a caixa de fala
+        /// do HUD, que podia ficar por baixo da janela).</para>
         ///
         /// <para>O método existia desde que eu o escrevi, com <b>zero chamadores fora de
         /// teste</b>, até a auditoria de ligação o encontrar.</para>
@@ -198,23 +203,26 @@ namespace FavelaAmarela.Runtime.UI
             if (_descarteConfirmadoDoSlot != _indiceSelecionado)
             {
                 _descarteConfirmadoDoSlot = _indiceSelecionado;
-                Falar($"Abandonar {nome}? Não o verás de novo. Delete outra vez para largá-lo.");
+                Avisar($"Abandonar {nome}? Não o verás de novo. Delete outra vez para largá-lo.");
                 return;
             }
 
-            if (_inventario.Descartar(_indiceSelecionado))
-                Falar($"{nome} ficou para trás.");
-
+            bool largou = _inventario.Descartar(_indiceSelecionado);
             LimparConfirmacaoDeDescarte();
             LimparSelecao();
+            if (largou) Avisar($"{nome} ficou para trás.");
         }
 
         private void LimparConfirmacaoDeDescarte() => _descarteConfirmadoDoSlot = -1;
 
-        private void Falar(string texto)
+        /// <summary>
+        /// Recusas e confirmações vão para a coluna de detalhe, e não para a caixa de fala do
+        /// HUD: é para onde o jogador está olhando, e a caixa de fala pode ficar por baixo da
+        /// janela do inventário.
+        /// </summary>
+        private void Avisar(string texto)
         {
-            var caixa = FavelaAmarela.Runtime.UI.TutorialHintUI.Instancia;
-            if (caixa != null) caixa.Mostrar(texto, 4f);
+            if (detalhe != null) detalhe.Avisar(texto);
         }
 
         /// <summary>Abre se fechado, fecha se aberto.</summary>
@@ -245,6 +253,7 @@ namespace FavelaAmarela.Runtime.UI
             }
 
             Redesenhar();
+            MostrarDetalhe();
         }
 
         /// <summary>Fecha a tela e devolve o mundo ao ritmo em que estava.</summary>
@@ -326,6 +335,7 @@ namespace FavelaAmarela.Runtime.UI
                 _origemSelecionada = origem;
                 _indiceSelecionado = indice;
                 Redesenhar();
+                MostrarDetalhe();
                 return;
             }
 
@@ -340,13 +350,68 @@ namespace FavelaAmarela.Runtime.UI
                 _inventario.Mover(_indiceSelecionado, indice);
 
             else if (_origemSelecionada == Origem.Mochila && origem == Origem.Corpo)
-                _inventario.Equipar(_indiceSelecionado);
+            {
+                if (!TentarVestir(_indiceSelecionado)) return;
+            }
 
             else if (_origemSelecionada == Origem.Corpo && origem == Origem.Mochila)
-                _inventario.Desequipar(_indiceSelecionado);
+            {
+                if (!TentarGuardar(_indiceSelecionado)) return;
+            }
 
             // Corpo -> Corpo não tem semântica: trocar elmo por grevas não é operação.
             LimparSelecao();
+        }
+
+        /// <summary>
+        /// Veste o item da mochila — ou diz <b>por que não</b>, e mantém a escolha acesa para o
+        /// jogador ver de qual item se trata. Antes a recusa era muda.
+        /// </summary>
+        private bool TentarVestir(int indiceMochila)
+        {
+            var recusa = _inventario.PorQueNaoEquipa(indiceMochila);
+            if (recusa == RecusaAoEquipar.Nenhuma && _inventario.Equipar(indiceMochila)) return true;
+
+            var eq = _inventario.Equipment;
+            var arma = eq.GetSlot(eq.IndiceDoSlot(EquipmentSlot.Arma));
+            var secundaria = eq.GetSlot(eq.IndiceDoSlot(EquipmentSlot.MaoSecundaria));
+            Avisar(DescricaoDeItem.TextoDaRecusa(recusa, _inventario.Main.GetSlot(indiceMochila), arma, secundaria));
+            return false;
+        }
+
+        /// <summary>Guarda o item do corpo na mochila — ou diz por que não (mochila cheia).</summary>
+        private bool TentarGuardar(int indiceCorpo)
+        {
+            var recusa = _inventario.PorQueNaoDesequipa(indiceCorpo);
+            if (recusa == RecusaAoDesequipar.Nenhuma && _inventario.Desequipar(indiceCorpo)) return true;
+
+            Avisar(DescricaoDeItem.TextoDaRecusa(recusa, _inventario.Equipment.GetSlot(indiceCorpo)));
+            return false;
+        }
+
+        /// <summary>Mostra na coluna de detalhe o que está escolhido — ou o Damião.</summary>
+        private void MostrarDetalhe()
+        {
+            if (detalhe == null || _inventario == null) return;
+
+            if (_origemSelecionada == Origem.Nenhuma || _indiceSelecionado < 0)
+            {
+                detalhe.MostrarDamiao();
+                return;
+            }
+
+            bool noCorpo = _origemSelecionada == Origem.Corpo;
+            var item = noCorpo ? _inventario.Equipment.GetSlot(_indiceSelecionado)
+                               : _inventario.Main.GetSlot(_indiceSelecionado);
+
+            ItemInstance vestido = null;
+            if (!noCorpo && item?.Def != null && DescricaoDeItem.SeVeste(item.Def))
+            {
+                int slot = _inventario.Equipment.IndiceDoSlot(item.Def.SlotEquipamento);
+                if (slot >= 0) vestido = _inventario.Equipment.GetSlot(slot);
+            }
+
+            detalhe.MostrarItem(item, vestido, noCorpo);
         }
 
         private void LimparSelecao()
@@ -355,6 +420,7 @@ namespace FavelaAmarela.Runtime.UI
             _indiceSelecionado = -1;
             _descarteConfirmadoDoSlot = -1;
             Redesenhar();
+            MostrarDetalhe();
         }
 
         private bool EstaSelecionado(Origem origem, int indice) =>
